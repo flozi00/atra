@@ -2,6 +2,7 @@ Absenkautomatik
 Armatur
 Armaturen
 Aufputzarmatur
+Betätigungsplatte
 Druckspüler
 Geruchsverschluss
 Kaltwasserventil
@@ -12,4 +13,3 @@ Perlator
 Perlatoren
 Siphon
 Trap
-Betätigungsplatte
