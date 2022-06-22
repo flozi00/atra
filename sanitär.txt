@@ -4,7 +4,17 @@ Armaturen
 Aufputzarmatur
 Betätigungsplatte
 Druckspüler
+Drückerplatte
+Durchflussbegrenzer
+Durchlauferhitzer
+Duschabtrennung
+Eckventil
+Excenter-Ablaufgarnitur
+Feuchtigkeitsmessung
+Fuge
 Geruchsverschluss
+Heizkörper
+Keramik
 Kaltwasserventil
 Karbonisierer
 Kohlensäurearmatur
