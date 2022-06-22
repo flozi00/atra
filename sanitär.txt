@@ -14,9 +14,9 @@ Feuchtigkeitsmessung
 Fuge
 Geruchsverschluss
 Heizkörper
-Keramik
 Kaltwasserventil
 Karbonisierer
+Keramik
 Kohlensäurearmatur
 Konvektionswärme
 Perlator
