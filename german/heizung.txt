@@ -165,7 +165,6 @@ Warmwasser-Schichtenspeicher
 Warmwasserbereitung
 Warmwasserkomfort
 Warmwasserspeicher
-Warmwasserspeicher
 Warmwasserwärmepumpe
 Wartung
 Wasser-Wärmepumpe
