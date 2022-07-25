@@ -1,2 +1,4 @@
+german/antipsychotika
+german/benzodiazepine
 german/heizung
 german/sanitär
