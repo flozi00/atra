@@ -5,3 +5,4 @@ repos:
     -   id: file-contents-sorter
         types: [file] 
         files: \.(json|txt)$
+        args: [--unique]
