@@ -3,7 +3,6 @@ Abilify Maintena
 Adasuve
 Amisulprid
 Aripiprazol
-Aripiprazol
 Asenapin
 Atosil
 Benperidol
@@ -12,7 +11,6 @@ Bromperidol
 Cariprazin
 Chlorpromazin
 Chlorprothixen
-Ciatyl-Z
 Ciatyl-Z
 Clozapin
 Dapotum-Depot
@@ -26,11 +24,8 @@ Eunerpan
 Fluanxol
 Fluanxol-Depot
 Flupentixol
-Flupentixol
-Fluphenazin
 Fluphenazin
 Fluspi
-Fluspirilen
 Fluspirilen
 Glianimon
 Haldol
@@ -53,9 +48,7 @@ Navane
 Neurocil
 Nipolept
 Olanzapin
-Olanzapin
 Orap
-Paliperidon
 Paliperidon
 Perazin
 Perphenazin
@@ -70,7 +63,6 @@ Reagila
 Rexulti
 Risperdal
 Risperdal Consta
-Risperidon
 Risperidon
 Serdolect
 Seroquel
@@ -91,7 +83,6 @@ Xomolix
 Zeldox
 Ziprasidon
 Zotepin
-Zuclopenthixol
 Zuclopenthixol
 Zypadhera
 Zyprexa

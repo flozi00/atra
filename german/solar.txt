@@ -7,15 +7,15 @@ Anlagenmonitoring
 Antireflexschicht
 Aufdach
 Autarkie
-Blitzschutz
 BMS
 Batterie Management System
+Blitzschutz
+DC
 Dachausrichtung
 Dachhaken
 Dachneigung
 Dachpacht
 Datenlogger
-DC
 Diffuse Strahlung
 EEG
 EEG Inbetriebnahme
@@ -26,17 +26,15 @@ Einspeisevergütung
 Einspeisezähler/Zweirichtungszähler
 Einstrahlung
 Erneuerbare Energien
-Ertragsprognose
 Ersatzstrom
+Ertragsprognose
 Insellösung
-kWh
-kWp
 Leistungsoptimierer
+MPP Tracker
 Maximum Power Point
 Modulstring
 Monokristalline Solarzelle
 Montagesystem
-MPP Tracker
 Netzbetreiber
 Notstrom
 Photovoltaik
@@ -47,14 +45,12 @@ Siebzig Prozent Regelung
 Silizium
 Solardachziegel
 Solarenergie
-Einstrahlung
 Solarzelle
-photovoltaische Zelle
-Standard Test Bedingungen
 Speicher
+Standard Test Bedingungen
 Tagesgang
-Unterbrechungsfreie Stromversorgung
 USV
+Unterbrechungsfreie Stromversorgung
 Verschattung
 Volleinspeisung
 Wafer
@@ -63,3 +59,6 @@ Wechselstrom
 Wirkungsgrad
 Zelltypen
 Zweirichtungszähler
+kWh
+kWp
+photovoltaische Zelle
