@@ -1,0 +1,62 @@
+AC
+AC-Nennleistung
+AC-seitig
+Akkumulator
+Ampere
+Anlagenmonitoring
+Antireflexschicht
+Aufdach
+Autarkie
+Blitzschutz
+BMS
+Batterie Management System
+Dachausrichtung
+Dachhaken
+Dachneigung
+Dachpacht
+Datenlogger
+DC
+Diffuse Strahlung
+EEG
+EEG Inbetriebnahme
+EEG-Umlage
+Eigenverbrauch
+Einspeisepunkt
+Einspeisevergütung
+Einspeisezähler/Zweirichtungszähler
+Einstrahlung
+Erneuerbare Energien
+Ertragsprognose
+Ersatzstrom
+Insellösung
+kWh
+kWp
+Leistungsoptimierer
+Maximum Power Point
+Modulstring
+Monokristalline Solarzelle
+Montagesystem
+MPP Tracker
+Netzbetreiber
+Notstrom
+Photovoltaik
+Photovoltaikmodul
+Polykristalline Solarzellen
+Reihenschaltung
+Siebzig Prozent Regelung
+Silizium
+Solardachziegel
+Solarenergie (Einstrahlung)
+Solarzelle (photovoltaische Zelle)
+Standard Test Bedingungen
+Speicher
+Tagesgang
+Unterbrechungsfreie Stromversorgung (USV)
+Verschattung
+Volleinspeisung
+Wafer
+Wechselrichter
+Wechselstrom
+Wirkungsgrad
+Zelltypen
+Zweirichtungszähler
