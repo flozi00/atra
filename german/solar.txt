@@ -46,12 +46,15 @@ Reihenschaltung
 Siebzig Prozent Regelung
 Silizium
 Solardachziegel
-Solarenergie (Einstrahlung)
-Solarzelle (photovoltaische Zelle)
+Solarenergie
+Einstrahlung
+Solarzelle
+photovoltaische Zelle
 Standard Test Bedingungen
 Speicher
 Tagesgang
-Unterbrechungsfreie Stromversorgung (USV)
+Unterbrechungsfreie Stromversorgung
+USV
 Verschattung
 Volleinspeisung
 Wafer
