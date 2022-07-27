@@ -3,3 +3,4 @@ german/benzodiazepine
 german/antidepressiva
 german/heizung
 german/sanitär
+german/solar
