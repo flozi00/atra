@@ -1,8 +1,8 @@
-transformers
-pyctcdecode
-https://github.com/kpu/kenlm/archive/master.zip
 gradio
-ort-nightly
-onnx
+https://github.com/kpu/kenlm/archive/master.zip
 numpy
+onnx
+ort-nightly
+pyctcdecode
 torch
+transformers
