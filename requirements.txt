@@ -1,14 +1,8 @@
 transformers
-datasets
 pyctcdecode
-unidecode
 https://github.com/kpu/kenlm/archive/master.zip
-audiomentations
-jiwer
-requests-cache
 gradio
 ort-nightly
 onnx
 numpy
 torch
-torchaudio
