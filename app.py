@@ -1,9 +1,10 @@
-import gradio as gr
-import torch
-from transformers import AutoModelForCTC, Wav2Vec2Processor
-from pyctcdecode import build_ctcdecoder
 import subprocess
+
+import gradio as gr
 import numpy as np
+import torch
+from pyctcdecode import build_ctcdecoder
+from transformers import AutoModelForCTC, Wav2Vec2Processor
 
 
 def ffmpeg_read(bpayload: bytes, sampling_rate: int) -> np.array:
