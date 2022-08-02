@@ -68,7 +68,7 @@ def run_transcription(audio, main_lang, hotword_categories):
 
 
             for y in range(len(logits)):
-                beams = decoder.decode_beams(logits.cpu().numpy()[y], beam_width=250, hotword_weight=150, hotwords=hotwords)
+                beams = decoder.decode_beams(logits.cpu().numpy()[y], beam_width=50, hotword_weight=100, hotwords=hotwords)
 
                 offset = speech_timestamps[x+y]["start"]/processor.feature_extractor.sampling_rate
                 top_beam = beams[0]
