@@ -1,7 +1,0 @@
-# action.yml
-name: 'build and load'
-description: 'build and load asr app'
-on: [pull_request]
-runs:
-  using: 'docker'
-  image: 'Dockerfile'
