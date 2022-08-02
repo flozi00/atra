@@ -210,4 +210,6 @@ with ui:
         outputs=[transcription, chunks, hotwordlist],
     )
 
-ui.launch(server_name="0.0.0.0")
+
+if __name__ == "__main__":
+    ui.launch(server_name="0.0.0.0")
