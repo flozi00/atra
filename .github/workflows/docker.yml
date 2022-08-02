@@ -1,2 +1,6 @@
-- name: Build and push Docker images
-  uses: docker/build-push-action@v3.1.0
+# action.yml
+name: 'build and load'
+description: 'build and load asr app'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
