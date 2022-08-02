@@ -6,3 +6,12 @@ repos:
         types: [file] 
         files: \.(json|txt)$
         args: [--unique]
+-   repo: https://github.com/psf/black
+    rev: stable
+    hooks:
+    - id: black
+      language_version: python3.6
+-   repo: https://gitlab.com/pycqa/flake8
+    rev: 3.7.9
+    hooks:
+    - id: flake8
