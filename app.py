@@ -174,4 +174,5 @@ with ui:
     mic.change(fn=run_transcription, inputs=[mic, lang, categories], outputs=[transcription, chunks, hotwordlist])
     audio_file.change(fn=run_transcription, inputs=[audio_file, lang, categories], outputs=[transcription, chunks, hotwordlist])
 
-ui.launch(server_name="0.0.0.0")
+if __name__ == "__main__":
+    ui.launch(server_name="0.0.0.0")
