@@ -6,11 +6,9 @@ jobs:
   runMultipleCommands:
     runs-on: ubuntu-latest
     steps:
-     - uses: actions/checkout@v2.3.4
-        with:
-          lfs: 'true'
-          submodules: 'recursive'
+     - uses: actions/checkout@v1
      - run: |
         sudo apt install ffmpeg -y
         pip install -r requirements.txt
+        git lfs pull
         python test.py
