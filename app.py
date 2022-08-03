@@ -81,8 +81,8 @@ def run_transcription(audio, main_lang, hotword_categories):
             for y in range(len(logits)):
                 beams = decoder.decode_beams(
                     logits.cpu().numpy()[y],
-                    beam_width=250,
-                    hotword_weight=150,
+                    beam_width=50,
+                    hotword_weight=100,
                     hotwords=hotwords,
                 )
 
@@ -90,6 +90,7 @@ def run_transcription(audio, main_lang, hotword_categories):
                     speech_timestamps[x + y]["start"]
                     / processor.feature_extractor.sampling_rate
                 )
+
                 top_beam = beams[0]
                 transcription_beam, lm_state, indices, logit_score, lm_score = top_beam
                 transcription_beam = transcription_beam.replace('"', "")
