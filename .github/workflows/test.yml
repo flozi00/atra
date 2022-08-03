@@ -1,0 +1,14 @@
+name: My Workflow
+
+on: [pull_request]
+
+jobs:
+  runMultipleCommands:
+    runs-on: ubuntu-latest
+    steps:
+     - uses: actions/checkout@v1
+     - run: |
+        sudo apt install ffmpeg -y
+        pip install -r requirements.txt
+        git lfs pull
+        python test.py

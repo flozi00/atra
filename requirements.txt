@@ -5,4 +5,5 @@ onnx
 ort-nightly
 pyctcdecode
 torch
+torchaudio
 transformers
