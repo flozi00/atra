@@ -81,8 +81,7 @@ def run_transcription(audio, main_lang, hotword_categories):
             for y in range(len(logits)):
                 beams = decoder.decode_beams(
                     logits.cpu().numpy()[y],
-                    beam_width=50,
-                    hotword_weight=100,
+                    hotword_weight=2,
                     hotwords=hotwords,
                 )
 
