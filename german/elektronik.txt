@@ -1,5 +1,5 @@
-Aktive Bauelemente
 Akkumulator, Akku
+Aktive Bauelemente
 Analogelektronik
 Anode
 Antenne
@@ -12,16 +12,14 @@ Basisschaltung
 Batterie
 Betriebsspannung
 Blinker 
-Wechselblinker
 Brückengleichrichterschaltung
 Darlington-Schaltung
-Dimmer-Schaltung
-Dämmerungsschalter
 Detektorradio
 Digitalelektronik
+Dimmer-Schaltung
 Diode
 Dipol 
-Antenne
+Dämmerungsschalter
 Einkristall
 Eintaktverstärker
 Elektroakustik
@@ -63,21 +61,21 @@ Kollektorschaltung
 Kondensator
 Krokodilklemme
 Krokoklemme
+LED
 Lautsprecher
 Leiter
 Lenzsche Regel
 Leuchtdiode 
-LED
 Logikschaltung
-Lötauge
 Luftspule
+Lötauge
 Magnetspule
 Microcontroller
 Morsetaste
 Multimeter
+NICHT-Schaltung
 Netzteil
 Nichtleiter
-NICHT-Schaltung
 ODER-Schaltung
 Operationsverstärker
 Parallelschaltung
@@ -94,8 +92,8 @@ Schaltzeichen
 Schottky-Diode
 Schwingkreis
 Schwingspule
-Serienschaltung
 Selbstinduktion
+Serienschaltung
 Sicherung
 Solarzelle
 Spannung
@@ -105,8 +103,6 @@ Spannungsteiler
 Spule
 Steckbrett
 Strom
-elektrisch
-elektrischer
 Stromkreis
 Strommessung
 Summer
@@ -115,21 +111,21 @@ Thermo-Bimetall
 Thermoelement
 Thyristor
 Tonfrequenzgenerator
-Transistor
 Transformator
+Transistor
 Triac
 Trigger
 Triode
 Tunneldiode
 UND-Schaltung
+Umschalter
 Verstärker
 Wackelkontakt
-Wechselschaltung
 Wechselblinker
+Wechselschalter 
+Wechselschaltung
 Wechselspannung
 Wechselstrom
-Wechselschalter 
-Umschalter
 Wechsler
 Widerstand
 Wippschalter
@@ -137,3 +133,5 @@ Wirbelstrom
 Wirbelstrombremse
 XODER-Schaltung
 Zenerdiode
+elektrisch
+elektrischer
