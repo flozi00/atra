@@ -5,6 +5,7 @@ import numpy as np
 import torch
 from pyctcdecode import build_ctcdecoder
 from transformers import AutoModelForCTC, Wav2Vec2Processor
+import time
 
 
 def ffmpeg_read(bpayload: bytes, sampling_rate: int) -> np.array:
@@ -47,9 +48,15 @@ def ffmpeg_read(bpayload: bytes, sampling_rate: int) -> np.array:
 
 
 def run_transcription(audio, main_lang, hotword_categories):
+    logs = ""
+    start_time = time.time()
     transcription = ""
     chunks = []
     decoder = decoders[main_lang]
+
+    logs += f"init vars time: {time.time() - start_time}\n"
+    start_time = time.time()
+    
     if audio is not None:
         hotwords = []
         for h in hotword_categories:
@@ -59,9 +66,19 @@ def run_transcription(audio, main_lang, hotword_categories):
                     if len(w) >= 3:
                         hotwords.append(w.strip())
 
+        logs += f"init hotwords time: {time.time() - start_time}\n"
+        start_time = time.time()
+
         with open(audio, "rb") as f:
             payload = f.read()
+        
+        logs += f"read audio time: {time.time() - start_time}\n"
+        start_time = time.time()
+
         audio = ffmpeg_read(payload, sampling_rate=16000)
+
+        logs += f"convert audio time: {time.time() - start_time}\n"
+        start_time = time.time()
 
         speech_timestamps = get_speech_timestamps(audio, model_vad, sampling_rate=16000)
         audio_batch = [
@@ -69,14 +86,24 @@ def run_transcription(audio, main_lang, hotword_categories):
             for st in range(len(speech_timestamps))
         ]
 
+        logs += f"get speech timestamps time: {time.time() - start_time}\n"
+        start_time = time.time()
+
         for x in range(0, len(audio_batch), batch_size):
             data = audio_batch[x : x + batch_size]
 
             input_values = processor(
                 data, sampling_rate=16000, return_tensors="pt", padding=True
             ).input_values
+
+            logs += f"process audio time: {time.time() - start_time}\n"
+            start_time = time.time()
+
             with torch.inference_mode():
                 logits = model(input_values).logits
+
+            logs += f"inference time: {time.time() - start_time}\n"
+            start_time = time.time()
 
             for y in range(len(logits)):
                 beams = decoder.decode_beams(
@@ -119,9 +146,12 @@ def run_transcription(audio, main_lang, hotword_categories):
                         }
                     )
 
-        return transcription, chunks, hotwords
+            logs += f"LM decode time: {time.time() - start_time}\n"
+            start_time = time.time()
+
+        return transcription, chunks, hotwords, logs
     else:
-        return "", [], []
+        return "", [], [], ""
 
 
 """
@@ -199,16 +229,18 @@ with ui:
             chunks = gr.JSON()
         with gr.TabItem("Hotwords"):
             hotwordlist = gr.JSON()
+        with gr.TabItem("Logs"):
+            logs = gr.Textbox()
 
     mic.change(
         fn=run_transcription,
         inputs=[mic, lang, categories],
-        outputs=[transcription, chunks, hotwordlist],
+        outputs=[transcription, chunks, hotwordlist, logs],
     )
     audio_file.change(
         fn=run_transcription,
         inputs=[audio_file, lang, categories],
-        outputs=[transcription, chunks, hotwordlist],
+        outputs=[transcription, chunks, hotwordlist, logs],
     )
 
 
