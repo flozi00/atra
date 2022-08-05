@@ -1,9 +1,9 @@
-name: My Workflow
+name: Test Model loading
 
 on: [pull_request]
 
 jobs:
-  runMultipleCommands:
+  InstallAndTestLoading:
     runs-on: ubuntu-latest
     steps:
      - uses: actions/checkout@v1
