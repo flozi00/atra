@@ -23,8 +23,8 @@ def run_transcription(audio, main_lang, hotword_categories):
         tokenizer=tokenizer,
         feature_extractor=fextractor,
         decoder=decoder,
-        chunk_length_s=10,
-        stride_length_s=(4, 1),
+        chunk_length_s=6,
+        stride_length_s=(2, 1),
     )
 
     logs += f"init vars time: {time.time() - start_time}\n"
