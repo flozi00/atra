@@ -1,0 +1,3 @@
+[submodule "languagemodels"]
+	path = asr-as-a-service-lms
+	url = https://huggingface.co/flozi00/asr-as-a-service-lms
