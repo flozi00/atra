@@ -1,50 +1,8 @@
-import subprocess
-
 import gradio as gr
-import numpy as np
-import torch
 from pyctcdecode import build_ctcdecoder
-from transformers import AutoModelForCTC, Wav2Vec2Processor
+from transformers import AutoModelForCTC, Wav2Vec2Processor, Wav2Vec2FeatureExtractor, Wav2Vec2CTCTokenizer, pipeline
 import time
 
-
-def ffmpeg_read(bpayload: bytes, sampling_rate: int) -> np.array:
-    """
-    Helper function to read an audio file through ffmpeg.
-    """
-    ar = f"{sampling_rate}"
-    ac = "1"
-    format_for_conversion = "f32le"
-    ffmpeg_command = [
-        "ffmpeg",
-        "-i",
-        "pipe:0",
-        "-ac",
-        ac,
-        "-ar",
-        ar,
-        "-f",
-        format_for_conversion,
-        "-hide_banner",
-        "-loglevel",
-        "quiet",
-        "pipe:1",
-    ]
-
-    try:
-        with subprocess.Popen(
-            ffmpeg_command, stdin=subprocess.PIPE, stdout=subprocess.PIPE
-        ) as ffmpeg_process:
-            output_stream = ffmpeg_process.communicate(bpayload)
-    except FileNotFoundError as error:
-        raise ValueError(
-            "ffmpeg was not found but is required to load audio files from filename"
-        ) from error
-    out_bytes = output_stream[0]
-    audio = np.frombuffer(out_bytes, np.float32)
-    if audio.shape[0] == 0:
-        raise ValueError("Malformed soundfile")
-    return audio
 
 
 def run_transcription(audio, main_lang, hotword_categories):
@@ -53,6 +11,8 @@ def run_transcription(audio, main_lang, hotword_categories):
     transcription = ""
     chunks = []
     decoder = decoders[main_lang]
+
+    p = pipeline("automatic-speech-recognition", model=model, tokenizer = tokenizer, feature_extractor = fextractor, decoder=decoder, chunk_length_s = 10, stride_length_s=(4, 1))
 
     logs += f"init vars time: {time.time() - start_time}\n"
     start_time = time.time()
@@ -69,85 +29,13 @@ def run_transcription(audio, main_lang, hotword_categories):
         logs += f"init hotwords time: {time.time() - start_time}\n"
         start_time = time.time()
 
-        with open(audio, "rb") as f:
-            payload = f.read()
-        
-        logs += f"read audio time: {time.time() - start_time}\n"
-        start_time = time.time()
+        inferenced = p(audio, return_timestamps = "word", hotwords = hotwords, hotword_weight = 2)
+        logs += f"inference time: {time.time() - start_time}\n"
 
-        audio = ffmpeg_read(payload, sampling_rate=16000)
-
-        logs += f"convert audio time: {time.time() - start_time}\n"
-        start_time = time.time()
-
-        speech_timestamps = get_speech_timestamps(audio, model_vad, sampling_rate=16000)
-        audio_batch = [
-            audio[speech_timestamps[st]["start"] : speech_timestamps[st]["end"]]
-            for st in range(len(speech_timestamps))
-        ]
-
-        logs += f"get speech timestamps time: {time.time() - start_time}\n"
-        start_time = time.time()
-
-        for x in range(0, len(audio_batch), batch_size):
-            data = audio_batch[x : x + batch_size]
-
-            input_values = processor(
-                data, sampling_rate=16000, return_tensors="pt", padding=True
-            ).input_values
-
-            logs += f"process audio time: {time.time() - start_time}\n"
-            start_time = time.time()
-
-            with torch.inference_mode():
-                logits = model(input_values).logits
-
-            logs += f"inference time: {time.time() - start_time}\n"
-            start_time = time.time()
-
-            for y in range(len(logits)):
-                beams = decoder.decode_beams(
-                    logits.cpu().numpy()[y],
-                    hotword_weight=2,
-                    hotwords=hotwords,
-                )
-
-                offset = (
-                    speech_timestamps[x + y]["start"]
-                    / processor.feature_extractor.sampling_rate
-                )
-
-                top_beam = beams[0]
-                transcription_beam, lm_state, indices, logit_score, lm_score = top_beam
-                transcription_beam = transcription_beam.replace('"', "")
-                transcription += transcription_beam + " "
-                word_offsets = []
-                chunk_offset = indices
-                for word, (start_offset, end_offset) in chunk_offset:
-                    word_offsets.append(
-                        {
-                            "word": word,
-                            "start_offset": start_offset,
-                            "end_offset": end_offset,
-                        }
-                    )
-
-                for item in word_offsets:
-                    start = item["start_offset"] * 320
-                    start /= processor.feature_extractor.sampling_rate
-
-                    stop = item["end_offset"] * 320
-                    stop /= processor.feature_extractor.sampling_rate
-
-                    chunks.append(
-                        {
-                            "text": item["word"],
-                            "timestamp": (start + offset, stop + offset),
-                        }
-                    )
-
-            logs += f"LM decode time: {time.time() - start_time}\n"
-            start_time = time.time()
+        transcription = inferenced["text"]
+        times = inferenced["chunks"]
+        for i in range(len(times)):
+            chunks.append({"text": times[i]["text"],"start": float(times[i]["timestamp"][0]), "end": float(times[i]["timestamp"][1])})
 
         return transcription, chunks, hotwords, logs
     else:
@@ -170,22 +58,15 @@ def get_categories():
 
 
 """
-VAD download and initialization
-"""
-model_vad, utils = torch.hub.load(
-    repo_or_dir="snakers4/silero-vad", model="silero_vad", force_reload=False, onnx=True
-)
-
-(get_speech_timestamps, _, read_audio, *_) = utils
-
-
-"""
 Modell download and initialization
 """
-model = AutoModelForCTC.from_pretrained("aware-ai/wav2vec2-xls-r-300m")
+modelid = "aware-ai/wav2vec2-xls-r-300m"
+model = AutoModelForCTC.from_pretrained(modelid)
 model.eval()
 
-processor = Wav2Vec2Processor.from_pretrained("aware-ai/wav2vec2-xls-r-300m")
+processor = Wav2Vec2Processor.from_pretrained(modelid)
+tokenizer = Wav2Vec2CTCTokenizer.from_pretrained(modelid)
+fextractor = Wav2Vec2FeatureExtractor.from_pretrained(modelid)
 
 """
 decoder stuff
