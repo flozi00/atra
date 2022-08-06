@@ -199,7 +199,7 @@ langs = ["german"]
 for l in langs:
     decoder = build_ctcdecoder(
         list(sorted_dict.keys()),
-        f"2glm-{l}.arpa",
+        f"asr-as-a-service-lms/2glm-{l}.arpa",
     )
     decoders[l] = decoder
 
