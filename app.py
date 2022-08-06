@@ -1,8 +1,13 @@
 import gradio as gr
 from pyctcdecode import build_ctcdecoder
-from transformers import AutoModelForCTC, Wav2Vec2Processor, Wav2Vec2FeatureExtractor, Wav2Vec2CTCTokenizer, pipeline
+from transformers import (
+    AutoModelForCTC,
+    Wav2Vec2Processor,
+    Wav2Vec2FeatureExtractor,
+    Wav2Vec2CTCTokenizer,
+    pipeline,
+)
 import time
-
 
 
 def run_transcription(audio, main_lang, hotword_categories):
@@ -12,11 +17,19 @@ def run_transcription(audio, main_lang, hotword_categories):
     chunks = []
     decoder = decoders[main_lang]
 
-    p = pipeline("automatic-speech-recognition", model=model, tokenizer = tokenizer, feature_extractor = fextractor, decoder=decoder, chunk_length_s = 10, stride_length_s=(4, 1))
+    p = pipeline(
+        "automatic-speech-recognition",
+        model=model,
+        tokenizer=tokenizer,
+        feature_extractor=fextractor,
+        decoder=decoder,
+        chunk_length_s=10,
+        stride_length_s=(4, 1),
+    )
 
     logs += f"init vars time: {time.time() - start_time}\n"
     start_time = time.time()
-    
+
     if audio is not None:
         hotwords = []
         for h in hotword_categories:
@@ -29,13 +42,21 @@ def run_transcription(audio, main_lang, hotword_categories):
         logs += f"init hotwords time: {time.time() - start_time}\n"
         start_time = time.time()
 
-        inferenced = p(audio, return_timestamps = "word", hotwords = hotwords, hotword_weight = 2)
+        inferenced = p(
+            audio, return_timestamps="word", hotwords=hotwords, hotword_weight=2
+        )
         logs += f"inference time: {time.time() - start_time}\n"
 
         transcription = inferenced["text"]
         times = inferenced["chunks"]
         for i in range(len(times)):
-            chunks.append({"text": times[i]["text"],"start": float(times[i]["timestamp"][0]), "end": float(times[i]["timestamp"][1])})
+            chunks.append(
+                {
+                    "text": times[i]["text"],
+                    "start": float(times[i]["timestamp"][0]),
+                    "end": float(times[i]["timestamp"][1]),
+                }
+            )
 
         return transcription, chunks, hotwords, logs
     else:
@@ -80,7 +101,7 @@ langs = ["german"]
 for l in langs:
     decoder = build_ctcdecoder(
         list(sorted_dict.keys()),
-        f"2glm-{l}.arpa",
+        f"asr-as-a-service-lms/2glm-{l}.arpa",
     )
     decoders[l] = decoder
 
