@@ -10,5 +10,5 @@ jobs:
      - run: |
         sudo apt install ffmpeg -y
         pip install -r requirements.txt
-        git lfs pull
+        git pull --recurse-submodules
         python test.py
