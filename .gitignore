@@ -38,3 +38,4 @@ wtg-*/
 *gram
 *dataset.csv
 train*.csv
+*.onnx

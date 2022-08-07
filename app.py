@@ -6,7 +6,8 @@ import torch
 from pyctcdecode import build_ctcdecoder
 from transformers import AutoModelForCTC, Wav2Vec2Processor
 import time
-
+import onnxruntime as rt
+from pathlib import Path
 
 def ffmpeg_read(bpayload: bytes, sampling_rate: int) -> np.array:
     """
@@ -56,7 +57,7 @@ def run_transcription(audio, main_lang, hotword_categories):
 
     logs += f"init vars time: {time.time() - start_time}\n"
     start_time = time.time()
-    
+
     if audio is not None:
         hotwords = []
         for h in hotword_categories:
@@ -71,7 +72,7 @@ def run_transcription(audio, main_lang, hotword_categories):
 
         with open(audio, "rb") as f:
             payload = f.read()
-        
+
         logs += f"read audio time: {time.time() - start_time}\n"
         start_time = time.time()
 
@@ -99,15 +100,17 @@ def run_transcription(audio, main_lang, hotword_categories):
             logs += f"process audio time: {time.time() - start_time}\n"
             start_time = time.time()
 
-            with torch.inference_mode():
-                logits = model(input_values).logits
 
-            logs += f"inference time: {time.time() - start_time}\n"
+            onnx_outputs = session.run(
+                None, {session.get_inputs()[0].name: input_values.numpy()}
+            ) 
+
+            logs += f"inference time onnx: {time.time() - start_time}\n"
             start_time = time.time()
 
-            for y in range(len(logits)):
+            for y in range(len(onnx_outputs[0])):
                 beams = decoder.decode_beams(
-                    logits.cpu().numpy()[y],
+                    onnx_outputs[0][y],
                     hotword_weight=2,
                     hotwords=hotwords,
                 )
@@ -133,10 +136,10 @@ def run_transcription(audio, main_lang, hotword_categories):
                     )
 
                 for item in word_offsets:
-                    start = item["start_offset"] * 320
+                    start = item["start_offset"] * model.config.inputs_to_logits_ratio
                     start /= processor.feature_extractor.sampling_rate
 
-                    stop = item["end_offset"] * 320
+                    stop = item["end_offset"] * model.config.inputs_to_logits_ratio
                     stop /= processor.feature_extractor.sampling_rate
 
                     chunks.append(
@@ -188,6 +191,39 @@ model.eval()
 processor = Wav2Vec2Processor.from_pretrained("aware-ai/wav2vec2-xls-r-300m")
 
 """
+onnx runtime initialization
+"""
+ONNX_PATH = "model.onnx"
+
+path = Path(ONNX_PATH)
+
+if(path.is_file() == False):
+    audio_len = 160000
+
+    x = torch.randn(1, audio_len, requires_grad=True)
+
+    torch.onnx.export(
+        model,  # model being run
+        x,  # model input (or a tuple for multiple inputs)
+        ONNX_PATH,  # where to save the model (can be a file or file-like object)
+        export_params=True,  # store the trained parameter weights inside the model file
+        opset_version=13,  # the ONNX version to export the model to
+        do_constant_folding=True,  # whether to execute constant folding for optimization
+        input_names=["input"],  # the model's input names
+        output_names=["output"],  # the model's output names
+        dynamic_axes={
+            "input": {0: "batch", 1: "audio_len"},  # variable length axes
+            "output": {0: "batch", 1: "audio_len"},
+        },
+    )
+
+
+sess_options = rt.SessionOptions()
+sess_options.graph_optimization_level = rt.GraphOptimizationLevel.ORT_ENABLE_ALL
+session = rt.InferenceSession(ONNX_PATH, sess_options)
+
+
+"""
 decoder stuff
 """
 vocab_dict = processor.tokenizer.get_vocab()
@@ -196,15 +232,16 @@ sorted_dict = {k: v for k, v in sorted(vocab_dict.items(), key=lambda item: item
 decoders = {}
 langs = ["german"]
 
+
 for l in langs:
     decoder = build_ctcdecoder(
-        list(sorted_dict.keys()),
-        f"asr-as-a-service-lms/2glm-{l}.arpa",
+        labels = list(sorted_dict.keys()),
+        kenlm_model_path = f"asr-as-a-service-lms/2glm-{l}.arpa",
+        #unigrams = list(sorted_dict.keys()),
     )
     decoders[l] = decoder
 
-
-batch_size = 8
+batch_size = 4
 
 
 ui = gr.Blocks()

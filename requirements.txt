@@ -6,4 +6,4 @@ ort-nightly
 pyctcdecode
 torch
 torchaudio
-transformers
+transformers>=4.21.1
