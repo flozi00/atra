@@ -11,7 +11,6 @@ from pathlib import Path
 import glob
 
 
-
 def ffmpeg_read(bpayload: bytes, sampling_rate: int) -> np.array:
     """
     Helper function to read an audio file through ffmpeg.
@@ -166,12 +165,11 @@ read the hotword categories from the index.txt file
 
 def get_categories(langs):
     hotword_categories = []
-    
+
     for lang in langs:
-        path = f'{lang}/*.txt'
+        path = f"{lang}/*.txt"
         for file in glob.glob(path, recursive=True):
             hotword_categories.append(file.split(".")[0])
-
 
     return hotword_categories
 
@@ -224,7 +222,7 @@ if path.is_file() == False:
         },
     )
 
-    
+
 print("Loading ONNX model")
 sess_options = rt.SessionOptions()
 sess_options.graph_optimization_level = rt.GraphOptimizationLevel.ORT_ENABLE_ALL
