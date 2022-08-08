@@ -1,7 +1,0 @@
-german/antidepressiva
-german/antipsychotika
-german/benzodiazepine
-german/heizung
-german/sanitär
-german/solar
-german/viessmann

@@ -8,6 +8,8 @@ from transformers import AutoModelForCTC, Wav2Vec2Processor
 import time
 import onnxruntime as rt
 from pathlib import Path
+import glob
+
 
 
 def ffmpeg_read(bpayload: bytes, sampling_rate: int) -> np.array:
@@ -162,12 +164,14 @@ read the hotword categories from the index.txt file
 """
 
 
-def get_categories():
+def get_categories(langs):
     hotword_categories = []
-    with open("index.txt", "r") as f:
-        for line in f:
-            if len(line) > 3:
-                hotword_categories.append(line.strip())
+    
+    for lang in langs:
+        path = f'{lang}/*.txt'
+        for file in glob.glob(path, recursive=True):
+            hotword_categories.append(file.split(".")[0])
+
 
     return hotword_categories
 
@@ -255,7 +259,7 @@ with ui:
         with gr.TabItem("target language"):
             lang = gr.Radio(langs, value=langs[0])
         with gr.TabItem("hotword categories"):
-            categories = gr.CheckboxGroup(choices=get_categories())
+            categories = gr.CheckboxGroup(choices=get_categories(langs))
 
     with gr.Tabs():
         with gr.TabItem("Microphone"):
