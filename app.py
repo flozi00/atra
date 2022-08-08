@@ -9,6 +9,7 @@ import time
 import onnxruntime as rt
 from pathlib import Path
 
+
 def ffmpeg_read(bpayload: bytes, sampling_rate: int) -> np.array:
     """
     Helper function to read an audio file through ffmpeg.
@@ -100,10 +101,9 @@ def run_transcription(audio, main_lang, hotword_categories):
             logs += f"process audio time: {time.time() - start_time}\n"
             start_time = time.time()
 
-
             onnx_outputs = session.run(
                 None, {session.get_inputs()[0].name: input_values.numpy()}
-            ) 
+            )
 
             logs += f"inference time onnx: {time.time() - start_time}\n"
             start_time = time.time()
@@ -175,6 +175,7 @@ def get_categories():
 """
 VAD download and initialization
 """
+print("Downloading VAD model")
 model_vad, utils = torch.hub.load(
     repo_or_dir="snakers4/silero-vad", model="silero_vad", force_reload=False, onnx=True
 )
@@ -185,6 +186,7 @@ model_vad, utils = torch.hub.load(
 """
 Modell download and initialization
 """
+print("Downloading ASR model")
 model = AutoModelForCTC.from_pretrained("aware-ai/wav2vec2-xls-r-300m")
 model.eval()
 
@@ -197,7 +199,8 @@ ONNX_PATH = "model.onnx"
 
 path = Path(ONNX_PATH)
 
-if(path.is_file() == False):
+if path.is_file() == False:
+    print("ONNX model not found, building model")
     audio_len = 160000
 
     x = torch.randn(1, audio_len, requires_grad=True)
@@ -217,7 +220,8 @@ if(path.is_file() == False):
         },
     )
 
-
+    
+print("Loading ONNX model")
 sess_options = rt.SessionOptions()
 sess_options.graph_optimization_level = rt.GraphOptimizationLevel.ORT_ENABLE_ALL
 session = rt.InferenceSession(ONNX_PATH, sess_options)
@@ -235,9 +239,9 @@ langs = ["german"]
 
 for l in langs:
     decoder = build_ctcdecoder(
-        labels = list(sorted_dict.keys()),
-        kenlm_model_path = f"asr-as-a-service-lms/2glm-{l}.arpa",
-        #unigrams = list(sorted_dict.keys()),
+        labels=list(sorted_dict.keys()),
+        kenlm_model_path=f"asr-as-a-service-lms/2glm-{l}.arpa",
+        # unigrams = list(sorted_dict.keys()),
     )
     decoders[l] = decoder
 
