@@ -10,7 +10,7 @@ import onnxruntime as rt
 from pathlib import Path
 import glob
 
-
+#copied from https://github.com/huggingface/transformers
 def ffmpeg_read(bpayload: bytes, sampling_rate: int) -> np.array:
     """
     Helper function to read an audio file through ffmpeg.
