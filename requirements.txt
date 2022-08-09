@@ -2,7 +2,7 @@ gradio
 https://github.com/kpu/kenlm/archive/master.zip
 numpy
 onnx
-ort-nightly
+onnxruntime>=1.12.1
 pyctcdecode
 torch
 torchaudio
