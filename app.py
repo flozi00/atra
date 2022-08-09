@@ -168,7 +168,7 @@ def get_categories():
 
     path = f"**/*.txt"
     for file in glob.glob(path, recursive=True):
-        if("/" in file and "-" not in file):
+        if "/" in file and "-" not in file:
             hotword_categories.append(file.split(".")[0])
 
     return hotword_categories
@@ -243,7 +243,7 @@ for l in langs:
     decoder = build_ctcdecoder(
         labels=list(sorted_dict.keys()),
         kenlm_model_path=f"asr-as-a-service-lms/2glm-{l}.arpa",
-        unigrams = list(sorted_dict.keys()),
+        unigrams=list(sorted_dict.keys()),
     )
     decoders[l] = decoder
 
