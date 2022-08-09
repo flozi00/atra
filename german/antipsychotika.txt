@@ -1,6 +1,4 @@
 Abilify
-Abilify
-Maintena
 Adasuve
 Amisulprid
 Aripiprazol
@@ -14,6 +12,7 @@ Chlorpromazin
 Chlorprothixen
 Ciatyl-Z
 Clozapin
+Consta
 Dapotum-Depot
 Decentan
 Delpral
@@ -42,6 +41,7 @@ Levomepromazin
 Loxapin
 Lurasidon
 Lyogen
+Maintena
 Megaphen
 Melleril
 Melperon
@@ -63,8 +63,6 @@ Quetiapin
 Reagila
 Rexulti
 Risperdal
-Risperdal
-Consta
 Risperidon
 Serdolect
 Seroquel
