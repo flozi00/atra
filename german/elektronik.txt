@@ -1,7 +1,6 @@
-Akkumulator,
 Akku
+Akkumulator,
 Aktive
-Bauelemente
 Analogelektronik
 Anode
 Antenne
@@ -12,9 +11,9 @@ Bandpaß
 Basis
 Basisschaltung
 Batterie
+Bauelemente
 Betriebsspannung
 Blinker
-
 Brückengleichrichterschaltung
 Darlington-Schaltung
 Detektorradio
@@ -22,7 +21,6 @@ Digitalelektronik
 Dimmer-Schaltung
 Diode
 Dipol
-
 Dämmerungsschalter
 Einkristall
 Eintaktverstärker
@@ -50,8 +48,6 @@ Gleichstrom
 Gleichstromgenerator
 Glühlampe
 Grundschaltungen
-des
-Transistors
 Halbleiter
 Heißleiter
 Hochfrequenzlitze
@@ -59,7 +55,6 @@ Hupe
 Impedanz
 Induktion
 Integrierter
-Schaltkreis
 Isolator
 Kathode
 Klangregelung
@@ -73,9 +68,7 @@ LED
 Lautsprecher
 Leiter
 Lenzsche
-Regel
 Leuchtdiode
-
 Logikschaltung
 Luftspule
 Lötauge
@@ -90,13 +83,14 @@ ODER-Schaltung
 Operationsverstärker
 Parallelschaltung
 Passive
-Bauelemente
 Platine
+Regel
 Reibungselektrizität
 Reihenschaltung
 Relais
 Röhrenverstärker
 Schalter
+Schaltkreis
 Schaltnetzteil
 Schaltplan
 Schaltzeichen
@@ -124,6 +118,7 @@ Thyristor
 Tonfrequenzgenerator
 Transformator
 Transistor
+Transistors
 Triac
 Trigger
 Triode
@@ -134,7 +129,6 @@ Verstärker
 Wackelkontakt
 Wechselblinker
 Wechselschalter
-
 Wechselschaltung
 Wechselspannung
 Wechselstrom
@@ -145,5 +139,6 @@ Wirbelstrom
 Wirbelstrombremse
 XODER-Schaltung
 Zenerdiode
+des
 elektrisch
 elektrischer
