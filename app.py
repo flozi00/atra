@@ -243,7 +243,7 @@ for l in langs:
     decoder = build_ctcdecoder(
         labels=list(sorted_dict.keys()),
         kenlm_model_path=f"asr-as-a-service-lms/2glm-{l}.arpa",
-        #unigrams = list(sorted_dict.keys()),
+        # unigrams = list(sorted_dict.keys()),
     )
     decoders[l] = decoder
 
