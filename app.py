@@ -163,12 +163,12 @@ read the hotword categories from the index.txt file
 """
 
 
-def get_categories(langs):
+def get_categories():
     hotword_categories = []
 
-    for lang in langs:
-        path = f"{lang}/*.txt"
-        for file in glob.glob(path, recursive=True):
+    path = f"**/*.txt"
+    for file in glob.glob(path, recursive=True):
+        if("/" in file and "-" not in file):
             hotword_categories.append(file.split(".")[0])
 
     return hotword_categories
@@ -188,10 +188,6 @@ model_vad, utils = torch.hub.load(
 """
 Modell download and initialization
 """
-print("Downloading ASR model")
-model = AutoModelForCTC.from_pretrained("aware-ai/wav2vec2-xls-r-300m")
-model.eval()
-
 processor = Wav2Vec2Processor.from_pretrained("aware-ai/wav2vec2-xls-r-300m")
 
 """
@@ -202,6 +198,10 @@ ONNX_PATH = "model.onnx"
 path = Path(ONNX_PATH)
 
 if path.is_file() == False:
+    print("Downloading ASR model")
+    model = AutoModelForCTC.from_pretrained("aware-ai/wav2vec2-xls-r-300m")
+    model.eval()
+
     print("ONNX model not found, building model")
     audio_len = 160000
 
@@ -243,7 +243,7 @@ for l in langs:
     decoder = build_ctcdecoder(
         labels=list(sorted_dict.keys()),
         kenlm_model_path=f"asr-as-a-service-lms/2glm-{l}.arpa",
-        # unigrams = list(sorted_dict.keys()),
+        unigrams = list(sorted_dict.keys()),
     )
     decoders[l] = decoder
 
@@ -257,7 +257,7 @@ with ui:
         with gr.TabItem("target language"):
             lang = gr.Radio(langs, value=langs[0])
         with gr.TabItem("hotword categories"):
-            categories = gr.CheckboxGroup(choices=get_categories(langs))
+            categories = gr.CheckboxGroup(choices=get_categories())
 
     with gr.Tabs():
         with gr.TabItem("Microphone"):
