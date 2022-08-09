@@ -8,7 +8,9 @@ Antireflexschicht
 Aufdach
 Autarkie
 BMS
-Batterie Management System
+Batterie
+Management
+System
 Blitzschutz
 DC
 Dachausrichtung
@@ -16,41 +18,54 @@ Dachhaken
 Dachneigung
 Dachpacht
 Datenlogger
-Diffuse Strahlung
+Diffuse
+Strahlung
 EEG
-EEG Inbetriebnahme
+EEG
+Inbetriebnahme
 EEG-Umlage
 Eigenverbrauch
 Einspeisepunkt
 Einspeisevergütung
 Einspeisezähler/Zweirichtungszähler
 Einstrahlung
-Erneuerbare Energien
+Erneuerbare
+Energien
 Ersatzstrom
 Ertragsprognose
 Insellösung
 Leistungsoptimierer
-MPP Tracker
-Maximum Power Point
+MPP
+Tracker
+Maximum
+Power
+Point
 Modulstring
-Monokristalline Solarzelle
+Monokristalline
+Solarzelle
 Montagesystem
 Netzbetreiber
 Notstrom
 Photovoltaik
 Photovoltaikmodul
-Polykristalline Solarzellen
+Polykristalline
+Solarzellen
 Reihenschaltung
-Siebzig Prozent Regelung
+Siebzig
+Prozent
+Regelung
 Silizium
 Solardachziegel
 Solarenergie
 Solarzelle
 Speicher
-Standard Test Bedingungen
+Standard
+Test
+Bedingungen
 Tagesgang
 USV
-Unterbrechungsfreie Stromversorgung
+Unterbrechungsfreie
+Stromversorgung
 Verschattung
 Volleinspeisung
 Wafer
@@ -61,4 +76,5 @@ Zelltypen
 Zweirichtungszähler
 kWh
 kWp
-photovoltaische Zelle
+photovoltaische
+Zelle

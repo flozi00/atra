@@ -1,5 +1,6 @@
 Abilify
-Abilify Maintena
+Abilify
+Maintena
 Adasuve
 Amisulprid
 Aripiprazol
@@ -62,7 +63,8 @@ Quetiapin
 Reagila
 Rexulti
 Risperdal
-Risperdal Consta
+Risperdal
+Consta
 Risperidon
 Serdolect
 Seroquel

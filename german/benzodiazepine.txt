@@ -12,7 +12,8 @@ Avlane
 Briantum
 Bromazanil
 Bromazepam
-Bromazepam OPT
+Bromazepam
+OPT
 Buccolam
 Calmday
 Camazepam
@@ -55,7 +56,8 @@ Erispan
 Esilgan
 Estazolam
 Eszo
-Ethyl loflazepat
+Ethyl
+loflazepat
 Eurodin
 Faustan
 Fenazepam
@@ -68,7 +70,8 @@ Fluninoc
 Flunitrazepam
 Flunitrazolam
 Flurazepam
-Flurazepam Real
+Flurazepam
+Real
 Flutazolam
 Flutoprazepam
 Frisium
@@ -90,7 +93,8 @@ Limbitrol
 Loprazolam
 Loramet
 Lorazepam
-Lorazepam dura
+Lorazepam
+dura
 Loretam
 Lormetazepam
 Lubalix
@@ -174,7 +178,8 @@ Tolid
 Tranquit
 Tranxene
 Tranxilium
-Tranxilium N
+Tranxilium
+N
 Triazolam
 Unakalm
 Urbadan
@@ -185,5 +190,6 @@ Valocordin-Diazepam
 Vegesan
 Victan
 Xanax
-Xanax retard
+Xanax
+retard
 Xanor
