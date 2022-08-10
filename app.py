@@ -236,13 +236,13 @@ vocab_dict = processor.tokenizer.get_vocab()
 sorted_dict = {k: v for k, v in sorted(vocab_dict.items(), key=lambda item: item[1])}
 
 decoders = {}
-langs = ["german", "english"]
+langs = ["german", "english", "german-english"]
 
 
 for l in langs:
     decoder = build_ctcdecoder(
         labels=list(sorted_dict.keys()),
-        kenlm_model_path=f"asr-as-a-service-lms/2glm-{l}.arpa",
+        kenlm_model_path=f"./asr-as-a-service-lms/2glm-{l}.arpa",
         # unigrams = list(sorted_dict.keys()),
     )
     decoders[l] = decoder
