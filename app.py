@@ -4,7 +4,7 @@ import gradio as gr
 import numpy as np
 import torch
 from pyctcdecode import build_ctcdecoder
-from transformers import AutoModelForCTC, Wav2Vec2Processor
+from transformers import AutoModelForCTC, Wav2Vec2Processor, AutoConfig
 import time
 import onnxruntime as rt
 from pathlib import Path
@@ -137,10 +137,10 @@ def run_transcription(audio, main_lang, hotword_categories):
                     )
 
                 for item in word_offsets:
-                    start = item["start_offset"] * model.config.inputs_to_logits_ratio
+                    start = item["start_offset"] * config.inputs_to_logits_ratio
                     start /= processor.feature_extractor.sampling_rate
 
-                    stop = item["end_offset"] * model.config.inputs_to_logits_ratio
+                    stop = item["end_offset"] * config.inputs_to_logits_ratio
                     stop /= processor.feature_extractor.sampling_rate
 
                     chunks.append(
@@ -189,7 +189,7 @@ model_vad, utils = torch.hub.load(
 Modell download and initialization
 """
 processor = Wav2Vec2Processor.from_pretrained("aware-ai/wav2vec2-xls-r-300m")
-
+config = AutoConfig.from_pretrained("aware-ai/wav2vec2-xls-r-300m")
 """
 onnx runtime initialization
 """
@@ -236,7 +236,7 @@ vocab_dict = processor.tokenizer.get_vocab()
 sorted_dict = {k: v for k, v in sorted(vocab_dict.items(), key=lambda item: item[1])}
 
 decoders = {}
-langs = ["german"]
+langs = ["german", "english"]
 
 
 for l in langs:
