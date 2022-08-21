@@ -57,7 +57,7 @@ def run_transcription(audio, main_lang, hotword_categories):
     chunks = []
     decoder = decoders[main_lang]
 
-    logs += f"init vars time: {time.time() - start_time}\n"
+    logs += f"init vars time: {'{:.4f}'.format(time.time() - start_time)}\n"
     start_time = time.time()
 
     if audio is not None:
@@ -69,18 +69,18 @@ def run_transcription(audio, main_lang, hotword_categories):
                     if len(w) >= 3:
                         hotwords.append(w.strip())
 
-        logs += f"init hotwords time: {time.time() - start_time}\n"
+        logs += f"init hotwords time: {'{:.4f}'.format(time.time() - start_time)}\n"
         start_time = time.time()
 
         with open(audio, "rb") as f:
             payload = f.read()
 
-        logs += f"read audio time: {time.time() - start_time}\n"
+        logs += f"read audio time: {'{:.4f}'.format(time.time() - start_time)}\n"
         start_time = time.time()
 
         audio = ffmpeg_read(payload, sampling_rate=16000)
 
-        logs += f"convert audio time: {time.time() - start_time}\n"
+        logs += f"convert audio time: {'{:.4f}'.format(time.time() - start_time)}\n"
         start_time = time.time()
 
         speech_timestamps = get_speech_timestamps(audio, model_vad, sampling_rate=16000)
@@ -89,7 +89,7 @@ def run_transcription(audio, main_lang, hotword_categories):
             for st in range(len(speech_timestamps))
         ]
 
-        logs += f"get speech timestamps time: {time.time() - start_time}\n"
+        logs += f"get speech timestamps time: {'{:.4f}'.format(time.time() - start_time)}\n"
         start_time = time.time()
 
         for x in range(0, len(audio_batch), batch_size):
@@ -99,14 +99,14 @@ def run_transcription(audio, main_lang, hotword_categories):
                 data, sampling_rate=16000, return_tensors="pt", padding=True
             ).input_values
 
-            logs += f"process audio time: {time.time() - start_time}\n"
+            logs += f"process audio time: {'{:.4f}'.format(time.time() - start_time)}\n"
             start_time = time.time()
 
             onnx_outputs = session.run(
                 None, {session.get_inputs()[0].name: input_values.numpy()}
             )
 
-            logs += f"inference time onnx: {time.time() - start_time}\n"
+            logs += f"inference time onnx: {'{:.4f}'.format(time.time() - start_time)}\n"
             start_time = time.time()
 
             for y in range(len(onnx_outputs[0])):
@@ -150,7 +150,7 @@ def run_transcription(audio, main_lang, hotword_categories):
                         }
                     )
 
-            logs += f"LM decode time: {time.time() - start_time}\n"
+            logs += f"LM decode time: {'{:.4f}'.format(time.time() - start_time)}\n"
             start_time = time.time()
 
         return transcription, chunks, hotwords, logs
@@ -188,8 +188,9 @@ model_vad, utils = torch.hub.load(
 """
 Modell download and initialization
 """
-processor = Wav2Vec2Processor.from_pretrained("aware-ai/wav2vec2-xls-r-300m")
-config = AutoConfig.from_pretrained("aware-ai/wav2vec2-xls-r-300m")
+ID = "aware-ai/wav2vec2-xls-r-1b-european"
+processor = Wav2Vec2Processor.from_pretrained(ID)
+config = AutoConfig.from_pretrained(ID)
 """
 onnx runtime initialization
 """
@@ -199,28 +200,28 @@ path = Path(ONNX_PATH)
 
 if path.is_file() == False:
     print("Downloading ASR model")
-    model = AutoModelForCTC.from_pretrained("aware-ai/wav2vec2-xls-r-300m")
+    model = AutoModelForCTC.from_pretrained(ID)
     model.eval()
 
     print("ONNX model not found, building model")
-    audio_len = 160000
+    audio_len = 10
 
-    x = torch.randn(1, audio_len, requires_grad=True)
-
-    torch.onnx.export(
-        model,  # model being run
-        x,  # model input (or a tuple for multiple inputs)
-        ONNX_PATH,  # where to save the model (can be a file or file-like object)
-        export_params=True,  # store the trained parameter weights inside the model file
-        opset_version=13,  # the ONNX version to export the model to
-        do_constant_folding=True,  # whether to execute constant folding for optimization
-        input_names=["input"],  # the model's input names
-        output_names=["output"],  # the model's output names
-        dynamic_axes={
-            "input": {0: "batch", 1: "audio_len"},  # variable length axes
-            "output": {0: "batch", 1: "audio_len"},
-        },
-    )
+    x = torch.randn(1, 16000*audio_len, requires_grad=True)
+    with torch.inference_mode():
+        torch.onnx.export(
+            model,  # model being run
+            x,  # model input (or a tuple for multiple inputs)
+            ONNX_PATH,  # where to save the model (can be a file or file-like object)
+            export_params=True,  # store the trained parameter weights inside the model file
+            opset_version=13,  # the ONNX version to export the model to
+            do_constant_folding=True,  # whether to execute constant folding for optimization
+            input_names=["input"],  # the model's input names
+            output_names=["output"],  # the model's output names
+            dynamic_axes={
+                "input": {0: "batch", 1: "audio_len"},  # variable length axes
+                "output": {0: "batch", 1: "audio_len"},
+            },
+        )
 
 
 print("Loading ONNX model")
