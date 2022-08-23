@@ -188,7 +188,7 @@ model_vad, utils = torch.hub.load(
 """
 Modell download and initialization
 """
-ID = "aware-ai/wav2vec2-xls-r-1b-european"
+ID = "aware-ai/wav2vec2-base-german"
 processor = Wav2Vec2Processor.from_pretrained(ID)
 config = AutoConfig.from_pretrained(ID)
 """
