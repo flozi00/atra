@@ -2,7 +2,7 @@ import subprocess
 import numpy as np
 import torch
 
-#copied from https://github.com/huggingface/transformers
+# copied from https://github.com/huggingface/transformers
 def ffmpeg_read(bpayload: bytes, sampling_rate: int) -> np.array:
     """
     Helper function to read an audio file through ffmpeg.
@@ -40,6 +40,7 @@ def ffmpeg_read(bpayload: bytes, sampling_rate: int) -> np.array:
     if audio.shape[0] == 0:
         raise ValueError("Malformed soundfile")
     return audio
+
 
 """
 VAD download and initialization

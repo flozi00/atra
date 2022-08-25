@@ -2,6 +2,7 @@ from transformers import AutoModelForCTC
 import torch
 import os
 
+
 def exporting(l):
     """
     onnx runtime initialization
@@ -17,7 +18,7 @@ def exporting(l):
     print("ONNX model not found, building model")
     audio_len = 10
 
-    x = torch.randn(1, 16000*audio_len, requires_grad=True)
+    x = torch.randn(1, 16000 * audio_len, requires_grad=True)
     with torch.inference_mode():
         torch.onnx.export(
             model,  # model being run
