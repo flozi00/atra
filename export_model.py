@@ -6,7 +6,7 @@ def exporting(l):
     """
     onnx runtime initialization
     """
-    path = f"./lm-{l}.arpa"
+    path = f"./{l}.onnx"
     if os.path.exists(path):
         os.remove(path)
 
