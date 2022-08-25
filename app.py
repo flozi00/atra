@@ -1,53 +1,12 @@
-import subprocess
 
 import gradio as gr
-import numpy as np
-import torch
 from pyctcdecode import build_ctcdecoder
-from transformers import AutoModelForCTC, Wav2Vec2Processor, AutoConfig
 import time
+from transformers import Wav2Vec2Processor
 import onnxruntime as rt
-from pathlib import Path
+from export_model import exporting
 import glob
-
-#copied from https://github.com/huggingface/transformers
-def ffmpeg_read(bpayload: bytes, sampling_rate: int) -> np.array:
-    """
-    Helper function to read an audio file through ffmpeg.
-    """
-    ar = f"{sampling_rate}"
-    ac = "1"
-    format_for_conversion = "f32le"
-    ffmpeg_command = [
-        "ffmpeg",
-        "-i",
-        "pipe:0",
-        "-ac",
-        ac,
-        "-ar",
-        ar,
-        "-f",
-        format_for_conversion,
-        "-hide_banner",
-        "-loglevel",
-        "quiet",
-        "pipe:1",
-    ]
-
-    try:
-        with subprocess.Popen(
-            ffmpeg_command, stdin=subprocess.PIPE, stdout=subprocess.PIPE
-        ) as ffmpeg_process:
-            output_stream = ffmpeg_process.communicate(bpayload)
-    except FileNotFoundError as error:
-        raise ValueError(
-            "ffmpeg was not found but is required to load audio files from filename"
-        ) from error
-    out_bytes = output_stream[0]
-    audio = np.frombuffer(out_bytes, np.float32)
-    if audio.shape[0] == 0:
-        raise ValueError("Malformed soundfile")
-    return audio
+from utils import ffmpeg_read, model_vad, get_speech_timestamps
 
 
 def run_transcription(audio, main_lang, hotword_categories):
@@ -55,7 +14,7 @@ def run_transcription(audio, main_lang, hotword_categories):
     start_time = time.time()
     transcription = ""
     chunks = []
-    decoder = decoders[main_lang]
+    session, decoder = decoders[main_lang]
 
     logs += f"init vars time: {'{:.4f}'.format(time.time() - start_time)}\n"
     start_time = time.time()
@@ -83,9 +42,10 @@ def run_transcription(audio, main_lang, hotword_categories):
         logs += f"convert audio time: {'{:.4f}'.format(time.time() - start_time)}\n"
         start_time = time.time()
 
-        speech_timestamps = get_speech_timestamps(audio, model_vad, sampling_rate=16000)
+        speech_timestamps = get_speech_timestamps(
+            audio, model_vad, sampling_rate=16000, min_silence_duration_ms=500)
         audio_batch = [
-            audio[speech_timestamps[st]["start"] : speech_timestamps[st]["end"]]
+            audio[speech_timestamps[st]["start"]: speech_timestamps[st]["end"]]
             for st in range(len(speech_timestamps))
         ]
 
@@ -93,7 +53,7 @@ def run_transcription(audio, main_lang, hotword_categories):
         start_time = time.time()
 
         for x in range(0, len(audio_batch), batch_size):
-            data = audio_batch[x : x + batch_size]
+            data = audio_batch[x: x + batch_size]
 
             input_values = processor(
                 data, sampling_rate=16000, return_tensors="pt", padding=True
@@ -112,43 +72,24 @@ def run_transcription(audio, main_lang, hotword_categories):
             for y in range(len(onnx_outputs[0])):
                 beams = decoder.decode_beams(
                     onnx_outputs[0][y],
-                    hotword_weight=2,
+                    hotword_weight=20,
                     hotwords=hotwords,
+                    #beam_width=500,
                 )
 
-                offset = (
-                    speech_timestamps[x + y]["start"]
-                    / processor.feature_extractor.sampling_rate
-                )
-
+                for b in beams:
+                    print(b[0])
                 top_beam = beams[0]
                 transcription_beam, lm_state, indices, logit_score, lm_score = top_beam
                 transcription_beam = transcription_beam.replace('"', "")
                 transcription += transcription_beam + " "
-                word_offsets = []
-                chunk_offset = indices
-                for word, (start_offset, end_offset) in chunk_offset:
-                    word_offsets.append(
-                        {
-                            "word": word,
-                            "start_offset": start_offset,
-                            "end_offset": end_offset,
-                        }
-                    )
 
-                for item in word_offsets:
-                    start = item["start_offset"] * config.inputs_to_logits_ratio
-                    start /= processor.feature_extractor.sampling_rate
-
-                    stop = item["end_offset"] * config.inputs_to_logits_ratio
-                    stop /= processor.feature_extractor.sampling_rate
-
-                    chunks.append(
-                        {
-                            "text": item["word"],
-                            "timestamp": (start + offset, stop + offset),
-                        }
-                    )
+                chunks.append(
+                    {
+                        "text": transcription_beam,
+                        "timestamp": (speech_timestamps[y]["start"]/16000, speech_timestamps[y]["end"]/16000),
+                    }
+                )
 
             logs += f"LM decode time: {'{:.4f}'.format(time.time() - start_time)}\n"
             start_time = time.time()
@@ -161,8 +102,6 @@ def run_transcription(audio, main_lang, hotword_categories):
 """
 read the hotword categories from the index.txt file
 """
-
-
 def get_categories():
     hotword_categories = []
 
@@ -175,78 +114,38 @@ def get_categories():
 
 
 """
-VAD download and initialization
-"""
-print("Downloading VAD model")
-model_vad, utils = torch.hub.load(
-    repo_or_dir="snakers4/silero-vad", model="silero_vad", force_reload=False, onnx=True
-)
-
-(get_speech_timestamps, _, read_audio, *_) = utils
-
-
-"""
 Modell download and initialization
 """
 ID = "aware-ai/wav2vec2-xls-r-1b-european"
 processor = Wav2Vec2Processor.from_pretrained(ID)
-config = AutoConfig.from_pretrained(ID)
+
 """
 onnx runtime initialization
 """
-ONNX_PATH = "model.onnx"
-
-path = Path(ONNX_PATH)
-
-if path.is_file() == False:
-    print("Downloading ASR model")
-    model = AutoModelForCTC.from_pretrained(ID)
-    model.eval()
-
-    print("ONNX model not found, building model")
-    audio_len = 10
-
-    x = torch.randn(1, 16000*audio_len, requires_grad=True)
-    with torch.inference_mode():
-        torch.onnx.export(
-            model,  # model being run
-            x,  # model input (or a tuple for multiple inputs)
-            ONNX_PATH,  # where to save the model (can be a file or file-like object)
-            export_params=True,  # store the trained parameter weights inside the model file
-            opset_version=13,  # the ONNX version to export the model to
-            do_constant_folding=True,  # whether to execute constant folding for optimization
-            input_names=["input"],  # the model's input names
-            output_names=["output"],  # the model's output names
-            dynamic_axes={
-                "input": {0: "batch", 1: "audio_len"},  # variable length axes
-                "output": {0: "batch", 1: "audio_len"},
-            },
-        )
-
-
-print("Loading ONNX model")
 sess_options = rt.SessionOptions()
 sess_options.graph_optimization_level = rt.GraphOptimizationLevel.ORT_ENABLE_ALL
-session = rt.InferenceSession(ONNX_PATH, sess_options)
 
 
 """
 decoder stuff
 """
 vocab_dict = processor.tokenizer.get_vocab()
-sorted_dict = {k: v for k, v in sorted(vocab_dict.items(), key=lambda item: item[1])}
+sorted_dict = {k: v for k, v in sorted(
+    vocab_dict.items(), key=lambda item: item[1])}
 
 decoders = {}
-langs = ["german", "english", "german-english"]
+langs = ["german"]
 
 
 for l in langs:
+    exporting(l)
     decoder = build_ctcdecoder(
         labels=list(sorted_dict.keys()),
-        kenlm_model_path=f"./asr-as-a-service-lms/2glm-{l}.arpa",
+        kenlm_model_path=f"./asr-as-a-service-lms/lm-{l}.arpa",
         # unigrams = list(sorted_dict.keys()),
     )
-    decoders[l] = decoder
+    onnxsession = rt.InferenceSession(f"./{l}.onnx", sess_options)
+    decoders[l] = (onnxsession, decoder)
 
 batch_size = 4
 
@@ -276,6 +175,11 @@ with ui:
         with gr.TabItem("Logs"):
             logs = gr.Textbox()
 
+    categories.change(
+        fn=run_transcription,
+        inputs=[mic, lang, categories],
+        outputs=[transcription, chunks, hotwordlist, logs],
+    )
     mic.change(
         fn=run_transcription,
         inputs=[mic, lang, categories],
