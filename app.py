@@ -134,7 +134,7 @@ sorted_dict = {k: v for k, v in sorted(
     vocab_dict.items(), key=lambda item: item[1])}
 
 decoders = {}
-langs = ["german"]
+langs = ["german", "german-english"]
 
 
 for l in langs:
