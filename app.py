@@ -1,4 +1,3 @@
-
 import gradio as gr
 from pyctcdecode import build_ctcdecoder
 import time
@@ -43,17 +42,20 @@ def run_transcription(audio, main_lang, hotword_categories):
         start_time = time.time()
 
         speech_timestamps = get_speech_timestamps(
-            audio, model_vad, sampling_rate=16000, min_silence_duration_ms=500)
+            audio, model_vad, sampling_rate=16000, min_silence_duration_ms=500
+        )
         audio_batch = [
-            audio[speech_timestamps[st]["start"]: speech_timestamps[st]["end"]]
+            audio[speech_timestamps[st]["start"] : speech_timestamps[st]["end"]]
             for st in range(len(speech_timestamps))
         ]
 
-        logs += f"get speech timestamps time: {'{:.4f}'.format(time.time() - start_time)}\n"
+        logs += (
+            f"get speech timestamps time: {'{:.4f}'.format(time.time() - start_time)}\n"
+        )
         start_time = time.time()
 
         for x in range(0, len(audio_batch), batch_size):
-            data = audio_batch[x: x + batch_size]
+            data = audio_batch[x : x + batch_size]
 
             input_values = processor(
                 data, sampling_rate=16000, return_tensors="pt", padding=True
@@ -66,7 +68,9 @@ def run_transcription(audio, main_lang, hotword_categories):
                 None, {session.get_inputs()[0].name: input_values.numpy()}
             )
 
-            logs += f"inference time onnx: {'{:.4f}'.format(time.time() - start_time)}\n"
+            logs += (
+                f"inference time onnx: {'{:.4f}'.format(time.time() - start_time)}\n"
+            )
             start_time = time.time()
 
             for y in range(len(onnx_outputs[0])):
@@ -74,7 +78,7 @@ def run_transcription(audio, main_lang, hotword_categories):
                     onnx_outputs[0][y],
                     hotword_weight=20,
                     hotwords=hotwords,
-                    #beam_width=500,
+                    # beam_width=500,
                 )
 
                 for b in beams:
@@ -87,7 +91,10 @@ def run_transcription(audio, main_lang, hotword_categories):
                 chunks.append(
                     {
                         "text": transcription_beam,
-                        "timestamp": (speech_timestamps[y]["start"]/16000, speech_timestamps[y]["end"]/16000),
+                        "timestamp": (
+                            speech_timestamps[y]["start"] / 16000,
+                            speech_timestamps[y]["end"] / 16000,
+                        ),
                     }
                 )
 
@@ -102,6 +109,8 @@ def run_transcription(audio, main_lang, hotword_categories):
 """
 read the hotword categories from the index.txt file
 """
+
+
 def get_categories():
     hotword_categories = []
 
@@ -130,8 +139,7 @@ sess_options.graph_optimization_level = rt.GraphOptimizationLevel.ORT_ENABLE_ALL
 decoder stuff
 """
 vocab_dict = processor.tokenizer.get_vocab()
-sorted_dict = {k: v for k, v in sorted(
-    vocab_dict.items(), key=lambda item: item[1])}
+sorted_dict = {k: v for k, v in sorted(vocab_dict.items(), key=lambda item: item[1])}
 
 decoders = {}
 langs = ["german", "german-english"]
