@@ -142,7 +142,7 @@ vocab_dict = processor.tokenizer.get_vocab()
 sorted_dict = {k: v for k, v in sorted(vocab_dict.items(), key=lambda item: item[1])}
 
 decoders = {}
-langs = ["german", "german-english"]
+langs = ["german", "german-english", "english"]
 
 
 for l in langs:
