@@ -7,6 +7,7 @@ from export_model import exporting
 import glob
 from utils import ffmpeg_read, model_vad, get_speech_timestamps
 
+
 def run_transcription(audio, main_lang, hotword_categories):
     logs = ""
     start_time = time.time()
@@ -149,7 +150,11 @@ for l in langs:
         kenlm_model_path=f"./asr-as-a-service-lms/lm-{l}.arpa",
         # unigrams = list(sorted_dict.keys()),
     )
-    onnxsession = rt.InferenceSession(f"./{l}.onnx", sess_options)
+    onnxsession = rt.InferenceSession(
+        f"./{l}.onnx",
+        sess_options,
+        providers=["OpenVINOExecutionProvider", "CPUExecutionProvider"],
+    )
     decoders[l] = (onnxsession, decoder)
 
 batch_size = 4
