@@ -3,6 +3,7 @@ https://github.com/kpu/kenlm/archive/master.zip
 numpy
 onnx
 onnxruntime>=1.12.1
+onnxruntime-openvino
 pyctcdecode
 torch
 torchaudio
