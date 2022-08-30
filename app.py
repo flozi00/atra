@@ -153,7 +153,6 @@ for l in langs:
     onnxsession = rt.InferenceSession(
         f"./{l}.onnx",
         sess_options,
-        providers=["OpenVINOExecutionProvider", "CPUExecutionProvider"],
     )
     decoders[l] = (onnxsession, decoder)
 

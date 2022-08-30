@@ -47,7 +47,7 @@ VAD download and initialization
 """
 print("Downloading VAD model")
 model_vad, utils = torch.hub.load(
-    repo_or_dir="flozi00/silero-vad", model="silero_vad", force_reload=False, onnx=True
+    repo_or_dir="snakers4/silero-vad", model="silero_vad", force_reload=False, onnx=True
 )
 
 (get_speech_timestamps, _, read_audio, *_) = utils
