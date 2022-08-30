@@ -6,7 +6,6 @@ import onnxruntime as rt
 from export_model import exporting
 import glob
 from utils import ffmpeg_read, model_vad, get_speech_timestamps
-from torchaudio.models.decoder import ctc_decoder
 
 def run_transcription(audio, main_lang, hotword_categories):
     logs = ""
