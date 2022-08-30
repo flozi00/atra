@@ -4,7 +4,7 @@ numpy
 onnx
 onnxruntime>=1.12.1
 onnxruntime-openvino
-pyctcdecode
+https://github.com/flozi00/pyctcdecode/archive/refs/heads/main.zip
 torch
 torchaudio
 transformers>=4.21.1

@@ -6,7 +6,7 @@ import onnxruntime as rt
 from export_model import exporting
 import glob
 from utils import ffmpeg_read, model_vad, get_speech_timestamps
-
+from torchaudio.models.decoder import ctc_decoder
 
 def run_transcription(audio, main_lang, hotword_categories):
     logs = ""
@@ -81,8 +81,6 @@ def run_transcription(audio, main_lang, hotword_categories):
                     # beam_width=500,
                 )
 
-                for b in beams:
-                    print(b[0])
                 top_beam = beams[0]
                 transcription_beam, lm_state, indices, logit_score, lm_score = top_beam
                 transcription_beam = transcription_beam.replace('"', "")
