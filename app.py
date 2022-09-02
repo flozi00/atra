@@ -119,12 +119,6 @@ def get_categories():
 
     return hotword_categories
 
-
-"""
-Modell download and initialization
-"""
-ID = "aware-ai/wav2vec2-xls-r-1b-european"
-
 """
 onnx runtime initialization
 """
