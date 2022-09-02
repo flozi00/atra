@@ -2,6 +2,12 @@ import subprocess
 import numpy as np
 import torch
 
+MODEL_MAPPING = {
+    "german": "aware-ai/wav2vec2-xls-r-300m-german",
+    "english": "aware-ai/wav2vec2-xls-r-300m-english",
+    "german-english": "aware-ai/wav2vec2-xls-r-300m-german-english",
+}
+
 # copied from https://github.com/huggingface/transformers
 def ffmpeg_read(bpayload: bytes, sampling_rate: int) -> np.array:
     """

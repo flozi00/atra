@@ -5,7 +5,7 @@ from transformers import Wav2Vec2Processor
 import onnxruntime as rt
 from export_model import exporting
 import glob
-from utils import ffmpeg_read, model_vad, get_speech_timestamps
+from utils import ffmpeg_read, model_vad, get_speech_timestamps, MODEL_MAPPING
 
 
 def run_transcription(audio, main_lang, hotword_categories):
@@ -13,7 +13,7 @@ def run_transcription(audio, main_lang, hotword_categories):
     start_time = time.time()
     transcription = ""
     chunks = []
-    session, decoder = decoders[main_lang]
+    session, decoder, processor = decoders[main_lang]
 
     logs += f"init vars time: {'{:.4f}'.format(time.time() - start_time)}\n"
     start_time = time.time()
@@ -42,7 +42,7 @@ def run_transcription(audio, main_lang, hotword_categories):
         start_time = time.time()
 
         speech_timestamps = get_speech_timestamps(
-            audio, model_vad, sampling_rate=16000, min_silence_duration_ms=500
+            audio, model_vad, sampling_rate=16000, min_silence_duration_ms=250
         )
         audio_batch = [
             audio[speech_timestamps[st]["start"] : speech_timestamps[st]["end"]]
@@ -124,7 +124,6 @@ def get_categories():
 Modell download and initialization
 """
 ID = "aware-ai/wav2vec2-xls-r-1b-european"
-processor = Wav2Vec2Processor.from_pretrained(ID)
 
 """
 onnx runtime initialization
@@ -136,14 +135,14 @@ sess_options.graph_optimization_level = rt.GraphOptimizationLevel.ORT_ENABLE_ALL
 """
 decoder stuff
 """
-vocab_dict = processor.tokenizer.get_vocab()
-sorted_dict = {k: v for k, v in sorted(vocab_dict.items(), key=lambda item: item[1])}
-
 decoders = {}
-langs = ["german", "german-english", "english"]
+langs = list(MODEL_MAPPING.keys())
 
 
 for l in langs:
+    processor = Wav2Vec2Processor.from_pretrained(MODEL_MAPPING[l])
+    vocab_dict = processor.tokenizer.get_vocab()
+    sorted_dict = {k: v for k, v in sorted(vocab_dict.items(), key=lambda item: item[1])}
     exporting(l)
     decoder = build_ctcdecoder(
         labels=list(sorted_dict.keys()),
@@ -154,7 +153,7 @@ for l in langs:
         f"./{l}.onnx",
         sess_options,
     )
-    decoders[l] = (onnxsession, decoder)
+    decoders[l] = (onnxsession, decoder, processor)
 
 batch_size = 4
 

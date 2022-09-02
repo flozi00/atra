@@ -1,6 +1,7 @@
 from transformers import AutoModelForCTC
 import torch
 import os
+from utils import MODEL_MAPPING
 
 
 def exporting(l):
@@ -12,7 +13,7 @@ def exporting(l):
         os.remove(path)
 
     print("Downloading ASR model")
-    model = AutoModelForCTC.from_pretrained(f"aware-ai/wav2vec2-xls-r-300m-{l}")
+    model = AutoModelForCTC.from_pretrained(MODEL_MAPPING[l])
     model.eval()
 
     print("ONNX model not found, building model")
