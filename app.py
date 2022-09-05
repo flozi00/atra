@@ -119,6 +119,7 @@ def get_categories():
 
     return hotword_categories
 
+
 """
 onnx runtime initialization
 """
@@ -136,7 +137,9 @@ langs = list(MODEL_MAPPING.keys())
 for l in langs:
     processor = Wav2Vec2Processor.from_pretrained(MODEL_MAPPING[l])
     vocab_dict = processor.tokenizer.get_vocab()
-    sorted_dict = {k: v for k, v in sorted(vocab_dict.items(), key=lambda item: item[1])}
+    sorted_dict = {
+        k: v for k, v in sorted(vocab_dict.items(), key=lambda item: item[1])
+    }
     exporting(l)
     decoder = build_ctcdecoder(
         labels=list(sorted_dict.keys()),

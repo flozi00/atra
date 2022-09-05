@@ -1,9 +1,9 @@
 gradio
+https://github.com/flozi00/pyctcdecode/archive/refs/heads/main.zip
 https://github.com/kpu/kenlm/archive/master.zip
 numpy
 onnx
 onnxruntime>=1.12.1
-https://github.com/flozi00/pyctcdecode/archive/refs/heads/main.zip
 torch
 torchaudio
 transformers>=4.21.1
