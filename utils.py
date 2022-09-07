@@ -3,7 +3,7 @@ import numpy as np
 import torch
 
 MODEL_MAPPING = {
-    "german": "aware-ai/wav2vec2-xls-r-300m-german",
+    "german": "aware-ai/wav2vec2-xls-r-1b-german",
     "english": "aware-ai/wav2vec2-xls-r-300m-english",
     "german-english": "aware-ai/wav2vec2-xls-r-300m-german-english",
 }
