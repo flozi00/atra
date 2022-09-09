@@ -39,3 +39,4 @@ wtg-*/
 *dataset.csv
 train*.csv
 *.onnx
+!silero_vad.onnx

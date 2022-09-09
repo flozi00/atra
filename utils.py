@@ -1,9 +1,9 @@
 import subprocess
 import numpy as np
-import torch
+from silero_vad import silero_vad
 
 MODEL_MAPPING = {
-    "german": "aware-ai/wav2vec2-xls-r-1b-german",
+    "german": "aware-ai/wav2vec2-xls-r-300m-german",
     "english": "aware-ai/wav2vec2-xls-r-300m-english",
     "german-english": "aware-ai/wav2vec2-xls-r-300m-german-english",
 }
@@ -52,8 +52,6 @@ def ffmpeg_read(bpayload: bytes, sampling_rate: int) -> np.array:
 VAD download and initialization
 """
 print("Downloading VAD model")
-model_vad, utils = torch.hub.load(
-    repo_or_dir="snakers4/silero-vad", model="silero_vad", force_reload=False, onnx=True
-)
+model_vad, utils = silero_vad(True)
 
 (get_speech_timestamps, _, read_audio, *_) = utils

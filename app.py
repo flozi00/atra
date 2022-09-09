@@ -8,7 +8,7 @@ import glob
 from utils import ffmpeg_read, model_vad, get_speech_timestamps, MODEL_MAPPING
 
 
-def run_transcription(audio, main_lang, hotword_categories):
+def run_transcription(audio, audio2, main_lang, hotword_categories):
     logs = ""
     start_time = time.time()
     transcription = ""
@@ -18,7 +18,7 @@ def run_transcription(audio, main_lang, hotword_categories):
     logs += f"init vars time: {'{:.4f}'.format(time.time() - start_time)}\n"
     start_time = time.time()
 
-    if audio is not None:
+    if audio is not None or audio2 is not None:
         hotwords = []
         for h in hotword_categories:
             with open(f"{h}.txt", "r") as f:
@@ -30,7 +30,7 @@ def run_transcription(audio, main_lang, hotword_categories):
         logs += f"init hotwords time: {'{:.4f}'.format(time.time() - start_time)}\n"
         start_time = time.time()
 
-        with open(audio, "rb") as f:
+        with open(audio if audio is not None else audio2, "rb") as f:
             payload = f.read()
 
         logs += f"read audio time: {'{:.4f}'.format(time.time() - start_time)}\n"
@@ -42,7 +42,7 @@ def run_transcription(audio, main_lang, hotword_categories):
         start_time = time.time()
 
         speech_timestamps = get_speech_timestamps(
-            audio, model_vad, sampling_rate=16000, min_silence_duration_ms=250
+            audio, model_vad, sampling_rate=16000, min_silence_duration_ms=500
         )
         audio_batch = [
             audio[speech_timestamps[st]["start"] : speech_timestamps[st]["end"]]
@@ -149,6 +149,11 @@ for l in langs:
     onnxsession = rt.InferenceSession(
         f"./{l}.onnx",
         sess_options,
+        providers=[
+            "CUDAExecutionProvider",
+            "OpenVINOExecutionProvider",
+            "CPUExecutionProvider",
+        ],
     )
     decoders[l] = (onnxsession, decoder, processor)
 
@@ -180,19 +185,24 @@ with ui:
         with gr.TabItem("Logs"):
             logs = gr.Textbox()
 
+    lang.change(
+        fn=run_transcription,
+        inputs=[mic, audio_file, lang, categories],
+        outputs=[transcription, chunks, hotwordlist, logs],
+    )
     categories.change(
         fn=run_transcription,
-        inputs=[mic, lang, categories],
+        inputs=[mic, audio_file, lang, categories],
         outputs=[transcription, chunks, hotwordlist, logs],
     )
     mic.change(
         fn=run_transcription,
-        inputs=[mic, lang, categories],
+        inputs=[mic, audio_file, lang, categories],
         outputs=[transcription, chunks, hotwordlist, logs],
     )
     audio_file.change(
         fn=run_transcription,
-        inputs=[audio_file, lang, categories],
+        inputs=[mic, audio_file, lang, categories],
         outputs=[transcription, chunks, hotwordlist, logs],
     )
 
