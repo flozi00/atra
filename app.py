@@ -146,13 +146,12 @@ for l in langs:
         kenlm_model_path=f"./asr-as-a-service-lms/lm-{l}.arpa",
         # unigrams = list(sorted_dict.keys()),
     )
+    EPS = ["Tensorrt", "CUDA", "OpenVINO", "CPU"]
     onnxsession = rt.InferenceSession(
         f"./{l}.onnx",
         sess_options,
         providers=[
-            "CUDAExecutionProvider",
-            "OpenVINOExecutionProvider",
-            "CPUExecutionProvider",
+            f"{ep}ExecutionProvider" for ep in EPS
         ],
     )
     decoders[l] = (onnxsession, decoder, processor)
