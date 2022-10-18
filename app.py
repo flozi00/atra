@@ -54,8 +54,8 @@ def run_transcription(audio, main_lang, hotword_categories):
         )
         start_time = time.time()
 
-        for x in range(0, len(audio_batch), batch_size):
-            data = audio_batch[x : x + batch_size]
+        for x in range(len(audio_batch)):
+            data = audio_batch[x]
 
             input_values = processor(
                 data, sampling_rate=16000, return_tensors="pt", padding=True
@@ -146,7 +146,7 @@ for l in langs:
         kenlm_model_path=f"./asr-as-a-service-lms/lm-{l}.arpa",
         # unigrams = list(sorted_dict.keys()),
     )
-    EPS = ["Tensorrt", "CUDA", "OpenVINO", "CPU"]
+    EPS = ["CUDA", "OpenVINO", "CPU"]
     onnxsession = rt.InferenceSession(
         f"./{l}.onnx",
         sess_options,
@@ -155,8 +155,6 @@ for l in langs:
         ],
     )
     decoders[l] = (onnxsession, decoder, processor)
-
-batch_size = 4
 
 
 ui = gr.Blocks()
