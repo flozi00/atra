@@ -1,12 +1,50 @@
 import gradio as gr
 from pyctcdecode import build_ctcdecoder
 import time
-from transformers import Wav2Vec2Processor
+from transformers import AutoProcessor
 import onnxruntime as rt
 from export_model import exporting
 import glob
 from utils import ffmpeg_read, model_vad, get_speech_timestamps, MODEL_MAPPING
+import yt_dlp as youtube_dl
+from shutil import move
+import os
 
+class FilenameCollectorPP(youtube_dl.postprocessor.common.PostProcessor):
+    def __init__(self):
+        super(FilenameCollectorPP, self).__init__(None)
+        self.filenames = []
+        self.tags = ""
+
+    def run(self, information):
+        self.filenames.append(information["filepath"])
+        self.tags = " ".join(information["tags"][:3])
+        return [], information
+
+
+def download_audio(url):
+    options = {
+        "format": "bestaudio/best",
+        "postprocessors": [
+            {
+                "key": "FFmpegExtractAudio",
+                "preferredcodec": "mp3",
+                "preferredquality": "320",
+            }
+        ],
+        "outtmpl": "%(title)s.%(ext)s",
+    }
+
+    ydl = youtube_dl.YoutubeDL(options)
+    filename_collector = FilenameCollectorPP()
+    ydl.add_post_processor(filename_collector)
+    ydl.download([url])
+
+    fname, tags = filename_collector.filenames[0], filename_collector.tags
+    move(fname, tags + " " + fname)
+    fname = tags + " " + fname
+
+    return fname
 
 def run_transcription(audio, main_lang, hotword_categories):
     logs = ""
@@ -30,8 +68,12 @@ def run_transcription(audio, main_lang, hotword_categories):
         logs += f"init hotwords time: {'{:.4f}'.format(time.time() - start_time)}\n"
         start_time = time.time()
 
+        if("https://" in audio):
+            audio = download_audio(audio)
+
         with open(audio, "rb") as f:
             payload = f.read()
+        os.remove(audio)
 
         logs += f"read audio time: {'{:.4f}'.format(time.time() - start_time)}\n"
         start_time = time.time()
@@ -42,7 +84,7 @@ def run_transcription(audio, main_lang, hotword_categories):
         start_time = time.time()
 
         speech_timestamps = get_speech_timestamps(
-            audio, model_vad, sampling_rate=16000, min_silence_duration_ms=500
+            audio, model_vad, sampling_rate=16000, min_silence_duration_ms=250
         )
         audio_batch = [
             audio[speech_timestamps[st]["start"] : speech_timestamps[st]["end"]]
@@ -90,8 +132,8 @@ def run_transcription(audio, main_lang, hotword_categories):
                     {
                         "text": transcription_beam,
                         "timestamp": (
-                            speech_timestamps[y]["start"] / 16000,
-                            speech_timestamps[y]["end"] / 16000,
+                            speech_timestamps[x]["start"] / 16000,
+                            speech_timestamps[x]["end"] / 16000,
                         ),
                     }
                 )
@@ -135,7 +177,7 @@ langs = list(MODEL_MAPPING.keys())
 
 
 for l in langs:
-    processor = Wav2Vec2Processor.from_pretrained(MODEL_MAPPING[l])
+    processor = AutoProcessor.from_pretrained(MODEL_MAPPING[l])
     vocab_dict = processor.tokenizer.get_vocab()
     sorted_dict = {
         k: v for k, v in sorted(vocab_dict.items(), key=lambda item: item[1])
@@ -171,6 +213,8 @@ with ui:
             mic = gr.Audio(source="microphone", type="filepath")
         with gr.TabItem("File"):
             audio_file = gr.Audio(source="upload", type="filepath")
+        with gr.TabItem("URL"):
+            video_url = gr.Textbox()
 
     with gr.Tabs():
         with gr.TabItem("Transcription"):
@@ -190,6 +234,11 @@ with ui:
     audio_file.change(
         fn=run_transcription,
         inputs=[audio_file, lang, categories],
+        outputs=[transcription, chunks, hotwordlist, logs],
+    )
+    video_url.change(
+        fn=run_transcription,
+        inputs=[video_url, lang, categories],
         outputs=[transcription, chunks, hotwordlist, logs],
     )
 

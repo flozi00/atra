@@ -7,3 +7,4 @@ onnxruntime>=1.12.1
 torch
 torchaudio
 transformers>=4.21.1
+yt-dlp
