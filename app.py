@@ -84,7 +84,7 @@ def run_transcription(audio, main_lang, hotword_categories):
         start_time = time.time()
 
         speech_timestamps = get_speech_timestamps(
-            audio, model_vad, sampling_rate=16000, min_silence_duration_ms=250
+            audio, model_vad, sampling_rate=16000, min_silence_duration_ms=50
         )
         audio_batch = [
             audio[speech_timestamps[st]["start"] : speech_timestamps[st]["end"]]

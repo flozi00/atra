@@ -3,7 +3,7 @@ import numpy as np
 from silero_vad import silero_vad
 
 MODEL_MAPPING = {
-    "german": "aware-ai/wav2vec2-xls-r-1b-german"
+    "german": "aware-ai/wav2vec2-xls-r-1b-german-cv11"
 }
 
 # copied from https://github.com/huggingface/transformers
