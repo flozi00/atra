@@ -2,9 +2,7 @@ import subprocess
 import numpy as np
 from silero_vad import silero_vad
 
-MODEL_MAPPING = {
-    "german": "aware-ai/wav2vec2-xls-r-1b-german-cv11"
-}
+MODEL_MAPPING = {"german": "/mnt/nvme0/asr/whisper-small-german"}
 
 # copied from https://github.com/huggingface/transformers
 def ffmpeg_read(bpayload: bytes, sampling_rate: int) -> np.array:
