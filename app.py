@@ -135,9 +135,9 @@ def run_transcription(audio, main_lang, hotword_categories):
             with torch.inference_mode():
                 predicted_ids = model.generate(
                     input_values,
-                    num_return_sequences=10,
-                    num_beams=10,
-                    no_repeat_ngram_size=1,
+                    #num_return_sequences=10,
+                    #num_beams=10,
+                    #no_repeat_ngram_size=1,
                     max_length=(len(data) / 16000) * 12,
                     use_cache=True,
                 )
