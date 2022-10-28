@@ -2,10 +2,20 @@ import gradio as gr
 import time
 from transformers import WhisperProcessor, WhisperForConditionalGeneration
 import glob
-from utils import ffmpeg_read, model_vad, get_speech_timestamps, MODEL_MAPPING, LANG_MAPPING
+from utils import (
+    ffmpeg_read,
+    model_vad,
+    get_speech_timestamps,
+    MODEL_MAPPING,
+    LANG_MAPPING,
+)
 import yt_dlp as youtube_dl
 from shutil import move
 import os
+import torch
+
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 class FilenameCollectorPP(youtube_dl.postprocessor.common.PostProcessor):
@@ -51,7 +61,9 @@ def run_transcription(audio, main_lang, hotword_categories):
     full_transcription = ""
     chunks = []
 
-    model.config.forced_decoder_ids = processor.get_decoder_prompt_ids(language = LANG_MAPPING[main_lang], task = "transcribe")
+    model.config.forced_decoder_ids = processor.get_decoder_prompt_ids(
+        language=LANG_MAPPING[main_lang], task="transcribe"
+    )
 
     logs += f"init vars time: {'{:.4f}'.format(time.time() - start_time)}\n"
     start_time = time.time()
@@ -64,6 +76,9 @@ def run_transcription(audio, main_lang, hotword_categories):
                 for w in words:
                     if len(w) >= 3:
                         hotwords.append(w.strip())
+
+        if len(hotwords) <= 1:
+            hotwords = [" "]
 
         logs += f"init hotwords time: {'{:.4f}'.format(time.time() - start_time)}\n"
         start_time = time.time()
@@ -85,7 +100,10 @@ def run_transcription(audio, main_lang, hotword_categories):
             start_time = time.time()
 
         speech_timestamps = get_speech_timestamps(
-            audio, model_vad, sampling_rate=16000, min_silence_duration_ms=250,
+            audio,
+            model_vad,
+            sampling_rate=16000,
+            min_silence_duration_ms=250,
         )
         audio_batch = [
             audio[speech_timestamps[st]["start"] : speech_timestamps[st]["end"]]
@@ -100,13 +118,34 @@ def run_transcription(audio, main_lang, hotword_categories):
             data = audio_batch[x]
 
             input_values = processor.feature_extractor(
-                data, sampling_rate=16000, return_tensors="pt", truncation=True,
+                data,
+                sampling_rate=16000,
+                return_tensors="pt",
+                truncation=True,
             ).input_features
 
+            input_values = input_values.to(device)
 
-            predicted_ids = model.generate(input_values)
-            transcription = processor.batch_decode(predicted_ids, skip_special_tokens = True)[0]
-            full_transcription += transcription
+            force_words_ids = [
+                processor.tokenizer(
+                    hotwords, add_prefix_space=True, add_special_tokens=False
+                ).input_ids
+            ]
+
+            with torch.inference_mode():
+                predicted_ids = model.generate(
+                    input_values,
+                    num_return_sequences=10,
+                    num_beams=10,
+                    no_repeat_ngram_size=1,
+                    max_length=(len(data) / 16000) * 12,
+                    use_cache=True,
+                )
+
+            transcription = processor.batch_decode(
+                predicted_ids, skip_special_tokens=True
+            )[0]
+            full_transcription += str(transcription)
             chunks.append(
                 {
                     "text": transcription,
@@ -117,11 +156,10 @@ def run_transcription(audio, main_lang, hotword_categories):
                 }
             )
 
-            yield full_transcription, chunks, hotwords, logs
 
-        yield full_transcription, chunks, hotwords, logs
+        return full_transcription, chunks, hotwords, logs
     else:
-        yield "", [], [], ""
+        return "", [], [], ""
 
 
 """
@@ -140,7 +178,6 @@ def get_categories():
     return hotword_categories
 
 
-
 """
 model stuff
 """
@@ -148,9 +185,9 @@ decoders = {}
 langs = list(MODEL_MAPPING.keys())
 
 
-
 processor = WhisperProcessor.from_pretrained("openai/whisper-large")
-model = WhisperForConditionalGeneration.from_pretrained("openai/whisper-large")
+model = WhisperForConditionalGeneration.from_pretrained("openai/whisper-large").eval()
+model.to(device)
 
 
 ui = gr.Blocks()
@@ -198,5 +235,4 @@ with ui:
 
 
 if __name__ == "__main__":
-    ui.queue()
     ui.launch(server_name="0.0.0.0")
