@@ -2,7 +2,7 @@ import gradio as gr
 import time
 from transformers import WhisperProcessor, WhisperForConditionalGeneration
 import glob
-from utils import ffmpeg_read, model_vad, get_speech_timestamps, MODEL_MAPPING
+from utils import ffmpeg_read, model_vad, get_speech_timestamps, MODEL_MAPPING, LANG_MAPPING
 import yt_dlp as youtube_dl
 from shutil import move
 import os
@@ -50,7 +50,8 @@ def run_transcription(audio, main_lang, hotword_categories):
     start_time = time.time()
     full_transcription = ""
     chunks = []
-    model, processor = decoders[main_lang]
+
+    model.config.forced_decoder_ids = processor.get_decoder_prompt_ids(language = LANG_MAPPING[main_lang], task = "transcribe")
 
     logs += f"init vars time: {'{:.4f}'.format(time.time() - start_time)}\n"
     start_time = time.time()
@@ -147,11 +148,9 @@ decoders = {}
 langs = list(MODEL_MAPPING.keys())
 
 
-for l in langs:
-    processor = WhisperProcessor.from_pretrained(MODEL_MAPPING[l])
-    model = WhisperForConditionalGeneration.from_pretrained(MODEL_MAPPING[l])
-    
-    decoders[l] = (model, processor)
+
+processor = WhisperProcessor.from_pretrained("openai/whisper-large")
+model = WhisperForConditionalGeneration.from_pretrained("openai/whisper-large")
 
 
 ui = gr.Blocks()
