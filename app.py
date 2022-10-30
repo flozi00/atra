@@ -61,10 +61,6 @@ def run_transcription(audio, main_lang, hotword_categories):
     full_transcription = ""
     chunks = []
 
-    model.config.forced_decoder_ids = processor.get_decoder_prompt_ids(
-        language=LANG_MAPPING[main_lang], task="transcribe"
-    )
-
     logs += f"init vars time: {'{:.4f}'.format(time.time() - start_time)}\n"
     start_time = time.time()
 
@@ -135,11 +131,15 @@ def run_transcription(audio, main_lang, hotword_categories):
             with torch.inference_mode():
                 predicted_ids = model.generate(
                     input_values,
-                    #num_return_sequences=10,
-                    #num_beams=10,
-                    #no_repeat_ngram_size=1,
+                    # num_return_sequences=10,
+                    # num_beams=10,
+                    # no_repeat_ngram_size=1,
                     max_length=(len(data) / 16000) * 12,
                     use_cache=True,
+                    forced_decoder_ids=processor.get_decoder_prompt_ids(
+                        language=LANG_MAPPING[main_lang], task="transcribe"
+                    ),
+                    
                 )
 
             transcription = processor.batch_decode(
@@ -155,7 +155,6 @@ def run_transcription(audio, main_lang, hotword_categories):
                     ),
                 }
             )
-
 
         return full_transcription, chunks, hotwords, logs
     else:
@@ -187,7 +186,7 @@ langs = list(MODEL_MAPPING.keys())
 
 processor = WhisperProcessor.from_pretrained("openai/whisper-large")
 model = WhisperForConditionalGeneration.from_pretrained("openai/whisper-large").eval()
-model.to(device)
+model = model.to(device)
 
 
 ui = gr.Blocks()
