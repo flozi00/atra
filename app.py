@@ -1,19 +1,65 @@
 import gradio as gr
-from pyctcdecode import build_ctcdecoder
 import time
-from transformers import Wav2Vec2Processor
-import onnxruntime as rt
-from export_model import exporting
+from transformers import WhisperProcessor, WhisperForConditionalGeneration
 import glob
-from utils import ffmpeg_read, model_vad, get_speech_timestamps, MODEL_MAPPING
+from utils import (
+    ffmpeg_read,
+    model_vad,
+    get_speech_timestamps,
+    MODEL_MAPPING,
+    LANG_MAPPING,
+)
+import yt_dlp as youtube_dl
+from shutil import move
+import os
+import torch
+
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+
+class FilenameCollectorPP(youtube_dl.postprocessor.common.PostProcessor):
+    def __init__(self):
+        super(FilenameCollectorPP, self).__init__(None)
+        self.filenames = []
+        self.tags = ""
+
+    def run(self, information):
+        self.filenames.append(information["filepath"])
+        self.tags = " ".join(information["tags"][:3])
+        return [], information
+
+
+def download_audio(url):
+    options = {
+        "format": "bestaudio/best",
+        "postprocessors": [
+            {
+                "key": "FFmpegExtractAudio",
+                "preferredcodec": "mp3",
+                "preferredquality": "320",
+            }
+        ],
+        "outtmpl": "%(title)s.%(ext)s",
+    }
+
+    ydl = youtube_dl.YoutubeDL(options)
+    filename_collector = FilenameCollectorPP()
+    ydl.add_post_processor(filename_collector)
+    ydl.download([url])
+
+    fname, tags = filename_collector.filenames[0], filename_collector.tags
+    move(fname, tags + " " + fname)
+    fname = tags + " " + fname
+
+    return fname
 
 
 def run_transcription(audio, main_lang, hotword_categories):
     logs = ""
     start_time = time.time()
-    transcription = ""
+    full_transcription = ""
     chunks = []
-    session, decoder, processor = decoders[main_lang]
 
     logs += f"init vars time: {'{:.4f}'.format(time.time() - start_time)}\n"
     start_time = time.time()
@@ -27,22 +73,33 @@ def run_transcription(audio, main_lang, hotword_categories):
                     if len(w) >= 3:
                         hotwords.append(w.strip())
 
+        if len(hotwords) <= 1:
+            hotwords = [" "]
+
         logs += f"init hotwords time: {'{:.4f}'.format(time.time() - start_time)}\n"
         start_time = time.time()
 
-        with open(audio, "rb") as f:
-            payload = f.read()
+        if "https://" in audio:
+            audio = download_audio(audio)
 
-        logs += f"read audio time: {'{:.4f}'.format(time.time() - start_time)}\n"
-        start_time = time.time()
+        if isinstance(audio, str):
+            with open(audio, "rb") as f:
+                payload = f.read()
+            os.remove(audio)
 
-        audio = ffmpeg_read(payload, sampling_rate=16000)
+            logs += f"read audio time: {'{:.4f}'.format(time.time() - start_time)}\n"
+            start_time = time.time()
 
-        logs += f"convert audio time: {'{:.4f}'.format(time.time() - start_time)}\n"
-        start_time = time.time()
+            audio = ffmpeg_read(payload, sampling_rate=16000)
+
+            logs += f"convert audio time: {'{:.4f}'.format(time.time() - start_time)}\n"
+            start_time = time.time()
 
         speech_timestamps = get_speech_timestamps(
-            audio, model_vad, sampling_rate=16000, min_silence_duration_ms=500
+            audio,
+            model_vad,
+            sampling_rate=16000,
+            min_silence_duration_ms=250,
         )
         audio_batch = [
             audio[speech_timestamps[st]["start"] : speech_timestamps[st]["end"]]
@@ -52,54 +109,54 @@ def run_transcription(audio, main_lang, hotword_categories):
         logs += (
             f"get speech timestamps time: {'{:.4f}'.format(time.time() - start_time)}\n"
         )
-        start_time = time.time()
 
-        for x in range(0, len(audio_batch), batch_size):
-            data = audio_batch[x : x + batch_size]
+        for x in range(len(audio_batch)):
+            data = audio_batch[x]
 
-            input_values = processor(
-                data, sampling_rate=16000, return_tensors="pt", padding=True
-            ).input_values
+            input_values = processor.feature_extractor(
+                data,
+                sampling_rate=16000,
+                return_tensors="pt",
+                truncation=True,
+            ).input_features
 
-            logs += f"process audio time: {'{:.4f}'.format(time.time() - start_time)}\n"
-            start_time = time.time()
+            input_values = input_values.to(device)
 
-            onnx_outputs = session.run(
-                None, {session.get_inputs()[0].name: input_values.numpy()}
-            )
+            force_words_ids = [
+                processor.tokenizer(
+                    hotwords, add_prefix_space=True, add_special_tokens=False
+                ).input_ids
+            ]
 
-            logs += (
-                f"inference time onnx: {'{:.4f}'.format(time.time() - start_time)}\n"
-            )
-            start_time = time.time()
-
-            for y in range(len(onnx_outputs[0])):
-                beams = decoder.decode_beams(
-                    onnx_outputs[0][y],
-                    hotword_weight=20,
-                    hotwords=hotwords,
-                    # beam_width=500,
+            with torch.inference_mode():
+                predicted_ids = model.generate(
+                    input_values,
+                    # num_return_sequences=10,
+                    # num_beams=10,
+                    # no_repeat_ngram_size=1,
+                    max_length=(len(data) / 16000) * 12,
+                    use_cache=True,
+                    forced_decoder_ids=processor.get_decoder_prompt_ids(
+                        language=LANG_MAPPING[main_lang], task="transcribe"
+                    ),
+                    
                 )
 
-                top_beam = beams[0]
-                transcription_beam, lm_state, indices, logit_score, lm_score = top_beam
-                transcription_beam = transcription_beam.replace('"', "")
-                transcription += transcription_beam + " "
+            transcription = processor.batch_decode(
+                predicted_ids, skip_special_tokens=True
+            )[0]
+            full_transcription += str(transcription)
+            chunks.append(
+                {
+                    "text": transcription,
+                    "timestamp": (
+                        speech_timestamps[x]["start"] / 16000,
+                        speech_timestamps[x]["end"] / 16000,
+                    ),
+                }
+            )
 
-                chunks.append(
-                    {
-                        "text": transcription_beam,
-                        "timestamp": (
-                            speech_timestamps[y]["start"] / 16000,
-                            speech_timestamps[y]["end"] / 16000,
-                        ),
-                    }
-                )
-
-            logs += f"LM decode time: {'{:.4f}'.format(time.time() - start_time)}\n"
-            start_time = time.time()
-
-        return transcription, chunks, hotwords, logs
+        return full_transcription, chunks, hotwords, logs
     else:
         return "", [], [], ""
 
@@ -121,42 +178,15 @@ def get_categories():
 
 
 """
-onnx runtime initialization
-"""
-sess_options = rt.SessionOptions()
-sess_options.graph_optimization_level = rt.GraphOptimizationLevel.ORT_ENABLE_ALL
-
-
-"""
-decoder stuff
+model stuff
 """
 decoders = {}
 langs = list(MODEL_MAPPING.keys())
 
 
-for l in langs:
-    processor = Wav2Vec2Processor.from_pretrained(MODEL_MAPPING[l])
-    vocab_dict = processor.tokenizer.get_vocab()
-    sorted_dict = {
-        k: v for k, v in sorted(vocab_dict.items(), key=lambda item: item[1])
-    }
-    exporting(l)
-    decoder = build_ctcdecoder(
-        labels=list(sorted_dict.keys()),
-        kenlm_model_path=f"./asr-as-a-service-lms/lm-{l}.arpa",
-        # unigrams = list(sorted_dict.keys()),
-    )
-    EPS = ["Tensorrt", "CUDA", "OpenVINO", "CPU"]
-    onnxsession = rt.InferenceSession(
-        f"./{l}.onnx",
-        sess_options,
-        providers=[
-            f"{ep}ExecutionProvider" for ep in EPS
-        ],
-    )
-    decoders[l] = (onnxsession, decoder, processor)
-
-batch_size = 4
+processor = WhisperProcessor.from_pretrained("openai/whisper-large")
+model = WhisperForConditionalGeneration.from_pretrained("openai/whisper-large").eval()
+model = model.to(device)
 
 
 ui = gr.Blocks()
@@ -173,6 +203,8 @@ with ui:
             mic = gr.Audio(source="microphone", type="filepath")
         with gr.TabItem("File"):
             audio_file = gr.Audio(source="upload", type="filepath")
+        with gr.TabItem("URL"):
+            video_url = gr.Textbox()
 
     with gr.Tabs():
         with gr.TabItem("Transcription"):
@@ -192,6 +224,11 @@ with ui:
     audio_file.change(
         fn=run_transcription,
         inputs=[audio_file, lang, categories],
+        outputs=[transcription, chunks, hotwordlist, logs],
+    )
+    video_url.change(
+        fn=run_transcription,
+        inputs=[video_url, lang, categories],
         outputs=[transcription, chunks, hotwordlist, logs],
     )
 
