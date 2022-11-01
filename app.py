@@ -13,9 +13,20 @@ import yt_dlp as youtube_dl
 from shutil import move
 import os
 import torch
-
+from optimum.pipelines import pipeline
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
+
+trans_pipes = {
+    "Helsinki-NLP/opus-mt-en-de": pipeline(
+        "translation", model=f"Helsinki-NLP/opus-mt-en-de"
+    ),
+    "Helsinki-NLP/opus-mt-de-en": pipeline(
+        "translation", model=f"Helsinki-NLP/opus-mt-de-en"
+    ),
+}
 
 
 class FilenameCollectorPP(youtube_dl.postprocessor.common.PostProcessor):
@@ -56,6 +67,7 @@ def download_audio(url):
 
 
 def run_transcription(audio, main_lang, hotword_categories):
+    global trans_pipes
     logs = ""
     start_time = time.time()
     full_transcription = ""
@@ -139,7 +151,6 @@ def run_transcription(audio, main_lang, hotword_categories):
                     forced_decoder_ids=processor.get_decoder_prompt_ids(
                         language=LANG_MAPPING[main_lang], task="transcribe"
                     ),
-                    
                 )
 
             transcription = processor.batch_decode(
@@ -156,7 +167,38 @@ def run_transcription(audio, main_lang, hotword_categories):
                 }
             )
 
-        return full_transcription, chunks, hotwords, logs
+        if LANG_MAPPING[main_lang] != "en":
+            trans_pipe = trans_pipes.get(
+                f"Helsinki-NLP/opus-mt-{LANG_MAPPING[main_lang]}-en", None
+            )
+            if trans_pipe is None:
+                trans_pipe = pipeline(
+                    "translation",
+                    model=f"Helsinki-NLP/opus-mt-{LANG_MAPPING[main_lang]}-en",
+                )
+                trans_pipes[
+                    f"Helsinki-NLP/opus-mt-{LANG_MAPPING[main_lang]}-en"
+                ] = trans_pipe
+            en_version = trans_pipe(full_transcription)[0]["translation_text"]
+        else:
+            en_version = full_transcription
+        summarization = summarizer(
+            en_version, max_length=130, min_length=30, do_sample=False
+        )[0]["summary_text"]
+        if LANG_MAPPING[main_lang] != "en":
+            trans_pipe = trans_pipes.get(
+                f"Helsinki-NLP/opus-mt-en-{LANG_MAPPING[main_lang]}", None
+            )
+            if trans_pipe is None:
+                trans_pipe = pipeline(
+                    "translation",
+                    model=f"Helsinki-NLP/opus-mt-en-{LANG_MAPPING[main_lang]}",
+                )
+                trans_pipes[
+                    f"Helsinki-NLP/opus-mt-en-{LANG_MAPPING[main_lang]}"
+                ] = trans_pipe
+            summarization = trans_pipe(summarization)[0]["translation_text"]
+        return full_transcription, chunks, hotwords, logs, summarization
     else:
         return "", [], [], ""
 
@@ -215,21 +257,23 @@ with ui:
             hotwordlist = gr.JSON()
         with gr.TabItem("Logs"):
             logs = gr.Textbox()
+        with gr.TabItem("Summarization"):
+            sumarization = gr.Textbox()
 
     mic.change(
         fn=run_transcription,
         inputs=[mic, lang, categories],
-        outputs=[transcription, chunks, hotwordlist, logs],
+        outputs=[transcription, chunks, hotwordlist, logs, sumarization],
     )
     audio_file.change(
         fn=run_transcription,
         inputs=[audio_file, lang, categories],
-        outputs=[transcription, chunks, hotwordlist, logs],
+        outputs=[transcription, chunks, hotwordlist, logs, sumarization],
     )
     video_url.change(
         fn=run_transcription,
         inputs=[video_url, lang, categories],
-        outputs=[transcription, chunks, hotwordlist, logs],
+        outputs=[transcription, chunks, hotwordlist, logs, sumarization],
     )
 
 

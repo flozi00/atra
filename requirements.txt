@@ -10,3 +10,5 @@ transformers>=4.21.1
 yt-dlp
 jiwer
 datasets
+optimum
+sacremoses
