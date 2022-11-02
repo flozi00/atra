@@ -1,6 +1,6 @@
 import subprocess
 import numpy as np
-from silero_vad import silero_vad
+from aaas.silero_vad import silero_vad
 
 MODEL_MAPPING = {"german": "openai/whisper-large"}
 LANG_MAPPING = {"german": "de"}
