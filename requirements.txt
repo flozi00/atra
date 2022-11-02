@@ -1,12 +1,12 @@
+datasets
 gradio
+jiwer
 numpy
 onnx
 onnxruntime>=1.12.1
+optimum
+sacremoses
 torch
 torchaudio
 transformers>=4.24.0
 yt-dlp
-jiwer
-datasets
-optimum
-sacremoses

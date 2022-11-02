@@ -12,6 +12,7 @@ trans_pipes = {
     ),
 }
 
+
 def translate(text, source, target):
     global trans_pipes
 
@@ -19,29 +20,25 @@ def translate(text, source, target):
         return text
 
     model_id = f"Helsinki-NLP/opus-mt-{source}-{target}"
-    trans_pipe = trans_pipes.get(
-            model_id, None
-        )
+    trans_pipe = trans_pipes.get(model_id, None)
     if trans_pipe is None:
         trans_pipe = pipeline(
             "translation",
             model=model_id,
         )
-        trans_pipes[
-            model_id
-        ] = trans_pipe
+        trans_pipes[model_id] = trans_pipe
 
     translated = trans_pipe(text)[0]["translation_text"]
 
     return translated
 
+
 def summarize(main_lang, text):
     en_version = translate(text, LANG_MAPPING[main_lang], "en")
-    
+
     summarization = summarizer(
         en_version, max_length=130, min_length=30, do_sample=False
     )[0]["summary_text"]
-    
 
     summarization = translate(summarization, "en", LANG_MAPPING[main_lang])
 
