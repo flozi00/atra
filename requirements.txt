@@ -10,3 +10,4 @@ torch
 torchaudio
 transformers>=4.24.0
 yt-dlp
+sentencepiece
