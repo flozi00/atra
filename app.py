@@ -13,7 +13,7 @@ from aaas.remote_utils import download_audio
 import os
 import torch
 
-device = "cpu" if torch.cuda.is_available() else "cpu"
+device = "cuda" if torch.cuda.is_available() else "cpu"
 langs = list(LANG_MAPPING.keys())
 
 def run_transcription(audio, main_lang, hotword_categories):
