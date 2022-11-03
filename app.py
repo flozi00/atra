@@ -101,9 +101,7 @@ def run_transcription(audio, main_lang, hotword_categories):
                     forced_decoder_ids=processor.get_decoder_prompt_ids(
                         language=LANG_MAPPING[main_lang], task="transcribe"
                     ),
-                    top_k=3,
-                    do_sample=False,
-                    penalty_alpha=0,
+                    num_beams=10
                 )
 
             logs += (
@@ -142,8 +140,7 @@ def run_transcription(audio, main_lang, hotword_categories):
                 full_transcription["text"] += c["text"] + "\n"
                 full_transcription["en_text"] += c["en_text"] + "\n"
 
-        logs += f"transcription and translation: {'{:.4f}'.format(time.time() - start_time)}\n"
-        start_time = time.time()
+        
         if len(full_transcription) > 512:
             summarization = summarize(full_transcription["en_text"])
         else:
