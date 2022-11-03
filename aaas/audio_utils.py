@@ -25,7 +25,7 @@ def get_model_and_processor(lang, device):
         model = model.to(device)
         MODEL_MAPPING[lang]["model"] = model
 
-    return processor, model
+    return model, processor
 
 
 # copied from https://github.com/huggingface/transformers
