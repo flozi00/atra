@@ -1,65 +1,30 @@
 import gradio as gr
 import time
-from transformers import WhisperProcessor, WhisperForConditionalGeneration
 import glob
 from aaas.audio_utils import (
     ffmpeg_read,
     model_vad,
     get_speech_timestamps,
-    MODEL_MAPPING,
     LANG_MAPPING,
+    get_model_and_processor,
 )
 from aaas.text_utils import summarize, translate
-import yt_dlp as youtube_dl
-from shutil import move
+from aaas.remote_utils import download_audio
 import os
 import torch
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model_id = "openai/whisper-large" if device == "cuda" else "openai/whisper-small"
-
-class FilenameCollectorPP(youtube_dl.postprocessor.common.PostProcessor):
-    def __init__(self):
-        super(FilenameCollectorPP, self).__init__(None)
-        self.filenames = []
-        self.tags = ""
-
-    def run(self, information):
-        self.filenames.append(information["filepath"])
-        self.tags = " ".join(information["tags"][:3])
-        return [], information
-
-
-def download_audio(url):
-    options = {
-        "format": "bestaudio/best",
-        "postprocessors": [
-            {
-                "key": "FFmpegExtractAudio",
-                "preferredcodec": "mp3",
-                "preferredquality": "320",
-            }
-        ],
-        "outtmpl": "%(title)s.%(ext)s",
-    }
-
-    ydl = youtube_dl.YoutubeDL(options)
-    filename_collector = FilenameCollectorPP()
-    ydl.add_post_processor(filename_collector)
-    ydl.download([url])
-
-    fname, tags = filename_collector.filenames[0], filename_collector.tags
-    move(fname, tags + " " + fname)
-    fname = tags + " " + fname
-
-    return fname
-
+device = "cuda" if torch.cuda.is_available() else "cpu"
+langs = list(LANG_MAPPING.keys())
 
 def run_transcription(audio, main_lang, hotword_categories):
     global trans_pipes
     logs = ""
     start_time = time.time()
     chunks = []
+
+    model, processor = get_model_and_processor(
+        lang="universal" if device == "cuda" else main_lang
+    )
 
     logs += f"init vars time: {'{:.4f}'.format(time.time() - start_time)}\n"
     start_time = time.time()
@@ -191,18 +156,6 @@ def get_categories():
             hotword_categories.append(file.split(".")[0])
 
     return hotword_categories
-
-
-"""
-model stuff
-"""
-decoders = {}
-langs = list(MODEL_MAPPING.keys())
-
-
-processor = WhisperProcessor.from_pretrained(model_id)
-model = WhisperForConditionalGeneration.from_pretrained(model_id).eval()
-model = model.to(device)
 
 
 ui = gr.Blocks()

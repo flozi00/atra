@@ -3,8 +3,8 @@ from aaas.audio_utils import LANG_MAPPING
 from transformers import AutoTokenizer
 from optimum.onnxruntime import ORTModelForSeq2SeqLM
 
-optimum_pipes = {
-}
+optimum_pipes = {}
+
 
 def get_optimum_pipeline(task, model_id):
     global optimum_pipes
@@ -16,24 +16,23 @@ def get_optimum_pipeline(task, model_id):
     if pipe != None:
         return pipe
 
-    if(task in ["translation", "summarization"]):
+    if task in ["translation", "summarization"]:
         try:
             model = ORTModelForSeq2SeqLM.from_pretrained(onnx_id)
             tokenizer = AutoTokenizer.from_pretrained(onnx_id)
         except:
-            model = ORTModelForSeq2SeqLM.from_pretrained(model_id, from_transformers=True)
+            model = ORTModelForSeq2SeqLM.from_pretrained(
+                model_id, from_transformers=True
+            )
             tokenizer = AutoTokenizer.from_pretrained(model_id, from_transformers=True)
             model.save_pretrained(onnx_id)
             tokenizer.save_pretrained(onnx_id)
 
-
-    pipe = pipeline(
-        task, model=model, tokenizer=tokenizer
-    )
+    pipe = pipeline(task, model=model, tokenizer=tokenizer)
     optimum_pipes[pipe_id] = pipe
 
     return pipe
-    
+
 
 def translate(text, source, target):
 
@@ -49,7 +48,9 @@ def translate(text, source, target):
 
 
 def summarize(main_lang, text):
-    summarizer = get_optimum_pipeline("summarization", model_id="facebook/bart-large-cnn")
+    summarizer = get_optimum_pipeline(
+        "summarization", model_id="facebook/bart-large-cnn"
+    )
 
     en_version = translate(text, LANG_MAPPING[main_lang], "en")
 

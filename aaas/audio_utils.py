@@ -1,9 +1,32 @@
 import subprocess
 import numpy as np
 from aaas.silero_vad import silero_vad
+from transformers import WhisperProcessor, WhisperForConditionalGeneration
 
-MODEL_MAPPING = {"german": "openai/whisper-large"}
+MODEL_MAPPING = {
+    "german": {"name": "aware-ai/whisper-base-german"},
+    "universal": {"name": "openai/whisper-large"},
+}
 LANG_MAPPING = {"german": "de"}
+
+
+def get_model_and_processor(lang, device):
+    model_id = MODEL_MAPPING[lang]["name"]
+
+    model = MODEL_MAPPING[lang].get("model", None)
+    processor = MODEL_MAPPING[lang].get("processor", None)
+
+    if processor == None:
+        processor = WhisperProcessor.from_pretrained(model_id)
+        MODEL_MAPPING[lang]["processor"] = processor
+
+    if model == None:
+        model = WhisperForConditionalGeneration.from_pretrained(model_id).eval()
+        model = model.to(device)
+        MODEL_MAPPING[lang]["model"] = model
+
+    return processor, model
+
 
 # copied from https://github.com/huggingface/transformers
 def ffmpeg_read(bpayload: bytes, sampling_rate: int) -> np.array:
