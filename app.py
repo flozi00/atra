@@ -16,7 +16,7 @@ import os
 import torch
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
+model_id = "openai/whisper-large" if device == "cuda" else "openai/whisper-small"
 
 class FilenameCollectorPP(youtube_dl.postprocessor.common.PostProcessor):
     def __init__(self):
@@ -139,7 +139,7 @@ def run_transcription(audio, main_lang, hotword_categories):
                     ),
                     top_k=3,
                     do_sample=False,
-                    penalty_alpha=0.1,
+                    penalty_alpha=0,
                 )
 
             transcription = processor.batch_decode(
@@ -200,8 +200,8 @@ decoders = {}
 langs = list(MODEL_MAPPING.keys())
 
 
-processor = WhisperProcessor.from_pretrained("openai/whisper-large")
-model = WhisperForConditionalGeneration.from_pretrained("openai/whisper-large").eval()
+processor = WhisperProcessor.from_pretrained(model_id)
+model = WhisperForConditionalGeneration.from_pretrained(model_id).eval()
 model = model.to(device)
 
 

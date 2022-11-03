@@ -43,3 +43,5 @@ train*.csv
 *.bias
 onnx_*
 !silero_vad.onnx
+*.json
+*.spm
