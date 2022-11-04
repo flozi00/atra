@@ -206,6 +206,7 @@ with ui:
         fn=run_transcription,
         inputs=[mic, lang, categories],
         outputs=[transcription, chunks, hotwordlist, logs, sumarization],
+        api_name="transcription"
     )
     audio_file.change(
         fn=run_transcription,
