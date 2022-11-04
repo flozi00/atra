@@ -136,7 +136,7 @@ def run_transcription(audio, main_lang, hotword_categories):
             for c in chunks:
                 full_transcription["text"] += c["text"] + "\n"
 
-            yield full_transcription["text"], chunks, hotwords, logs, summarization
+            #yield full_transcription["text"], chunks, hotwords, logs, summarization
 
         if len(full_transcription) > 512:
             for c in range(len(chunks)):
@@ -152,9 +152,9 @@ def run_transcription(audio, main_lang, hotword_categories):
 
         logs += f"summarization: {'{:.4f}'.format(time.time() - start_time)}\n"
 
-        yield full_transcription["text"], chunks, hotwords, logs, summarization
+        return full_transcription["text"], chunks, hotwords, logs, summarization
     else:
-        yield "", [], [], "", ""
+        return "", [], [], "", ""
 
 
 """
@@ -221,5 +221,5 @@ with ui:
 
 
 if __name__ == "__main__":
-    ui.queue()
+    #ui.queue()
     ui.launch(server_name="0.0.0.0")
