@@ -2,9 +2,11 @@ from optimum.pipelines import pipeline
 from aaas.audio_utils import LANG_MAPPING
 from transformers import AutoTokenizer
 from optimum.onnxruntime import ORTModelForSeq2SeqLM
+import onnxruntime
 
 optimum_pipes = {}
 
+provider = "CUDAExecutionProvider" if "CUDAExecutionProvider" in onnxruntime.get_available_providers() else "CPUExecutionProvider"
 
 def get_optimum_pipeline(task, model_id):
     global optimum_pipes
@@ -18,11 +20,11 @@ def get_optimum_pipeline(task, model_id):
 
     if task in ["translation", "summarization"]:
         try:
-            model = ORTModelForSeq2SeqLM.from_pretrained(onnx_id)
+            model = ORTModelForSeq2SeqLM.from_pretrained(onnx_id, provider=provider)
             tokenizer = AutoTokenizer.from_pretrained(onnx_id)
         except:
             model = ORTModelForSeq2SeqLM.from_pretrained(
-                model_id, from_transformers=True
+                model_id, from_transformers=True, provider=provider
             )
             tokenizer = AutoTokenizer.from_pretrained(model_id, from_transformers=True)
             model.save_pretrained(onnx_id)

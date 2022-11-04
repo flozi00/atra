@@ -21,9 +21,10 @@ def run_transcription(audio, main_lang, hotword_categories):
     logs = ""
     start_time = time.time()
     chunks = []
+    summarization = ""
 
     model, processor = get_model_and_processor(
-        lang="universal" if device == "cuda" else main_lang, device=device
+        main_lang, device=device
     )
 
     logs += f"init vars time: {'{:.4f}'.format(time.time() - start_time)}\n"
@@ -96,12 +97,14 @@ def run_transcription(audio, main_lang, hotword_categories):
             with torch.inference_mode():
                 predicted_ids = model.generate(
                     input_values,
-                    max_length=(len(data) / 16000) * 12,
+                    max_length=int((len(data) / 16000) * 12),
+                    min_length = 4,
                     use_cache=True,
+                    num_beams = 20,
                     forced_decoder_ids=processor.get_decoder_prompt_ids(
                         language=LANG_MAPPING[main_lang], task="transcribe"
                     ),
-                    num_beams=10
+                    return_dict_in_generate=False, output_scores=False
                 )
 
             logs += (
@@ -121,7 +124,6 @@ def run_transcription(audio, main_lang, hotword_categories):
             chunks.append(
                 {
                     "text": transcription,
-                    "en_text": translate(transcription, LANG_MAPPING[main_lang], "en"),
                     "timestamp": (
                         speech_timestamps[x]["start"] / 16000,
                         speech_timestamps[x]["end"] / 16000,
@@ -129,28 +131,30 @@ def run_transcription(audio, main_lang, hotword_categories):
                 }
             )
 
-            logs += (
-                f"translate: {'{:.4f}'.format(time.time() - start_time)}\n"
-            )
-            start_time = time.time()
-
             full_transcription = {"text": "", "en_text": ""}
 
             for c in chunks:
                 full_transcription["text"] += c["text"] + "\n"
-                full_transcription["en_text"] += c["en_text"] + "\n"
 
-        
+            yield full_transcription["text"], chunks, hotwords, logs, summarization
+
         if len(full_transcription) > 512:
+            for c in range(len(chunks)):
+                chunks[c]["en_text"] = translate(chunks[c]["text"], LANG_MAPPING[main_lang], "en"),
+                full_transcription["en_text"] += chunks[c]["en_text"] + "\n"
+            logs += (
+                f"translate: {'{:.4f}'.format(time.time() - start_time)}\n"
+            )
+            start_time = time.time()
             summarization = summarize(full_transcription["en_text"])
         else:
             summarization = ""
 
         logs += f"summarization: {'{:.4f}'.format(time.time() - start_time)}\n"
 
-        return full_transcription["text"], chunks, hotwords, logs, summarization
+        yield full_transcription["text"], chunks, hotwords, logs, summarization
     else:
-        return "", [], [], "", ""
+        yield "", [], [], "", ""
 
 
 """
@@ -216,4 +220,5 @@ with ui:
 
 
 if __name__ == "__main__":
+    ui.queue()
     ui.launch(server_name="0.0.0.0")
