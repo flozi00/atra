@@ -30,7 +30,7 @@ def run_transcription(audio, main_lang, hotword_categories):
     logs += f"init vars time: {'{:.4f}'.format(time.time() - start_time)}\n"
     start_time = time.time()
 
-    if audio is not None:
+    if audio is not None and len(audio) > 3:
         hotwords = []
         for h in hotword_categories:
             with open(f"{h}.txt", "r") as f:
@@ -55,11 +55,12 @@ def run_transcription(audio, main_lang, hotword_categories):
 
             logs += f"read audio time: {'{:.4f}'.format(time.time() - start_time)}\n"
             start_time = time.time()
+            yield "", [], [], logs, ""
 
             audio = ffmpeg_read(payload, sampling_rate=16000)
-
             logs += f"convert audio time: {'{:.4f}'.format(time.time() - start_time)}\n"
             start_time = time.time()
+            yield "", [], [], logs, ""
 
         speech_timestamps = get_speech_timestamps(
             audio,
@@ -72,10 +73,16 @@ def run_transcription(audio, main_lang, hotword_categories):
             for st in range(len(speech_timestamps))
         ]
 
+        if(len(audio_batch) > 10):
+            model, processor = get_model_and_processor(
+                "universal", device=device
+            )
+
         logs += (
             f"get speech timestamps time: {'{:.4f}'.format(time.time() - start_time)}\n"
         )
         start_time = time.time()
+        yield "", [], [], logs, ""
 
         for x in range(len(audio_batch)):
             data = audio_batch[x]
@@ -88,6 +95,8 @@ def run_transcription(audio, main_lang, hotword_categories):
             ).input_features
 
             input_values = input_values.to(device)
+            if device == "cuda":
+                input_values = input_values.half()
 
             logs += (
                 f"feature extractor: {'{:.4f}'.format(time.time() - start_time)}\n"
@@ -97,10 +106,10 @@ def run_transcription(audio, main_lang, hotword_categories):
             with torch.inference_mode():
                 predicted_ids = model.generate(
                     input_values,
-                    max_length=int((len(data) / 16000) * 12),
+                    max_length=int((len(data) / 16000) * 12)+1,
                     min_length = 4,
                     use_cache=True,
-                    num_beams = 20,
+                    num_beams = 50 if device == "cuda" else 4,
                     forced_decoder_ids=processor.get_decoder_prompt_ids(
                         language=LANG_MAPPING[main_lang], task="transcribe"
                     ),
@@ -136,25 +145,26 @@ def run_transcription(audio, main_lang, hotword_categories):
             for c in chunks:
                 full_transcription["text"] += c["text"] + "\n"
 
-            #yield full_transcription["text"], chunks, hotwords, logs, summarization
+            yield full_transcription["text"], chunks, hotwords, logs, summarization
 
-        if len(full_transcription) > 512:
+        if len(full_transcription["text"]) > 512:
             for c in range(len(chunks)):
-                chunks[c]["en_text"] = translate(chunks[c]["text"], LANG_MAPPING[main_lang], "en"),
+                chunks[c]["en_text"] = translate(chunks[c]["text"], LANG_MAPPING[main_lang], "en")
                 full_transcription["en_text"] += chunks[c]["en_text"] + "\n"
+                yield full_transcription["text"], chunks, hotwords, logs, summarization
             logs += (
                 f"translate: {'{:.4f}'.format(time.time() - start_time)}\n"
             )
             start_time = time.time()
-            summarization = summarize(full_transcription["en_text"])
+            summarization = summarize(main_lang, full_transcription["en_text"])
         else:
             summarization = ""
 
         logs += f"summarization: {'{:.4f}'.format(time.time() - start_time)}\n"
 
-        return full_transcription["text"], chunks, hotwords, logs, summarization
+        yield full_transcription["text"], chunks, hotwords, logs, summarization
     else:
-        return "", [], [], "", ""
+        yield "", [], [], "", ""
 
 
 """
@@ -221,5 +231,5 @@ with ui:
 
 
 if __name__ == "__main__":
-    #ui.queue()
+    ui.queue(concurrency_count=3)
     ui.launch(server_name="0.0.0.0")

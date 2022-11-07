@@ -45,3 +45,5 @@ onnx_*
 !silero_vad.onnx
 *.json
 *.spm
+merges.txt
+*.model

@@ -4,7 +4,7 @@ from aaas.silero_vad import silero_vad
 from transformers import WhisperProcessor, WhisperForConditionalGeneration
 
 MODEL_MAPPING = {
-    "german": {"name": "aware-ai/whisper-base-german"},
+    "german": {"name": "aware-ai/whisper-base-european"},
     "universal": {"name": "openai/whisper-large"},
 }
 LANG_MAPPING = {"german": "de"}
@@ -23,6 +23,8 @@ def get_model_and_processor(lang, device):
     if model == None:
         model = WhisperForConditionalGeneration.from_pretrained(model_id).eval()
         model = model.to(device)
+        if device == "cuda":
+            model.half()
         MODEL_MAPPING[lang]["model"] = model
 
     return model, processor

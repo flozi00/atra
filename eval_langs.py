@@ -20,7 +20,7 @@ for lang in [["de", "german"]]:
         predicted = run_transcription(data["audio"]["array"], lang[1], [])[0]
         ground = data["sentence"]
 
-        error = jiwer.cer(ground, predicted)
+        error = jiwer.cer(ground.lower(), predicted.lower())
         errors += error
         count += 1
 

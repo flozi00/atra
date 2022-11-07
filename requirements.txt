@@ -1,5 +1,5 @@
 datasets
-gradio
+gradio==3.9
 jiwer
 numpy
 onnx

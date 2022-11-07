@@ -17,13 +17,13 @@ class FilenameCollectorPP(youtube_dl.postprocessor.common.PostProcessor):
 def download_audio(url):
     options = {
         "format": "bestaudio/best",
-        "postprocessors": [
-            {
-                "key": "FFmpegExtractAudio",
-                "preferredcodec": "mp3",
-                "preferredquality": "320",
-            }
-        ],
+        #"postprocessors": [
+        #    {
+        #        "key": "FFmpegExtractAudio",
+        #        "preferredcodec": "mp3",
+        #        "preferredquality": "320",
+        #    }
+        #],
         "outtmpl": "%(title)s.%(ext)s",
     }
 

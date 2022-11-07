@@ -51,7 +51,7 @@ def translate(text, source, target):
 
 def summarize(main_lang, text):
     summarizer = get_optimum_pipeline(
-        "summarization", model_id="facebook/bart-large-cnn"
+        "summarization", model_id="google/bigbird-pegasus-large-bigpatent"
     )
 
     en_version = translate(text, LANG_MAPPING[main_lang], "en")
