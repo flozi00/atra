@@ -55,12 +55,10 @@ def run_transcription(audio, main_lang, hotword_categories):
 
             logs += f"read audio time: {'{:.4f}'.format(time.time() - start_time)}\n"
             start_time = time.time()
-            yield "", [], [], logs, ""
 
             audio = ffmpeg_read(payload, sampling_rate=16000)
             logs += f"convert audio time: {'{:.4f}'.format(time.time() - start_time)}\n"
             start_time = time.time()
-            yield "", [], [], logs, ""
 
         speech_timestamps = get_speech_timestamps(
             audio,
@@ -78,11 +76,12 @@ def run_transcription(audio, main_lang, hotword_categories):
                 "universal", device=device
             )
 
+        do_stream = len(audio_batch) > 10
+
         logs += (
             f"get speech timestamps time: {'{:.4f}'.format(time.time() - start_time)}\n"
         )
         start_time = time.time()
-        yield "", [], [], logs, ""
 
         for x in range(len(audio_batch)):
             data = audio_batch[x]
@@ -145,9 +144,10 @@ def run_transcription(audio, main_lang, hotword_categories):
             for c in chunks:
                 full_transcription["text"] += c["text"] + "\n"
 
-            yield full_transcription["text"], chunks, hotwords, logs, summarization
+            if(do_stream == True):
+                yield full_transcription["text"], chunks, hotwords, logs, summarization
 
-        if len(full_transcription["text"]) > 512:
+        if(do_stream == True):
             for c in range(len(chunks)):
                 chunks[c]["en_text"] = translate(chunks[c]["text"], LANG_MAPPING[main_lang], "en")
                 full_transcription["en_text"] += chunks[c]["en_text"] + "\n"
