@@ -1,7 +1,7 @@
 import subprocess
 import numpy as np
 from aaas.silero_vad import silero_vad
-from transformers import WhisperProcessor
+from transformers import WhisperProcessor, WhisperForConditionalGeneration
 from optimum.onnxruntime import ORTModelForSpeechSeq2Seq
 import onnxruntime
 
@@ -36,7 +36,7 @@ def get_model_and_processor(lang):
         MODEL_MAPPING[lang]["processor"] = processor
 
     if model == None:
-        model = ORTModelForSpeechSeq2Seq.from_pretrained(model_id, from_transformers=True, provider=provider, session_options=sess_options)
+        model = WhisperForConditionalGeneration.from_pretrained(model_id)
         MODEL_MAPPING[lang]["model"] = model
 
     return model, processor
