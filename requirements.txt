@@ -4,6 +4,7 @@ jiwer
 numpy
 onnx
 onnxruntime>=1.12.1
+onnxruntime-openvino
 https://github.com/mht-sharma/optimum/archive/refs/heads/main.zip
 sacremoses
 torch
