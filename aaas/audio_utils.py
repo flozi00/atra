@@ -1,7 +1,9 @@
 import subprocess
 import numpy as np
 from aaas.silero_vad import silero_vad
-from transformers import WhisperProcessor, WhisperForConditionalGeneration
+from transformers import WhisperProcessor
+from optimum.onnxruntime import ORTModelForSpeechSeq2Seq
+import onnxruntime
 
 MODEL_MAPPING = {
     "german": {"name": "aware-ai/whisper-base-european"},
@@ -9,8 +11,21 @@ MODEL_MAPPING = {
 }
 LANG_MAPPING = {"german": "de"}
 
+providers = [
+    "CUDAExecutionProvider",
+    "OpenVINOExecutionProvider",
+    "CPUExecutionProvider"
+]
 
-def get_model_and_processor(lang, device):
+for p in providers:
+    if(p in onnxruntime.get_available_providers()):
+        provider = p
+        break
+
+sess_options = onnxruntime.SessionOptions()
+sess_options.graph_optimization_level = onnxruntime.GraphOptimizationLevel.ORT_ENABLE_ALL
+
+def get_model_and_processor(lang):
     model_id = MODEL_MAPPING[lang]["name"]
 
     model = MODEL_MAPPING[lang].get("model", None)
@@ -21,10 +36,7 @@ def get_model_and_processor(lang, device):
         MODEL_MAPPING[lang]["processor"] = processor
 
     if model == None:
-        model = WhisperForConditionalGeneration.from_pretrained(model_id).eval()
-        model = model.to(device)
-        if device == "cuda":
-            model.half()
+        model = ORTModelForSpeechSeq2Seq.from_pretrained(model_id, from_transformers=True, provider=provider, session_options=sess_options)
         MODEL_MAPPING[lang]["model"] = model
 
     return model, processor

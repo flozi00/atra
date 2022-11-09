@@ -11,10 +11,9 @@ from aaas.audio_utils import (
 from aaas.text_utils import summarize, translate
 from aaas.remote_utils import download_audio
 import os
-import torch
 
-device = "cuda" if torch.cuda.is_available() else "cpu"
 langs = list(LANG_MAPPING.keys())
+
 
 def run_transcription(audio, main_lang, hotword_categories):
     global trans_pipes
@@ -23,9 +22,7 @@ def run_transcription(audio, main_lang, hotword_categories):
     chunks = []
     summarization = ""
 
-    model, processor = get_model_and_processor(
-        main_lang, device=device
-    )
+    model, processor = get_model_and_processor(main_lang)
 
     logs += f"init vars time: {'{:.4f}'.format(time.time() - start_time)}\n"
     start_time = time.time()
@@ -47,6 +44,7 @@ def run_transcription(audio, main_lang, hotword_categories):
 
         if "https://" in audio:
             audio = download_audio(audio)
+            model, processor = get_model_and_processor("universal")
 
         if isinstance(audio, str):
             with open(audio, "rb") as f:
@@ -71,11 +69,6 @@ def run_transcription(audio, main_lang, hotword_categories):
             for st in range(len(speech_timestamps))
         ]
 
-        if(len(audio_batch) > 10):
-            model, processor = get_model_and_processor(
-                "universal", device=device
-            )
-
         do_stream = len(audio_batch) > 10
 
         logs += (
@@ -93,40 +86,28 @@ def run_transcription(audio, main_lang, hotword_categories):
                 truncation=True,
             ).input_features
 
-            input_values = input_values.to(device)
-            if device == "cuda":
-                input_values = input_values.half()
-
-            logs += (
-                f"feature extractor: {'{:.4f}'.format(time.time() - start_time)}\n"
-            )
+            logs += f"feature extractor: {'{:.4f}'.format(time.time() - start_time)}\n"
             start_time = time.time()
 
-            with torch.inference_mode():
-                predicted_ids = model.generate(
-                    input_values,
-                    max_length=int(((len(data) / 16000) * 12)/2)+1,
-                    min_length = 4,
-                    early_stopping = True,
-                    use_cache=True,
-                    num_beams = 20 if device == "cuda" else 4,
-                    forced_decoder_ids=processor.get_decoder_prompt_ids(
-                        language=LANG_MAPPING[main_lang], task="transcribe"
-                    ),
-                )
-
-            logs += (
-                f"inference: {'{:.4f}'.format(time.time() - start_time)}\n"
+            predicted_ids = model.generate(
+                input_values,
+                max_length=int(((len(data) / 16000) * 12) / 2) + 10,
+                use_cache=True,
+                no_repeat_ngram_size=1,
+                num_beams=10,
+                forced_decoder_ids=processor.get_decoder_prompt_ids(
+                    language=LANG_MAPPING[main_lang], task="transcribe"
+                ),
             )
+
+            logs += f"inference: {'{:.4f}'.format(time.time() - start_time)}\n"
             start_time = time.time()
 
             transcription = processor.batch_decode(
                 predicted_ids, skip_special_tokens=True
             )[0]
 
-            logs += (
-                f"decode: {'{:.4f}'.format(time.time() - start_time)}\n"
-            )
+            logs += f"decode: {'{:.4f}'.format(time.time() - start_time)}\n"
             start_time = time.time()
 
             chunks.append(
@@ -144,19 +125,19 @@ def run_transcription(audio, main_lang, hotword_categories):
             for c in chunks:
                 full_transcription["text"] += c["text"] + "\n"
 
-            if(do_stream == True):
+            if do_stream == True:
                 yield full_transcription["text"], chunks, hotwords, logs, summarization
 
-        if(do_stream == True):
+        if do_stream == True:
             for c in range(len(chunks)):
-                chunks[c]["en_text"] = translate(chunks[c]["text"], LANG_MAPPING[main_lang], "en")
+                chunks[c]["en_text"] = translate(
+                    chunks[c]["text"], LANG_MAPPING[main_lang], "en"
+                )
                 full_transcription["en_text"] += chunks[c]["en_text"] + "\n"
                 yield full_transcription["text"], chunks, hotwords, logs, summarization
-            logs += (
-                f"translate: {'{:.4f}'.format(time.time() - start_time)}\n"
-            )
+            logs += f"translate: {'{:.4f}'.format(time.time() - start_time)}\n"
             start_time = time.time()
-            summarization = summarize(main_lang, full_transcription["en_text"])
+            summarization = summarize(main_lang, full_transcription["en_text"][:12800])
         else:
             summarization = ""
 
@@ -208,7 +189,7 @@ with ui:
         with gr.TabItem("Hotwords"):
             hotwordlist = gr.JSON()
         with gr.TabItem("Logs"):
-            logs = gr.Textbox(lines = 10)
+            logs = gr.Textbox(lines=10)
         with gr.TabItem("Summarization"):
             sumarization = gr.Textbox()
 
@@ -216,7 +197,7 @@ with ui:
         fn=run_transcription,
         inputs=[mic, lang, categories],
         outputs=[transcription, chunks, hotwordlist, logs, sumarization],
-        api_name="transcription"
+        api_name="transcription",
     )
     audio_file.change(
         fn=run_transcription,
