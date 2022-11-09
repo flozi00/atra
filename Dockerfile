@@ -7,6 +7,6 @@ WORKDIR /asr-server
 
 RUN pip install -r requirements.txt && git submodule init && git submodule update
 
-EXPOSE 8080
+EXPOSE 7860
 
 CMD exec python app.py
