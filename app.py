@@ -11,6 +11,7 @@ from aaas.audio_utils import (
 from aaas.text_utils import summarize, translate
 from aaas.remote_utils import download_audio
 import os
+import torch
 
 langs = list(LANG_MAPPING.keys())
 
@@ -89,16 +90,17 @@ def run_transcription(audio, main_lang, hotword_categories):
             logs += f"feature extractor: {'{:.4f}'.format(time.time() - start_time)}\n"
             start_time = time.time()
 
-            predicted_ids = model.generate(
-                input_values,
-                max_length=int(((len(data) / 16000) * 12) / 2) + 10,
-                use_cache=True,
-                no_repeat_ngram_size=1,
-                num_beams=10,
-                forced_decoder_ids=processor.get_decoder_prompt_ids(
-                    language=LANG_MAPPING[main_lang], task="transcribe"
-                ),
-            )
+            with torch.inference_mode():
+                predicted_ids = model.generate(
+                    input_values,
+                    max_length=int(((len(data) / 16000) * 12) / 2) + 10,
+                    use_cache=True,
+                    no_repeat_ngram_size=1,
+                    num_beams=10,
+                    forced_decoder_ids=processor.get_decoder_prompt_ids(
+                        language=LANG_MAPPING[main_lang], task="transcribe"
+                    ),
+                )
 
             logs += f"inference: {'{:.4f}'.format(time.time() - start_time)}\n"
             start_time = time.time()
