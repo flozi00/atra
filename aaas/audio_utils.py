@@ -2,8 +2,10 @@ import subprocess
 import numpy as np
 from aaas.silero_vad import silero_vad
 from transformers import WhisperProcessor, WhisperForConditionalGeneration
-from optimum.onnxruntime import ORTModelForSpeechSeq2Seq
 import onnxruntime
+import torch
+import torch.quantization
+import torch.nn as nn
 
 MODEL_MAPPING = {
     "german": {"name": "aware-ai/whisper-base-european"},
@@ -36,7 +38,11 @@ def get_model_and_processor(lang):
         MODEL_MAPPING[lang]["processor"] = processor
 
     if model == None:
-        model = WhisperForConditionalGeneration.from_pretrained(model_id)
+        model = WhisperForConditionalGeneration.from_pretrained(model_id).eval()
+        model = torch.quantization.quantize_dynamic(
+            model, {nn.Linear}, dtype=torch.qint8
+        )
+
         MODEL_MAPPING[lang]["model"] = model
 
     return model, processor

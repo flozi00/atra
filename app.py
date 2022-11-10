@@ -22,6 +22,7 @@ def run_transcription(audio, main_lang, hotword_categories):
     start_time = time.time()
     chunks = []
     summarization = ""
+    full_transcription = {"text": "", "en_text": ""}
 
     model, processor = get_model_and_processor(main_lang)
 
