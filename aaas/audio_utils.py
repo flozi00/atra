@@ -6,7 +6,7 @@ import onnxruntime
 import torch
 import torch.quantization
 import torch.nn as nn
-import platform
+import subprocess
 
 MODEL_MAPPING = {
     "german": {"name": "aware-ai/whisper-base-european"},
@@ -40,10 +40,10 @@ def get_model_and_processor(lang):
 
     if model == None:
         model = WhisperForConditionalGeneration.from_pretrained(model_id).eval()
-        if("intel" in platform.processor().lower()):
+        try:
             import intel_extension_for_pytorch as ipex
             model = ipex.optimize(model)
-        else:
+        except:
             model = torch.quantization.quantize_dynamic(
                 model, {nn.Linear}, dtype=torch.qint8
             )
