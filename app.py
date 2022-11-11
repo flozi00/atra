@@ -92,12 +92,14 @@ def run_transcription(audio, main_lang, hotword_categories):
             start_time = time.time()
 
             with torch.inference_mode():
+                if torch.cuda.is_available():
+                    input_values = input_values.to("cuda").half()
                 predicted_ids = model.generate(
                     input_values,
                     max_length=int(((len(data) / 16000) * 12) / 2) + 10,
                     use_cache=True,
                     no_repeat_ngram_size=1,
-                    num_beams=10,
+                    num_beams=2,
                     forced_decoder_ids=processor.get_decoder_prompt_ids(
                         language=LANG_MAPPING[main_lang], task="transcribe"
                     ),

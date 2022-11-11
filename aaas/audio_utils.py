@@ -9,7 +9,7 @@ import torch.nn as nn
 import subprocess
 
 MODEL_MAPPING = {
-    "german": {"name": "aware-ai/whisper-base-european"},
+    "german": {"name": "aware-ai/whisper-small-german"},
     "universal": {"name": "openai/whisper-large"},
 }
 LANG_MAPPING = {"german": "de"}
@@ -40,13 +40,16 @@ def get_model_and_processor(lang):
 
     if model == None:
         model = WhisperForConditionalGeneration.from_pretrained(model_id).eval()
-        try:
-            import intel_extension_for_pytorch as ipex
-            model = ipex.optimize(model)
-        except:
-            model = torch.quantization.quantize_dynamic(
-                model, {nn.Linear}, dtype=torch.qint8
-            )
+        if torch.cuda.is_available():
+            model = model.to("cuda").half()
+        else:
+            try:
+                import intel_extension_for_pytorch as ipex
+                model = ipex.optimize(model)
+            except:
+                model = torch.quantization.quantize_dynamic(
+                    model, {nn.Linear}, dtype=torch.qint8
+                )
 
         MODEL_MAPPING[lang]["model"] = model
 
