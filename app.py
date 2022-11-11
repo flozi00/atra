@@ -65,6 +65,7 @@ def run_transcription(audio, main_lang, hotword_categories):
             model_vad,
             sampling_rate=16000,
             min_silence_duration_ms=250,
+            speech_pad_ms=200,
         )
         audio_batch = [
             audio[speech_timestamps[st]["start"] : speech_timestamps[st]["end"]]
@@ -72,6 +73,25 @@ def run_transcription(audio, main_lang, hotword_categories):
         ]
 
         do_stream = len(audio_batch) > 10
+
+        if(do_stream == False):
+            new_batch = []
+            tmp_audio = []
+            for b in audio_batch:
+                if(len(tmp_audio) + len(b) < 30*16000):
+                    tmp_audio.extend(b)
+                elif(len(b) > 28*16000):
+                    new_batch.append(tmp_audio)
+                    tmp_audio = []
+                    new_batch.append(b)
+                else:
+                    new_batch.append(tmp_audio)
+                    tmp_audio = []
+
+            if(tmp_audio != []):
+                new_batch.append(tmp_audio)
+
+            audio_batch = new_batch
 
         logs += (
             f"get speech timestamps time: {'{:.4f}'.format(time.time() - start_time)}\n"
