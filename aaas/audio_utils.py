@@ -17,16 +17,19 @@ LANG_MAPPING = {"german": "de"}
 providers = [
     "CUDAExecutionProvider",
     "OpenVINOExecutionProvider",
-    "CPUExecutionProvider"
+    "CPUExecutionProvider",
 ]
 
 for p in providers:
-    if(p in onnxruntime.get_available_providers()):
+    if p in onnxruntime.get_available_providers():
         provider = p
         break
 
 sess_options = onnxruntime.SessionOptions()
-sess_options.graph_optimization_level = onnxruntime.GraphOptimizationLevel.ORT_ENABLE_ALL
+sess_options.graph_optimization_level = (
+    onnxruntime.GraphOptimizationLevel.ORT_ENABLE_ALL
+)
+
 
 def get_model_and_processor(lang):
     model_id = MODEL_MAPPING[lang]["name"]
@@ -45,6 +48,7 @@ def get_model_and_processor(lang):
         else:
             try:
                 import intel_extension_for_pytorch as ipex
+
                 model = ipex.optimize(model)
             except:
                 model = torch.quantization.quantize_dynamic(

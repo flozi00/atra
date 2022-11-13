@@ -5,8 +5,8 @@ numpy
 onnx
 onnxruntime>=1.12.1
 sacremoses
+sentencepiece
 torch
 torchaudio
 transformers>=4.24.0
 yt-dlp
-sentencepiece

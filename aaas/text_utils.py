@@ -9,16 +9,19 @@ optimum_pipes = {}
 providers = [
     "CUDAExecutionProvider",
     "OpenVINOExecutionProvider",
-    "CPUExecutionProvider"
+    "CPUExecutionProvider",
 ]
 
 for p in providers:
-    if(p in onnxruntime.get_available_providers()):
+    if p in onnxruntime.get_available_providers():
         provider = p
         break
 
 sess_options = onnxruntime.SessionOptions()
-sess_options.graph_optimization_level = onnxruntime.GraphOptimizationLevel.ORT_ENABLE_ALL
+sess_options.graph_optimization_level = (
+    onnxruntime.GraphOptimizationLevel.ORT_ENABLE_ALL
+)
+
 
 def get_optimum_pipeline(task, model_id):
     global optimum_pipes
@@ -32,11 +35,16 @@ def get_optimum_pipeline(task, model_id):
 
     if task in ["translation", "summarization"]:
         try:
-            model = ORTModelForSeq2SeqLM.from_pretrained(onnx_id, provider=provider, session_options=sess_options)
+            model = ORTModelForSeq2SeqLM.from_pretrained(
+                onnx_id, provider=provider, session_options=sess_options
+            )
             tokenizer = AutoTokenizer.from_pretrained(onnx_id)
         except:
             model = ORTModelForSeq2SeqLM.from_pretrained(
-                model_id, from_transformers=True, provider=provider, session_options=sess_options
+                model_id,
+                from_transformers=True,
+                provider=provider,
+                session_options=sess_options,
             )
             tokenizer = AutoTokenizer.from_pretrained(model_id, from_transformers=True)
             model.save_pretrained(onnx_id)
