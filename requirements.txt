@@ -4,10 +4,9 @@ jiwer
 numpy
 onnx
 onnxruntime>=1.12.1
-https://github.com/mht-sharma/optimum/archive/refs/heads/main.zip
 sacremoses
+sentencepiece
 torch
 torchaudio
 transformers>=4.24.0
 yt-dlp
-sentencepiece
