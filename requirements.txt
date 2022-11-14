@@ -11,3 +11,5 @@ torchaudio
 transformers>=4.24.0
 yt-dlp
 moviepy
+demucs
+denoiser

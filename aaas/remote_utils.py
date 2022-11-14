@@ -16,7 +16,7 @@ class FilenameCollectorPP(youtube_dl.postprocessor.common.PostProcessor):
 
 def download_audio(url):
     options = {
-        "format": "bestaudio/best",
+        #"format": "best",
         # "postprocessors": [
         #    {
         #        "key": "FFmpegExtractAudio",

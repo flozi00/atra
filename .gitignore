@@ -47,3 +47,6 @@ onnx_*
 *.spm
 merges.txt
 *.model
+out/
+*.mp*
+*.webm

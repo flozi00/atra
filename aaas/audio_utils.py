@@ -107,3 +107,22 @@ print("Downloading VAD model")
 model_vad, utils = silero_vad(True)
 
 (get_speech_timestamps, _, read_audio, *_) = utils
+
+def batch_audio_by_silence(audio_batch):
+    new_batch = []
+    tmp_audio = []
+    for b in audio_batch:
+        if len(tmp_audio) + len(b) < 30 * 16000:
+            tmp_audio.extend(b)
+        elif len(b) > 28 * 16000:
+            new_batch.append(tmp_audio)
+            tmp_audio = []
+            new_batch.append(b)
+        else:
+            new_batch.append(tmp_audio)
+            tmp_audio = []
+
+    if tmp_audio != []:
+        new_batch.append(tmp_audio)
+
+    return new_batch

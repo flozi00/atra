@@ -5,11 +5,13 @@ from aaas.audio_utils import (
     get_speech_timestamps,
     LANG_MAPPING,
     get_model_and_processor,
+    batch_audio_by_silence,
 )
 from aaas.video_utils import merge_subtitles
 from aaas.text_utils import translate
 from aaas.remote_utils import download_audio
 import torch
+import os
 
 langs = list(LANG_MAPPING.keys())
 
@@ -22,6 +24,9 @@ def run_transcription(audio, main_lang, model_config):
     if audio is not None and len(audio) > 3:
         if "https://" in audio:
             audio = download_audio(audio)
+            do_stream = True
+        else:
+            do_stream = False
 
         if model_config == "multilingual":
             model, processor = get_model_and_processor("universal")
@@ -29,9 +34,13 @@ def run_transcription(audio, main_lang, model_config):
             model, processor = get_model_and_processor(main_lang)
 
         if isinstance(audio, str):
+            audio_name = audio.split(".")[-2]
+            audio_path = audio
+            if do_stream == True:
+                os.system(f'demucs -n mdx_extra --two-stems=vocals "{audio}" -o out')
+                audio = "./out/mdx_extra/" + audio_name + "/vocals.wav"
             with open(audio, "rb") as f:
                 payload = f.read()
-            audio_path = audio
 
             audio = ffmpeg_read(payload, sampling_rate=16000)
 
@@ -47,26 +56,8 @@ def run_transcription(audio, main_lang, model_config):
             for st in range(len(speech_timestamps))
         ]
 
-        do_stream = len(audio_batch) > 10
-
         if do_stream == False:
-            new_batch = []
-            tmp_audio = []
-            for b in audio_batch:
-                if len(tmp_audio) + len(b) < 30 * 16000:
-                    tmp_audio.extend(b)
-                elif len(b) > 28 * 16000:
-                    new_batch.append(tmp_audio)
-                    tmp_audio = []
-                    new_batch.append(b)
-                else:
-                    new_batch.append(tmp_audio)
-                    tmp_audio = []
-
-            if tmp_audio != []:
-                new_batch.append(tmp_audio)
-
-            audio_batch = new_batch
+            audio_batch = batch_audio_by_silence(audio_batch)
 
         for x in range(len(audio_batch)):
             data = audio_batch[x]
@@ -126,8 +117,10 @@ def run_transcription(audio, main_lang, model_config):
         yield full_transcription["text"], chunks, summarization, None
 
         if do_stream == True:
-            file = merge_subtitles(chunks, audio_path)
+            file = merge_subtitles(chunks, audio_path, audio_name)
             yield full_transcription["text"], chunks, summarization, file
+            os.remove(file)
+        os.remove(audio_path)
     else:
         yield "", [], "", None
 
