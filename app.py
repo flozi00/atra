@@ -19,12 +19,16 @@ app = FastAPI()
 
 langs = list(LANG_MAPPING.keys())
 
+
 @app.post("/asr/{main_lang}/{model_config}/")
 async def write(request: Request, main_lang, model_config):
     mydata = await request.body()
     audio = np.frombuffer(mydata, dtype=np.float32)
-    
-    return inference_asr(data_batch=[audio], main_lang=main_lang, model_config=model_config)[0]
+
+    return inference_asr(
+        data_batch=[audio], main_lang=main_lang, model_config=model_config
+    )[0]
+
 
 def run_transcription(audio, main_lang, model_config):
     chunks = []
@@ -66,7 +70,11 @@ def run_transcription(audio, main_lang, model_config):
 
         transcription = []
         for data in audio_batch:
-            transcription.append(remote_inference(main_lang=main_lang, model_config=model_config, data=data))
+            transcription.append(
+                remote_inference(
+                    main_lang=main_lang, model_config=model_config, data=data
+                )
+            )
 
         for x in range(len(audio_batch)):
             response = transcription[x].result()
@@ -78,7 +86,7 @@ def run_transcription(audio, main_lang, model_config):
                 }
             )
 
-        chunks = sorted(chunks, key=lambda d: d['start_timestamp']) 
+        chunks = sorted(chunks, key=lambda d: d["start_timestamp"])
         for c in chunks:
             full_transcription["text"] += c["text"] + "\n"
 
@@ -91,8 +99,9 @@ def run_transcription(audio, main_lang, model_config):
 
         if do_stream == True:
             file = merge_subtitles(chunks, audio_path, audio_name)
-        
+
     return full_transcription["text"], chunks, file
+
 
 ui = gr.Blocks()
 
@@ -101,7 +110,9 @@ with ui:
         with gr.TabItem("target language"):
             lang = gr.Radio(langs, value=langs[0])
         with gr.TabItem("model configuration"):
-            model_config = gr.Radio(choices=["monolingual", "multilingual"], value="monolingual")
+            model_config = gr.Radio(
+                choices=["monolingual", "multilingual"], value="monolingual"
+            )
 
     with gr.Tabs():
         with gr.TabItem("Microphone"):
