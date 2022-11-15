@@ -10,7 +10,7 @@ import subprocess
 from optimum.bettertransformer import BetterTransformer
 
 MODEL_MAPPING = {
-    "german": {"name": "aware-ai/whisper-small-german"},
+    "german": {"name": "aware-ai/whisper-tiny-german"},
     "universal": {"name": "openai/whisper-large"},
 }
 LANG_MAPPING = {"german": "de"}
@@ -31,8 +31,42 @@ sess_options.graph_optimization_level = (
     onnxruntime.GraphOptimizationLevel.ORT_ENABLE_ALL
 )
 
+def inference_asr(data_batch, main_lang: str, model_config: str) -> str:
+    transcription = []
+    if model_config == "multilingual":
+        model, processor = get_model_and_processor("universal")
+    else:
+        model, processor = get_model_and_processor(main_lang)
+    
+    for data in data_batch:
+        input_values = processor.feature_extractor(
+            data,
+            sampling_rate=16000,
+            return_tensors="pt",
+            truncation=True,
+        ).input_features
 
-def get_model_and_processor(lang):
+        with torch.inference_mode():
+            if torch.cuda.is_available():
+                input_values = input_values.to("cuda").half()
+            predicted_ids = model.generate(
+                input_values,
+                max_length=int(((len(data) / 16000) * 12) / 2) + 10,
+                use_cache=True,
+                no_repeat_ngram_size=1,
+                num_beams=2,
+                forced_decoder_ids=processor.get_decoder_prompt_ids(
+                    language=LANG_MAPPING[main_lang], task="transcribe"
+                ),
+            )
+
+        transcription.append(processor.batch_decode(
+            predicted_ids, skip_special_tokens=True
+        )[0])
+
+    return transcription
+
+def get_model_and_processor(lang: str):
     model_id = MODEL_MAPPING[lang]["name"]
 
     model = MODEL_MAPPING[lang].get("model", None)
@@ -103,10 +137,6 @@ def ffmpeg_read(bpayload: bytes, sampling_rate: int) -> np.array:
     return audio
 
 
-"""
-VAD download and initialization
-"""
-print("Downloading VAD model")
 model_vad, utils = silero_vad(True)
 
 (get_speech_timestamps, _, read_audio, *_) = utils

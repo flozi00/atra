@@ -14,8 +14,8 @@ def burn_subtitles(start, end, text):
 def merge_subtitles(subtitles, base_file, audio_name):
     subtitle_frames = []
     for i in range(len(subtitles)):
-        start = subtitles[i]["timestamp"][0]
-        end = subtitles[i]["timestamp"][1]
+        start = subtitles[i]["start_timestamp"]
+        end = subtitles[i]["stop_timestamp"]
         text = subtitles[i]["text"]
         subtitle_frames.append(burn_subtitles(start, end, text))
 

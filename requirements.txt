@@ -13,3 +13,4 @@ transformers>=4.24.0
 yt-dlp
 moviepy
 demucs
+https://github.com/ross/requests-futures/archive/refs/heads/main.zip
