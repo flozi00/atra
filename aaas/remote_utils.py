@@ -8,6 +8,7 @@ backend = os.getenv("inference_backend", "http://127.0.0.1:7860")
 
 session = FuturesSession()
 
+
 class FilenameCollectorPP(youtube_dl.postprocessor.common.PostProcessor):
     def __init__(self):
         super(FilenameCollectorPP, self).__init__(None)
@@ -22,7 +23,7 @@ class FilenameCollectorPP(youtube_dl.postprocessor.common.PostProcessor):
 
 def download_audio(url):
     options = {
-        #"format": "best",
+        # "format": "best",
         # "postprocessors": [
         #    {
         #        "key": "FFmpegExtractAudio",
@@ -44,6 +45,9 @@ def download_audio(url):
 
     return fname
 
+
 def remote_inference(main_lang, model_config, data):
-    transcription = session.post(f'{backend}/asr/{main_lang}/{model_config}/', data=np.asarray(data).tobytes())
+    transcription = session.post(
+        f"{backend}/asr/{main_lang}/{model_config}/", data=np.asarray(data).tobytes()
+    )
     return transcription

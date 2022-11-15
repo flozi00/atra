@@ -31,13 +31,14 @@ sess_options.graph_optimization_level = (
     onnxruntime.GraphOptimizationLevel.ORT_ENABLE_ALL
 )
 
+
 def inference_asr(data_batch, main_lang: str, model_config: str) -> str:
     transcription = []
     if model_config == "multilingual":
         model, processor = get_model_and_processor("universal")
     else:
         model, processor = get_model_and_processor(main_lang)
-    
+
     for data in data_batch:
         input_values = processor.feature_extractor(
             data,
@@ -60,11 +61,12 @@ def inference_asr(data_batch, main_lang: str, model_config: str) -> str:
                 ),
             )
 
-        transcription.append(processor.batch_decode(
-            predicted_ids, skip_special_tokens=True
-        )[0])
+        transcription.append(
+            processor.batch_decode(predicted_ids, skip_special_tokens=True)[0]
+        )
 
     return transcription
+
 
 def get_model_and_processor(lang: str):
     model_id = MODEL_MAPPING[lang]["name"]
@@ -140,6 +142,7 @@ def ffmpeg_read(bpayload: bytes, sampling_rate: int) -> np.array:
 model_vad, utils = silero_vad(True)
 
 (get_speech_timestamps, _, read_audio, *_) = utils
+
 
 def batch_audio_by_silence(audio_batch):
     new_batch = []
