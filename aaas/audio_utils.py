@@ -7,6 +7,7 @@ import torch
 import torch.quantization
 import torch.nn as nn
 import subprocess
+from optimum.bettertransformer import BetterTransformer
 
 MODEL_MAPPING = {
     "german": {"name": "aware-ai/whisper-small-german"},
@@ -45,7 +46,9 @@ def get_model_and_processor(lang):
         model = WhisperForConditionalGeneration.from_pretrained(model_id).eval()
         if torch.cuda.is_available():
             model = model.to("cuda").half()
-        else:
+        model = BetterTransformer.transform(model)
+
+        if torch.cuda.is_available() == False:
             try:
                 import intel_extension_for_pytorch as ipex
 
