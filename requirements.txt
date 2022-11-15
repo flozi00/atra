@@ -4,12 +4,12 @@ jiwer
 numpy
 onnx
 onnxruntime>=1.12.1
+https://github.com/huggingface/optimum/archive/refs/heads/main.zip
 sacremoses
 sentencepiece
-torch
+torch>=1.13.0
 torchaudio
 transformers>=4.24.0
 yt-dlp
 moviepy
 demucs
-denoiser
