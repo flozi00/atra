@@ -52,6 +52,9 @@ def run_transcription(audio, main_lang, model_config):
                 payload = f.read()
 
             audio = ffmpeg_read(payload, sampling_rate=16000)
+            if do_stream == True:
+                os.remove("./out/mdx_extra/" + audio_name + "/vocals.wav")
+                os.remove("./out/mdx_extra/" + audio_name + "/no_vocals.wav")
 
         speech_timestamps = get_speech_timestamps(
             audio,
@@ -81,8 +84,8 @@ def run_transcription(audio, main_lang, model_config):
             chunks.append(
                 {
                     "text": response.json(),
-                    "start_timestamp": speech_timestamps[x]["start"] / 16000,
-                    "stop_timestamp": speech_timestamps[x]["end"] / 16000,
+                    "start_timestamp": (speech_timestamps[x]["start"] / 16000)-0.2,
+                    "stop_timestamp": (speech_timestamps[x]["end"] / 16000)-0.5,
                 }
             )
 
@@ -97,8 +100,10 @@ def run_transcription(audio, main_lang, model_config):
                 )
                 full_transcription["en_text"] += chunks[c]["en_text"] + "\n"
 
-        if do_stream == True:
+        if audio_path.split(".")[-1] in ["mp4", "webm"]:
             file = merge_subtitles(chunks, audio_path, audio_name)
+
+        os.remove(audio_path)
 
     return full_transcription["text"], chunks, file
 

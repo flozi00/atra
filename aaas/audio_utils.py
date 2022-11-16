@@ -139,10 +139,7 @@ def ffmpeg_read(bpayload: bytes, sampling_rate: int) -> np.array:
     return audio
 
 
-model_vad, utils = silero_vad(True)
-
-(get_speech_timestamps, _, read_audio, *_) = utils
-
+model_vad, get_speech_timestamps = silero_vad(True)
 
 def batch_audio_by_silence(audio_batch):
     new_batch = []

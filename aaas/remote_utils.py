@@ -40,8 +40,8 @@ def download_audio(url):
     ydl.download([url])
 
     fname, tags = filename_collector.filenames[0], filename_collector.tags
-    move(fname, tags + " " + fname)
-    fname = tags + " " + fname
+    move(fname, tags + "." + fname.split(".")[-1])
+    fname = tags + "." + fname.split(".")[-1]
 
     return fname
 

@@ -22,24 +22,14 @@ def merge_subtitles(subtitles, base_file, audio_name):
         text = subtitles[i]["text"]
         subtitle_frames.append(burn_subtitles(start, end, text))
 
-    if base_file.split(".")[-1] not in ["mp4", "webm"]:
-        audio_only = True
-        file_clip = AudioFileClip(base_file)
-    else:
-        audio_only = False
-        file_clip = VideoFileClip(base_file)
-        subtitle_frames = [file_clip] + subtitle_frames
-        audio = file_clip.audio
 
-    if audio_only == True:
-        composed_video = CompositeVideoClip(
-            subtitle_frames, bg_color=[0x68, 0xAF, 0x14], size=(720, 512)
-        )
-        new_audioclip = CompositeAudioClip([file_clip])
-        composed_video.audio = new_audioclip
-    else:
-        composed_video = CompositeVideoClip(subtitle_frames, use_bgclip=True)
-        composed_video.audio = audio
-    composed_video.write_videofile(f"{audio_name}.mp4", fps=10)
+    file_clip = VideoFileClip(base_file)
+    subtitle_frames = [file_clip] + subtitle_frames
+    audio = file_clip.audio
+
+    composed_video = CompositeVideoClip(subtitle_frames, use_bgclip=True)
+    composed_video.audio = audio
+
+    composed_video.write_videofile(f"{audio_name}.mp4", fps=10, codec="libx264")
 
     return f"{audio_name}.mp4"
