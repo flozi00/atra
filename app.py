@@ -6,6 +6,7 @@ from aaas.audio_utils import (
     LANG_MAPPING,
     inference_asr,
     batch_audio_by_silence,
+    inference_denoise,
 )
 from aaas.video_utils import merge_subtitles
 from aaas.text_utils import translate
@@ -14,6 +15,7 @@ import os
 from fastapi import FastAPI, Request
 import uvicorn
 import numpy as np
+import soundfile as sf
 
 app = FastAPI()
 
@@ -24,6 +26,8 @@ langs = list(LANG_MAPPING.keys())
 async def write(request: Request, main_lang, model_config):
     mydata = await request.body()
     audio = np.frombuffer(mydata, dtype=np.float32)
+
+    audio = inference_denoise(audio)
 
     return inference_asr(
         data_batch=[audio], main_lang=main_lang, model_config=model_config

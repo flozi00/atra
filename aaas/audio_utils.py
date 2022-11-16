@@ -32,6 +32,9 @@ sess_options.graph_optimization_level = (
 )
 
 
+def inference_denoise(audio):
+    return audio
+
 def inference_asr(data_batch, main_lang: str, model_config: str) -> str:
     transcription = []
     if model_config == "multilingual":
