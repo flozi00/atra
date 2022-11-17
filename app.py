@@ -158,4 +158,4 @@ with ui:
 app = gr.mount_gradio_app(app, ui, path="")
 
 if __name__ == "__main__":
-    uvicorn.run("app:app", port=7860, log_level="info")
+    uvicorn.run("app:app", host='0.0.0.0', port=7860, log_level="info")
