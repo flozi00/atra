@@ -22,7 +22,6 @@ def merge_subtitles(subtitles, base_file, audio_name):
         text = subtitles[i]["text"]
         subtitle_frames.append(burn_subtitles(start, end, text))
 
-
     file_clip = VideoFileClip(base_file)
     subtitle_frames = [file_clip] + subtitle_frames
     audio = file_clip.audio

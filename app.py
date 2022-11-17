@@ -15,7 +15,6 @@ import os
 from fastapi import FastAPI, Request
 import uvicorn
 import numpy as np
-import soundfile as sf
 
 app = FastAPI()
 
@@ -88,8 +87,8 @@ def run_transcription(audio, main_lang, model_config):
             chunks.append(
                 {
                     "text": response.json(),
-                    "start_timestamp": (speech_timestamps[x]["start"] / 16000)-0.2,
-                    "stop_timestamp": (speech_timestamps[x]["end"] / 16000)-0.5,
+                    "start_timestamp": (speech_timestamps[x]["start"] / 16000) - 0.2,
+                    "stop_timestamp": (speech_timestamps[x]["end"] / 16000) - 0.5,
                 }
             )
 

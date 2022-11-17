@@ -35,6 +35,7 @@ sess_options.graph_optimization_level = (
 def inference_denoise(audio):
     return audio
 
+
 def inference_asr(data_batch, main_lang: str, model_config: str) -> str:
     transcription = []
     if model_config == "multilingual":
@@ -143,6 +144,7 @@ def ffmpeg_read(bpayload: bytes, sampling_rate: int) -> np.array:
 
 
 model_vad, get_speech_timestamps = silero_vad(True)
+
 
 def batch_audio_by_silence(audio_batch):
     new_batch = []

@@ -87,7 +87,7 @@ def get_speech_timestamps(
     threshold: float = 0.5,
     sampling_rate: int = 16000,
     min_speech_duration_ms: int = 250,
-    max_speech_duration_ms: int = 1000*28,
+    max_speech_duration_ms: int = 1000 * 28,
     min_silence_duration_ms: int = 100,
     window_size_samples: int = 1536,
     speech_pad_ms: int = 30,
