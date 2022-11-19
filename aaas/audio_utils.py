@@ -10,10 +10,10 @@ import subprocess
 from optimum.bettertransformer import BetterTransformer
 
 MODEL_MAPPING = {
-    "german": {"name": "aware-ai/whisper-tiny-german"},
+    "german": {"name": "flozi00/whisper-small-german"},
     "universal": {"name": "openai/whisper-large"},
 }
-LANG_MAPPING = {"german": "de"}
+LANG_MAPPING = {"german": "de", "english": "en", "french": "fr", "spanish": "es"}
 
 providers = [
     "CUDAExecutionProvider",
@@ -73,7 +73,11 @@ def inference_asr(data_batch, main_lang: str, model_config: str) -> str:
 
 
 def get_model_and_processor(lang: str):
-    model_id = MODEL_MAPPING[lang]["name"]
+    try:
+        model_id = MODEL_MAPPING[lang]["name"]
+    except:
+        lang = "universal"
+        model_id = MODEL_MAPPING[lang]["name"]
 
     model = MODEL_MAPPING[lang].get("model", None)
     processor = MODEL_MAPPING[lang].get("processor", None)
