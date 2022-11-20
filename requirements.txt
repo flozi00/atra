@@ -1,7 +1,7 @@
 datasets
 demucs
 gradio==3.9
-https://github.com/huggingface/optimum/archive/refs/heads/main.zip
+optimum
 https://github.com/ross/requests-futures/archive/refs/heads/main.zip
 jiwer
 moviepy
