@@ -199,7 +199,7 @@ def run_transcription(audio, main_lang, model_config):
         for data in audio_batch:
             transcription.append(
                 remote_inference(
-                    main_lang=main_lang, model_config=model_config, data=data
+                    main_lang=main_lang, model_config=model_config, data=data, premium=True if len(audio_batch) == 1 else False
                 )
             )
 
