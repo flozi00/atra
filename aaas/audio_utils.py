@@ -1,35 +1,21 @@
-import subprocess
 import numpy as np
-from aaas.silero_vad import silero_vad
 from transformers import WhisperProcessor, WhisperForConditionalGeneration
-import onnxruntime
 import torch
+import os
 import torch.quantization
 import torch.nn as nn
-import subprocess
 from optimum.bettertransformer import BetterTransformer
+from aaas.backend_utils import inference_only, check_nodes
+from aaas.statics import *
 
-MODEL_MAPPING = {
-    "german": {"name": "flozi00/whisper-small-german"},
-    "universal": {"name": "openai/whisper-large"},
-}
-LANG_MAPPING = {"german": "de", "english": "en", "french": "fr", "spanish": "es"}
+if inference_only == False:
+    from aaas.video_utils import merge_subtitles
+    from aaas.text_utils import translate
+    from aaas.remote_utils import download_audio, remote_inference
+    import subprocess
+    from aaas.silero_vad import silero_vad
 
-providers = [
-    "CUDAExecutionProvider",
-    "OpenVINOExecutionProvider",
-    "CPUExecutionProvider",
-]
-
-for p in providers:
-    if p in onnxruntime.get_available_providers():
-        provider = p
-        break
-
-sess_options = onnxruntime.SessionOptions()
-sess_options.graph_optimization_level = (
-    onnxruntime.GraphOptimizationLevel.ORT_ENABLE_ALL
-)
+    model_vad, get_speech_timestamps = silero_vad(True)
 
 
 def inference_denoise(audio):
@@ -59,7 +45,7 @@ def inference_asr(data_batch, main_lang: str, model_config: str) -> str:
                 max_length=int(((len(data) / 16000) * 12) / 2) + 10,
                 use_cache=True,
                 no_repeat_ngram_size=1,
-                num_beams=2,
+                num_beams=20,
                 forced_decoder_ids=processor.get_decoder_prompt_ids(
                     language=LANG_MAPPING[main_lang], task="transcribe"
                 ),
@@ -147,9 +133,6 @@ def ffmpeg_read(bpayload: bytes, sampling_rate: int) -> np.array:
     return audio
 
 
-model_vad, get_speech_timestamps = silero_vad(True)
-
-
 def batch_audio_by_silence(audio_batch):
     new_batch = []
     tmp_audio = []
@@ -168,3 +151,82 @@ def batch_audio_by_silence(audio_batch):
         new_batch.append(tmp_audio)
 
     return new_batch
+
+
+def run_transcription(audio, main_lang, model_config):
+    chunks = []
+    file = None
+    full_transcription = {"text": "", "en_text": ""}
+    check_nodes()
+
+    if audio is not None and len(audio) > 3:
+        if "https://" in audio:
+            audio = download_audio(audio)
+            do_stream = True
+        else:
+            do_stream = False
+
+        if isinstance(audio, str):
+            audio_name = audio.split(".")[-2]
+            audio_path = audio
+            if do_stream == True:
+                os.system(f'demucs -n mdx_extra --two-stems=vocals "{audio}" -o out')
+                audio = "./out/mdx_extra/" + audio_name + "/vocals.wav"
+            with open(audio, "rb") as f:
+                payload = f.read()
+
+            audio = ffmpeg_read(payload, sampling_rate=16000)
+            if do_stream == True:
+                os.remove("./out/mdx_extra/" + audio_name + "/vocals.wav")
+                os.remove("./out/mdx_extra/" + audio_name + "/no_vocals.wav")
+
+        speech_timestamps = get_speech_timestamps(
+            audio,
+            model_vad,
+            sampling_rate=16000,
+            min_silence_duration_ms=250,
+            speech_pad_ms=200,
+        )
+        audio_batch = [
+            audio[speech_timestamps[st]["start"] : speech_timestamps[st]["end"]]
+            for st in range(len(speech_timestamps))
+        ]
+
+        if do_stream == False:
+            audio_batch = batch_audio_by_silence(audio_batch)
+
+        transcription = []
+        for data in audio_batch:
+            transcription.append(
+                remote_inference(
+                    main_lang=main_lang, model_config=model_config, data=data
+                )
+            )
+
+        for x in range(len(audio_batch)):
+            response = transcription[x].result()
+            chunks.append(
+                {
+                    "text": response.json(),
+                    "start_timestamp": (speech_timestamps[x]["start"] / 16000) - 0.2,
+                    "stop_timestamp": (speech_timestamps[x]["end"] / 16000) - 0.5,
+                }
+            )
+
+        chunks = sorted(chunks, key=lambda d: d["start_timestamp"])
+        for c in chunks:
+            full_transcription["text"] += c["text"] + "\n"
+
+        if do_stream == True:
+            for c in range(len(chunks)):
+                chunks[c]["en_text"] = translate(
+                    chunks[c]["text"], LANG_MAPPING[main_lang], "en"
+                )
+                full_transcription["en_text"] += chunks[c]["en_text"] + "\n"
+
+        if audio_path.split(".")[-1] in ["mp4", "webm"]:
+            file = merge_subtitles(chunks, audio_path, audio_name)
+
+        os.remove(audio_path)
+
+    return full_transcription["text"], chunks, file

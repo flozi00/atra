@@ -1,5 +1,5 @@
 from optimum.pipelines import pipeline
-from aaas.audio_utils import LANG_MAPPING
+from aaas.statics import *
 from transformers import AutoTokenizer
 from optimum.onnxruntime import ORTModelForSeq2SeqLM
 import onnxruntime
