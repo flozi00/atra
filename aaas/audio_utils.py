@@ -1,18 +1,14 @@
-import numpy as np
 from transformers import WhisperProcessor, WhisperForConditionalGeneration
 import torch
-import os
 import torch.quantization
 import torch.nn as nn
 from optimum.bettertransformer import BetterTransformer
-from aaas.backend_utils import inference_only, decrease_queue
+from aaas.backend_utils import inference_only
 from aaas.statics import *
+from aaas.backend_utils import ipex_optimizer
+import intel_extension_for_pytorch as ipex
 
 if inference_only == False:
-    from aaas.video_utils import merge_subtitles
-    from aaas.text_utils import translate
-    from aaas.remote_utils import remote_inference
-    import subprocess
     from aaas.silero_vad import silero_vad
 
     model_vad, get_speech_timestamps = silero_vad(True)
@@ -45,7 +41,7 @@ def inference_asr(data_batch, main_lang: str, model_config: str) -> str:
                 max_length=int(((len(data) / 16000) * 12) / 2) + 10,
                 use_cache=True,
                 no_repeat_ngram_size=1,
-                num_beams=4,
+                num_beams=2,
                 forced_decoder_ids=processor.get_decoder_prompt_ids(
                     language=LANG_MAPPING[main_lang], task="transcribe"
                 ),
@@ -74,11 +70,13 @@ def get_model_and_processor(lang: str):
 
     if model == None:
         model = WhisperForConditionalGeneration.from_pretrained(model_id).eval()
-        if torch.cuda.is_available():
-            model = model.to("cuda").half()
         model = BetterTransformer.transform(model)
 
-        if torch.cuda.is_available() == False:
+        if torch.cuda.is_available():
+            model = model.to("cuda").half()
+        elif ipex_optimizer == True:
+            model = ipex.optimize(model)
+        else:
             model = torch.quantization.quantize_dynamic(
                 model, {nn.Linear}, dtype=torch.qint8
             )
@@ -86,46 +84,6 @@ def get_model_and_processor(lang: str):
         MODEL_MAPPING[lang]["model"] = model
 
     return model, processor
-
-
-# copied from https://github.com/huggingface/transformers
-def ffmpeg_read(bpayload: bytes, sampling_rate: int) -> np.array:
-    """
-    Helper function to read an audio file through ffmpeg.
-    """
-    ar = f"{sampling_rate}"
-    ac = "1"
-    format_for_conversion = "f32le"
-    ffmpeg_command = [
-        "ffmpeg",
-        "-i",
-        "pipe:0",
-        "-ac",
-        ac,
-        "-ar",
-        ar,
-        "-f",
-        format_for_conversion,
-        "-hide_banner",
-        "-loglevel",
-        "quiet",
-        "pipe:1",
-    ]
-
-    try:
-        with subprocess.Popen(
-            ffmpeg_command, stdin=subprocess.PIPE, stdout=subprocess.PIPE
-        ) as ffmpeg_process:
-            output_stream = ffmpeg_process.communicate(bpayload)
-    except FileNotFoundError as error:
-        raise ValueError(
-            "ffmpeg was not found but is required to load audio files from filename"
-        ) from error
-    out_bytes = output_stream[0]
-    audio = np.frombuffer(out_bytes, np.float32)
-    if audio.shape[0] == 0:
-        raise ValueError("Malformed soundfile")
-    return audio
 
 
 def batch_audio_by_silence(audio_batch):
@@ -146,81 +104,3 @@ def batch_audio_by_silence(audio_batch):
         new_batch.append(tmp_audio)
 
     return new_batch
-
-
-def run_transcription(audio, main_lang, model_config, target_lang=""):
-    chunks = []
-    file = None
-    full_transcription = {"target_text": ""}
-    if target_lang == "":
-        target_lang = main_lang
-
-    if audio is not None and len(audio) > 3:
-        if isinstance(audio, str):
-            audio_name = audio.split(".")[-2]
-            audio_path = audio
-            extension = audio_path.split(".")[-1]
-
-            if extension in ["mp4"]:
-                do_stream = True
-            else:
-                do_stream = False
-
-            with open(audio, "rb") as f:
-                payload = f.read()
-
-            audio = ffmpeg_read(payload, sampling_rate=16000)
-
-        speech_timestamps = get_speech_timestamps(
-            audio,
-            model_vad,
-            sampling_rate=16000,
-            min_silence_duration_ms=250,
-            speech_pad_ms=200,
-        )
-        audio_batch = [
-            audio[speech_timestamps[st]["start"] : speech_timestamps[st]["end"]]
-            for st in range(len(speech_timestamps))
-        ]
-
-        if do_stream == False:
-            audio_batch = batch_audio_by_silence(audio_batch)
-
-        transcription = []
-        for data in audio_batch:
-            transcription.append(
-                remote_inference(
-                    main_lang=main_lang,
-                    model_config=model_config,
-                    data=data,
-                    premium= not do_stream,
-                )
-            )
-
-        for x in range(len(audio_batch)):
-            response = transcription[x][0].result()
-            decrease_queue(transcription[x][1])
-            chunks.append(
-                {
-                    "native_text": response.json(),
-                    "start_timestamp": (speech_timestamps[x]["start"] / 16000) - 0.1,
-                    "stop_timestamp": (speech_timestamps[x]["end"] / 16000) - 0.5,
-                }
-            )
-
-        chunks = sorted(chunks, key=lambda d: d["start_timestamp"])
-
-        for c in range(len(chunks)):
-            chunks[c]["target_text"] = translate(
-                chunks[c]["native_text"],
-                LANG_MAPPING[main_lang],
-                LANG_MAPPING[target_lang],
-            )
-            full_transcription["target_text"] += chunks[c]["target_text"] + "\n"
-
-        if do_stream == True:
-            file = merge_subtitles(chunks, audio_path, audio_name)
-
-        os.remove(audio_path)
-
-    return full_transcription["target_text"], chunks, file

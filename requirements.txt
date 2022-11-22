@@ -12,3 +12,4 @@ sentencepiece
 torch>=1.13.0
 torchaudio
 transformers>=4.24.0
+intel_extension_for_pytorch

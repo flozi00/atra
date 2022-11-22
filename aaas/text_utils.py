@@ -1,27 +1,8 @@
 from optimum.pipelines import pipeline
 from aaas.statics import *
+from aaas.model_utils import get_model_as_onnx
 from transformers import AutoTokenizer
 from optimum.onnxruntime import ORTModelForSeq2SeqLM
-import onnxruntime
-
-optimum_pipes = {}
-
-providers = [
-    "CUDAExecutionProvider",
-    "OpenVINOExecutionProvider",
-    "CPUExecutionProvider",
-]
-
-for p in providers:
-    if p in onnxruntime.get_available_providers():
-        provider = p
-        break
-
-sess_options = onnxruntime.SessionOptions()
-sess_options.graph_optimization_level = (
-    onnxruntime.GraphOptimizationLevel.ORT_ENABLE_ALL
-)
-
 
 def get_optimum_pipeline(task, model_id):
     global optimum_pipes
@@ -35,17 +16,10 @@ def get_optimum_pipeline(task, model_id):
 
     if task in ["translation", "summarization"]:
         try:
-            model = ORTModelForSeq2SeqLM.from_pretrained(
-                onnx_id, provider=provider, session_options=sess_options
-            )
+            model = get_model_as_onnx(ORTModelForSeq2SeqLM, onnx_id=onnx_id)
             tokenizer = AutoTokenizer.from_pretrained(onnx_id)
         except:
-            model = ORTModelForSeq2SeqLM.from_pretrained(
-                model_id,
-                from_transformers=True,
-                provider=provider,
-                session_options=sess_options,
-            )
+            model = get_model_as_onnx(ORTModelForSeq2SeqLM, onnx_id=onnx_id, convert=True)
             tokenizer = AutoTokenizer.from_pretrained(model_id, from_transformers=True)
             model.save_pretrained(onnx_id)
             tokenizer.save_pretrained(onnx_id)

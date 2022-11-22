@@ -6,6 +6,9 @@ BACKENDS = []
 inference_only = os.getenv("inference_only", "False")
 inference_only = True if inference_only == "True" else False
 
+ipex_optimizer = os.getenv("ipex", "True")
+ipex_optimizer = True if ipex_optimizer == "True" else False
+
 master_node = os.getenv("master_node", "")
 master_user = os.getenv("master_user", "")
 master_pass = os.getenv("master_pass", "")
