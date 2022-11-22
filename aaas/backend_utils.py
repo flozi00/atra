@@ -46,12 +46,12 @@ def get_best_node(premium = False):
                     BACKENDS.remove(BACKENDS[x])
                     return get_best_node(premium)
 
-        if(BACKENDS[x]["device"] == "cpu"):
-            if(health_check(BACKENDS[x]["port"]) == True):
-                return BACKENDS[x]["port"]
-            else:
-                BACKENDS.remove(BACKENDS[x])
-                return get_best_node(premium)
+    for x in range(len(BACKENDS)):
+        if(health_check(BACKENDS[x]["port"]) == True):
+            return BACKENDS[x]["port"]
+        else:
+            BACKENDS.remove(BACKENDS[x])
+            return get_best_node(premium)
 
     return 7860
 
