@@ -11,7 +11,7 @@ from aaas.statics import *
 if inference_only == False:
     from aaas.video_utils import merge_subtitles
     from aaas.text_utils import translate
-    from aaas.remote_utils import download_audio, remote_inference
+    from aaas.remote_utils import remote_inference
     import subprocess
     from aaas.silero_vad import silero_vad
 
@@ -79,14 +79,9 @@ def get_model_and_processor(lang: str):
         model = BetterTransformer.transform(model)
 
         if torch.cuda.is_available() == False:
-            try:
-                import intel_extension_for_pytorch as ipex
-
-                model = ipex.optimize(model)
-            except:
-                model = torch.quantization.quantize_dynamic(
-                    model, {nn.Linear}, dtype=torch.qint8
-                )
+            model = torch.quantization.quantize_dynamic(
+                model, {nn.Linear}, dtype=torch.qint8
+            )
 
         MODEL_MAPPING[lang]["model"] = model
 
@@ -153,33 +148,30 @@ def batch_audio_by_silence(audio_batch):
     return new_batch
 
 
-def run_transcription(audio, main_lang, model_config):
+def run_transcription(audio, main_lang, model_config, target_lang = ""):
     chunks = []
     file = None
-    full_transcription = {"text": "", "en_text": ""}
+    full_transcription = {"target_text": ""}
+    if target_lang == "":
+        target_lang = main_lang
     check_nodes()
 
     if audio is not None and len(audio) > 3:
-        if "https://" in audio:
-            audio = download_audio(audio)
-            do_stream = True
-        else:
-            do_stream = False
-
         if isinstance(audio, str):
             audio_name = audio.split(".")[-2]
             audio_path = audio
-            if do_stream == True:
-                os.system(f'demucs -n mdx_extra --two-stems=vocals "{audio}" -o out')
-                audio = "./out/mdx_extra/" + audio_name + "/vocals.wav"
+            extension = audio_path.split(".")[-1]
+            
+            if extension in ["mp4"]:
+                do_stream = True
+            else:
+                do_stream = False
+
             with open(audio, "rb") as f:
                 payload = f.read()
 
             audio = ffmpeg_read(payload, sampling_rate=16000)
-            if do_stream == True:
-                os.remove("./out/mdx_extra/" + audio_name + "/vocals.wav")
-                os.remove("./out/mdx_extra/" + audio_name + "/no_vocals.wav")
-
+            
         speech_timestamps = get_speech_timestamps(
             audio,
             model_vad,
@@ -199,7 +191,10 @@ def run_transcription(audio, main_lang, model_config):
         for data in audio_batch:
             transcription.append(
                 remote_inference(
-                    main_lang=main_lang, model_config=model_config, data=data, premium=True if len(audio_batch) == 1 else False
+                    main_lang=main_lang,
+                    model_config=model_config,
+                    data=data,
+                    premium=do_stream,
                 )
             )
 
@@ -207,26 +202,23 @@ def run_transcription(audio, main_lang, model_config):
             response = transcription[x].result()
             chunks.append(
                 {
-                    "text": response.json(),
-                    "start_timestamp": (speech_timestamps[x]["start"] / 16000) - 0.2,
+                    "native_text": response.json(),
+                    "start_timestamp": (speech_timestamps[x]["start"] / 16000) - 0.1,
                     "stop_timestamp": (speech_timestamps[x]["end"] / 16000) - 0.5,
                 }
             )
 
         chunks = sorted(chunks, key=lambda d: d["start_timestamp"])
-        for c in chunks:
-            full_transcription["text"] += c["text"] + "\n"
+        
+        for c in range(len(chunks)):
+            chunks[c]["target_text"] = translate(
+                chunks[c]["native_text"], LANG_MAPPING[main_lang], LANG_MAPPING[target_lang]
+            )
+            full_transcription["target_text"] += chunks[c]["target_text"] + "\n"
 
         if do_stream == True:
-            for c in range(len(chunks)):
-                chunks[c]["en_text"] = translate(
-                    chunks[c]["text"], LANG_MAPPING[main_lang], "en"
-                )
-                full_transcription["en_text"] += chunks[c]["en_text"] + "\n"
-
-        if audio_path.split(".")[-1] in ["mp4", "webm"]:
             file = merge_subtitles(chunks, audio_path, audio_name)
 
         os.remove(audio_path)
 
-    return full_transcription["text"], chunks, file
+    return full_transcription["target_text"], chunks, file

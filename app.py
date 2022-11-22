@@ -5,7 +5,6 @@ from aaas.audio_utils import (
 from aaas.backend_utils import (
     CPU_BACKENDS,
     GPU_BACKENDS,
-    health_check,
     inference_only,
     master_node,
     master_pass,
@@ -61,7 +60,7 @@ if inference_only == False:
     import gradio as gr
 
     app = gr.mount_gradio_app(app, build_gradio(), path="")
-else:
+elif __name__ == "__main__":
     import requests
 
     forward_port = requests.get(

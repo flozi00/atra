@@ -1,5 +1,4 @@
 datasets
-demucs
 gradio==3.9
 optimum
 https://github.com/ross/requests-futures/archive/refs/heads/main.zip
@@ -13,4 +12,3 @@ sentencepiece
 torch>=1.13.0
 torchaudio
 transformers>=4.24.0
-yt-dlp

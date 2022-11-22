@@ -19,7 +19,7 @@ def merge_subtitles(subtitles, base_file, audio_name):
     for i in range(len(subtitles)):
         start = subtitles[i]["start_timestamp"]
         end = subtitles[i]["stop_timestamp"]
-        text = subtitles[i]["text"]
+        text = subtitles[i]["target_text"]
         subtitle_frames.append(burn_subtitles(start, end, text))
 
     file_clip = VideoFileClip(base_file)
