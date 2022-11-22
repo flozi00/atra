@@ -148,7 +148,7 @@ def batch_audio_by_silence(audio_batch):
     return new_batch
 
 
-def run_transcription(audio, main_lang, model_config, target_lang = ""):
+def run_transcription(audio, main_lang, model_config, target_lang=""):
     chunks = []
     file = None
     full_transcription = {"target_text": ""}
@@ -161,7 +161,7 @@ def run_transcription(audio, main_lang, model_config, target_lang = ""):
             audio_name = audio.split(".")[-2]
             audio_path = audio
             extension = audio_path.split(".")[-1]
-            
+
             if extension in ["mp4"]:
                 do_stream = True
             else:
@@ -171,7 +171,7 @@ def run_transcription(audio, main_lang, model_config, target_lang = ""):
                 payload = f.read()
 
             audio = ffmpeg_read(payload, sampling_rate=16000)
-            
+
         speech_timestamps = get_speech_timestamps(
             audio,
             model_vad,
@@ -209,10 +209,12 @@ def run_transcription(audio, main_lang, model_config, target_lang = ""):
             )
 
         chunks = sorted(chunks, key=lambda d: d["start_timestamp"])
-        
+
         for c in range(len(chunks)):
             chunks[c]["target_text"] = translate(
-                chunks[c]["native_text"], LANG_MAPPING[main_lang], LANG_MAPPING[target_lang]
+                chunks[c]["native_text"],
+                LANG_MAPPING[main_lang],
+                LANG_MAPPING[target_lang],
             )
             full_transcription["target_text"] += chunks[c]["target_text"] + "\n"
 

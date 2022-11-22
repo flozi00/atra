@@ -67,19 +67,3 @@ def translate(text, source, target):
     translated = trans_pipe(text)[0]["translation_text"]
 
     return translated
-
-
-def summarize(main_lang, text):
-    summarizer = get_optimum_pipeline(
-        "summarization", model_id="google/bigbird-pegasus-large-bigpatent"
-    )
-
-    en_version = translate(text, LANG_MAPPING[main_lang], "en")
-
-    summarization = summarizer(
-        en_version, max_length=130, min_length=30, do_sample=False
-    )[0]["summary_text"]
-
-    summarization = translate(summarization, "en", LANG_MAPPING[main_lang])
-
-    return summarization
