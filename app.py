@@ -3,8 +3,8 @@ from aaas.audio_utils import (
     inference_denoise,
 )
 from aaas.backend_utils import (
-    CPU_BACKENDS,
-    GPU_BACKENDS,
+    BACKENDS,
+    get_used_ports,
     inference_only,
     master_node,
     master_pass,
@@ -41,20 +41,17 @@ if inference_only == False:
 
     @app.get("/get_free_port/")
     def get_set_port(password, device):
-        global CPU_BACKENDS, GPU_BACKENDS
+        global BACKENDS
         if password != master_pass:
             return "false password"
 
-        merged_lists = CPU_BACKENDS + GPU_BACKENDS
+        merged_lists = get_used_ports()
         start_port = 7861
         while start_port in merged_lists:
             start_port += 1
 
-        if device == "gpu":
-            GPU_BACKENDS.append(start_port)
-        if device == "cpu":
-            CPU_BACKENDS.append(start_port)
-
+        BACKENDS.append({"port": start_port, "device": device, "requests": 0})
+        
         return start_port
 
     import gradio as gr

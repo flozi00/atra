@@ -5,7 +5,7 @@ import os
 import torch.quantization
 import torch.nn as nn
 from optimum.bettertransformer import BetterTransformer
-from aaas.backend_utils import inference_only, check_nodes
+from aaas.backend_utils import inference_only, decrease_queue
 from aaas.statics import *
 
 if inference_only == False:
@@ -45,7 +45,7 @@ def inference_asr(data_batch, main_lang: str, model_config: str) -> str:
                 max_length=int(((len(data) / 16000) * 12) / 2) + 10,
                 use_cache=True,
                 no_repeat_ngram_size=1,
-                num_beams=20,
+                num_beams=4,
                 forced_decoder_ids=processor.get_decoder_prompt_ids(
                     language=LANG_MAPPING[main_lang], task="transcribe"
                 ),
@@ -154,7 +154,6 @@ def run_transcription(audio, main_lang, model_config, target_lang=""):
     full_transcription = {"target_text": ""}
     if target_lang == "":
         target_lang = main_lang
-    check_nodes()
 
     if audio is not None and len(audio) > 3:
         if isinstance(audio, str):
@@ -199,7 +198,8 @@ def run_transcription(audio, main_lang, model_config, target_lang=""):
             )
 
         for x in range(len(audio_batch)):
-            response = transcription[x].result()
+            response = transcription[x][0].result()
+            decrease_queue(transcription[x][1])
             chunks.append(
                 {
                     "native_text": response.json(),

@@ -1,8 +1,7 @@
 import urllib.request
 import os
 
-CPU_BACKENDS = []
-GPU_BACKENDS = []
+BACKENDS = []
 
 inference_only = os.getenv("inference_only", "False")
 inference_only = True if inference_only == "True" else False
@@ -23,19 +22,39 @@ def health_check(port):
     except:
         return False
 
+async def increase_queue(port):
+    global BACKENDS
+    for x in range(len(BACKENDS)):
+        if(BACKENDS[x]["port"] == port):
+            BACKENDS[x]["requests"] += 1
 
-def check_nodes():
-    global CPU_BACKENDS, GPU_BACKENDS
-    to_remove = []
-    ports = GPU_BACKENDS + CPU_BACKENDS
-    for port in ports:
-        if health_check(port) == True:
-            continue
+async def decrease_queue(port):
+    global BACKENDS
+    for x in range(len(BACKENDS)):
+        if(BACKENDS[x]["port"] == port):
+            BACKENDS[x]["requests"] -= 1
+
+def get_best_node(premium = False):
+    global BACKENDS
+    BACKENDS = sorted(BACKENDS, key=lambda d: d['requests']) 
+    for x in range(len(BACKENDS)):
+        if(premium == True):
+            if(BACKENDS[x]["device"] == "gpu"):
+                if(health_check(BACKENDS[x]["port"]) == True):
+                    return BACKENDS[x]["port"]
+                else:
+                    BACKENDS.remove(BACKENDS[x])
+                    return get_best_node(premium)
         else:
-            to_remove.append(port)
+            if(BACKENDS[x]["device"] == "cpu"):
+                if(health_check(BACKENDS[x]["port"]) == True):
+                    return BACKENDS[x]["port"]
+                else:
+                    BACKENDS.remove(BACKENDS[x])
+                    return get_best_node(premium)
 
-    for p in to_remove:
-        if p in GPU_BACKENDS:
-            GPU_BACKENDS.remove(p)
-        if p in CPU_BACKENDS:
-            CPU_BACKENDS.remove(p)
+    return 7860
+
+def get_used_ports():
+    global BACKENDS
+    return [port for port in BACKENDS["port"]]
