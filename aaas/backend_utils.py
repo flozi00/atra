@@ -57,4 +57,4 @@ def get_best_node(premium = False):
 
 def get_used_ports():
     global BACKENDS
-    return [port for port in BACKENDS["port"]]
+    return [port["port"] for port in BACKENDS]
