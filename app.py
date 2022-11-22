@@ -50,6 +50,7 @@ if inference_only == False:
         while start_port in merged_lists:
             start_port += 1
 
+        os.system(f"echo {master_pass}|sudo -S fuser -k {start_port}/tcp")
         BACKENDS.append({"port": start_port, "device": device, "requests": 0})
         
         return start_port
