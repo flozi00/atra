@@ -1,4 +1,4 @@
-from aaas.backend_utils import CPU_BACKENDS, GPU_BACKENDS, health_check, inference_only
+from aaas.backend_utils import CPU_BACKENDS, GPU_BACKENDS, inference_only
 import random
 
 if inference_only == False:

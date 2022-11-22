@@ -42,6 +42,7 @@ if inference_only == False:
 
     @app.get("/get_free_port/")
     def get_set_port(password, device):
+        global CPU_BACKENDS, GPU_BACKENDS
         if password != master_pass:
             return "false password"
 

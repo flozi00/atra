@@ -25,6 +25,7 @@ def health_check(port):
 
 
 def check_nodes():
+    global CPU_BACKENDS, GPU_BACKENDS
     to_remove = []
     ports = GPU_BACKENDS + CPU_BACKENDS
     for port in ports:
