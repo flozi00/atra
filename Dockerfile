@@ -8,7 +8,7 @@ WORKDIR /asr-server
 COPY policy.xml  /etc/ImageMagick-6/policy.xml
 
 RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
+RUN pip install torch>=1.13.0 torchaudio --extra-index-url https://download.pytorch.org/whl/cpu && pip install -r requirements.txt
 
 EXPOSE 7860
 
