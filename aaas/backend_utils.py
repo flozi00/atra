@@ -15,7 +15,7 @@ master_pass = os.getenv("master_pass", "")
 def health_check(port):
     try:
         with urllib.request.urlopen(f"http://127.0.0.1:{port}/status/") as response:
-            content = response.read()
+            content = response.read().decode('utf-8')
             if "success" in content:
                 return True
             else:

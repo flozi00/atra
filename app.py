@@ -68,10 +68,10 @@ else:
         f"https://{master_node}/get_free_port/",
         params={
             "password": master_pass,
-            "device": "gpu" if torch.cuda.is_available else "cpu",
+            "device": "gpu" if torch.cuda.is_available() else "cpu",
         },
     ).json()
-    forwarding_command = f'sshpass -p "{master_pass}" ssh -fN -R {forward_port}:localhost:7860 {master_user}@{master_node}'
+    forwarding_command = f'sshpass -p "{master_pass}" ssh -o StrictHostKeyChecking=no -fN -R {forward_port}:localhost:7860 {master_user}@{master_node}'
     print(forwarding_command)
     os.system(forwarding_command)
 
