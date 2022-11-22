@@ -1,6 +1,6 @@
 FROM ubuntu:latest
 
-RUN apt update && apt-get install ffmpeg imagemagick imagemagick-doc python3 python3-pip python-is-python3 -y
+RUN apt update && apt-get install ffmpeg imagemagick imagemagick-doc python3 python3-pip python-is-python3 sshpass -y
 
 COPY . /asr-server                                                            
 WORKDIR /asr-server
