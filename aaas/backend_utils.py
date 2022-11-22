@@ -24,7 +24,7 @@ def health_check(port):
         return False
 
 
-async def check_nodes():
+def check_nodes():
     global CPU_BACKENDS, GPU_BACKENDS
     to_remove = []
     ports = GPU_BACKENDS + CPU_BACKENDS
