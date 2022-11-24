@@ -1,15 +1,12 @@
-FROM ubuntu:20.04
+FROM python:3.9.15-slim
 
-RUN apt update && apt-get install ffmpeg imagemagick imagemagick-doc python3 python3-pip sshpass -y
+RUN apt update && apt-get install ffmpeg sshpass -y
 
 COPY . /asr-server                                                            
 WORKDIR /asr-server
 
-COPY policy.xml  /etc/ImageMagick-6/policy.xml
-
-RUN pip3 install --upgrade pip
-RUN pip3 install torch>=1.13.0 --extra-index-url https://download.pytorch.org/whl/cpu && pip install -r requirements.txt
+RUN pip install torch>=1.13.0 --extra-index-url https://download.pytorch.org/whl/cpu && pip install -r requirements.txt
 
 EXPOSE 7860
 
-CMD exec python3 app.py
+CMD exec python app.py
