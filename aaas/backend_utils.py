@@ -41,7 +41,7 @@ async def decrease_queue(port):
 def get_best_node(premium=False):
     global BACKENDS
     BACKENDS = sorted(BACKENDS, key=lambda d: d["requests"])
-    
+    print(BACKENDS)
     for x in range(len(BACKENDS)):
         if health_check(BACKENDS[x]["port"]) == True:
             return BACKENDS[x]["port"]
