@@ -19,7 +19,8 @@ def health_check(port):
                 return True
             else:
                 return False
-    except:
+    except Exception as e:
+        print(port, e)
         return False
 
 
@@ -40,15 +41,7 @@ async def decrease_queue(port):
 def get_best_node(premium=False):
     global BACKENDS
     BACKENDS = sorted(BACKENDS, key=lambda d: d["requests"])
-    if premium == True:
-        for x in range(len(BACKENDS)):
-            if BACKENDS[x]["device"] == "gpu":
-                if health_check(BACKENDS[x]["port"]) == True:
-                    return BACKENDS[x]["port"]
-                else:
-                    BACKENDS.remove(BACKENDS[x])
-                    return get_best_node(premium)
-
+    
     for x in range(len(BACKENDS)):
         if health_check(BACKENDS[x]["port"]) == True:
             return BACKENDS[x]["port"]
