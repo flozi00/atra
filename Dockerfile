@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 
 RUN apt update && apt-get install ffmpeg imagemagick imagemagick-doc python3 python3-pip sshpass -y
 
