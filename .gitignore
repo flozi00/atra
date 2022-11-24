@@ -51,3 +51,4 @@ out/
 *.mp*
 *.webm
 *.html
+model_cache/
