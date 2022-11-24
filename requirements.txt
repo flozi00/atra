@@ -1,5 +1,5 @@
 datasets
-gradio==3.9
+gradio>=3.9
 optimum>=1.5.0
 https://github.com/ross/requests-futures/archive/refs/heads/main.zip
 jiwer
