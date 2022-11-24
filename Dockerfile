@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM ubuntu:18.04
 
 RUN apt update && apt-get install ffmpeg imagemagick imagemagick-doc python3 python3-pip python-is-python3 sshpass -y
 
