@@ -1,6 +1,6 @@
 FROM ubuntu:18.04
 
-RUN apt update && apt-get install ffmpeg imagemagick imagemagick-doc python3 python3-pip python-is-python3 sshpass -y
+RUN apt update && apt-get install ffmpeg imagemagick imagemagick-doc python3 python3-pip sshpass -y
 
 COPY . /asr-server                                                            
 WORKDIR /asr-server
@@ -12,4 +12,4 @@ RUN pip install torch>=1.13.0 --extra-index-url https://download.pytorch.org/whl
 
 EXPOSE 7860
 
-CMD exec python app.py
+CMD exec python3 app.py
