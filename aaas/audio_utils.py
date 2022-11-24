@@ -1,12 +1,8 @@
-from transformers import WhisperProcessor, WhisperForConditionalGeneration
-import torch
-import torch.quantization
-import torch.nn as nn
-from optimum.bettertransformer import BetterTransformer
+from transformers import WhisperProcessor
 from aaas.backend_utils import inference_only
 from aaas.statics import *
-from aaas.backend_utils import ipex_optimizer
-import intel_extension_for_pytorch as ipex
+from aaas.model_utils import get_model_as_onnx
+from optimum.onnxruntime import ORTModelForSpeechSeq2Seq
 
 if inference_only == False:
     from aaas.silero_vad import silero_vad
@@ -33,19 +29,16 @@ def inference_asr(data_batch, main_lang: str, model_config: str) -> str:
             truncation=True,
         ).input_features
 
-        with torch.inference_mode():
-            if torch.cuda.is_available():
-                input_values = input_values.to("cuda").half()
-            predicted_ids = model.generate(
-                input_values,
-                max_length=int(((len(data) / 16000) * 12) / 2) + 10,
-                use_cache=True,
-                no_repeat_ngram_size=1,
-                num_beams=2,
-                forced_decoder_ids=processor.get_decoder_prompt_ids(
-                    language=LANG_MAPPING[main_lang], task="transcribe"
-                ),
-            )
+        predicted_ids = model.generate(
+            input_values,
+            max_length=int(((len(data) / 16000) * 12) / 2) + 10,
+            use_cache=True,
+            no_repeat_ngram_size=1,
+            num_beams=2,
+            forced_decoder_ids=processor.get_decoder_prompt_ids(
+                language=LANG_MAPPING[main_lang], task="transcribe"
+            ),
+        )
 
         transcription.append(
             processor.batch_decode(predicted_ids, skip_special_tokens=True)[0]
@@ -69,18 +62,7 @@ def get_model_and_processor(lang: str):
         MODEL_MAPPING[lang]["processor"] = processor
 
     if model == None:
-        model = WhisperForConditionalGeneration.from_pretrained(model_id).eval()
-        model = BetterTransformer.transform(model)
-
-        if torch.cuda.is_available():
-            model = model.to("cuda").half()
-        elif ipex_optimizer == True:
-            model = ipex.optimize(model)
-        else:
-            model = torch.quantization.quantize_dynamic(
-                model, {nn.Linear}, dtype=torch.qint8
-            )
-
+        model = get_model_as_onnx(ORTModelForSpeechSeq2Seq, model_id)
         MODEL_MAPPING[lang]["model"] = model
 
     return model, processor

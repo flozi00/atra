@@ -19,8 +19,13 @@ class OnnxWrapper:
     def __init__(self, path):
         import onnxruntime
 
+        sess_options = onnxruntime.SessionOptions()
+        sess_options.graph_optimization_level = (
+            onnxruntime.GraphOptimizationLevel.ORT_ENABLE_ALL
+        )
+
         self.session = onnxruntime.InferenceSession(
-            path, providers=["CPUExecutionProvider"]
+            path, providers=["CPUExecutionProvider"], sess_options=sess_options
         )
         self.session.intra_op_num_threads = 1
         self.session.inter_op_num_threads = 1
@@ -58,27 +63,6 @@ class OnnxWrapper:
         out = torch.tensor(out).squeeze(2)[:, 1]  # make output type match JIT analog
 
         return out
-
-
-class Validator:
-    def __init__(self, url):
-        self.onnx = True if url.endswith(".onnx") else False
-        torch.hub.download_url_to_file(url, "inf.model")
-        if self.onnx:
-            import onnxruntime
-
-            self.model = onnxruntime.InferenceSession("inf.model")
-
-    def __call__(self, inputs: torch.Tensor):
-        with torch.no_grad():
-            if self.onnx:
-                ort_inputs = {"input": inputs.cpu().numpy()}
-                outs = self.model.run(None, ort_inputs)
-                outs = [torch.Tensor(x) for x in outs]
-            else:
-                outs = self.model(inputs)
-
-        return outs
 
 
 def get_speech_timestamps(

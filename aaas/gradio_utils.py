@@ -99,7 +99,7 @@ def run_transcription(audio, main_lang, model_config, target_lang=""):
                     main_lang=main_lang,
                     model_config=model_config,
                     data=data,
-                    premium= not do_stream,
+                    premium=not do_stream,
                 )
             )
 

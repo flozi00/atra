@@ -1,6 +1,6 @@
 datasets
 gradio==3.9
-optimum
+optimum>=1.5.0
 https://github.com/ross/requests-futures/archive/refs/heads/main.zip
 jiwer
 moviepy
@@ -10,6 +10,5 @@ onnxruntime>=1.12.1
 sacremoses
 sentencepiece
 torch>=1.13.0
-torchaudio
 transformers>=4.24.0
-intel_extension_for_pytorch
+onnxruntime-openvino

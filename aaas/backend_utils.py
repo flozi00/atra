@@ -6,9 +6,6 @@ BACKENDS = []
 inference_only = os.getenv("inference_only", "False")
 inference_only = True if inference_only == "True" else False
 
-ipex_optimizer = os.getenv("ipex", "True")
-ipex_optimizer = True if ipex_optimizer == "True" else False
-
 master_node = os.getenv("master_node", "")
 master_user = os.getenv("master_user", "")
 master_pass = os.getenv("master_pass", "")
@@ -25,38 +22,42 @@ def health_check(port):
     except:
         return False
 
+
 async def increase_queue(port):
     global BACKENDS
     for x in range(len(BACKENDS)):
-        if(BACKENDS[x]["port"] == port):
+        if BACKENDS[x]["port"] == port:
             BACKENDS[x]["requests"] += 1
+
 
 async def decrease_queue(port):
     global BACKENDS
     for x in range(len(BACKENDS)):
-        if(BACKENDS[x]["port"] == port):
+        if BACKENDS[x]["port"] == port:
             BACKENDS[x]["requests"] -= 1
 
-def get_best_node(premium = False):
+
+def get_best_node(premium=False):
     global BACKENDS
-    BACKENDS = sorted(BACKENDS, key=lambda d: d['requests']) 
-    if(premium == True):
+    BACKENDS = sorted(BACKENDS, key=lambda d: d["requests"])
+    if premium == True:
         for x in range(len(BACKENDS)):
-            if(BACKENDS[x]["device"] == "gpu"):
-                if(health_check(BACKENDS[x]["port"]) == True):
+            if BACKENDS[x]["device"] == "gpu":
+                if health_check(BACKENDS[x]["port"]) == True:
                     return BACKENDS[x]["port"]
                 else:
                     BACKENDS.remove(BACKENDS[x])
                     return get_best_node(premium)
 
     for x in range(len(BACKENDS)):
-        if(health_check(BACKENDS[x]["port"]) == True):
+        if health_check(BACKENDS[x]["port"]) == True:
             return BACKENDS[x]["port"]
         else:
             BACKENDS.remove(BACKENDS[x])
             return get_best_node(premium)
 
     return 7860
+
 
 def get_used_ports():
     global BACKENDS
