@@ -7,7 +7,7 @@ cpu_threads = os.cpu_count()
 
 providers = [
     #"CUDAExecutionProvider",
-    #"OpenVINOExecutionProvider",
+    "OpenVINOExecutionProvider",
     "CPUExecutionProvider",
 ]
 
