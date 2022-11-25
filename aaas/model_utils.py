@@ -6,8 +6,8 @@ from optimum.onnxruntime import ORTQuantizer
 cpu_threads = os.cpu_count()
 
 providers = [
-    "CUDAExecutionProvider",
-    "OpenVINOExecutionProvider",
+    #"CUDAExecutionProvider",
+    #"OpenVINOExecutionProvider",
     "CPUExecutionProvider",
 ]
 
