@@ -13,6 +13,8 @@ master_node = os.getenv("master_node", "")
 master_user = os.getenv("master_user", "")
 master_pass = os.getenv("master_pass", "")
 
+fallback_url = os.getenv("fallback_url", "http://127.0.0.1:7860")
+
 port_to_listen = os.getenv("PORT", 7860)
 
 def health_check(port):
@@ -53,7 +55,7 @@ def get_best_node(premium=False):
             BACKENDS.remove(BACKENDS[x])
             return get_best_node(premium)
 
-    return 7860
+    return False
 
 
 def get_used_ports():
