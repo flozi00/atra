@@ -8,7 +8,7 @@ if inference_only == False:
 
     def remote_inference(main_lang, model_config, data, premium=False):
         target_port = get_best_node(premium=premium)
-        if type(target_port, int):
+        if isinstance(target_port, int):
             url = f"http://127.0.0.1:{target_port}/asr/{main_lang}/{model_config}/"
         else:
             url = f"{fallback_url}/asr/{main_lang}/{model_config}/"
