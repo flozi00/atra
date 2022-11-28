@@ -1,11 +1,9 @@
 import gradio as gr
 from aaas.audio_utils import LANG_MAPPING
-from aaas.backend_utils import decrease_queue
 import os
 from aaas.video_utils import merge_subtitles
 from aaas.text_utils import translate
-from aaas.remote_utils import remote_inference
-from aaas.audio_utils import batch_audio_by_silence, get_speech_timestamps, model_vad
+from aaas.audio_utils import batch_audio_by_silence, get_speech_timestamps, model_vad, inference_asr
 from transformers.pipelines.audio_utils import ffmpeg_read
 
 langs = list(LANG_MAPPING.keys())
@@ -92,23 +90,17 @@ def run_transcription(audio, main_lang, model_config, target_lang=""):
         if do_stream == False:
             audio_batch = batch_audio_by_silence(audio_batch)
 
-        transcription = []
-        for data in audio_batch:
-            transcription.append(
-                remote_inference(
-                    main_lang=main_lang,
-                    model_config=model_config,
-                    data=data,
-                    premium=not do_stream,
-                )
+        transcription = inference_asr(
+                data_batch=audio_batch,
+                main_lang=main_lang,
+                model_config=model_config,
             )
 
         for x in range(len(audio_batch)):
-            response = transcription[x][0].result()
-            decrease_queue(transcription[x][1])
+            response = transcription[x]
             chunks.append(
                 {
-                    "native_text": response.json(),
+                    "native_text": response,
                     "start_timestamp": (speech_timestamps[x]["start"] / 16000) - 0.1,
                     "stop_timestamp": (speech_timestamps[x]["end"] / 16000) - 0.5,
                 }

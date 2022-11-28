@@ -1,6 +1,7 @@
 import torch
 import warnings
 import numpy as np
+from aaas.utils import timeit
 
 languages = ["ru", "en", "de", "es"]
 
@@ -64,7 +65,7 @@ class OnnxWrapper:
 
         return out
 
-
+@timeit
 def get_speech_timestamps(
     audio: torch.Tensor,
     model,

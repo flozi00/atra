@@ -1,18 +1,16 @@
 from transformers import AutoProcessor
-from aaas.backend_utils import inference_only
 from aaas.statics import *
 from aaas.model_utils import get_model
+from aaas.silero_vad import silero_vad
+from aaas.utils import timeit
 
-if inference_only == False:
-    from aaas.silero_vad import silero_vad
-
-    model_vad, get_speech_timestamps = silero_vad(True)
+model_vad, get_speech_timestamps = silero_vad(True)
 
 
 def inference_denoise(audio):
     return audio
 
-
+@timeit
 def inference_asr(data_batch, main_lang: str, model_config: str) -> str:
     transcription = []
     if model_config == "multilingual":
@@ -45,7 +43,7 @@ def inference_asr(data_batch, main_lang: str, model_config: str) -> str:
 
     return transcription
 
-
+@timeit
 def get_model_and_processor(lang: str):
     try:
         model_id = MODEL_MAPPING[lang]["name"]
@@ -67,7 +65,7 @@ def get_model_and_processor(lang: str):
 
     return model, processor
 
-
+@timeit
 def batch_audio_by_silence(audio_batch):
     new_batch = []
     tmp_audio = []
