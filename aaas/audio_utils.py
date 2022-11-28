@@ -1,8 +1,7 @@
-from transformers import WhisperProcessor
+from transformers import AutoProcessor
 from aaas.backend_utils import inference_only
 from aaas.statics import *
-from aaas.model_utils import get_model_as_onnx
-from optimum.onnxruntime import ORTModelForSpeechSeq2Seq
+from aaas.model_utils import get_model
 
 if inference_only == False:
     from aaas.silero_vad import silero_vad
@@ -56,13 +55,14 @@ def get_model_and_processor(lang: str):
 
     model = MODEL_MAPPING[lang].get("model", None)
     processor = MODEL_MAPPING[lang].get("processor", None)
+    model_class = MODEL_MAPPING[lang].get("class", None)
 
     if processor == None:
-        processor = WhisperProcessor.from_pretrained(model_id)
+        processor = AutoProcessor.from_pretrained(model_id)
         MODEL_MAPPING[lang]["processor"] = processor
 
     if model == None:
-        model = get_model_as_onnx(ORTModelForSpeechSeq2Seq, model_id)
+        model = get_model(model_class, model_id)
         MODEL_MAPPING[lang]["model"] = model
 
     return model, processor

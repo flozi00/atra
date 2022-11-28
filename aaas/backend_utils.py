@@ -6,10 +6,14 @@ BACKENDS = []
 inference_only = os.getenv("inference_only", "False")
 inference_only = True if inference_only == "True" else False
 
+connect_to_master = os.getenv("connect_to_master", "True")
+connect_to_master = True if connect_to_master == "True" else False
+
 master_node = os.getenv("master_node", "")
 master_user = os.getenv("master_user", "")
 master_pass = os.getenv("master_pass", "")
 
+port_to_listen = os.getenv("PORT", 7860)
 
 def health_check(port):
     try:

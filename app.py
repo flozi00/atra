@@ -9,6 +9,8 @@ from aaas.backend_utils import (
     master_node,
     master_pass,
     master_user,
+    port_to_listen,
+    connect_to_master,
 )
 from fastapi import FastAPI, Request
 import uvicorn
@@ -61,7 +63,7 @@ if inference_only == False:
     import gradio as gr
 
     app = gr.mount_gradio_app(app, build_gradio(), path="")
-elif __name__ == "__main__":
+elif __name__ == "__main__" and connect_to_master:
     import requests
 
     forward_port = requests.get(
@@ -77,4 +79,4 @@ elif __name__ == "__main__":
 
 
 if __name__ == "__main__":
-    uvicorn.run("app:app", host="0.0.0.0", port=7860, log_level="info")
+    uvicorn.run("app:app", host="0.0.0.0", port=port_to_listen, log_level="info")
