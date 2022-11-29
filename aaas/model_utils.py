@@ -31,13 +31,22 @@ def get_model(model_class, model_id):
             model_id,
             provider=provider,
             session_options=sess_options,
-            from_transformers=True,
             cache_dir="./model_cache",
         )
     except:
-        model = model_class.from_pretrained(
-            model_id,
-            cache_dir="./model_cache",
-        )
+        try:
+            model = model_class.from_pretrained(
+                model_id,
+                provider=provider,
+                session_options=sess_options,
+                from_transformers=True,
+                cache_dir="./model_cache",
+            )
+            model.save_pretrained("./model_cache" + model_id.split("/")[-1])
+        except:
+            model = model_class.from_pretrained(
+                model_id,
+                cache_dir="./model_cache",
+            )
 
     return model
