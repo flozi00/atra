@@ -7,9 +7,6 @@ from aaas.utils import timeit
 model_vad, get_speech_timestamps = silero_vad(True)
 
 
-def inference_denoise(audio):
-    return audio
-
 @timeit
 def inference_asr(data_batch, main_lang: str, model_config: str) -> str:
     transcription = []
