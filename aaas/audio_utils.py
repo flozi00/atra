@@ -3,6 +3,7 @@ from aaas.statics import *
 from aaas.model_utils import get_model
 from aaas.silero_vad import silero_vad
 from aaas.utils import timeit
+from tqdm.auto import tqdm
 
 model_vad, get_speech_timestamps = silero_vad(True)
 
@@ -15,7 +16,7 @@ def inference_asr(data_batch, main_lang: str, model_config: str) -> str:
     else:
         model, processor = get_model_and_processor(main_lang)
 
-    for data in data_batch:
+    for data in tqdm(data_batch):
         input_values = processor.feature_extractor(
             data,
             sampling_rate=16000,
@@ -27,8 +28,7 @@ def inference_asr(data_batch, main_lang: str, model_config: str) -> str:
             input_values,
             max_length=int(((len(data) / 16000) * 12) / 2) + 10,
             use_cache=True,
-            no_repeat_ngram_size=1,
-            num_beams=2,
+            num_beams=1,
             forced_decoder_ids=processor.get_decoder_prompt_ids(
                 language=LANG_MAPPING[main_lang], task="transcribe"
             ),

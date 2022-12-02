@@ -78,17 +78,17 @@ def run_transcription(audio, main_lang, model_config, target_lang=""):
         speech_timestamps = get_speech_timestamps(
             audio,
             model_vad,
+            threshold=0.4,
             sampling_rate=16000,
             min_silence_duration_ms=250,
             speech_pad_ms=200,
         )
         audio_batch = [
-            audio[speech_timestamps[st]["start"] : speech_timestamps[st]["end"]]
+            audio[speech_timestamps[st]["start"]-800 : speech_timestamps[st]["end"]+800]
             for st in range(len(speech_timestamps))
         ]
 
-        if do_stream == False:
-            audio_batch = batch_audio_by_silence(audio_batch)
+        audio_batch = batch_audio_by_silence(audio_batch)
 
         transcription = inference_asr(
                 data_batch=audio_batch,
