@@ -55,6 +55,7 @@ def get_model_and_processor(lang: str, model_config: str):
     if processor == None:
         processor = AutoProcessor.from_pretrained(model_id)
         MODEL_MAPPING[model_config][lang]["processor"] = processor
+        processor.save_pretrained("./model_cache" + model_id.split("/")[-1])
 
     if model == None:
         model = get_model(model_class, model_id)
