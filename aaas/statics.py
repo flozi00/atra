@@ -13,7 +13,6 @@ MODEL_MAPPING = {
         "universal": {"name": "openai/whisper-medium", "class": ORTModelForSpeechSeq2Seq},
     },
     "large":{
-        "german": {"name": "flozi00/whisper-large-german", "class": ORTModelForSpeechSeq2Seq},
         "universal": {"name": "openai/whisper-large", "class": ORTModelForSpeechSeq2Seq},
     },
 }
