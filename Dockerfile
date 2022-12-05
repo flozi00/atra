@@ -5,7 +5,7 @@ RUN apt update && apt-get install ffmpeg -y
 COPY . /asr-server                                                            
 WORKDIR /asr-server
 
-RUN pip install torch>=1.13.0 --extra-index-url https://download.pytorch.org/whl/cpu && pip install -r requirements.txt
+RUN pip install torch>=1.13.0 --extra-index-url https://download.pytorch.org/whl/cpu --no-cache-dir && pip install -r requirements.txt --no-cache-dir
 
 EXPOSE 7860
 

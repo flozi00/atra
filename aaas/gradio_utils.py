@@ -46,7 +46,6 @@ def build_gradio():
             outputs=[transcription, chunks],
         )
 
-    ui.queue()
     return ui
 
 
@@ -100,8 +99,7 @@ def run_transcription(audio, main_lang, model_config, target_lang=""):
                 }
             )
             full_transcription["target_text"] += response + "\n"
-            yield full_transcription["target_text"], chunks
 
         os.remove(audio_path)
 
-    yield full_transcription["target_text"], chunks
+    return full_transcription["target_text"], chunks
