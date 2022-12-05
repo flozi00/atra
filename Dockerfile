@@ -6,7 +6,6 @@ COPY . /asr-server
 WORKDIR /asr-server
 
 RUN pip install torch>=1.13.0 --extra-index-url https://download.pytorch.org/whl/cpu && pip install -r requirements.txt
-RUN python preload.py
 
 EXPOSE 7860
 
