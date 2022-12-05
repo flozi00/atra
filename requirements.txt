@@ -1,5 +1,5 @@
 datasets
-gradio>=3.12.0
+gradio==3.9.0
 optimum>=1.5.0
 onnx
 onnxruntime>=1.12.1
