@@ -1,9 +1,8 @@
 import gradio as gr
 from aaas.audio_utils import LANG_MAPPING
 import os
-from aaas.video_utils import merge_subtitles
 from aaas.text_utils import translate
-from aaas.audio_utils import batch_audio_by_silence, get_speech_timestamps, model_vad, inference_asr
+from aaas.audio_utils import batch_audio_by_silence, get_speech_timestamps, model_vad, inference_asr, preprocess_audio
 from transformers.pipelines.audio_utils import ffmpeg_read
 
 langs = list(LANG_MAPPING.keys())
@@ -18,7 +17,7 @@ def build_gradio():
                 lang = gr.Radio(langs, value=langs[0])
             with gr.TabItem("model configuration"):
                 model_config = gr.Radio(
-                    choices=["monolingual", "multilingual"], value="monolingual"
+                    choices=["small", "medium", "large"], value="small"
                 )
             with gr.TabItem("translate to"):
                 target_lang = gr.Radio(langs)
@@ -34,21 +33,20 @@ def build_gradio():
                 transcription = gr.Textbox()
             with gr.TabItem("details"):
                 chunks = gr.JSON()
-            with gr.TabItem("Subtitled Video"):
-                video = gr.Video()
 
         mic.change(
             fn=run_transcription,
             inputs=[mic, lang, model_config, target_lang],
-            outputs=[transcription, chunks, video],
+            outputs=[transcription, chunks],
             api_name="transcription",
         )
         audio_file.change(
             fn=run_transcription,
             inputs=[audio_file, lang, model_config, target_lang],
-            outputs=[transcription, chunks, video],
+            outputs=[transcription, chunks],
         )
 
+    ui.queue()
     return ui
 
 
@@ -65,60 +63,45 @@ def run_transcription(audio, main_lang, model_config, target_lang=""):
             audio_path = audio
             extension = audio_path.split(".")[-1]
 
-            if extension in ["mp4"]:
-                do_stream = True
-            else:
-                do_stream = False
-
             with open(audio, "rb") as f:
                 payload = f.read()
 
             audio = ffmpeg_read(payload, sampling_rate=16000)
+            audio = preprocess_audio(audio=audio)
 
         speech_timestamps = get_speech_timestamps(
             audio,
             model_vad,
+            threshold=0.5,
             sampling_rate=16000,
-            min_silence_duration_ms=250,
-            speech_pad_ms=200,
+            min_silence_duration_ms=500,
+            speech_pad_ms=100,
         )
         audio_batch = [
-            audio[speech_timestamps[st]["start"] : speech_timestamps[st]["end"]]
+            audio[speech_timestamps[st]["start"]-800 : speech_timestamps[st]["end"]+800]
             for st in range(len(speech_timestamps))
         ]
 
-        if do_stream == False:
-            audio_batch = batch_audio_by_silence(audio_batch)
-
-        transcription = inference_asr(
-                data_batch=audio_batch,
-                main_lang=main_lang,
-                model_config=model_config,
-            )
+        audio_batch = batch_audio_by_silence(audio_batch)
 
         for x in range(len(audio_batch)):
-            response = transcription[x]
+            audio = audio_batch[x]
+            response = inference_asr(
+                    data_batch=[audio],
+                    main_lang=main_lang,
+                    model_config=model_config,
+                )[0]
             chunks.append(
                 {
                     "native_text": response,
                     "start_timestamp": (speech_timestamps[x]["start"] / 16000) - 0.1,
                     "stop_timestamp": (speech_timestamps[x]["end"] / 16000) - 0.5,
+                    "target_text": translate(response, LANG_MAPPING[main_lang], LANG_MAPPING[target_lang]),
                 }
             )
-
-        chunks = sorted(chunks, key=lambda d: d["start_timestamp"])
-
-        for c in range(len(chunks)):
-            chunks[c]["target_text"] = translate(
-                chunks[c]["native_text"],
-                LANG_MAPPING[main_lang],
-                LANG_MAPPING[target_lang],
-            )
-            full_transcription["target_text"] += chunks[c]["target_text"] + "\n"
-
-        if do_stream == True:
-            file = merge_subtitles(chunks, audio_path, audio_name)
+            full_transcription["target_text"] += response + "\n"
+            yield full_transcription["target_text"], chunks
 
         os.remove(audio_path)
 
-    return full_transcription["target_text"], chunks, file
+    yield full_transcription["target_text"], chunks

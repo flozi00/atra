@@ -3,19 +3,19 @@ from aaas.statics import *
 from aaas.model_utils import get_model
 from aaas.silero_vad import silero_vad
 from aaas.utils import timeit
+from tqdm.auto import tqdm
 
 model_vad, get_speech_timestamps = silero_vad(True)
 
+def preprocess_audio(audio):
+    return audio
 
 @timeit
 def inference_asr(data_batch, main_lang: str, model_config: str) -> str:
     transcription = []
-    if model_config == "multilingual":
-        model, processor = get_model_and_processor("universal")
-    else:
-        model, processor = get_model_and_processor(main_lang)
+    model, processor = get_model_and_processor(main_lang, model_config)
 
-    for data in data_batch:
+    for data in tqdm(data_batch):
         input_values = processor.feature_extractor(
             data,
             sampling_rate=16000,
@@ -27,8 +27,8 @@ def inference_asr(data_batch, main_lang: str, model_config: str) -> str:
             input_values,
             max_length=int(((len(data) / 16000) * 12) / 2) + 10,
             use_cache=True,
-            no_repeat_ngram_size=1,
-            num_beams=2,
+            no_repeat_ngram_size = 5,
+            num_beams=1,
             forced_decoder_ids=processor.get_decoder_prompt_ids(
                 language=LANG_MAPPING[main_lang], task="transcribe"
             ),
@@ -41,24 +41,25 @@ def inference_asr(data_batch, main_lang: str, model_config: str) -> str:
     return transcription
 
 @timeit
-def get_model_and_processor(lang: str):
+def get_model_and_processor(lang: str, model_config: str):
     try:
-        model_id = MODEL_MAPPING[lang]["name"]
+        model_id = MODEL_MAPPING[model_config][lang]["name"]
     except:
         lang = "universal"
-        model_id = MODEL_MAPPING[lang]["name"]
+        model_id = MODEL_MAPPING[model_config][lang]["name"]
 
-    model = MODEL_MAPPING[lang].get("model", None)
-    processor = MODEL_MAPPING[lang].get("processor", None)
-    model_class = MODEL_MAPPING[lang].get("class", None)
+    model = MODEL_MAPPING[model_config][lang].get("model", None)
+    processor = MODEL_MAPPING[model_config][lang].get("processor", None)
+    model_class = MODEL_MAPPING[model_config][lang].get("class", None)
 
     if processor == None:
         processor = AutoProcessor.from_pretrained(model_id)
-        MODEL_MAPPING[lang]["processor"] = processor
+        MODEL_MAPPING[model_config][lang]["processor"] = processor
+        processor.save_pretrained("./model_cache" + model_id.split("/")[-1])
 
     if model == None:
         model = get_model(model_class, model_id)
-        MODEL_MAPPING[lang]["model"] = model
+        MODEL_MAPPING[model_config][lang]["model"] = model
 
     return model, processor
 
