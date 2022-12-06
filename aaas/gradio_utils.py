@@ -78,7 +78,7 @@ def run_transcription(audio, main_lang, model_config, target_lang=""):
             for st in range(len(speech_timestamps))
         ]
 
-        audio_batch = batch_audio_by_silence(audio_batch)
+        #audio_batch = batch_audio_by_silence(audio_batch)
 
         for x in range(len(audio_batch)):
             audio = audio_batch[x]
