@@ -1,4 +1,3 @@
-datasets
 gradio>=3.12.0
 optimum>=1.5.0
 onnx

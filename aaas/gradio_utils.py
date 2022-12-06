@@ -51,16 +51,13 @@ def build_gradio():
 
 def run_transcription(audio, main_lang, model_config, target_lang=""):
     chunks = []
-    file = None
     full_transcription = {"target_text": ""}
     if target_lang == "":
         target_lang = main_lang
 
     if audio is not None and len(audio) > 3:
         if isinstance(audio, str):
-            audio_name = audio.split(".")[-2]
             audio_path = audio
-            extension = audio_path.split(".")[-1]
 
             with open(audio, "rb") as f:
                 payload = f.read()
@@ -99,7 +96,8 @@ def run_transcription(audio, main_lang, model_config, target_lang=""):
                 }
             )
             full_transcription["target_text"] += response + "\n"
+            yield full_transcription["target_text"], chunks
             
         os.remove(audio_path)
 
-    return full_transcription["target_text"], chunks
+    yield full_transcription["target_text"], chunks
