@@ -2,8 +2,9 @@ import gradio as gr
 from aaas.audio_utils import LANG_MAPPING
 import os
 from aaas.text_utils import translate
-from aaas.audio_utils import batch_audio_by_silence, get_speech_timestamps, model_vad, inference_asr, preprocess_audio
+from aaas.audio_utils import get_model_and_processor, get_speech_timestamps, model_vad, inference_asr, preprocess_audio
 from transformers.pipelines.audio_utils import ffmpeg_read
+from tqdm.auto import tqdm
 
 langs = list(LANG_MAPPING.keys())
 
@@ -79,8 +80,8 @@ def run_transcription(audio, main_lang, model_config, target_lang=""):
         ]
 
         #audio_batch = batch_audio_by_silence(audio_batch)
-
-        for x in range(len(audio_batch)):
+        model, processor = get_model_and_processor(main_lang, model_config)
+        for x in tqdm(range(len(audio_batch))):
             audio = audio_batch[x]
             response = inference_asr(
                     data_batch=[audio],

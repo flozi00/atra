@@ -3,9 +3,9 @@ from optimum.onnxruntime import ORTModelForSpeechSeq2Seq
 
 MODEL_MAPPING = {
     "small":{
-        "german": {"name": "flozi00/whisper-small-german", "class": ORTModelForSpeechSeq2Seq},
-        "english": {"name": "flozi00/whisper-small.en.onnx", "class": ORTModelForSpeechSeq2Seq},
-        "universal": {"name": "flozi00/whisper-small.onnx", "class": ORTModelForSpeechSeq2Seq},
+        "german": {"name": "flozi00/whisper-small-german", "class": AutoModelForSpeechSeq2Seq},
+        "english": {"name": "openai/whisper-small.en", "class": ORTModelForSpeechSeq2Seq},
+        "universal": {"name": "openai/whisper-small", "class": ORTModelForSpeechSeq2Seq},
     },
     "medium":{
         "german": {"name": "flozi00/whisper-medium-german", "class": ORTModelForSpeechSeq2Seq},

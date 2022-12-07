@@ -3,7 +3,7 @@ from aaas.statics import *
 from aaas.model_utils import get_model
 from aaas.silero_vad import silero_vad
 from aaas.utils import timeit
-from tqdm.auto import tqdm
+import torch
 
 model_vad, get_speech_timestamps = silero_vad(True)
 
@@ -15,7 +15,7 @@ def inference_asr(data_batch, main_lang: str, model_config: str) -> str:
     transcription = []
     model, processor = get_model_and_processor(main_lang, model_config)
 
-    for data in tqdm(data_batch):
+    for data in data_batch:
         input_values = processor.feature_extractor(
             data,
             sampling_rate=16000,
@@ -23,16 +23,17 @@ def inference_asr(data_batch, main_lang: str, model_config: str) -> str:
             truncation=True,
         ).input_features
 
-        predicted_ids = model.generate(
-            input_values,
-            max_length=int(((len(data) / 16000) * 12) / 2) + 10,
-            use_cache=True,
-            no_repeat_ngram_size = 5,
-            num_beams=1,
-            forced_decoder_ids=processor.get_decoder_prompt_ids(
-                language=LANG_MAPPING[main_lang], task="transcribe"
-            ),
-        )
+        with torch.inference_mode():
+            predicted_ids = model.generate(
+                input_values,
+                max_length=int(((len(data) / 16000) * 12) / 2) + 10,
+                use_cache=True,
+                no_repeat_ngram_size = 5,
+                num_beams=1,
+                forced_decoder_ids=processor.get_decoder_prompt_ids(
+                    language=LANG_MAPPING[main_lang], task="transcribe"
+                ),
+            )
 
         transcription.append(
             processor.batch_decode(predicted_ids, skip_special_tokens=True)[0]
