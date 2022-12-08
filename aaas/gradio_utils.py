@@ -17,7 +17,7 @@ def build_gradio():
                 lang = gr.Radio(langs, value=langs[0])
             with gr.TabItem("model configuration"):
                 model_config = gr.Radio(
-                    choices=["small", "medium", "large"], value="medium"
+                    choices=["small", "medium", "large"], value="large"
                 )
             with gr.TabItem("translate to"):
                 target_lang = gr.Radio(langs)
