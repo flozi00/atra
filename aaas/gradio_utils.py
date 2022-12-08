@@ -4,9 +4,8 @@ import os
 from aaas.text_utils import translate
 from aaas.audio_utils import get_model_and_processor, get_speech_timestamps, model_vad, inference_asr, preprocess_audio
 from transformers.pipelines.audio_utils import ffmpeg_read
-from tqdm.auto import tqdm
 
-langs = list(LANG_MAPPING.keys())
+langs = sorted(list(LANG_MAPPING.keys()))
 
 
 def build_gradio():
@@ -18,7 +17,7 @@ def build_gradio():
                 lang = gr.Radio(langs, value=langs[0])
             with gr.TabItem("model configuration"):
                 model_config = gr.Radio(
-                    choices=["small", "medium", "large"], value="small"
+                    choices=["small", "medium", "large"], value="medium"
                 )
             with gr.TabItem("translate to"):
                 target_lang = gr.Radio(langs)
@@ -79,9 +78,8 @@ def run_transcription(audio, main_lang, model_config, target_lang=""):
             for st in range(len(speech_timestamps))
         ]
 
-        #audio_batch = batch_audio_by_silence(audio_batch)
-        model, processor = get_model_and_processor(main_lang, model_config)
-        for x in tqdm(range(len(audio_batch))):
+        get_model_and_processor(main_lang, model_config)
+        for x in range(len(audio_batch)):
             audio = audio_batch[x]
             response = inference_asr(
                     data_batch=[audio],
