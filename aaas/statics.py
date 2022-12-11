@@ -1,5 +1,4 @@
 from transformers import AutoModelForSpeechSeq2Seq
-from optimum.onnxruntime import ORTModelForSpeechSeq2Seq
 
 MODEL_MAPPING = {
     "small":{
@@ -19,7 +18,7 @@ MODEL_MAPPING = {
 
 LANGUAGE_CODES = {
     "en": "english",
-    #"zh": "chinese",
+    "zh": "chinese",
     "de": "german",
     "es": "spanish",
     "ru": "russian",

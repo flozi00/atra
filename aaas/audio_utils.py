@@ -7,14 +7,10 @@ import torch
 
 model_vad, get_speech_timestamps = silero_vad(True)
 
-def preprocess_audio(audio):
-    return audio
-
 @timeit
 def inference_asr(data_batch, main_lang: str, model_config: str) -> str:
     transcription = []
     model, processor = get_model_and_processor(main_lang, model_config)
-
     for data in data_batch:
         input_values = processor.feature_extractor(
             data,
@@ -41,7 +37,6 @@ def inference_asr(data_batch, main_lang: str, model_config: str) -> str:
 
     return transcription
 
-@timeit
 def get_model_and_processor(lang: str, model_config: str):
     try:
         model_id = MODEL_MAPPING[model_config][lang]["name"]

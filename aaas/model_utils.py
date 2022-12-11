@@ -1,8 +1,6 @@
 import onnxruntime
 import os
 from optimum.bettertransformer import BetterTransformer
-from torch import _dynamo as dynamo
-import torch
 
 cpu_threads = os.cpu_count()
 
@@ -47,13 +45,10 @@ def get_model(model_class, model_id):
             )
             model.save_pretrained("./model_cache" + model_id.split("/")[-1])
         except:
-            print("use torch model")
             model = model_class.from_pretrained(
                 model_id,
                 cache_dir="./model_cache",
             )
             model = BetterTransformer.transform(model)
-            
-            model = dynamo.optimize("onednn")(model)
-            
+                        
     return model

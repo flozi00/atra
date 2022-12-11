@@ -2,7 +2,7 @@ import gradio as gr
 from aaas.audio_utils import LANG_MAPPING
 import os
 from aaas.text_utils import translate
-from aaas.audio_utils import get_model_and_processor, get_speech_timestamps, model_vad, inference_asr, preprocess_audio
+from aaas.audio_utils import get_model_and_processor, get_speech_timestamps, model_vad, inference_asr
 from transformers.pipelines.audio_utils import ffmpeg_read
 
 langs = sorted(list(LANG_MAPPING.keys()))
@@ -56,36 +56,41 @@ def run_transcription(audio, main_lang, model_config, target_lang=""):
         target_lang = main_lang
 
     if audio is not None and len(audio) > 3:
-        if isinstance(audio, str):
-            audio_path = audio
+        audio_path = audio
 
-            with open(audio, "rb") as f:
-                payload = f.read()
+        with open(audio, "rb") as f:
+            payload = f.read()
 
-            audio = ffmpeg_read(payload, sampling_rate=16000)
-            audio = preprocess_audio(audio=audio)
+        audio = ffmpeg_read(payload, sampling_rate=16000)
+        os.remove(audio_path)
 
-        speech_timestamps = get_speech_timestamps(
-            audio,
-            model_vad,
-            threshold=0.5,
-            sampling_rate=16000,
-            min_silence_duration_ms=500,
-            speech_pad_ms=100,
-        )
-        audio_batch = [
-            audio[speech_timestamps[st]["start"]-800 : speech_timestamps[st]["end"]+800]
-            for st in range(len(speech_timestamps))
-        ]
+        if(len(audio) > 29*16000):
+            speech_timestamps = get_speech_timestamps(
+                audio,
+                model_vad,
+                threshold=0.5,
+                sampling_rate=16000,
+                min_silence_duration_ms=500,
+                speech_pad_ms=100,
+            )
+            audio_batch = [
+                audio[speech_timestamps[st]["start"] : speech_timestamps[st]["end"]]
+                for st in range(len(speech_timestamps))
+            ]
+        else:
+            speech_timestamps = [{"start": 100, "end": len(audio)}]
+            audio_batch = [audio]
 
         get_model_and_processor(main_lang, model_config)
+        
         for x in range(len(audio_batch)):
             audio = audio_batch[x]
             response = inference_asr(
-                    data_batch=[audio],
-                    main_lang=main_lang,
-                    model_config=model_config,
-                )[0]
+                data_batch=[audio],
+                main_lang=main_lang,
+                model_config=model_config,
+            )[0]
+            
             chunks.append(
                 {
                     "native_text": response,
@@ -96,7 +101,5 @@ def run_transcription(audio, main_lang, model_config, target_lang=""):
             )
             full_transcription["target_text"] += response + "\n"
             yield full_transcription["target_text"], chunks
-            
-        os.remove(audio_path)
 
     yield full_transcription["target_text"], chunks
