@@ -88,12 +88,6 @@ def run_transcription(audio, main_lang, model_config, target_lang=""):
         
         queue_done = transkripts_done(audio_path)
         while(queue_done == False):
-            print("run queue")
-            task = get_audio_queue()
-            audio = base64.b64decode(task.data.encode('UTF-8'))
-            audio = ffmpeg_read(audio, 16000)
-            result = inference_asr(data_batch=[audio], main_lang=task.main_lang, model_config=task.model_config)[0]
-            set_transkript(task.data, result)
             queue_done = transkripts_done(audio_path)
         
         for x in range(len(queue)):
