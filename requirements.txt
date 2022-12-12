@@ -9,3 +9,4 @@ transformers>=4.24.0
 onnxruntime-openvino
 sqlmodel
 pymysql
+soundfile
