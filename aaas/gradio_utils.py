@@ -82,8 +82,6 @@ def run_transcription(audio, main_lang, model_config, target_lang=""):
         else:
             speech_timestamps = [{"start": 100, "end": len(audio)}]
             audio_batch = [audio]
-
-        get_model_and_processor(main_lang, model_config)
         
         for aud in audio_batch:
             queue.append(add_audio(audio=aud, master=audio_path, main_lang=main_lang, model_config=model_config))
