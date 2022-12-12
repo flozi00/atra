@@ -1,5 +1,5 @@
 from typing import Optional
-
+from aaas.utils import timeit
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 import soundfile as sf
 import base64
@@ -22,25 +22,25 @@ engine = create_engine(db_backend)
 
 SQLModel.metadata.create_all(engine)
 
-
-def add_audio(audio, master, main_lang, model_config):
+@timeit
+def add_audio(audio_batch, master, main_lang, model_config):
     path = str(random.randint(1,999999999999999)) + ".wav"
-
-    sf.write(file=path, data=audio, samplerate=16000)
-    
-    with open(path, "rb") as bfile:
-        audio_data = base64.b64encode(bfile.read()).decode('UTF-8')
-    os.remove(path)
-    hs = hashlib.sha256(audio_data.encode('utf-8')).hexdigest()
-
-    
-    entry = AudioQueue(master=master, data=audio_data, transcript="***TODO***", main_lang=main_lang, model_config=model_config, hs=hs)
-    
+    hashes = []
     with Session(engine) as session:
-        session.add(entry)
+        for audio in audio_batch:
+            sf.write(file=path, data=audio, samplerate=16000)
+            
+            with open(path, "rb") as bfile:
+                audio_data = base64.b64encode(bfile.read()).decode('UTF-8')
+            os.remove(path)
+            hs = hashlib.sha256(audio_data.encode('utf-8')).hexdigest()
+            hashes.append(hs)
+            entry = AudioQueue(master=master, data=audio_data, transcript="***TODO***", main_lang=main_lang, model_config=model_config, hs=hs)
+            session.add(entry)
+        
         session.commit()
     
-    return hs
+    return hashes
 
 def transkripts_done(master) -> bool:
     with Session(engine) as session:
@@ -48,6 +48,7 @@ def transkripts_done(master) -> bool:
         transkripts = session.exec(statement).all()
         return len(transkripts) == 0
     
+@timeit
 def get_transkript(data) -> list:
     with Session(engine) as session:
         statement = select(AudioQueue).where(AudioQueue.hs == data)

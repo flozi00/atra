@@ -2,10 +2,9 @@ import gradio as gr
 from aaas.audio_utils import LANG_MAPPING
 import os
 from aaas.text_utils import translate
-from aaas.audio_utils import get_speech_timestamps, model_vad, inference_asr
+from aaas.audio_utils import get_speech_timestamps, model_vad
 from transformers.pipelines.audio_utils import ffmpeg_read
-from aaas.datastore import get_transkript, add_audio, transkripts_done, get_audio_queue, set_transkript, delete_by_master
-import base64
+from aaas.datastore import get_transkript, add_audio, delete_by_master
 
 langs = sorted(list(LANG_MAPPING.keys()))
 
@@ -51,8 +50,8 @@ def build_gradio():
 
 
 def run_transcription(audio, main_lang, model_config, target_lang=""):
-    chunks = []
     queue = []
+    chunks = []
     full_transcription = {"target_text": ""}
     if target_lang == "":
         target_lang = main_lang
@@ -83,25 +82,28 @@ def run_transcription(audio, main_lang, model_config, target_lang=""):
             speech_timestamps = [{"start": 100, "end": len(audio)}]
             audio_batch = [audio]
         
-        for aud in audio_batch:
-            queue.append(add_audio(audio=aud, master=audio_path, main_lang=main_lang, model_config=model_config))
+        queue = add_audio(audio_batch=audio_batch, master=audio_path, main_lang=main_lang, model_config=model_config)
         
-        queue_done = transkripts_done(audio_path)
-        while(queue_done == False):
-            queue_done = transkripts_done(audio_path)
-        
-        for x in range(len(queue)):
-            response = get_transkript(queue[x])            
-            chunks.append(
-                {
-                    "native_text": response,
+        chunks = [{
+                    "id": queue[x],
+                    "native_text": "***TODO***",
                     "start_timestamp": (speech_timestamps[x]["start"] / 16000) - 0.1,
                     "stop_timestamp": (speech_timestamps[x]["end"] / 16000) - 0.5,
-                    "target_text": translate(response, LANG_MAPPING[main_lang], LANG_MAPPING[target_lang]),
-                }
-            )
-            full_transcription["target_text"] += response + "\n"
-            yield full_transcription["target_text"], chunks
+                } for x in range(len(speech_timestamps))]
+        
+        while("***TODO***" in str(chunks)):
+            for x in range(len(queue)):
+                if(chunks[x]["native_text"] == "***TODO***"):
+                    response = get_transkript(queue[x])
+                    if(response != "***TODO***"):
+                        chunks[x]["native_text"] = response
+                        chunks[x]["target_text"] = translate(response, LANG_MAPPING[main_lang], LANG_MAPPING[target_lang])
+
+                        full_transcription["target_text"] = ""
+                        for c in chunks:
+                            full_transcription["target_text"] += c.get("target_text", "")
+                        yield full_transcription["target_text"], chunks
+                        
         delete_by_master(audio_path)
 
     yield full_transcription["target_text"], chunks
