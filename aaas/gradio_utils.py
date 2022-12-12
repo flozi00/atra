@@ -2,7 +2,7 @@ import gradio as gr
 from aaas.audio_utils import LANG_MAPPING
 import os
 from aaas.text_utils import translate
-from aaas.audio_utils import get_model_and_processor, get_speech_timestamps, model_vad, inference_asr
+from aaas.audio_utils import get_speech_timestamps, model_vad, inference_asr
 from transformers.pipelines.audio_utils import ffmpeg_read
 from aaas.datastore import get_transkript, add_audio, transkripts_done, get_audio_queue, set_transkript, delete_by_master
 import base64

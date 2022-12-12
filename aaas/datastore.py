@@ -5,6 +5,7 @@ import soundfile as sf
 import base64
 import random
 import os
+import hashlib
 
 db_backend = os.getenv("DBBACKEND", "sqlite:///database.db")
 
@@ -15,6 +16,7 @@ class AudioQueue(SQLModel, table=True):
     transcript: str
     main_lang: str
     model_config: str
+    hs: str
     
 engine = create_engine(db_backend)
 
@@ -29,14 +31,16 @@ def add_audio(audio, master, main_lang, model_config):
     with open(path, "rb") as bfile:
         audio_data = base64.b64encode(bfile.read()).decode('UTF-8')
     os.remove(path)
+    hs = hashlib.sha256(audio_data.encode('utf-8')).hexdigest()
+
     
-    entry = AudioQueue(master=master, data=audio_data, transcript="***TODO***", main_lang=main_lang, model_config=model_config)
+    entry = AudioQueue(master=master, data=audio_data, transcript="***TODO***", main_lang=main_lang, model_config=model_config, hs=hs)
     
     with Session(engine) as session:
         session.add(entry)
         session.commit()
     
-    return audio_data
+    return hs
 
 def transkripts_done(master) -> bool:
     with Session(engine) as session:
@@ -46,7 +50,7 @@ def transkripts_done(master) -> bool:
     
 def get_transkript(data) -> list:
     with Session(engine) as session:
-        statement = select(AudioQueue).where(AudioQueue.data == data)
+        statement = select(AudioQueue).where(AudioQueue.hs == data)
         transkript = session.exec(statement).first()
         
         return transkript.transcript
@@ -68,6 +72,7 @@ def set_transkript(data, transcription) -> list:
         transkript = session.exec(statement).first()
         if transkript is not None:
             transkript.transcript = transcription
+            transkript.data = ""
             session.commit()
             session.refresh(transkript)
         
