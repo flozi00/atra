@@ -7,3 +7,5 @@ sentencepiece
 torch>=1.13.0
 transformers>=4.24.0
 onnxruntime-openvino
+sqlmodel
+pymysql

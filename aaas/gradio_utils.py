@@ -4,9 +4,10 @@ import os
 from aaas.text_utils import translate
 from aaas.audio_utils import get_model_and_processor, get_speech_timestamps, model_vad, inference_asr
 from transformers.pipelines.audio_utils import ffmpeg_read
+from aaas.datastore import get_transkript, add_audio, transkripts_done, get_audio_queue, set_transkript, delete_by_master
+import base64
 
 langs = sorted(list(LANG_MAPPING.keys()))
-
 
 def build_gradio():
     ui = gr.Blocks()
@@ -51,6 +52,7 @@ def build_gradio():
 
 def run_transcription(audio, main_lang, model_config, target_lang=""):
     chunks = []
+    queue = []
     full_transcription = {"target_text": ""}
     if target_lang == "":
         target_lang = main_lang
@@ -83,14 +85,21 @@ def run_transcription(audio, main_lang, model_config, target_lang=""):
 
         get_model_and_processor(main_lang, model_config)
         
-        for x in range(len(audio_batch)):
-            audio = audio_batch[x]
-            response = inference_asr(
-                data_batch=[audio],
-                main_lang=main_lang,
-                model_config=model_config,
-            )[0]
-            
+        for aud in audio_batch:
+            queue.append(add_audio(audio=aud, master=audio_path, main_lang=main_lang, model_config=model_config))
+        
+        queue_done = transkripts_done(audio_path)
+        while(queue_done == False):
+            print("run queue")
+            task = get_audio_queue()
+            audio = base64.b64decode(task.data.encode('UTF-8'))
+            audio = ffmpeg_read(audio, 16000)
+            result = inference_asr(data_batch=[audio], main_lang=task.main_lang, model_config=task.model_config)[0]
+            set_transkript(task.data, result)
+            queue_done = transkripts_done(audio_path)
+        
+        for x in range(len(queue)):
+            response = get_transkript(queue[x])            
             chunks.append(
                 {
                     "native_text": response,
@@ -101,5 +110,6 @@ def run_transcription(audio, main_lang, model_config, target_lang=""):
             )
             full_transcription["target_text"] += response + "\n"
             yield full_transcription["target_text"], chunks
+        delete_by_master(audio_path)
 
     yield full_transcription["target_text"], chunks
