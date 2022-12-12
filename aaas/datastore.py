@@ -66,9 +66,10 @@ def set_transkript(data, transcription) -> list:
     with Session(engine) as session:
         statement = select(AudioQueue).where(AudioQueue.data == data)
         transkript = session.exec(statement).first()
-        transkript.transcript = transcription
-        session.commit()
-        session.refresh(transkript)
+        if transkript is not None:
+            transkript.transcript = transcription
+            session.commit()
+            session.refresh(transkript)
         
 def delete_by_master(master):
     with Session(engine) as session:
