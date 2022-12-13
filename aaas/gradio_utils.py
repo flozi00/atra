@@ -3,11 +3,12 @@ import os
 import gradio as gr
 from transformers.pipelines.audio_utils import ffmpeg_read
 
-from aaas.silero_vad import silero_vad
 from aaas.audio_utils import LANG_MAPPING
-from aaas.datastore import add_audio, get_transkript, delete_by_hashes
+from aaas.datastore import add_audio, delete_by_hashes, get_all_transkripts
+from aaas.silero_vad import silero_vad
+from aaas.statics import TODO
 from aaas.text_utils import translate
-from aaas.statics import TODO, INPROGRESS
+import time
 
 langs = sorted(list(LANG_MAPPING.keys()))
 
@@ -77,7 +78,7 @@ def run_transcription(audio, main_lang, model_config, target_lang=""):
                 model_vad,
                 threshold=0.5,
                 sampling_rate=16000,
-                min_silence_duration_ms=500,
+                min_silence_duration_ms=250,
                 speech_pad_ms=100,
             )
             audio_batch = [
@@ -106,22 +107,27 @@ def run_transcription(audio, main_lang, model_config, target_lang=""):
         ]
 
         while TODO in str(chunks):
+            results = get_all_transkripts()
             for x in range(len(queue)):
                 if chunks[x]["native_text"] == TODO:
-                    response = get_transkript(queue[x])
-                    if response != TODO and response != INPROGRESS:
-                        chunks[x]["native_text"] = response
-                        chunks[x]["target_text"] = translate(
-                            response, LANG_MAPPING[main_lang], LANG_MAPPING[target_lang]
-                        )
-
-                        full_transcription["target_text"] = ""
-                        for c in chunks:
-                            full_transcription["target_text"] += c.get(
-                                "target_text", ""
+                    response = TODO
+                    for res in results:
+                        if res.hs == queue[x]:
+                            response = res.transcript
+                            chunks[x]["native_text"] = response
+                            chunks[x]["target_text"] = translate(
+                                response,
+                                LANG_MAPPING[main_lang],
+                                LANG_MAPPING[target_lang],
                             )
-                        yield full_transcription["target_text"], chunks
 
-        delete_by_hashes(queue)
+                            full_transcription["target_text"] = ""
+                            for c in chunks:
+                                full_transcription["target_text"] += (
+                                    c.get("target_text", "") + "\n"
+                                )
+                            yield full_transcription["target_text"], chunks
+                            delete_by_hashes([queue[x]])
+            time.sleep(1)
 
     yield full_transcription["target_text"], chunks

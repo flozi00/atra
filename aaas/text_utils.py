@@ -1,7 +1,8 @@
-from optimum.pipelines import pipeline
-from aaas.model_utils import get_model
-from transformers import AutoTokenizer
 from optimum.onnxruntime import ORTModelForSeq2SeqLM
+from optimum.pipelines import pipeline
+from transformers import AutoTokenizer
+
+from aaas.model_utils import get_model
 
 optimum_pipes = {}
 

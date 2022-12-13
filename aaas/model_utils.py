@@ -1,6 +1,9 @@
-import onnxruntime
 import os
+
+import onnxruntime
 from optimum.bettertransformer import BetterTransformer
+
+from aaas.utils import timeit
 
 cpu_threads = os.cpu_count()
 
@@ -26,6 +29,7 @@ sess_options.graph_optimization_level = (
 )
 
 
+@timeit
 def get_model(model_class, model_id):
     try:
         model = model_class.from_pretrained(

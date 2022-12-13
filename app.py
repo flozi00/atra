@@ -15,10 +15,12 @@ if mode == "APP":
         )
 else:
     print("Worker Mode")
-    from aaas.datastore import get_audio_queue, set_transkript, set_in_progress
-    from aaas.audio_utils import inference_asr
-    from transformers.pipelines.audio_utils import ffmpeg_read
     import base64
+
+    from transformers.pipelines.audio_utils import ffmpeg_read
+
+    from aaas.audio_utils import inference_asr
+    from aaas.datastore import get_audio_queue, set_in_progress, set_transkript
 
     while True:
         task = get_audio_queue()

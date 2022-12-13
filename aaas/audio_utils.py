@@ -1,8 +1,9 @@
-from transformers import AutoProcessor
-from aaas.statics import LANG_MAPPING, MODEL_MAPPING
-from aaas.model_utils import get_model
-from aaas.utils import timeit
 import torch
+from transformers import AutoProcessor
+
+from aaas.model_utils import get_model
+from aaas.statics import LANG_MAPPING, MODEL_MAPPING
+from aaas.utils import timeit
 
 
 @timeit
@@ -14,13 +15,18 @@ def inference_asr(data_batch, main_lang: str, model_config: str) -> str:
             data, sampling_rate=16000, return_tensors="pt", truncation=True,
         ).input_features
 
+        if torch.cuda.is_available() and model_config != "large":
+            input_values = input_values.to("cuda")
+            input_values = input_values.half()
+            model = model.to("cuda")
+            model = model.half()
         with torch.inference_mode():
             predicted_ids = model.generate(
                 input_values,
                 max_length=int(((len(data) / 16000) * 12) / 2) + 10,
                 use_cache=True,
-                no_repeat_ngram_size=5,
-                num_beams=1,
+                no_repeat_ngram_size=3,
+                num_beams=20 if model_config != "large" else 1,
                 forced_decoder_ids=processor.get_decoder_prompt_ids(
                     language=LANG_MAPPING[main_lang], task="transcribe"
                 ),

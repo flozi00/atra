@@ -1,12 +1,14 @@
-from typing import Optional
-from aaas.utils import timeit
-from sqlmodel import Field, Session, SQLModel, create_engine, select
-import soundfile as sf
 import base64
-import random
-import os
 import hashlib
-from aaas.statics import TODO, INPROGRESS
+import os
+import random
+from typing import Optional
+
+import soundfile as sf
+from sqlmodel import Field, Session, SQLModel, create_engine, select
+
+from aaas.statics import INPROGRESS, TODO
+from aaas.utils import timeit
 
 db_backend = os.getenv("DBBACKEND", "sqlite:///database.db")
 
@@ -60,7 +62,16 @@ def get_transkript(data):
         statement = select(AudioQueue).where(AudioQueue.hs == data)
         transkript = session.exec(statement).first()
 
-        return transkript.transcript
+    return transkript.transcript
+
+
+@timeit
+def get_all_transkripts():
+    with Session(engine) as session:
+        statement = select(AudioQueue).where(AudioQueue.data == "")
+        transkripts = session.exec(statement).all()
+
+    return transkripts
 
 
 def get_audio_queue():
@@ -77,7 +88,7 @@ def get_audio_queue():
                 sample = random.choice(todos)
             else:
                 sample = False
-        return sample
+    return sample
 
 
 def set_transkript(hs, transcription):
