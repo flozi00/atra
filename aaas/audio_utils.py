@@ -20,13 +20,16 @@ def inference_asr(data_batch, main_lang: str, model_config: str) -> str:
             input_values = input_values.half()
             model = model.to("cuda")
             model = model.half()
+            beams = 20
+        else:
+            beams = 3
         with torch.inference_mode():
             predicted_ids = model.generate(
                 input_values,
                 max_length=int(((len(data) / 16000) * 12) / 2) + 10,
                 use_cache=True,
                 no_repeat_ngram_size=3,
-                num_beams=20 if model_config != "large" else 1,
+                num_beams=beams,
                 forced_decoder_ids=processor.get_decoder_prompt_ids(
                     language=LANG_MAPPING[main_lang], task="transcribe"
                 ),

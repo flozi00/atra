@@ -74,15 +74,18 @@ def get_all_transkripts():
     return transkripts
 
 
+@timeit
 def get_audio_queue():
     with Session(engine) as session:
-        statement = select(AudioQueue).where(AudioQueue.transcript == TODO)
+        statement = select(AudioQueue).where(AudioQueue.transcript == TODO).limit(3)
         todos = session.exec(statement).all()
 
         if len(todos) != 0:
             sample = random.choice(todos)
         else:
-            statement = select(AudioQueue).where(AudioQueue.transcript == INPROGRESS)
+            statement = (
+                select(AudioQueue).where(AudioQueue.transcript == INPROGRESS).limit(3)
+            )
             todos = session.exec(statement).all()
             if len(todos) != 0:
                 sample = random.choice(todos)
@@ -91,6 +94,7 @@ def get_audio_queue():
     return sample
 
 
+@timeit
 def set_transkript(hs, transcription):
     with Session(engine) as session:
         statement = select(AudioQueue).where(AudioQueue.hs == hs)
@@ -102,6 +106,7 @@ def set_transkript(hs, transcription):
             session.refresh(transkript)
 
 
+@timeit
 def set_in_progress(hs):
     with Session(engine) as session:
         statement = select(AudioQueue).where(AudioQueue.hs == hs)

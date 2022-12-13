@@ -25,7 +25,6 @@ else:
     while True:
         task = get_audio_queue()
         if task is not False:
-            print("run queue")
             set_in_progress(task.hs)
             audio = base64.b64decode(task.data.encode("UTF-8"))
             audio = ffmpeg_read(audio, 16000)
