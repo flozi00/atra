@@ -1,5 +1,4 @@
 from optimum.pipelines import pipeline
-from aaas.statics import *
 from aaas.model_utils import get_model
 from transformers import AutoTokenizer
 from optimum.onnxruntime import ORTModelForSeq2SeqLM
@@ -13,7 +12,7 @@ def get_optimum_pipeline(task, model_id):
     pipe_id = f"{task}-{model_id}"
 
     pipe = optimum_pipes.get(pipe_id, None)
-    if pipe != None:
+    if pipe is not None:
         return pipe
 
     if task in ["translation", "summarization"]:

@@ -65,6 +65,7 @@ class OnnxWrapper:
 
         return out
 
+
 @timeit
 def get_speech_timestamps(
     audio: torch.Tensor,
@@ -91,8 +92,10 @@ def get_speech_timestamps(
     model: preloaded .jit silero VAD model
 
     threshold: float (default - 0.5)
-        Speech threshold. Silero VAD outputs speech probabilities for each audio chunk, probabilities ABOVE this value are considered as SPEECH.
-        It is better to tune this parameter for each dataset separately, but "lazy" 0.5 is pretty good for most datasets.
+        Speech threshold. Silero VAD outputs speech probabilities for each audio chunk, 
+        probabilities ABOVE this value are considered as SPEECH.
+        It is better to tune this parameter for each dataset separately, 
+        but "lazy" 0.5 is pretty good for most datasets.
 
     sampling_rate: int (default - 16000)
         Currently silero VAD models support 8000 and 16000 sample rates
@@ -101,11 +104,13 @@ def get_speech_timestamps(
         Final speech chunks shorter min_speech_duration_ms are thrown out
 
     min_silence_duration_ms: int (default - 100 milliseconds)
-        In the end of each speech chunk wait for min_silence_duration_ms before separating it
+        In the end of each speech chunk 
+        wait for min_silence_duration_ms before separating it
 
     window_size_samples: int (default - 1536 samples)
         Audio chunks of window_size_samples size are fed to the silero VAD model.
-        WARNING! Silero VAD models were trained using 512, 1024, 1536 samples for 16000 sample rate and 256, 512, 768 samples for 8000 sample rate.
+        WARNING! Silero VAD models were trained using 512, 1024, 1536 samples 
+        for 16000 sample rate and 256, 512, 768 samples for 8000 sample rate.
         Values other than these may affect model perfomance!!
 
     speech_pad_ms: int (default - 30 milliseconds)
@@ -120,13 +125,14 @@ def get_speech_timestamps(
     Returns
     ----------
     speeches: list of dicts
-        list containing ends and beginnings of speech chunks (samples or seconds based on return_seconds)
+        list containing ends and beginnings of speech chunks 
+        (samples or seconds based on return_seconds)
     """
 
     if not torch.is_tensor(audio):
         try:
             audio = torch.Tensor(audio)
-        except:
+        except Exception:
             raise TypeError("Audio cannot be casted to tensor. Cast it manually")
 
     if len(audio.shape) > 1:
@@ -134,7 +140,8 @@ def get_speech_timestamps(
             audio = audio.squeeze(0)
         if len(audio.shape) > 1:
             raise ValueError(
-                "More than one dimension in audio. Are you trying to process audio with 2 channels?"
+                """More than one dimension in audio. 
+                Are you trying to process audio with 2 channels?"""
             )
 
     if sampling_rate > 16000 and (sampling_rate % 16000 == 0):
@@ -149,16 +156,18 @@ def get_speech_timestamps(
 
     if sampling_rate == 8000 and window_size_samples > 768:
         warnings.warn(
-            "window_size_samples is too big for 8000 sampling_rate! Better set window_size_samples to 256, 512 or 768 for 8000 sample rate!"
+            """window_size_samples is too big for 8000 sampling_rate! 
+            Better set window_size_samples to 256, 512 or 768 for 8000 sample rate!"""
         )
     if window_size_samples not in [256, 512, 768, 1024, 1536]:
         warnings.warn(
-            "Unusual window_size_samples! Supported window_size_samples:\n - [512, 1024, 1536] for 16000 sampling_rate\n - [256, 512, 768] for 8000 sampling_rate"
+            """Unusual window_size_samples! Supported window_size_samples:\n - 
+            [512, 1024, 1536] for 16000 sampling_rate\n - 
+            [256, 512, 768] for 8000 sampling_rate"""
         )
 
     model.reset_states()
     min_speech_samples = sampling_rate * min_speech_duration_ms / 1000
-    max_speech_samples = sampling_rate * max_speech_duration_ms / 1000
     min_silence_samples = sampling_rate * min_silence_duration_ms / 1000
     speech_pad_samples = sampling_rate * speech_pad_ms / 1000
 

@@ -5,7 +5,7 @@ from optimum.bettertransformer import BetterTransformer
 cpu_threads = os.cpu_count()
 
 providers = [
-    #"CUDAExecutionProvider",
+    # "CUDAExecutionProvider",
     "OpenVINOExecutionProvider",
     "CPUExecutionProvider",
 ]
@@ -18,7 +18,7 @@ for p in providers:
 provider_options = {}
 
 if provider == "OpenVINOExecutionProvider":
-    provider_options["num_of_threads": cpu_threads]
+    provider_options["num_of_threads":cpu_threads]
 
 sess_options = onnxruntime.SessionOptions()
 sess_options.graph_optimization_level = (
@@ -34,7 +34,7 @@ def get_model(model_class, model_id):
             session_options=sess_options,
             cache_dir="./model_cache",
         )
-    except:
+    except Exception:
         try:
             model = model_class.from_pretrained(
                 model_id,
@@ -44,11 +44,8 @@ def get_model(model_class, model_id):
                 cache_dir="./model_cache",
             )
             model.save_pretrained("./model_cache" + model_id.split("/")[-1])
-        except:
-            model = model_class.from_pretrained(
-                model_id,
-                cache_dir="./model_cache",
-            )
+        except Exception:
+            model = model_class.from_pretrained(model_id, cache_dir="./model_cache",)
             model = BetterTransformer.transform(model)
-                        
+
     return model
