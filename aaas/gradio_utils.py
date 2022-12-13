@@ -7,7 +7,7 @@ from aaas.silero_vad import silero_vad
 from aaas.audio_utils import LANG_MAPPING
 from aaas.datastore import add_audio, get_transkript, delete_by_hashes
 from aaas.text_utils import translate
-from aaas.statics import TODO
+from aaas.statics import TODO, INPROGRESS
 
 langs = sorted(list(LANG_MAPPING.keys()))
 
@@ -109,7 +109,7 @@ def run_transcription(audio, main_lang, model_config, target_lang=""):
             for x in range(len(queue)):
                 if chunks[x]["native_text"] == TODO:
                     response = get_transkript(queue[x])
-                    if response != TODO:
+                    if response != TODO and response != INPROGRESS:
                         chunks[x]["native_text"] = response
                         chunks[x]["target_text"] = translate(
                             response, LANG_MAPPING[main_lang], LANG_MAPPING[target_lang]
