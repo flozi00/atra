@@ -47,15 +47,16 @@ def add_audio(audio_batch, master, main_lang, model_config):
                 + f"{main_lang}, {model_config}, {times}".encode("utf-8")
             ).hexdigest()
             hashes.append(hs)
-            entry = AudioQueue(
-                master=times,
-                data=audio_data,
-                transcript=TODO,
-                main_lang=main_lang,
-                model_config=model_config,
-                hs=hs,
-            )
-            session.add(entry)
+            if get_transkript(hs) is None:
+                entry = AudioQueue(
+                    master=times,
+                    data=audio_data,
+                    transcript=TODO,
+                    main_lang=main_lang,
+                    model_config=model_config,
+                    hs=hs,
+                )
+                session.add(entry)
 
         session.commit()
 
