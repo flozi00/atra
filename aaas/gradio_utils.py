@@ -32,8 +32,8 @@ def build_gradio():
             with gr.TabItem("File"):
                 audio_file = gr.Audio(source="upload", type="filepath")
 
-        task_id = gr.Textbox()
-        refresh = gr.Button()
+        task_id = gr.Textbox(label="Task ID")
+        refresh = gr.Button(value="Get Results")
 
         with gr.Tabs():
             with gr.TabItem("Transcription"):
