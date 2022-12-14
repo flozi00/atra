@@ -33,7 +33,10 @@ def add_audio(audio_batch, master, main_lang, model_config):
     path = str(random.randint(1, 999999999999999)) + ".wav"
     hashes = []
     with Session(engine) as session:
-        for audio in audio_batch:
+        for x in range(len(audio_batch)):
+            audio = audio_batch[x]
+            time_dict = master[x]
+            times = f"{time_dict['start']},{time_dict['end']}"
             sf.write(file=path, data=audio, samplerate=16000)
 
             with open(path, "rb") as bfile:
@@ -41,11 +44,11 @@ def add_audio(audio_batch, master, main_lang, model_config):
             os.remove(path)
             hs = hashlib.sha256(
                 audio_data.encode("utf-8")
-                + f"{main_lang}, {model_config}".encode("utf-8")
+                + f"{main_lang}, {model_config}, {times}".encode("utf-8")
             ).hexdigest()
             hashes.append(hs)
             entry = AudioQueue(
-                master=master,
+                master=times,
                 data=audio_data,
                 transcript=TODO,
                 main_lang=main_lang,
@@ -60,12 +63,12 @@ def add_audio(audio_batch, master, main_lang, model_config):
 
 
 @timeit
-def get_transkript(data):
+def get_transkript(hs):
     with Session(engine) as session:
-        statement = select(AudioQueue).where(AudioQueue.hs == data)
+        statement = select(AudioQueue).where(AudioQueue.hs == hs)
         transkript = session.exec(statement).first()
 
-    return transkript.transcript
+    return transkript
 
 
 @timeit
@@ -118,16 +121,6 @@ def set_in_progress(hs):
             transkript.transcript = INPROGRESS
             session.commit()
             session.refresh(transkript)
-
-
-def delete_by_master(master):
-    with Session(engine) as session:
-        statement = select(AudioQueue).where(AudioQueue.master == master)
-        results = session.exec(statement).all()
-        for res in results:
-            session.delete(res)
-
-        session.commit()
 
 
 @timeit

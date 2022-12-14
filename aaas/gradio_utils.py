@@ -3,11 +3,9 @@ import os
 import gradio as gr
 from transformers.pipelines.audio_utils import ffmpeg_read
 
-from aaas.audio_utils import LANG_MAPPING
-from aaas.datastore import add_audio, delete_by_hashes, get_all_transkripts
+from aaas.statics import LANG_MAPPING
+from aaas.datastore import add_audio, get_transkript
 from aaas.silero_vad import silero_vad
-from aaas.statics import TODO
-import time
 
 langs = sorted(list(LANG_MAPPING.keys()))
 
@@ -34,6 +32,9 @@ def build_gradio():
             with gr.TabItem("File"):
                 audio_file = gr.Audio(source="upload", type="filepath")
 
+        task_id = gr.Textbox()
+        refresh = gr.Button()
+
         with gr.Tabs():
             with gr.TabItem("Transcription"):
                 transcription = gr.Textbox()
@@ -43,13 +44,21 @@ def build_gradio():
         mic.change(
             fn=run_transcription,
             inputs=[mic, lang, model_config, target_lang],
-            outputs=[transcription, chunks],
+            outputs=[task_id],
             api_name="transcription",
         )
         audio_file.change(
             fn=run_transcription,
             inputs=[audio_file, lang, model_config, target_lang],
-            outputs=[transcription, chunks],
+            outputs=[task_id],
+        )
+
+        task_id.change(
+            fn=get_transcription, inputs=task_id, outputs=[transcription, chunks]
+        )
+
+        refresh.click(
+            fn=get_transcription, inputs=task_id, outputs=[transcription, chunks]
         )
 
     return ui
@@ -57,8 +66,6 @@ def build_gradio():
 
 def run_transcription(audio, main_lang, model_config, target_lang=""):
     queue = []
-    chunks = []
-    full_transcription = ""
     if target_lang == "":
         target_lang = main_lang
 
@@ -90,36 +97,31 @@ def run_transcription(audio, main_lang, model_config, target_lang=""):
 
         queue = add_audio(
             audio_batch=audio_batch,
-            master=audio_path,
+            master=speech_timestamps,
             main_lang=f"{main_lang},{target_lang}",
             model_config=model_config,
         )
 
-        chunks = [
-            {
-                "id": queue[x],
-                "text": TODO,
-                "start_timestamp": (speech_timestamps[x]["start"] / 16000) - 0.1,
-                "stop_timestamp": (speech_timestamps[x]["end"] / 16000) - 0.5,
-            }
-            for x in range(len(speech_timestamps))
-        ]
+        queue_string = ",".join(queue)
 
-        while TODO in str(chunks):
-            results = get_all_transkripts()
-            for x in range(len(queue)):
-                if chunks[x]["text"] == TODO:
-                    response = TODO
-                    for res in results:
-                        if res.hs == queue[x]:
-                            response = res.transcript
-                            chunks[x]["text"] = response
+        return queue_string
 
-                            full_transcription = ""
-                            for c in chunks:
-                                full_transcription += c.get("text", "") + "\n"
-                            yield full_transcription, chunks
-                            delete_by_hashes([queue[x]])
-            time.sleep(1)
 
-    yield full_transcription, chunks
+def get_transcription(queue_string: str):
+    full_transcription = ""
+    queue = queue_string.split(",")
+
+    chunks = [{"id": queue[x]} for x in range(len(queue))]
+
+    for x in range(len(queue)):
+        result = get_transkript(queue[x])
+        if result is not None:
+            chunks[x]["start_timestamp"] = int(result.master.split(",")[0]) / 16000
+            chunks[x]["stoip_timestamp"] = int(result.master.split(",")[1]) / 16000
+            chunks[x]["text"] = result.transcript
+
+        full_transcription = ""
+        for c in chunks:
+            full_transcription += c.get("text", "") + "\n"
+
+    return full_transcription, chunks
