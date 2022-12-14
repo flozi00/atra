@@ -3,6 +3,7 @@ from optimum.pipelines import pipeline
 from transformers import AutoTokenizer
 
 from aaas.model_utils import get_model
+from aaas.utils import timeit
 
 optimum_pipes = {}
 
@@ -26,6 +27,7 @@ def get_optimum_pipeline(task, model_id):
     return pipe
 
 
+@timeit
 def translate(text, source, target):
 
     if source == target:

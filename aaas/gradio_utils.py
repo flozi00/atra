@@ -7,7 +7,6 @@ from aaas.audio_utils import LANG_MAPPING
 from aaas.datastore import add_audio, delete_by_hashes, get_all_transkripts
 from aaas.silero_vad import silero_vad
 from aaas.statics import TODO
-from aaas.text_utils import translate
 import time
 
 langs = sorted(list(LANG_MAPPING.keys()))
@@ -59,7 +58,7 @@ def build_gradio():
 def run_transcription(audio, main_lang, model_config, target_lang=""):
     queue = []
     chunks = []
-    full_transcription = {"target_text": ""}
+    full_transcription = ""
     if target_lang == "":
         target_lang = main_lang
 
@@ -92,14 +91,14 @@ def run_transcription(audio, main_lang, model_config, target_lang=""):
         queue = add_audio(
             audio_batch=audio_batch,
             master=audio_path,
-            main_lang=main_lang,
+            main_lang=f"{main_lang},{target_lang}",
             model_config=model_config,
         )
 
         chunks = [
             {
                 "id": queue[x],
-                "native_text": TODO,
+                "text": TODO,
                 "start_timestamp": (speech_timestamps[x]["start"] / 16000) - 0.1,
                 "stop_timestamp": (speech_timestamps[x]["end"] / 16000) - 0.5,
             }
@@ -109,25 +108,18 @@ def run_transcription(audio, main_lang, model_config, target_lang=""):
         while TODO in str(chunks):
             results = get_all_transkripts()
             for x in range(len(queue)):
-                if chunks[x]["native_text"] == TODO:
+                if chunks[x]["text"] == TODO:
                     response = TODO
                     for res in results:
                         if res.hs == queue[x]:
                             response = res.transcript
-                            chunks[x]["native_text"] = response
-                            chunks[x]["target_text"] = translate(
-                                response,
-                                LANG_MAPPING[main_lang],
-                                LANG_MAPPING[target_lang],
-                            )
+                            chunks[x]["text"] = response
 
-                            full_transcription["target_text"] = ""
+                            full_transcription = ""
                             for c in chunks:
-                                full_transcription["target_text"] += (
-                                    c.get("target_text", "") + "\n"
-                                )
-                            yield full_transcription["target_text"], chunks
+                                full_transcription += c.get("text", "") + "\n"
+                            yield full_transcription, chunks
                             delete_by_hashes([queue[x]])
             time.sleep(1)
 
-    yield full_transcription["target_text"], chunks
+    yield full_transcription, chunks

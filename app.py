@@ -21,6 +21,8 @@ else:
 
     from aaas.audio_utils import inference_asr
     from aaas.datastore import get_audio_queue, set_in_progress, set_transkript
+    from aaas.text_utils import translate
+    from aaas.statics import LANG_MAPPING
 
     while True:
         task = get_audio_queue()
@@ -30,7 +32,12 @@ else:
             audio = ffmpeg_read(audio, 16000)
             result = inference_asr(
                 data_batch=[audio],
-                main_lang=task.main_lang,
+                main_lang=task.main_lang.split(",")[0],
                 model_config=task.model_config,
             )[0]
+            result = translate(
+                result,
+                LANG_MAPPING[task.main_lang.split(",")[0]],
+                LANG_MAPPING[task.main_lang.split(",")[-1]],
+            )
             set_transkript(task.hs, result)

@@ -39,7 +39,10 @@ def add_audio(audio_batch, master, main_lang, model_config):
             with open(path, "rb") as bfile:
                 audio_data = base64.b64encode(bfile.read()).decode("UTF-8")
             os.remove(path)
-            hs = hashlib.sha256(audio_data.encode("utf-8")).hexdigest()
+            hs = hashlib.sha256(
+                audio_data.encode("utf-8")
+                + f"{main_lang}, {model_config}".encode("utf-8")
+            ).hexdigest()
             hashes.append(hs)
             entry = AudioQueue(
                 master=master,
