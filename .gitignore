@@ -28,4 +28,5 @@ out/
 *.webm
 *.html
 model_cache/
+data_cache/
 *.db

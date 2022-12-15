@@ -10,3 +10,5 @@ onnxruntime-openvino
 sqlmodel
 pymysql
 soundfile
+accelerate
+evaluate

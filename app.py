@@ -1,4 +1,5 @@
 import os
+import time
 
 mode = os.getenv("SERVERMODE", "APP")
 
@@ -41,3 +42,5 @@ else:
                 LANG_MAPPING[task.main_lang.split(",")[-1]],
             )
             set_transkript(task.hs, result)
+        else:
+            time.sleep(3)

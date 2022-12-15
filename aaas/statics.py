@@ -16,10 +16,6 @@ MODEL_MAPPING = {
         },
     },
     "medium": {
-        "german": {
-            "name": "flozi00/whisper-medium-german",
-            "class": AutoModelForSpeechSeq2Seq,
-        },
         "english": {
             "name": "openai/whisper-medium.en",
             "class": AutoModelForSpeechSeq2Seq,
@@ -39,7 +35,7 @@ MODEL_MAPPING = {
 
 LANGUAGE_CODES = {
     "en": "english",
-    "zh": "chinese",
+    # "zh": "chinese",
     "de": "german",
     "es": "spanish",
     "ru": "russian",
