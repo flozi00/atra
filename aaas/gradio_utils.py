@@ -108,6 +108,9 @@ def run_transcription(audio, main_lang, model_config, target_lang=""):
 
 
 def get_transcription(queue_string: str):
+    if len(queue_string) < 5:
+        return "", []
+
     full_transcription = ""
     queue = queue_string.split(",")
 

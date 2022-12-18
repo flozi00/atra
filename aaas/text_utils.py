@@ -1,41 +1,30 @@
-from optimum.onnxruntime import ORTModelForSeq2SeqLM
-from optimum.pipelines import pipeline
-from transformers import AutoTokenizer
-
-from aaas.model_utils import get_model
 from aaas.utils import timeit
+from transformers import M2M100ForConditionalGeneration, M2M100Tokenizer
 
-optimum_pipes = {}
-
-
-def get_optimum_pipeline(task, model_id):
-    global optimum_pipes
-
-    pipe_id = f"{task}-{model_id}"
-
-    pipe = optimum_pipes.get(pipe_id, None)
-    if pipe is not None:
-        return pipe
-
-    if task in ["translation", "summarization"]:
-        model = get_model(ORTModelForSeq2SeqLM, model_id)
-        tokenizer = AutoTokenizer.from_pretrained(model_id)
-
-    pipe = pipeline(task, model=model, tokenizer=tokenizer)
-    optimum_pipes[pipe_id] = pipe
-
-    return pipe
+translation_model = None
+translation_tokenizer = None
 
 
 @timeit
 def translate(text, source, target):
+    global translation_model, translation_tokenizer
 
     if source == target:
         return text
 
-    model_id = f"Helsinki-NLP/opus-mt-{source}-{target}"
-    trans_pipe = get_optimum_pipeline("translation", model_id)
+    if translation_model is None:
+        translation_model = M2M100ForConditionalGeneration.from_pretrained(
+            "facebook/m2m100_418M"
+        )
+        translation_tokenizer = M2M100Tokenizer.from_pretrained("facebook/m2m100_418M")
 
-    translated = trans_pipe(text)[0]["translation_text"]
+    translation_tokenizer.src_lang = source
+    encoded_hi = translation_tokenizer(text, return_tensors="pt")
+    generated_tokens = translation_model.generate(
+        **encoded_hi, forced_bos_token_id=translation_tokenizer.get_lang_id(target)
+    )
+    translated = translation_tokenizer.batch_decode(
+        generated_tokens, skip_special_tokens=True
+    )[0]
 
     return translated
