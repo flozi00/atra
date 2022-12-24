@@ -65,6 +65,12 @@ def build_gradio():
 
 
 def run_transcription(audio, main_lang, model_config, target_lang=""):
+    if main_lang not in langs:
+        main_lang = "german"
+        target_lang = "german"
+    if model_config not in ["small", "medium", "large"]:
+        model_config = "small"
+
     queue = []
     if target_lang == "":
         target_lang = main_lang
