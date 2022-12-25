@@ -4,6 +4,7 @@ from transformers import pipeline
 from aaas.model_utils import get_model
 from aaas.statics import LANG_MAPPING, MODEL_MAPPING
 from aaas.utils import timeit
+import torch
 
 
 @timeit
@@ -22,13 +23,17 @@ def inference_asr(data_batch, main_lang: str, model_config: str) -> str:
         model=model,
         tokenizer=processor.tokenizer,
         feature_extractor=processor.feature_extractor,
-        device_map="auto",
+        device=0 if torch.cuda.is_available() and model_config != "large" else -1,
         torch_dtype="auto",
-        num_beams=5,
+        num_beams=20,
         no_repeat_ngram_size=3,
+        repetition_penalty=1.2,
+        use_cache=True,
     )
     for data in data_batch:
-        transcription.append(transcriber(data)["text"])
+        transcription.append(
+            transcriber(data, chunk_length_s=30, stride_length_s=[15, 0])["text"]
+        )
 
     return transcription
 

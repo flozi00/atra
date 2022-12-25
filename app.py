@@ -1,7 +1,7 @@
 import os
 import time
 
-mode = os.getenv("SERVERMODE", "APP")
+mode = os.getenv("SERVERMODE", "APP ")
 
 if mode == "APP":
     if __name__ == "__main__":

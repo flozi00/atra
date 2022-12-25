@@ -54,7 +54,10 @@ def build_gradio():
         )
 
         task_id.change(
-            fn=get_transcription, inputs=task_id, outputs=[transcription, chunks]
+            fn=get_transcription,
+            inputs=task_id,
+            outputs=[transcription, chunks],
+            api_name="get_transcription",
         )
 
         refresh.click(
@@ -90,7 +93,7 @@ def run_transcription(audio, main_lang, model_config, target_lang=""):
                 model_vad,
                 threshold=0.5,
                 sampling_rate=16000,
-                min_silence_duration_ms=250,
+                min_silence_duration_ms=1500,
                 speech_pad_ms=100,
             )
             audio_batch = [
@@ -114,6 +117,7 @@ def run_transcription(audio, main_lang, model_config, target_lang=""):
 
 
 def get_transcription(queue_string: str):
+    queue_string = str(queue_string)
     if len(queue_string) < 5:
         return "", []
 
