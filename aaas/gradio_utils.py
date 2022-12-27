@@ -93,7 +93,7 @@ def run_transcription(audio, main_lang, model_config, target_lang=""):
                 model_vad,
                 threshold=0.5,
                 sampling_rate=16000,
-                min_silence_duration_ms=1500,
+                min_silence_duration_ms=1000,
                 speech_pad_ms=100,
             )
             audio_batch = [
