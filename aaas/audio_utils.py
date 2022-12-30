@@ -25,14 +25,15 @@ def inference_asr(data_batch, main_lang: str, model_config: str) -> str:
         feature_extractor=processor.feature_extractor,
         device=0 if torch.cuda.is_available() else -1,
         torch_dtype=torch.float16 if torch.cuda.is_available() else "auto",
-        num_beams=20,
-        no_repeat_ngram_size=3,
-        repetition_penalty=1.2,
-        use_cache=True,
+        num_beams=50,
+        no_repeat_ngram_size=1,
+        repetition_penalty=0.7,
+        ignore_warning=True,
     )
+
     for data in data_batch:
         transcription.append(
-            transcriber(data, chunk_length_s=30, stride_length_s=[15, 0])["text"]
+            transcriber(data)["text"]  # chunk_length_s=30, stride_length_s=[15, 0]
         )
 
     return transcription

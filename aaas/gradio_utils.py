@@ -12,57 +12,50 @@ langs = sorted(list(LANG_MAPPING.keys()))
 model_vad, get_speech_timestamps = silero_vad(True)
 
 
+def build_asr_ui(lang, model_config, target_lang):
+    with gr.Row():
+        audio_file = gr.Audio(source="upload", type="filepath", label="Audiofile")
+
+    task_id = gr.Textbox(label="Task ID", max_lines=3)
+
+    with gr.Row():
+        with gr.TabItem("Transcription"):
+            transcription = gr.Textbox(max_lines=10)
+        with gr.TabItem("details"):
+            chunks = gr.JSON()
+
+    refresh = gr.Button(value="Get Results")
+
+    audio_file.change(
+        fn=run_transcription,
+        inputs=[audio_file, lang, model_config, target_lang],
+        outputs=[task_id],
+        api_name="transcription",
+    )
+
+    task_id.change(
+        fn=get_transcription,
+        inputs=task_id,
+        outputs=[transcription, chunks],
+        api_name="get_transcription",
+    )
+
+    refresh.click(fn=get_transcription, inputs=task_id, outputs=[transcription, chunks])
+
+
 def build_gradio():
     ui = gr.Blocks()
 
     with ui:
+        with gr.Row():
+            lang = gr.Radio(langs, value=langs[0], label="Source Language")
+            model_config = gr.Radio(
+                choices=["small", "medium", "large"], value="large", label="model size"
+            )
+            target_lang = gr.Radio(langs, label="Target language")
         with gr.Tabs():
-            with gr.TabItem("audio language"):
-                lang = gr.Radio(langs, value=langs[0])
-            with gr.TabItem("model configuration"):
-                model_config = gr.Radio(
-                    choices=["small", "medium", "large"], value="large"
-                )
-            with gr.TabItem("translate to"):
-                target_lang = gr.Radio(langs)
-
-        with gr.Tabs():
-            with gr.TabItem("Microphone"):
-                mic = gr.Audio(source="microphone", type="filepath")
-            with gr.TabItem("File"):
-                audio_file = gr.Audio(source="upload", type="filepath")
-
-        task_id = gr.Textbox(label="Task ID")
-        refresh = gr.Button(value="Get Results")
-
-        with gr.Tabs():
-            with gr.TabItem("Transcription"):
-                transcription = gr.Textbox()
-            with gr.TabItem("details"):
-                chunks = gr.JSON()
-
-        mic.change(
-            fn=run_transcription,
-            inputs=[mic, lang, model_config, target_lang],
-            outputs=[task_id],
-            api_name="transcription",
-        )
-        audio_file.change(
-            fn=run_transcription,
-            inputs=[audio_file, lang, model_config, target_lang],
-            outputs=[task_id],
-        )
-
-        task_id.change(
-            fn=get_transcription,
-            inputs=task_id,
-            outputs=[transcription, chunks],
-            api_name="get_transcription",
-        )
-
-        refresh.click(
-            fn=get_transcription, inputs=task_id, outputs=[transcription, chunks]
-        )
+            with gr.Tab("ASR"):
+                build_asr_ui(lang, model_config, target_lang)
 
     return ui
 
@@ -93,7 +86,8 @@ def run_transcription(audio, main_lang, model_config, target_lang=""):
                 model_vad,
                 threshold=0.5,
                 sampling_rate=16000,
-                min_silence_duration_ms=1000,
+                min_silence_duration_ms=250,
+                min_speech_duration_ms=1000,
                 speech_pad_ms=100,
             )
             audio_batch = [
@@ -129,8 +123,8 @@ def get_transcription(queue_string: str):
     for x in range(len(queue)):
         result = get_transkript(queue[x])
         if result is not None:
-            chunks[x]["start_timestamp"] = int(result.master.split(",")[0]) / 16000
-            chunks[x]["stoip_timestamp"] = int(result.master.split(",")[1]) / 16000
+            chunks[x]["start_timestamp"] = int(result.timestamps.split(",")[0]) / 16000
+            chunks[x]["stoip_timestamp"] = int(result.timestamps.split(",")[1]) / 16000
             chunks[x]["text"] = result.transcript
 
         full_transcription = ""
