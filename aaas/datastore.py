@@ -22,16 +22,14 @@ class AudioData(SQLModel, table=True):
     main_lang: str
     model_config: str
     hs: str
-    voting: int = 0
-
-
-engine = create_engine(db_backend)
-
-SQLModel.metadata.create_all(engine)
+    priority: int = 0
 
 
 @timeit
 def add_audio(audio_batch, master, main_lang, model_config):
+    engine = create_engine(db_backend)
+    SQLModel.metadata.create_all(engine)
+
     hashes = []
     with Session(engine) as session:
         for x in range(len(audio_batch)):
@@ -62,6 +60,8 @@ def add_audio(audio_batch, master, main_lang, model_config):
 
 @timeit
 def get_transkript(hs):
+    engine = create_engine(db_backend)
+    SQLModel.metadata.create_all(engine)
     with Session(engine) as session:
         statement = select(AudioData).where(AudioData.hs == hs)
         transkript = session.exec(statement).first()
@@ -71,9 +71,23 @@ def get_transkript(hs):
 
 @timeit
 def get_audio_queue():
+    engine = create_engine(db_backend)
+    SQLModel.metadata.create_all(engine)
     with Session(engine) as session:
-        statement = select(AudioData).where(AudioData.transcript == TODO).limit(3)
-        todos = session.exec(statement).all()
+
+        def get_queue(priority=10):
+            statement = (
+                select(AudioData)
+                .where(AudioData.transcript == TODO)
+                .where(AudioData.priority == priority)
+                .limit(3)
+            )
+            todos = session.exec(statement).all()
+            if len(todos) == 0:
+                todos = get_queue(priority=priority - 1)
+            return todos
+
+        todos = get_queue()
 
         if len(todos) != 0:
             sample = random.choice(todos)
@@ -91,6 +105,8 @@ def get_audio_queue():
 
 @timeit
 def set_transkript(hs, transcription):
+    engine = create_engine(db_backend)
+    SQLModel.metadata.create_all(engine)
     with Session(engine) as session:
         statement = select(AudioData).where(AudioData.hs == hs)
         transkript = session.exec(statement).first()
@@ -102,6 +118,8 @@ def set_transkript(hs, transcription):
 
 @timeit
 def set_in_progress(hs):
+    engine = create_engine(db_backend)
+    SQLModel.metadata.create_all(engine)
     with Session(engine) as session:
         statement = select(AudioData).where(AudioData.hs == hs)
         transkript = session.exec(statement).first()
@@ -113,6 +131,8 @@ def set_in_progress(hs):
 
 @timeit
 def delete_by_hashes(hashes):
+    engine = create_engine(db_backend)
+    SQLModel.metadata.create_all(engine)
     with Session(engine) as session:
         for hs in hashes:
             statement = select(AudioData).where(AudioData.hs == hs)
