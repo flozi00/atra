@@ -45,7 +45,8 @@ def add_audio(audio_batch, master, main_lang, model_config):
                     f"{audio_data} {main_lang}, {model_config}, {times}".encode("utf-8")
                 ).hexdigest()
                 hashes.append(hs)
-                if get_transkript(hs) is None:
+                entry = get_transkript(hs)
+                if entry is None:
                     entry = AudioData(
                         timestamps=times,
                         data=audio_data,
@@ -55,6 +56,10 @@ def add_audio(audio_batch, master, main_lang, model_config):
                         hs=hs,
                     )
                     session.add(entry)
+                else:
+                    entry.transcript = TODO
+                    session.commit()
+                    session.refresh(entry)
 
             session.commit()
 
