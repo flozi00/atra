@@ -25,102 +25,84 @@ class AudioData(SQLModel, table=True):
     priority: int = 0
 
 
-engine = create_engine(db_backend)
+engine = create_engine(db_backend, pool_recycle=3600, pool_pre_ping=True)
 SQLModel.metadata.create_all(engine)
 
 
 @timeit
 def add_audio(audio_batch, master, main_lang, model_config):
-    global engine
-    try:
-        hashes = []
-        with Session(engine) as session:
-            for x in range(len(audio_batch)):
-                audio = audio_batch[x]
-                time_dict = master[x]
-                times = f"{time_dict['start']},{time_dict['end']}"
+    hashes = []
+    with Session(engine) as session:
+        for x in range(len(audio_batch)):
+            audio = audio_batch[x]
+            time_dict = master[x]
+            times = f"{time_dict['start']},{time_dict['end']}"
 
-                audio_data = audio.tobytes()
-                hs = hashlib.sha256(
-                    f"{audio_data} {main_lang}, {model_config}, {times}".encode("utf-8")
-                ).hexdigest()
-                hashes.append(hs)
-                entry = get_transkript(hs)
-                if entry is None:
-                    entry = AudioData(
-                        timestamps=times,
-                        data=audio_data,
-                        transcript=TODO,
-                        main_lang=main_lang,
-                        model_config=model_config,
-                        hs=hs,
-                    )
-                    session.add(entry)
-                else:
-                    entry.transcript = TODO
-                    session.commit()
-                    session.refresh(entry)
+            audio_data = audio.tobytes()
+            hs = hashlib.sha256(
+                f"{audio_data} {main_lang}, {model_config}, {times}".encode("utf-8")
+            ).hexdigest()
+            hashes.append(hs)
+            entry = get_transkript(hs)
+            if entry is None:
+                entry = AudioData(
+                    timestamps=times,
+                    data=audio_data,
+                    transcript=TODO,
+                    main_lang=main_lang,
+                    model_config=model_config,
+                    hs=hs,
+                )
+                session.add(entry)
+            else:
+                entry.transcript = TODO
+                session.commit()
+                session.refresh(entry)
 
-            session.commit()
+        session.commit()
 
-        return hashes
-    except Exception:
-        engine = create_engine(db_backend)
-        SQLModel.metadata.create_all(engine)
-        return add_audio(audio_batch, master, main_lang, model_config)
+    return hashes
 
 
 @timeit
 def get_transkript(hs):
-    global engine
-    try:
-        with Session(engine) as session:
-            statement = select(AudioData).where(AudioData.hs == hs)
-            transkript = session.exec(statement).first()
+    with Session(engine) as session:
+        statement = select(AudioData).where(AudioData.hs == hs)
+        transkript = session.exec(statement).first()
 
-        return transkript
-    except Exception:
-        engine = create_engine(db_backend)
-        SQLModel.metadata.create_all(engine)
-        return get_transkript(hs)
+    return transkript
 
 
 @timeit
 def get_audio_queue():
-    global engine
-    try:
-        with Session(engine) as session:
+    with Session(engine) as session:
 
-            def get_queue(priority=1):
-                statement = (
-                    select(AudioData)
-                    .where(AudioData.transcript == TODO)
-                    .where(AudioData.priority == priority)
-                    .limit(3)
-                )
-                todos = session.exec(statement).all()
-                return todos
+        def get_queue(priority=1):
+            statement = (
+                select(AudioData)
+                .where(AudioData.transcript == TODO)
+                .where(AudioData.priority == priority)
+                .limit(3)
+            )
+            todos = session.exec(statement).all()
+            return todos
 
-            todos = get_queue(1)
-            if len(todos) == 0:
-                todos = get_queue(priority=0)
+        todos = get_queue(1)
+        if len(todos) == 0:
+            todos = get_queue(priority=0)
 
+        if len(todos) != 0:
+            sample = random.choice(todos)
+        else:
+            statement = (
+                select(AudioData).where(AudioData.transcript == INPROGRESS).limit(3)
+            )
+            todos = session.exec(statement).all()
             if len(todos) != 0:
                 sample = random.choice(todos)
             else:
-                statement = (
-                    select(AudioData).where(AudioData.transcript == INPROGRESS).limit(3)
-                )
-                todos = session.exec(statement).all()
-                if len(todos) != 0:
-                    sample = random.choice(todos)
-                else:
-                    sample = False
-        return sample
-    except Exception:
-        engine = create_engine(db_backend)
-        SQLModel.metadata.create_all(engine)
-        return get_audio_queue()
+                sample = False
+    return sample
 
 
 @timeit
