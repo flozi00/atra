@@ -75,7 +75,7 @@ def get_audio_queue():
     SQLModel.metadata.create_all(engine)
     with Session(engine) as session:
 
-        def get_queue(priority=10):
+        def get_queue(priority=1):
             statement = (
                 select(AudioData)
                 .where(AudioData.transcript == TODO)
@@ -83,11 +83,11 @@ def get_audio_queue():
                 .limit(3)
             )
             todos = session.exec(statement).all()
-            if len(todos) == 0:
-                todos = get_queue(priority=priority - 1)
             return todos
 
-        todos = get_queue()
+        todos = get_queue(1)
+        if len(todos) == 0:
+            todos = get_queue(priority=0)
 
         if len(todos) != 0:
             sample = random.choice(todos)
