@@ -107,7 +107,7 @@ def run_transcription(audio, main_lang, model_config, target_lang=""):
         model_config = "small"
 
     queue = []
-    if target_lang == "":
+    if target_lang not in langs:
         target_lang = main_lang
 
     if audio is not None and len(audio) > 3:
