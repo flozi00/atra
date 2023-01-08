@@ -155,7 +155,7 @@ def get_transcription(queue_string: str):
         result = get_transkript(queue[x])
         if result is not None:
             chunks[x]["start_timestamp"] = int(float(result.timestamps.split(",")[0]))
-            chunks[x]["stoip_timestamp"] = int(float(result.timestamps.split(",")[1]))
+            chunks[x]["stop_timestamp"] = int(float(result.timestamps.split(",")[1]))
             chunks[x]["text"] = result.transcript
 
         full_transcription = ""
