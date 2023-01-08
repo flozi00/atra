@@ -12,3 +12,4 @@ pymysql
 soundfile
 accelerate
 evaluate
+unidecode
