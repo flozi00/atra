@@ -33,7 +33,7 @@ def inference_asr(data_batch, main_lang: str, model_config: str) -> str:
 
     for data in data_batch:
         transcription.append(
-            transcriber(data)["text"]  # chunk_length_s=30, stride_length_s=[15, 0]
+            transcriber(data, chunk_length_s=30, stride_length_s=[15, 0])["text"]
         )
 
     return transcription

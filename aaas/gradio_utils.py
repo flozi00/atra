@@ -89,7 +89,7 @@ def run_vad(audio):
             model_vad,
             threshold=0.5,
             sampling_rate=16000,
-            min_silence_duration_ms=250,
+            min_silence_duration_ms=1000,
             min_speech_duration_ms=1000,
             speech_pad_ms=100,
             return_seconds=True,
