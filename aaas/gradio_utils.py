@@ -1,3 +1,4 @@
+from datetime import timedelta
 import os
 
 import gradio as gr
@@ -10,6 +11,22 @@ from aaas.silero_vad import silero_vad
 langs = sorted(list(LANG_MAPPING.keys()))
 
 model_vad, get_speech_timestamps = silero_vad(True)
+
+
+def build_subtitle_ui():
+    with gr.Row():
+        video_file = gr.Video(source="upload", type="filepath", label="VideoFile")
+
+    task_id = gr.Textbox(label="Task ID", max_lines=3)
+
+    refresh = gr.Button(value="Get Results")
+
+    refresh.click(
+        fn=get_sub_video,
+        inputs=[task_id, video_file],
+        outputs=[video_file],
+        api_name="subtitle",
+    )
 
 
 def build_vad():
@@ -70,6 +87,8 @@ def build_gradio():
                 build_asr_ui(lang, model_config, target_lang)
             with gr.Tab("VAD"):
                 build_vad()
+            with gr.Tab("Subtitles"):
+                build_subtitle_ui()
 
     return ui
 
@@ -163,3 +182,32 @@ def get_transcription(queue_string: str):
             full_transcription += c.get("text", "") + "\n"
 
     return full_transcription, chunks
+
+
+def get_sub_video(task_id, video_file):
+    segments = get_transcription(task_id)[1]
+    srtFilename = "subs.srt"
+    if os.path.exists(srtFilename):
+        os.remove(srtFilename)
+    id = 0
+    for segment in segments:
+        startTime = (
+            str(0) + str(timedelta(seconds=int(segment["start_timestamp"]))) + ",000"
+        )
+        endTime = (
+            str(0) + str(timedelta(seconds=int(segment["stop_timestamp"]))) + ",000"
+        )
+        text = segment["text"]
+        seg = f"{id}\n{startTime} --> {endTime}\n{text}\n\n"
+        id = id + 1
+
+        with open(srtFilename, "a+", encoding="utf-8") as srtFile:
+            srtFile.write(seg)
+
+    os.system(
+        f'ffmpeg -i "{video_file}" -vf subtitles="{srtFilename}" "{video_file}.mp4"'
+    )
+
+    print(segments)
+
+    return f"{video_file}.mp4"
