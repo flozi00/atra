@@ -55,9 +55,6 @@ def add_audio(audio_batch, master, main_lang, model_config):
                 )
                 session.add(entry)
                 session.commit()
-            else:
-                entry.transcript = TODO
-                session.commit()
 
     return hashes
 

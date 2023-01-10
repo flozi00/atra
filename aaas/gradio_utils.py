@@ -205,9 +205,11 @@ def get_sub_video(task_id, video_file):
             srtFile.write(seg)
 
     os.system(
-        f'ffmpeg -i "{video_file}" -vf subtitles="{srtFilename}" "{video_file}.mp4"'
+        f'ffmpeg -i "{video_file}" -i watermark.png -filter_complex "[1][0]scale2ref=w=oh*mdar:h=ih*0.2[logo][video];[video][logo]overlay=main_w-overlay_w-5:5" "{video_file}watermarked.mp4"'
     )
 
-    print(segments)
+    os.system(
+        f'ffmpeg -i "{video_file}watermarked.mp4" -vf subtitles="{srtFilename}" "{video_file}.mp4"'
+    )
 
     return f"{video_file}.mp4"
