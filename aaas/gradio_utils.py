@@ -15,7 +15,8 @@ model_vad, get_speech_timestamps = silero_vad(True)
 
 def build_subtitle_ui():
     with gr.Row():
-        video_file = gr.Video(source="upload", type="filepath", label="VideoFile")
+        video_file_in = gr.Video(source="upload", type="filepath", label="VideoFile")
+        video_file_out = gr.Video(source="upload", type="filepath", label="VideoFile")
 
     task_id = gr.Textbox(label="Task ID", max_lines=3)
 
@@ -23,8 +24,8 @@ def build_subtitle_ui():
 
     refresh.click(
         fn=get_sub_video,
-        inputs=[task_id, video_file],
-        outputs=[video_file],
+        inputs=[task_id, video_file_in],
+        outputs=[video_file_out],
         api_name="subtitle",
     )
 
