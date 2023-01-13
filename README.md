@@ -10,8 +10,8 @@ With the exception of the audio dataset and training script (at the moment, comi
 ## How to install
 Install the ffmpeg package for loading the audio files and python3 to run the code
 
-clone this repository and download the submodule with the languagemodel too.
-Probably you will need git-lfs installed.
-Update the whole system using "git pull --recurse-submodules"
-
 With both packages installed you can just run "pip install -r requirements.txt" to install the python librarys and then start the server with gradio UI using "python app.py"
+
+To run the worker run app.py with the enviroment variable "SERVERMODE" set to WORKER
+The easiest way is using the docker image and set the env vars there
+Just pull the command using: "docker pull flozi00/asrasaservice:main"
