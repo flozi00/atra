@@ -82,7 +82,7 @@ def build_gradio():
 
 
 def add_to_vad_queue(audio, main_lang, model_config, target_lang=""):
-    if audio is not None and len(audio) > 3:
+    if audio is not None and len(audio) > 8:
         audio_path = audio
 
         with open(audio, "rb") as f:
@@ -122,9 +122,9 @@ def add_vad_chunks(audio, main_lang, model_config, target_lang=""):
     speech_timestamps = get_speech_timestamps(
         audio,
         model_vad,
-        threshold=0.5,
+        threshold=0.6,
         sampling_rate=16000,
-        min_silence_duration_ms=1000,
+        min_silence_duration_ms=300,
         min_speech_duration_ms=1000,
         speech_pad_ms=100,
         return_seconds=True,
