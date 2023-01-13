@@ -4,9 +4,10 @@ import os
 import gradio as gr
 from transformers.pipelines.audio_utils import ffmpeg_read
 
-from aaas.statics import LANG_MAPPING
+from aaas.statics import LANG_MAPPING, TO_VAD
 from aaas.datastore import add_audio, get_transkript
 from aaas.silero_vad import silero_vad
+from aaas.audio_utils.demucs import seperate_vocal
 
 langs = sorted(list(LANG_MAPPING.keys()))
 
@@ -30,18 +31,6 @@ def build_subtitle_ui():
     )
 
 
-def build_vad():
-    with gr.Row():
-        audio_file = gr.Audio(source="upload", type="filepath", label="Audiofile")
-
-    with gr.Row():
-        chunks = gr.JSON()
-
-    audio_file.change(
-        fn=run_vad, inputs=[audio_file], outputs=[chunks], api_name="vad",
-    )
-
-
 def build_asr_ui(lang, model_config, target_lang):
     with gr.Row():
         audio_file = gr.Audio(source="upload", type="filepath", label="Audiofile")
@@ -57,7 +46,7 @@ def build_asr_ui(lang, model_config, target_lang):
     refresh = gr.Button(value="Get Results")
 
     audio_file.change(
-        fn=run_transcription,
+        fn=add_to_vad_queue,
         inputs=[audio_file, lang, model_config, target_lang],
         outputs=[task_id],
         api_name="transcription",
@@ -86,39 +75,34 @@ def build_gradio():
         with gr.Tabs():
             with gr.Tab("ASR"):
                 build_asr_ui(lang, model_config, target_lang)
-            with gr.Tab("VAD"):
-                build_vad()
             with gr.Tab("Subtitles"):
                 build_subtitle_ui()
 
     return ui
 
 
-def run_vad(audio):
-    speech_timestamps = []
+def add_to_vad_queue(audio, main_lang, model_config, target_lang=""):
     if audio is not None and len(audio) > 3:
+        audio_path = audio
 
-        if isinstance(audio, str):
-            with open(audio, "rb") as f:
-                payload = f.read()
+        with open(audio, "rb") as f:
+            payload = f.read()
 
-            audio = ffmpeg_read(payload, sampling_rate=16000)
+        audio = ffmpeg_read(payload, sampling_rate=16000)
+        os.remove(audio_path)
 
-        speech_timestamps = get_speech_timestamps(
-            audio,
-            model_vad,
-            threshold=0.5,
-            sampling_rate=16000,
-            min_silence_duration_ms=1000,
-            min_speech_duration_ms=1000,
-            speech_pad_ms=100,
-            return_seconds=True,
-        )
+    queue = add_audio(
+        audio_batch=[audio],
+        master="",
+        main_lang=f"{main_lang},{target_lang}",
+        model_config=model_config,
+        vad=True,
+    )
 
-    return speech_timestamps
+    return queue[0]
 
 
-def run_transcription(audio, main_lang, model_config, target_lang=""):
+def add_vad_chunks(audio, main_lang, model_config, target_lang=""):
     queue_string = ""
     if main_lang not in langs:
         main_lang = "german"
@@ -130,41 +114,52 @@ def run_transcription(audio, main_lang, model_config, target_lang=""):
     if target_lang not in langs:
         target_lang = main_lang
 
-    if audio is not None and len(audio) > 3:
-        audio_path = audio
+    audio = seperate_vocal(audio)
+    with open(audio, "rb") as f:
+        payload = f.read()
+    audio = ffmpeg_read(payload, sampling_rate=16000)
 
-        with open(audio, "rb") as f:
-            payload = f.read()
-
-        audio = ffmpeg_read(payload, sampling_rate=16000)
-        os.remove(audio_path)
-
-        speech_timestamps = run_vad(audio)
-        audio_batch = [
-            audio[
-                int(float(speech_timestamps[st]["start"]) * 16000) : int(
-                    float(speech_timestamps[st]["end"]) * 16000
-                )
-            ]
-            for st in range(len(speech_timestamps))
+    speech_timestamps = get_speech_timestamps(
+        audio,
+        model_vad,
+        threshold=0.5,
+        sampling_rate=16000,
+        min_silence_duration_ms=1000,
+        min_speech_duration_ms=1000,
+        speech_pad_ms=100,
+        return_seconds=True,
+    )
+    audio_batch = [
+        audio[
+            int(float(speech_timestamps[st]["start"]) * 16000) : int(
+                float(speech_timestamps[st]["end"]) * 16000
+            )
         ]
+        for st in range(len(speech_timestamps))
+    ]
 
-        queue = add_audio(
-            audio_batch=audio_batch,
-            master=speech_timestamps,
-            main_lang=f"{main_lang},{target_lang}",
-            model_config=model_config,
-        )
+    queue = add_audio(
+        audio_batch=audio_batch,
+        master=speech_timestamps,
+        main_lang=f"{main_lang},{target_lang}",
+        model_config=model_config,
+        vad=False,
+    )
 
-        queue_string = ",".join(queue)
+    queue_string = ",".join(queue)
 
     return queue_string
 
 
 def get_transcription(queue_string: str):
-    queue_string = str(queue_string)
-    if len(queue_string) < 5:
+    queue_string = get_transkript(str(queue_string))
+    if queue_string is None:
         return "", []
+    else:
+        queue_string = queue_string.transcript
+    queue_string = str(queue_string)
+    if len(queue_string) < 5 or "***" in queue_string:
+        return queue_string, []
 
     full_transcription = ""
     queue = queue_string.split(",")

@@ -139,3 +139,4 @@ LANG_MAPPING = {v: k for k, v in LANGUAGE_CODES.items()}
 
 TODO = "***TODO***"
 INPROGRESS = "***PROGRESS***"
+TO_VAD = "***DETECT VOICE***"

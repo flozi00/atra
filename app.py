@@ -1,7 +1,7 @@
 import os
 import time
 
-mode = os.getenv("SERVERMODE", "APP")
+mode = os.getenv("SERVERMODE", "APP ")
 
 if mode == "APP":
     if __name__ == "__main__":
@@ -17,10 +17,15 @@ if mode == "APP":
 else:
     print("Worker Mode")
 
-    from aaas.audio_utils import inference_asr
-    from aaas.datastore import get_audio_queue, set_in_progress, set_transkript
+    from aaas.audio_utils.asr import inference_asr
+    from aaas.datastore import (
+        get_audio_queue,
+        set_in_progress,
+        set_transkript,
+    )
     from aaas.text_utils import translate
-    from aaas.statics import LANG_MAPPING
+    from aaas.gradio_utils import add_vad_chunks
+    from aaas.statics import LANG_MAPPING, TO_VAD
     import numpy as np
 
     while True:
@@ -28,17 +33,24 @@ else:
         if task is not False:
             set_in_progress(task.hs)
             audio = np.frombuffer(task.data, dtype=np.float32)
-            # audio = ffmpeg_read(audio, 16000)
-            result = inference_asr(
-                data_batch=[audio],
-                main_lang=task.main_lang.split(",")[0],
-                model_config=task.model_config,
-            )[0]
-            result = translate(
-                result,
-                LANG_MAPPING[task.main_lang.split(",")[0]],
-                LANG_MAPPING[task.main_lang.split(",")[-1]],
-            )
+            if task.timestamps == TO_VAD:
+                result = add_vad_chunks(
+                    audio=audio,
+                    main_lang=task.main_lang.split(",")[0],
+                    model_config=task.model_config,
+                    target_lang=task.main_lang.split(",")[-1],
+                )
+            else:
+                result = inference_asr(
+                    data_batch=[audio],
+                    main_lang=task.main_lang.split(",")[0],
+                    model_config=task.model_config,
+                )[0]
+                result = translate(
+                    result,
+                    LANG_MAPPING[task.main_lang.split(",")[0]],
+                    LANG_MAPPING[task.main_lang.split(",")[-1]],
+                )
             set_transkript(task.hs, result)
         else:
             time.sleep(3)

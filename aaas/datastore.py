@@ -5,7 +5,7 @@ from typing import Optional
 
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 
-from aaas.statics import INPROGRESS, TODO
+from aaas.statics import INPROGRESS, TODO, TO_VAD
 from aaas.utils import timeit
 
 db_backend = os.getenv("DBBACKEND", "sqlite:///database.db")
@@ -30,13 +30,16 @@ SQLModel.metadata.create_all(engine)
 
 
 @timeit
-def add_audio(audio_batch, master, main_lang, model_config):
+def add_audio(audio_batch, master, main_lang, model_config, vad=False):
     hashes = []
     with Session(engine) as session:
         for x in range(len(audio_batch)):
             audio = audio_batch[x]
-            time_dict = master[x]
-            times = f"{time_dict['start']},{time_dict['end']}"
+            if vad == False:
+                time_dict = master[x]
+                times = f"{time_dict['start']},{time_dict['end']}"
+            else:
+                times = TO_VAD
 
             audio_data = audio.tobytes()
             hs = hashlib.sha256(
@@ -107,7 +110,7 @@ def set_transkript(hs, transcription):
         transkript = session.exec(statement).first()
         if transkript is not None:
             transkript.transcript = transcription
-            transkript.data = bytes("")
+            transkript.data = bytes("", encoding="latin1")
             session.commit()
             session.refresh(transkript)
 

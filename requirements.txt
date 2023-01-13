@@ -13,3 +13,4 @@ soundfile
 accelerate
 evaluate
 unidecode
+demucs>=4.0.0
