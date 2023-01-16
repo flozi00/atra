@@ -164,11 +164,12 @@ def get_transcription(queue_string: str):
     full_transcription = ""
     queue = queue_string.split(",")
 
-    chunks = [{"id": queue[x]} for x in range(len(queue))]
+    chunks = []
 
     for x in range(len(queue)):
         result = get_transkript(queue[x])
         if result is not None:
+            chunks.append({"id": queue[x]})
             chunks[x]["start_timestamp"] = int(float(result.timestamps.split(",")[0]))
             chunks[x]["stop_timestamp"] = int(float(result.timestamps.split(",")[1]))
             chunks[x]["text"] = result.transcript
