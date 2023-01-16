@@ -5,6 +5,7 @@ onnxruntime>=1.12.1
 sacremoses
 sentencepiece
 torch>=1.13.0
+torchaudio
 transformers>=4.25.0
 onnxruntime-openvino
 sqlmodel
