@@ -18,22 +18,22 @@ def inference_asr(data_batch, main_lang: str, model_config: str) -> str:
     except Exception:
         pass
 
+    if torch.cuda.is_available():
+        model = model.half()
+
     transcriber = pipeline(
         task="automatic-speech-recognition",
         model=model,
         tokenizer=processor.tokenizer,
         feature_extractor=processor.feature_extractor,
         device=0 if torch.cuda.is_available() else -1,
-        torch_dtype=torch.float16 if torch.cuda.is_available() else "auto",
-        num_beams=1,
-        no_repeat_ngram_size=1,
-        repetition_penalty=0.7,
+        torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
         ignore_warning=True,
     )
 
     for data in data_batch:
         transcription.append(
-            transcriber(data, chunk_length_s=30, stride_length_s=[15, 0])["text"]
+            transcriber(data, chunk_length_s=30, stride_length_s=[15, 0])["text"].replace("! ", "")
         )
 
     return transcription

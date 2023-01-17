@@ -6,8 +6,7 @@ sacremoses
 sentencepiece
 torch>=1.13.0
 torchaudio
-transformers>=4.25.0
-onnxruntime-openvino
+https://github.com/huggingface/transformers/archive/refs/heads/main.zip
 sqlmodel
 pymysql
 soundfile
