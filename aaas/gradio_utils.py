@@ -187,7 +187,6 @@ def add_vad_chunks(audio, main_lang, model_config, target_lang=""):
         master=speech_timestamps,
         main_lang=f"{main_lang},{target_lang}",
         model_config=model_config,
-        vad=False,
     )
 
     queue_string = ",".join(queue)
