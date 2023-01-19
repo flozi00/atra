@@ -63,6 +63,9 @@ def get_model_and_processor(lang: str, task: str, config: str):
 
     processor_class = MODEL_MAPPING[task][config][lang].get("processor", AutoProcessor)
     processor = processor_class.from_pretrained(model_id)
-    model = get_model(model_class, model_id)
+    model = MODEL_MAPPING[task][config][lang].get("cachedmodel", None)
+    if model is None:
+        model = get_model(model_class, model_id)
+        MODEL_MAPPING[task][config][lang]["cachedmodel"] = model
 
     return model, processor

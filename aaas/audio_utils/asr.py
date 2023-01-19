@@ -31,4 +31,12 @@ def inference_asr(data, main_lang: str, model_config: str) -> list:
     )
 
     audio = librosa.effects.time_stretch(data, 0.75)
-    return transcriber(audio, chunk_length_s=30, stride_length_s=[15, 0])["text"]
+    transcription = transcriber(audio, chunk_length_s=20, stride_length_s=[15, 0])[
+        "text"
+    ]
+
+    del model
+    del transcriber
+
+    return transcription
+
