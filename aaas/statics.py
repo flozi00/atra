@@ -1,34 +1,66 @@
-from transformers import AutoModelForSpeechSeq2Seq
+from transformers import (
+    AutoModelForSpeechSeq2Seq,
+    VisionEncoderDecoderModel,
+    TrOCRProcessor,
+)
 
 MODEL_MAPPING = {
-    "small": {
-        "german": {
-            "name": "flozi00/whisper-small-german",
-            "class": AutoModelForSpeechSeq2Seq,
+    "asr": {
+        "small": {
+            "german": {
+                "name": "flozi00/whisper-small-german",
+                "class": AutoModelForSpeechSeq2Seq,
+            },
+            "english": {
+                "name": "openai/whisper-small.en",
+                "class": AutoModelForSpeechSeq2Seq,
+            },
+            "universal": {
+                "name": "openai/whisper-small",
+                "class": AutoModelForSpeechSeq2Seq,
+            },
         },
-        "english": {
-            "name": "openai/whisper-small.en",
-            "class": AutoModelForSpeechSeq2Seq,
+        "medium": {
+            "english": {
+                "name": "openai/whisper-medium.en",
+                "class": AutoModelForSpeechSeq2Seq,
+            },
+            "universal": {
+                "name": "openai/whisper-medium",
+                "class": AutoModelForSpeechSeq2Seq,
+            },
         },
-        "universal": {
-            "name": "openai/whisper-small",
-            "class": AutoModelForSpeechSeq2Seq,
+        "large": {
+            "universal": {
+                "name": "openai/whisper-large-v2",
+                "class": AutoModelForSpeechSeq2Seq,
+            },
         },
     },
-    "medium": {
-        "english": {
-            "name": "openai/whisper-medium.en",
-            "class": AutoModelForSpeechSeq2Seq,
+    "ocr": {
+        "small": {
+            "handwritten": {
+                "name": "microsoft/trocr-base-handwritten",
+                "class": VisionEncoderDecoderModel,
+                "processor": TrOCRProcessor,
+            },
+            "universal": {
+                "name": "microsoft/trocr-base-printed",
+                "class": VisionEncoderDecoderModel,
+                "processor": TrOCRProcessor,
+            },
         },
-        "universal": {
-            "name": "openai/whisper-medium",
-            "class": AutoModelForSpeechSeq2Seq,
-        },
-    },
-    "large": {
-        "universal": {
-            "name": "openai/whisper-large-v2",
-            "class": AutoModelForSpeechSeq2Seq,
+        "large": {
+            "handwritten": {
+                "name": "microsoft/trocr-large-handwritten",
+                "class": VisionEncoderDecoderModel,
+                "processor": TrOCRProcessor,
+            },
+            "universal": {
+                "name": "microsoft/trocr-large-printed",
+                "class": VisionEncoderDecoderModel,
+                "processor": TrOCRProcessor,
+            },
         },
     },
 }
@@ -140,3 +172,4 @@ LANG_MAPPING = {v: k for k, v in LANGUAGE_CODES.items()}
 TODO = "***TODO***"
 INPROGRESS = "***PROGRESS***"
 TO_VAD = "***DETECT VOICE***"
+TO_OCR = "***TO OCR***"

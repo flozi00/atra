@@ -5,3 +5,4 @@ model_cache/
 data_cache/
 *.db
 *.wav
+dummy.*

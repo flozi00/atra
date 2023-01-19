@@ -4,6 +4,9 @@ import onnxruntime
 from optimum.bettertransformer import BetterTransformer
 
 from aaas.utils import timeit
+from aaas.statics import MODEL_MAPPING
+from transformers import AutoProcessor
+
 
 cpu_threads = os.cpu_count()
 
@@ -47,3 +50,19 @@ def get_model(model_class, model_id):
         except Exception:
             pass
     return model
+
+
+def get_model_and_processor(lang: str, task: str, config: str):
+
+    model_id = MODEL_MAPPING[task][config].get(lang, {}).get("name", None)
+    if model_id is None:
+        lang = "universal"
+        model_id = MODEL_MAPPING[task][config][lang]["name"]
+
+    model_class = MODEL_MAPPING[task][config][lang].get("class", None)
+
+    processor_class = MODEL_MAPPING[task][config][lang].get("processor", AutoProcessor)
+    processor = processor_class.from_pretrained(model_id)
+    model = get_model(model_class, model_id)
+
+    return model, processor

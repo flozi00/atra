@@ -4,8 +4,8 @@ import os
 import gradio as gr
 from transformers.pipelines.audio_utils import ffmpeg_read
 
-from aaas.statics import LANG_MAPPING, TO_VAD
-from aaas.datastore import add_audio, get_transkript
+from aaas.statics import LANG_MAPPING, TO_VAD, TO_OCR
+from aaas.datastore import add_to_queue, get_transkript
 from aaas.silero_vad import silero_vad
 from aaas.audio_utils.demucs import seperate_vocal
 
@@ -31,19 +31,18 @@ def build_subtitle_ui():
     )
 
 
-def build_asr_ui(lang, model_config, target_lang):
+def build_asr_ui():
+    with gr.Row():
+        lang = gr.Radio(langs, value=langs[0], label="Source Language")
+        model_config = gr.Radio(
+            choices=["small", "medium", "large"], value="large", label="model size"
+        )
+        target_lang = gr.Radio(langs, label="Target language")
+
     with gr.Row():
         audio_file = gr.Audio(source="upload", type="filepath", label="Audiofile")
 
     task_id = gr.Textbox(label="Task ID", max_lines=3)
-
-    with gr.Row():
-        with gr.TabItem("Transcription"):
-            transcription = gr.Textbox(max_lines=10)
-        with gr.TabItem("details"):
-            chunks = gr.JSON()
-
-    refresh = gr.Button(value="Get Results")
 
     audio_file.change(
         fn=add_to_vad_queue,
@@ -52,6 +51,36 @@ def build_asr_ui(lang, model_config, target_lang):
         api_name="transcription",
     )
 
+
+def build_ocr_ui():
+    with gr.Row():
+        model_config = gr.Radio(
+            choices=["small", "large"], value="large", label="model size"
+        )
+        ocr_mode = gr.Radio(choices=["handwritten", "printed"], label="OCR Mode")
+
+    with gr.Row():
+        image_file = gr.Image(source="upload", type="filepath", label="Imagefile")
+
+    task_id = gr.Textbox(label="Task ID", max_lines=3)
+
+    image_file.change(
+        fn=add_to_ocr_queue,
+        inputs=[image_file, model_config, ocr_mode],
+        outputs=[task_id],
+        api_name="ocr",
+    )
+
+
+def build_results_ui():
+    task_id = gr.Textbox(label="Task ID", max_lines=3)
+
+    with gr.Row():
+        with gr.TabItem("Transcription"):
+            transcription = gr.Textbox(max_lines=10)
+        with gr.TabItem("details"):
+            chunks = gr.JSON()
+
     task_id.change(
         fn=get_transcription,
         inputs=task_id,
@@ -59,26 +88,41 @@ def build_asr_ui(lang, model_config, target_lang):
         api_name="get_transcription",
     )
 
-    refresh.click(fn=get_transcription, inputs=task_id, outputs=[transcription, chunks])
-
 
 def build_gradio():
     ui = gr.Blocks()
 
     with ui:
-        with gr.Row():
-            lang = gr.Radio(langs, value=langs[0], label="Source Language")
-            model_config = gr.Radio(
-                choices=["small", "medium", "large"], value="large", label="model size"
-            )
-            target_lang = gr.Radio(langs, label="Target language")
         with gr.Tabs():
             with gr.Tab("ASR"):
-                build_asr_ui(lang, model_config, target_lang)
+                build_asr_ui()
+            with gr.Tab("OCR"):
+                build_ocr_ui()
             with gr.Tab("Subtitles"):
                 build_subtitle_ui()
+            with gr.Tab("Results"):
+                build_results_ui()
 
     return ui
+
+
+def add_to_ocr_queue(image, model_config, mode):
+    if image is not None and len(image) > 8:
+
+        with open(image, "rb") as f:
+            payload = f.read()
+
+        os.remove(image)
+
+    queue = add_to_queue(
+        audio_batch=[payload],
+        master="",
+        main_lang=mode,
+        model_config=model_config,
+        times=TO_OCR,
+    )
+
+    return queue[0]
 
 
 def add_to_vad_queue(audio, main_lang, model_config, target_lang=""):
@@ -91,12 +135,12 @@ def add_to_vad_queue(audio, main_lang, model_config, target_lang=""):
         audio = ffmpeg_read(payload, sampling_rate=16000)
         os.remove(audio_path)
 
-    queue = add_audio(
-        audio_batch=[audio],
+    queue = add_to_queue(
+        audio_batch=[audio.tobytes()],
         master="",
         main_lang=f"{main_lang},{target_lang}",
         model_config=model_config,
-        vad=True,
+        times=TO_VAD,
     )
 
     return queue[0]
@@ -134,11 +178,11 @@ def add_vad_chunks(audio, main_lang, model_config, target_lang=""):
             int(float(speech_timestamps[st]["start"]) * 16000) : int(
                 float(speech_timestamps[st]["end"]) * 16000
             )
-        ]
+        ].tobytes()
         for st in range(len(speech_timestamps))
     ]
 
-    queue = add_audio(
+    queue = add_to_queue(
         audio_batch=audio_batch,
         master=speech_timestamps,
         main_lang=f"{main_lang},{target_lang}",
@@ -152,31 +196,35 @@ def add_vad_chunks(audio, main_lang, model_config, target_lang=""):
 
 
 def get_transcription(queue_string: str):
+    full_transcription, chunks = "", []
     queue_string = get_transkript(str(queue_string))
     if queue_string is None:
         return "", []
+    elif queue_string.metas == TO_OCR:
+        return queue_string.transcript, []
     else:
-        queue_string = queue_string.transcript
-    queue_string = str(queue_string)
-    if len(queue_string) < 5 or "***" in queue_string:
-        return queue_string, []
+        queue_string = str(queue_string.transcript)
+        if len(queue_string) < 5 or "***" in queue_string:
+            return queue_string, []
 
-    full_transcription = ""
-    queue = queue_string.split(",")
+        queue = queue_string.split(",")
 
-    chunks = []
+        for x in range(len(queue)):
+            result = get_transkript(queue[x])
+            if result is not None:
+                chunks.append({"id": queue[x]})
+                try:
+                    chunks[x]["start_timestamp"] = int(
+                        float(result.metas.split(",")[0])
+                    )
+                    chunks[x]["stop_timestamp"] = int(float(result.metas.split(",")[1]))
+                except:
+                    pass
+                chunks[x]["text"] = result.transcript
 
-    for x in range(len(queue)):
-        result = get_transkript(queue[x])
-        if result is not None:
-            chunks.append({"id": queue[x]})
-            chunks[x]["start_timestamp"] = int(float(result.timestamps.split(",")[0]))
-            chunks[x]["stop_timestamp"] = int(float(result.timestamps.split(",")[1]))
-            chunks[x]["text"] = result.transcript
-
-        full_transcription = ""
-        for c in chunks:
-            full_transcription += c.get("text", "") + "\n"
+            full_transcription = ""
+            for c in chunks:
+                full_transcription += c.get("text", "") + "\n"
 
     return full_transcription, chunks
 
