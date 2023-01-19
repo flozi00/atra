@@ -14,3 +14,5 @@ accelerate
 evaluate
 unidecode
 demucs>=4.0.0
+librosa 
+pillow
