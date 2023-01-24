@@ -34,16 +34,20 @@ def add_to_queue(audio_batch, master, main_lang, model_config, times=None):
             audio_data = audio_batch[x]
             if times == None:
                 time_dict = master[x]
-                times = f"{time_dict['start']},{time_dict['end']}"
+                timesstamps = f"{time_dict['start']},{time_dict['end']}"
+            else:
+                timesstamps = times
 
             hs = hashlib.sha256(
-                f"{audio_data} {main_lang}, {model_config}, {times}".encode("utf-8")
+                f"{audio_data} {main_lang}, {model_config}, {timesstamps}".encode(
+                    "utf-8"
+                )
             ).hexdigest()
             hashes.append(hs)
             entry = get_transkript(hs)
             if entry is None:
                 entry = QueueData(
-                    metas=times,
+                    metas=timesstamps,
                     data=audio_data,
                     transcript=TODO,
                     langs=main_lang,

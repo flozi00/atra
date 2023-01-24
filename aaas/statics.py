@@ -31,6 +31,10 @@ MODEL_MAPPING = {
             },
         },
         "large": {
+            "german": {
+                "name": "flozi00/whisper-large-german",
+                "class": AutoModelForSpeechSeq2Seq,
+            },
             "universal": {
                 "name": "openai/whisper-large-v2",
                 "class": AutoModelForSpeechSeq2Seq,

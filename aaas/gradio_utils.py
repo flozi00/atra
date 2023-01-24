@@ -168,7 +168,7 @@ def add_vad_chunks(audio, main_lang, model_config, target_lang=""):
         model_vad,
         threshold=0.6,
         sampling_rate=16000,
-        min_silence_duration_ms=300,
+        min_silence_duration_ms=100,
         min_speech_duration_ms=1000,
         speech_pad_ms=100,
         return_seconds=True,
