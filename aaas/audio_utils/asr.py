@@ -21,7 +21,7 @@ def inference_asr(data, main_lang: str, model_config: str) -> list:
         torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
         ignore_warning=True,
         chunk_length_s=30,
-        stride_length_s=[15, 0],
+        stride_length_s=[5, 0],
     )
 
     transcription = transcriber(
@@ -29,6 +29,7 @@ def inference_asr(data, main_lang: str, model_config: str) -> list:
         generate_kwargs={
             "task": "transcribe",
             "language": f"<|{LANG_MAPPING[main_lang]}|>",
+            "use_cache": True,
         },
     )["text"].strip()
 

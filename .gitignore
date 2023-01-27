@@ -6,3 +6,4 @@ data_cache/
 *.db
 *.wav
 dummy.*
+dataset/*
