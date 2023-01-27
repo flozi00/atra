@@ -1,7 +1,8 @@
 from transformers import (
-    AutoModelForSpeechSeq2Seq,
     VisionEncoderDecoderModel,
     TrOCRProcessor,
+    WhisperProcessor,
+    WhisperForConditionalGeneration,
 )
 
 MODEL_MAPPING = {
@@ -9,31 +10,37 @@ MODEL_MAPPING = {
         "small": {
             "german": {
                 "name": "flozi00/whisper-small-german",
-                "class": AutoModelForSpeechSeq2Seq,
+                "class": WhisperForConditionalGeneration,
+                "processor": WhisperProcessor,
             },
             "english": {
                 "name": "openai/whisper-small.en",
-                "class": AutoModelForSpeechSeq2Seq,
+                "class": WhisperForConditionalGeneration,
+                "processor": WhisperProcessor,
             },
             "universal": {
                 "name": "openai/whisper-small",
-                "class": AutoModelForSpeechSeq2Seq,
+                "class": WhisperForConditionalGeneration,
+                "processor": WhisperProcessor,
             },
         },
         "medium": {
             "english": {
                 "name": "openai/whisper-medium.en",
-                "class": AutoModelForSpeechSeq2Seq,
+                "class": WhisperForConditionalGeneration,
+                "processor": WhisperProcessor,
             },
             "universal": {
                 "name": "openai/whisper-medium",
-                "class": AutoModelForSpeechSeq2Seq,
+                "class": WhisperForConditionalGeneration,
+                "processor": WhisperProcessor,
             },
         },
         "large": {
             "universal": {
                 "name": "openai/whisper-large-v2",
-                "class": AutoModelForSpeechSeq2Seq,
+                "class": WhisperForConditionalGeneration,
+                "processor": WhisperProcessor,
             },
         },
     },
@@ -173,3 +180,4 @@ TODO = "***TODO***"
 INPROGRESS = "***PROGRESS***"
 TO_VAD = "***DETECT VOICE***"
 TO_OCR = "***TO OCR***"
+TO_ASR = "***TO ASR***"

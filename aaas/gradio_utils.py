@@ -126,6 +126,12 @@ def add_to_ocr_queue(image, model_config, mode):
 
 
 def add_to_vad_queue(audio, main_lang, model_config, target_lang=""):
+    if main_lang not in langs:
+        main_lang = "german"
+    if model_config not in ["small", "medium", "large"]:
+        model_config = "small"
+    if target_lang not in langs:
+        target_lang = main_lang
     if audio is not None and len(audio) > 8:
         audio_path = audio
 
@@ -150,25 +156,23 @@ def add_vad_chunks(audio, main_lang, model_config, target_lang=""):
     queue_string = ""
     if main_lang not in langs:
         main_lang = "german"
-        target_lang = "german"
     if model_config not in ["small", "medium", "large"]:
         model_config = "small"
+    if target_lang not in langs:
+        target_lang = main_lang
 
     queue = []
     if target_lang not in langs:
         target_lang = main_lang
 
-    audio = seperate_vocal(audio)
-    with open(audio, "rb") as f:
-        payload = f.read()
-    audio = ffmpeg_read(payload, sampling_rate=16000)
+    # audio = seperate_vocal(audio)
 
     speech_timestamps = get_speech_timestamps(
         audio,
         model_vad,
         threshold=0.6,
         sampling_rate=16000,
-        min_silence_duration_ms=100,
+        min_silence_duration_ms=500,
         min_speech_duration_ms=1000,
         speech_pad_ms=100,
         return_seconds=True,
@@ -210,20 +214,20 @@ def get_transcription(queue_string: str):
 
         for x in range(len(queue)):
             result = get_transkript(queue[x])
+            chunks.append({"id": queue[x]})
             if result is not None:
-                chunks.append({"id": queue[x]})
                 try:
                     chunks[x]["start_timestamp"] = int(
                         float(result.metas.split(",")[0])
                     )
                     chunks[x]["stop_timestamp"] = int(float(result.metas.split(",")[1]))
-                except:
-                    pass
+                except Exception as e:
+                    print(e)
                 chunks[x]["text"] = result.transcript
 
-            full_transcription = ""
-            for c in chunks:
-                full_transcription += c.get("text", "") + "\n"
+    full_transcription = ""
+    for c in chunks:
+        full_transcription += c.get("text", "") + "\n"
 
     return full_transcription, chunks
 
