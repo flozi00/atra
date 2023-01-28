@@ -29,4 +29,4 @@ ds = datasets.Dataset.from_pandas(pds)
 ds = ds.map(add_prefix)
 ds = ds.cast_column("audio", datasets.Audio())
 
-ds.push_to_hub(export_name, private=True, max_shard_size="50MB")
+ds.push_to_hub(export_name, private=True, max_shard_size="100MB")
