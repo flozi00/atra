@@ -36,13 +36,13 @@ class VCtube:
                 {
                     "key": "FFmpegExtractAudio",
                     "preferredcodec": "wav",
-                    "preferredquality": "192",
+                    "preferredquality": "64",
                 }
             ],
-            "postprocessors_args": ["-ar", "21000"],
+            "postprocessors_args": ["-ar", "16000"],
             "prefer_ffmpeg": True,
             "keepvideo": False,
-            "outtmpl": download_path,  # 다운로드 경로 설정
+            "outtmpl": download_path,
             "ignoreerrors": True,
         }
 
