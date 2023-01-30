@@ -9,6 +9,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--name")
 parser.add_argument("--url")
 parser.add_argument("--lang")
+parser.add_argument("--token")
 
 args = parser.parse_args()
 
@@ -37,4 +38,7 @@ ds = ds.filter(lambda x: os.path.isfile(x["audio"]))
 ds = ds.cast_column("audio", datasets.Audio())
 print(ds)
 
-ds.push_to_hub(args.name, private=True)
+if args.token:
+    ds.push_to_hub(args.name, token=args.token)
+else:
+    ds.push_to_hub(args.name, private=True)
