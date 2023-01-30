@@ -12,10 +12,6 @@ parser.add_argument("--lang")
 
 args = parser.parse_args()
 
-try:
-    os.mkdir("dataset")
-except:
-    pass
 dataset_name = f"dataset/{args.name}"
 
 if os.path.isdir(dataset_name) == False:
