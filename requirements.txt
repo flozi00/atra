@@ -18,3 +18,4 @@ librosa
 pillow
 yt-dlp
 youtube-transcript-api
+pydub

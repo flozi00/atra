@@ -4,7 +4,6 @@ import json
 import os
 import shutil
 from collections import OrderedDict
-from functools import partial
 from glob import glob
 
 import pandas as pd
@@ -36,10 +35,10 @@ class VCtube:
                 {
                     "key": "FFmpegExtractAudio",
                     "preferredcodec": "wav",
-                    "preferredquality": "64",
+                    "preferredquality": "192",
                 }
             ],
-            "postprocessors_args": ["-ar", "16000", "ac", "1", "-f", "f32le"],
+            "postprocessors_args": ["-ar", "16000"],
             "prefer_ffmpeg": True,
             "keepvideo": False,
             "outtmpl": download_path,
@@ -91,8 +90,8 @@ class VCtube:
                         video, languages=[lang]
                     )
 
-                step_size = 5
-                for subt in range(0, len(subtitle) - (step_size + 1), step_size):
+                step_size = 12
+                for subt in range(0, len(subtitle) - (step_size + 1), 2):
                     video_id.append(video)
                     full_name = os.path.join(
                         wav_dir, video + "." + str(subt).zfill(4) + ".wav"
@@ -177,7 +176,7 @@ def split_with_caption(audio_path, skip_idx=0, out_ext="wav") -> list:
 
         segment = audio[start_idx:end_idx]
 
-        segment.export(target_audio_path, "wav")  # for soundsegment
+        segment.export(target_audio_path, format=out_ext)  # for soundsegment
 
         audio_paths.append(target_audio_path)
 
