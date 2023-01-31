@@ -51,6 +51,6 @@ else:
     )
 
 if args.token:
-    ds.push_to_hub(args.name, token=args.token, max_shard_size="50MB")
+    ds.push_to_hub(args.name, token=args.token, max_shard_size="50MB", private=True)
 else:
-    ds.push_to_hub(args.name, private=True)
+    ds.push_to_hub(args.name, max_shard_size="50MB", private=True)
