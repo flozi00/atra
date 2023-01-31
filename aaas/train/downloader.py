@@ -105,7 +105,6 @@ class VCtube:
                             for c in " ".join(
                                 subtitle[subt + x]["text"] for x in range(step_size)
                             )
-                            if c not in ("!", "?", ",", ".", "\n", "~", '"', "'")
                         ]
                     )
                     text.append(subtitle[subt]["text"])
