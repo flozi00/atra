@@ -39,7 +39,7 @@ def build_asr_ui():
         )
 
     with gr.Row():
-        audio_file = gr.Audio(source="upload", type="filepath", label="Audiofile")
+        audio_file = gr.Audio(source="microphone", type="filepath", label="Audiofile")
 
     task_id = gr.Textbox(label="Task ID", max_lines=3)
 
@@ -158,9 +158,6 @@ def add_vad_chunks(audio, main_lang, model_config):
         model_config = "small"
 
     queue = []
-    if target_lang not in langs:
-        target_lang = main_lang
-
     # audio = seperate_vocal(audio)
 
     speech_timestamps = get_speech_timestamps(

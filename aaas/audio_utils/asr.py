@@ -27,7 +27,7 @@ def inference_asr(data, main_lang: str, model_config: str) -> list:
     transcription = transcriber(
         data,
         generate_kwargs={
-            "task": "translate",
+            "task": "transcribe",
             "language": f"<|{LANG_MAPPING[main_lang]}|>",
             "use_cache": True,
         },

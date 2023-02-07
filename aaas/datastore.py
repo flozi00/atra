@@ -14,7 +14,7 @@ db_backend = os.getenv("DBBACKEND", "sqlite:///database.db")
 class QueueData(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     metas: str
-    data: bytes = Field(max_length=(2 ** 32) - 1)
+    data: bytes = Field(max_length=(2**32) - 1)
     transcript: str = Field(max_length=4096)
     langs: str
     model_config: str
