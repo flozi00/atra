@@ -26,7 +26,6 @@ class BackgroundTasks(threading.Thread):
                         audio=array,
                         main_lang=task.langs.split(",")[0],
                         model_config=task.model_config,
-                        target_lang=task.langs.split(",")[-1],
                     )
                 elif task.metas == TO_OCR:
                     with open("dummy.png", "wb") as f:
@@ -43,11 +42,6 @@ class BackgroundTasks(threading.Thread):
                         main_lang=task.langs.split(",")[0],
                         model_config=task.model_config,
                     )
-                    result = translate(
-                        result,
-                        LANG_MAPPING[task.langs.split(",")[0]],
-                        LANG_MAPPING[task.langs.split(",")[-1]],
-                    )
                 set_transkript(task.hash, result)
             else:
                 time.sleep(3)
@@ -60,5 +54,7 @@ if __name__ == "__main__":
 
     ui = build_gradio()
     ui.launch(
-        server_name="0.0.0.0", server_port=int(os.getenv("PORT", 7860)), max_threads=32,
+        server_name="0.0.0.0",
+        server_port=int(os.getenv("PORT", 7860)),
+        max_threads=32,
     )

@@ -37,7 +37,6 @@ def build_asr_ui():
         model_config = gr.Radio(
             choices=["small", "medium", "large"], value="large", label="model size"
         )
-        target_lang = gr.Radio(langs, label="Target language")
 
     with gr.Row():
         audio_file = gr.Audio(source="upload", type="filepath", label="Audiofile")
@@ -46,7 +45,7 @@ def build_asr_ui():
 
     audio_file.change(
         fn=add_to_vad_queue,
-        inputs=[audio_file, lang, model_config, target_lang],
+        inputs=[audio_file, lang, model_config],
         outputs=[task_id],
         api_name="transcription",
     )
@@ -125,13 +124,12 @@ def add_to_ocr_queue(image, model_config, mode):
     return queue[0]
 
 
-def add_to_vad_queue(audio, main_lang, model_config, target_lang=""):
+def add_to_vad_queue(audio, main_lang, model_config):
     if main_lang not in langs:
         main_lang = "german"
     if model_config not in ["small", "medium", "large"]:
         model_config = "small"
-    if target_lang not in langs:
-        target_lang = main_lang
+
     if audio is not None and len(audio) > 8:
         audio_path = audio
 
@@ -144,7 +142,7 @@ def add_to_vad_queue(audio, main_lang, model_config, target_lang=""):
     queue = add_to_queue(
         audio_batch=[audio.tobytes()],
         master="",
-        main_lang=f"{main_lang},{target_lang}",
+        main_lang=f"{main_lang}",
         model_config=model_config,
         times=TO_VAD,
     )
@@ -152,14 +150,12 @@ def add_to_vad_queue(audio, main_lang, model_config, target_lang=""):
     return queue[0]
 
 
-def add_vad_chunks(audio, main_lang, model_config, target_lang=""):
+def add_vad_chunks(audio, main_lang, model_config):
     queue_string = ""
     if main_lang not in langs:
         main_lang = "german"
     if model_config not in ["small", "medium", "large"]:
         model_config = "small"
-    if target_lang not in langs:
-        target_lang = main_lang
 
     queue = []
     if target_lang not in langs:
@@ -189,7 +185,7 @@ def add_vad_chunks(audio, main_lang, model_config, target_lang=""):
     queue = add_to_queue(
         audio_batch=audio_batch,
         master=speech_timestamps,
-        main_lang=f"{main_lang},{target_lang}",
+        main_lang=f"{main_lang}",
         model_config=model_config,
     )
 
