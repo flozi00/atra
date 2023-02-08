@@ -3,15 +3,23 @@ from optimum.bettertransformer import BetterTransformer
 from aaas.utils import timeit
 from aaas.statics import MODEL_MAPPING
 from transformers import AutoProcessor
+import torch
 
 
 @timeit
 def get_model(model_class, model_id):
-    model = model_class.from_pretrained(model_id, cache_dir="./model_cache",)
+    model = model_class.from_pretrained(
+        model_id,
+        cache_dir="./model_cache",
+    )
     try:
         model = BetterTransformer.transform(model)
-    except Exception:
-        pass
+    except Exception as e:
+        print(e)
+    try:
+        model = torch.compile(model)
+    except Exception as e:
+        print(e)
     return model
 
 
