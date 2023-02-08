@@ -1,0 +1,38 @@
+name: atra
+description: automatic transcribtion and subtitle translation
+
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+
+version: 0.1.1+14
+
+environment:
+  sdk: '>=2.18.5'
+
+dependencies:
+  file_saver: ^0.1.1
+  flutter:
+    sdk: flutter
+  flutter_form_builder: ^7.7.0
+  form_builder_file_picker: ^2.3.0
+  form_builder_validators: ^8.4.0
+  highlight_text: ^1.6.0
+  json_theme: ^4.0.0
+  loader_overlay: ^2.1.0
+  searchable_listview: ^2.2.1
+  shared_preferences: ^2.0.15
+  timeline_tile: ^2.0.0
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/appainter_theme.json

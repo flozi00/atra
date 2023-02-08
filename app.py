@@ -51,10 +51,20 @@ if __name__ == "__main__":
     t = BackgroundTasks()
     t.start()
     from aaas.gradio_utils import build_gradio
+    from fastapi import FastAPI, staticfiles
+    import uvicorn
+    import gradio as gr
 
+    app = FastAPI()
     ui = build_gradio()
-    ui.launch(
-        server_name="0.0.0.0",
-        server_port=int(os.getenv("PORT", 7860)),
-        max_threads=32,
+
+    app.mount("/gradio", gr.routes.App.create_app(ui))
+    app.mount(
+        "/",
+        staticfiles.StaticFiles(directory="client/build/web", html=True),
+        name="static",
+    )
+
+    uvicorn.run(
+        app, host="0.0.0.0", port=int(os.getenv("PORT", 7860)), log_level="info"
     )
