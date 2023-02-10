@@ -8,9 +8,8 @@ from aaas.datastore import (
     set_in_progress,
     set_transkript,
 )
-from aaas.text_utils import translate
 from aaas.gradio_utils import add_vad_chunks
-from aaas.statics import LANG_MAPPING, TO_VAD, TO_OCR
+from aaas.statics import TO_VAD, TO_OCR
 import numpy as np
 
 

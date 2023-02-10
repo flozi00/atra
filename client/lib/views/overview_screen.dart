@@ -6,16 +6,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../forms/subtitle.dart';
 import '../utils/network.dart';
-import './transcription_details.dart';
+import './timeline_view.dart';
 
-class TranscriptionOverview extends StatefulWidget {
-  const TranscriptionOverview({Key? key}) : super(key: key);
+class OverviewScreen extends StatefulWidget {
+  const OverviewScreen({Key? key}) : super(key: key);
 
   @override
-  _TranscriptionOverviewState createState() => _TranscriptionOverviewState();
+  _OverviewScreenState createState() => _OverviewScreenState();
 }
 
-class _TranscriptionOverviewState extends State<TranscriptionOverview> {
+class _OverviewScreenState extends State<OverviewScreen> {
   List<Transcription> cards = [];
   bool isFetching = false;
   Map<String, HighlightedWord> words = {};

@@ -6,7 +6,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:json_theme/json_theme.dart';
 
 import './layout/bar.dart';
-import './views/transcription_overview.dart';
+import 'views/overview_screen.dart';
 import 'views/upload.dart';
 
 void main() async {
@@ -58,12 +58,14 @@ class _MyHomePageState extends State<MyHomePage> {
     return build_app_bar(
       context,
       [
-        const Tab(icon: Icon(Icons.search), text: "Search"),
+        const Tab(icon: Icon(Icons.list), text: "Home"),
         const Tab(icon: Icon(Icons.upload_file), text: "Upload"),
+        //const Tab(icon: Icon(Icons.assistant), text: "Assistant"),
       ],
       [
-        const TranscriptionOverview(),
+        const OverviewScreen(),
         const Upload(),
+        //const Assistant(),
       ],
     );
   }

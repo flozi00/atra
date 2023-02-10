@@ -113,3 +113,19 @@ Future<Uint8List> get_video(String hash, String mediafile) async {
   // Return the byte array.
   return myvideo;
 }
+
+Future<List<dynamic>> search_web(String query) async {
+  String searchUrl =
+      "https://search.unlocked.link/search?q=$query&category_general=1&pageno=1&time_range=None&safesearch=0";
+
+  // Send a POST request to the server with the parameters.
+  var res = await http.get(Uri.parse(searchUrl), headers: headers);
+  // Check that the response from the server is valid.
+  if (res.statusCode != 200) {
+    throw Exception('http.post error: statusCode= ${res.statusCode}');
+  }
+
+  // Parse the response from the server and return the result.
+  List<dynamic> results = jsonDecode(utf8.decode(res.bodyBytes))["results"];
+  return results;
+}

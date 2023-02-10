@@ -7,7 +7,6 @@ from transformers.pipelines.audio_utils import ffmpeg_read
 from aaas.statics import LANG_MAPPING, TO_VAD, TO_OCR
 from aaas.datastore import add_to_queue, get_transkript
 from aaas.silero_vad import silero_vad
-from aaas.audio_utils.demucs import seperate_vocal
 
 langs = sorted(list(LANG_MAPPING.keys()))
 
