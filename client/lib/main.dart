@@ -60,7 +60,6 @@ class _MyHomePageState extends State<MyHomePage> {
       [
         const Tab(icon: Icon(Icons.list), text: "Home"),
         const Tab(icon: Icon(Icons.upload_file), text: "Upload"),
-        //const Tab(icon: Icon(Icons.assistant), text: "Assistant"),
       ],
       [
         const OverviewScreen(),

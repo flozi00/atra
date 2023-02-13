@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../forms/subtitle.dart';
 import '../utils/network.dart';
 import './timeline_view.dart';
+import 'package:woozy_search/woozy_search.dart';
 
 class OverviewScreen extends StatefulWidget {
   const OverviewScreen({Key? key}) : super(key: key);
@@ -21,6 +22,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
   Map<String, HighlightedWord> words = {};
   List<String> modes = ['ocr', 'asr'];
   String activeMode = 'ocr';
+  Woozy<dynamic> woozy = Woozy();
 
   @override
   void initState() {
@@ -126,6 +128,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
           String firstElement = hash.split(",")[0];
           await get_transcription(firstElement).then((values) {
             cards.add(Transcription(hash: hash, transcription: values[0]));
+            woozy.addEntry(values[0], value: hash);
             setState(() {});
           });
         }
@@ -149,19 +152,27 @@ class _OverviewScreenState extends State<OverviewScreen> {
         return cards;
       },
       asyncListFilter: (q, list) {
-        if (q == "") q = " ";
-        words = {
-          q: HighlightedWord(
+        words = {};
+        List<String> hashes = [];
+        for (String word in q.split(" ")) {
+          words[word] = HighlightedWord(
             textStyle: TextStyle(
               color: Theme.of(context).colorScheme.onPrimaryContainer,
               fontWeight: FontWeight.bold,
             ),
-          )
-        };
-        return list
-            .where((element) =>
-                element.transcription.toLowerCase().contains(q.toLowerCase()))
-            .toList();
+          );
+          woozy.search(word).forEach((element) {
+            if (element.score > 0.7) {
+              hashes.add(element.value);
+            }
+          });
+        }
+        var result =
+            list.where((element) => hashes.contains(element.hash)).toList();
+        if (result.isEmpty) {
+          return list;
+        }
+        return result;
       },
       inputDecoration: InputDecoration(
         labelText: "Search",

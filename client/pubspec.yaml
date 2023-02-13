@@ -21,9 +21,11 @@ dependencies:
   highlight_text: ^1.6.0
   json_theme: ^4.0.0
   loader_overlay: ^2.1.0
+  microphone: ^0.1.0
   searchable_listview: ^2.2.1
   shared_preferences: ^2.0.15
   timeline_tile: ^2.0.0
+  woozy_search: ^2.0.3
 
 
 dev_dependencies:
