@@ -5,12 +5,35 @@ import gradio as gr
 from transformers.pipelines.audio_utils import ffmpeg_read
 
 from aaas.statics import LANG_MAPPING, TO_VAD, TO_OCR
-from aaas.datastore import add_to_queue, get_transkript
+from aaas.datastore import add_to_queue, get_transkript, set_transkript
 from aaas.silero_vad import silero_vad
+import numpy as np
 
 langs = sorted(list(LANG_MAPPING.keys()))
 
 model_vad, get_speech_timestamps = silero_vad(True)
+
+
+def build_edit_ui():
+    task_id = gr.Textbox(label="Task ID", max_lines=3)
+
+    audio_file = gr.Audio(label="Audiofile")
+    transcription = gr.Textbox(max_lines=10)
+    send = gr.Button(value="Send")
+
+    task_id.change(
+        fn=get_audio,
+        inputs=task_id,
+        outputs=[audio_file, transcription],
+        api_name="get_audio",
+    )
+
+    send.click(
+        fn=set_transkript,
+        inputs=[task_id, transcription],
+        outputs=[],
+        api_name="correct_transcription",
+    )
 
 
 def build_subtitle_ui():
@@ -100,6 +123,8 @@ def build_gradio():
                 build_subtitle_ui()
             with gr.Tab("Results"):
                 build_results_ui()
+            with gr.Tab("Edit"):
+                build_edit_ui()
 
     return ui
 
@@ -222,6 +247,11 @@ def get_transcription(queue_string: str):
         full_transcription += c.get("text", "") + "\n"
 
     return full_transcription, chunks
+
+
+def get_audio(task_id):
+    result = get_transkript(task_id)
+    return (16000, np.frombuffer(result.data, dtype=np.float32)), result.transcript
 
 
 def get_sub_video(task_id, video_file):

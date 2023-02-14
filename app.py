@@ -12,6 +12,14 @@ from aaas.gradio_utils import add_vad_chunks
 from aaas.statics import TO_VAD, TO_OCR
 import numpy as np
 
+from aaas.gradio_utils import build_gradio
+from fastapi import FastAPI, staticfiles
+import uvicorn
+import gradio as gr
+
+app = FastAPI()
+ui = build_gradio()
+
 
 class BackgroundTasks(threading.Thread):
     def run(self, *args, **kwargs):
@@ -49,13 +57,6 @@ class BackgroundTasks(threading.Thread):
 if __name__ == "__main__":
     t = BackgroundTasks()
     t.start()
-    from aaas.gradio_utils import build_gradio
-    from fastapi import FastAPI, staticfiles
-    import uvicorn
-    import gradio as gr
-
-    app = FastAPI()
-    ui = build_gradio()
 
     app.mount("/gradio", gr.routes.App.create_app(ui))
     app.mount(

@@ -5,6 +5,7 @@ import 'package:timeline_tile/timeline_tile.dart';
 
 import '../utils/data.dart';
 import '../utils/network.dart';
+import 'package:just_audio/just_audio.dart';
 
 Future<_TimelineActivity> build_timeline(String args, BuildContext context,
     Map<String, HighlightedWord> words) async {
@@ -25,24 +26,29 @@ Future<_TimelineActivity> build_timeline(String args, BuildContext context,
         duration: 0,
         color: Theme.of(context).colorScheme.onPrimary,
         icon: Icons.mic_none,
+        hash: value["id"],
       );
       Step bind = Step(
-          type: Type.line,
-          hour: "",
-          message: value["text"],
-          duration: stopTime - startTime,
-          color: Theme.of(context).colorScheme.onSecondary,
-          icon: Icons.mic_none);
+        type: Type.line,
+        hour: "",
+        message: value["text"],
+        duration: stopTime - startTime,
+        color: Theme.of(context).colorScheme.onSecondary,
+        icon: Icons.mic_none,
+        hash: value["id"],
+      );
       details.add(tile);
       details.add(bind);
       if (count + 1 < values[1].length) {
         details.add(Step(
-            type: Type.line,
-            hour: "",
-            message: "",
-            duration: values[1][count + 1]['start_timestamp'] - stopTime,
-            color: Theme.of(context).colorScheme.onSecondary,
-            icon: Icons.mic_none));
+          type: Type.line,
+          hour: "",
+          message: "",
+          duration: values[1][count + 1]['start_timestamp'] - stopTime,
+          color: Theme.of(context).colorScheme.onSecondary,
+          icon: Icons.mic_none,
+          hash: value["id"],
+        ));
       }
     }
     widget = _TimelineActivity(steps: details, words: words);
@@ -103,12 +109,20 @@ class _TimelineActivity extends StatelessWidget {
           ),
         ),
         child: Center(
+            child: InkWell(
           child: Icon(
             step.icon,
             size: 32,
             color: Colors.white,
           ),
-        ),
+          onTap: () async {
+            final player = AudioPlayer(); // Create a player
+            await get_audio(step.hash).then((value) async {
+              await player.setUrl(value);
+              await player.play();
+            });
+          },
+        )),
       ),
     );
   }
@@ -135,13 +149,47 @@ class _RightChildTimeline extends StatelessWidget {
           Padding(
               padding:
                   const EdgeInsets.only(left: 20, top: 0, bottom: 8, right: 8),
-              child: TextHighlight(
-                text: step.message,
-                words: words,
-                textStyle: TextStyle(
-                  color: Theme.of(context).colorScheme.onBackground,
+              child: InkWell(
+                child: TextHighlight(
+                  text: step.message,
+                  words: words,
+                  textStyle: TextStyle(
+                    color: Theme.of(context).colorScheme.onBackground,
+                  ),
                 ),
-              ))
+                onTap: () {
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        TextEditingController controller =
+                            TextEditingController(text: step.message);
+                        return Dialog(
+                            child: Column(
+                          children: [
+                            const Text("Edit Transcript"),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            TextFormField(
+                              controller: controller,
+                              maxLines: 20,
+                              minLines: 3,
+                              decoration: const InputDecoration(
+                                  border: OutlineInputBorder()),
+                            ),
+                            ElevatedButton(
+                                onPressed: () async {
+                                  await update_transcript(
+                                      step.hash, controller.text);
+                                  step.message = controller.text;
+                                  Navigator.pop(context);
+                                },
+                                child: const Text("Save"))
+                          ],
+                        ));
+                      });
+                },
+              )),
         ],
       ),
     );
@@ -182,14 +230,16 @@ class Step {
     required this.duration,
     required this.color,
     required this.icon,
+    required this.hash,
   });
 
   final Type type;
   final String hour;
-  final String message;
+  String message;
   final int duration;
   final Color color;
   final IconData icon;
+  final String hash;
 
   bool get isCheckpoint => type == Type.checkpoint;
 

@@ -14,7 +14,7 @@ final headers = {
 };
 
 String baseURL = "https://asr.a-ware.io/gradio";
-//String baseURL = "http://127.0.0.1:7860";
+//String baseURL = "http://127.0.0.1:7860/gradio";
 
 //The function sendtotask sends the audio file to the server and returns the hash string of the task.
 Future<String> SendToASR(
@@ -112,4 +112,50 @@ Future<Uint8List> get_video(String hash, String mediafile) async {
 
   // Return the byte array.
   return myvideo;
+}
+
+// This function takes a hash and a video file and returns a byte array
+// of the video file.
+Future<String> get_audio(String hash) async {
+  // This is the body of the request that is sent to the server.
+  var params = {
+    "data": [
+      hash,
+    ]
+  };
+
+  // Send the request to the server.
+  var res = await http.post(Uri.parse('$baseURL/run/get_audio'),
+      headers: headers, body: jsonEncode(params));
+
+  // Check that the request was successful.
+  if (res.statusCode != 200) {
+    throw Exception('http.post error: statusCode= ${res.statusCode}');
+  }
+
+  // Get the name of the file that the server sent back.
+  String video =
+      Uri.encodeFull(jsonDecode(utf8.decode(res.bodyBytes))["data"][0]["name"]);
+
+  // Return the byte array.
+  return Uri.parse('$baseURL/file=$video').toString();
+}
+
+Future<bool> update_transcript(String hash, String text) async {
+  var params = {
+    "data": [
+      hash,
+      text,
+    ]
+  };
+
+  // Send the request to the server.
+  var res = await http.post(Uri.parse('$baseURL/run/correct_transcription'),
+      headers: headers, body: jsonEncode(params));
+
+  // Check that the request was successful.
+  if (res.statusCode != 200) {
+    throw Exception('http.post error: statusCode= ${res.statusCode}');
+  }
+  return true;
 }

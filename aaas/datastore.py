@@ -108,7 +108,6 @@ def set_transkript(hs, transcription):
         transkript = session.exec(statement).first()
         if transkript is not None:
             transkript.transcript = transcription
-            transkript.data = bytes("", encoding="latin1")
             session.commit()
             session.refresh(transkript)
 

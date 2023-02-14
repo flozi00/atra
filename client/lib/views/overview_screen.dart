@@ -34,8 +34,8 @@ class _OverviewScreenState extends State<OverviewScreen> {
     return Card(
         child: Column(children: [
       ListTile(
-        title: Text(hash.substring(1, 10)),
-        subtitle: Text(value.length > 25 ? value.substring(1, 25) : value),
+        title: Text(hash.substring(0, 10)),
+        subtitle: Text(value.length > 50 ? value.substring(0, 50) : value),
       ),
       ButtonBar(
         children: <Widget>[
@@ -74,14 +74,18 @@ class _OverviewScreenState extends State<OverviewScreen> {
                     return Dialog(
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20.0)),
-                        child: SingleChildScrollView(
-                            child: TextHighlight(
-                          text: value,
-                          words: words,
-                          textStyle: TextStyle(
-                            color: Theme.of(context).colorScheme.onBackground,
-                          ),
-                        )));
+                        child: Padding(
+                            padding: const EdgeInsets.only(
+                                left: 20, top: 20, bottom: 20, right: 20),
+                            child: SingleChildScrollView(
+                                child: TextHighlight(
+                              text: value,
+                              words: words,
+                              textStyle: TextStyle(
+                                color:
+                                    Theme.of(context).colorScheme.onBackground,
+                              ),
+                            ))));
                   });
             },
             child: const Text('Transkription'),
@@ -146,9 +150,10 @@ class _OverviewScreenState extends State<OverviewScreen> {
       asyncListCallback: () async {
         await build_cards_list();
         while (isFetching == true) {
-          await Future.delayed(const Duration(milliseconds: 1000));
+          await Future.delayed(const Duration(milliseconds: 10000));
         }
         print("asyncListCallback");
+
         return cards;
       },
       asyncListFilter: (q, list) {

@@ -12,6 +12,7 @@ environment:
   sdk: '>=2.18.5'
 
 dependencies:
+  audioplayers: ^3.0.1
   file_saver: ^0.1.1
   flutter:
     sdk: flutter
@@ -20,6 +21,7 @@ dependencies:
   form_builder_validators: ^8.4.0
   highlight_text: ^1.6.0
   json_theme: ^4.0.0
+  just_audio: ^0.9.31
   loader_overlay: ^2.1.0
   microphone: ^0.1.0
   searchable_listview: ^2.2.1
