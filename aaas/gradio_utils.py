@@ -61,7 +61,7 @@ def build_asr_ui():
         )
 
     with gr.Row():
-        audio_file = gr.Audio(source="microphone", type="filepath", label="Audiofile")
+        audio_file = gr.Audio(source="upload", type="filepath", label="Audiofile")
 
     task_id = gr.Textbox(label="Task ID", max_lines=3)
 
@@ -176,6 +176,8 @@ def add_to_vad_queue(audio, main_lang, model_config):
 
 def add_vad_chunks(audio, main_lang, model_config):
     queue_string = ""
+    speech_timestamps = []
+    silence_duration = 500
     if main_lang not in langs:
         main_lang = "german"
     if model_config not in ["small", "medium", "large"]:
@@ -184,16 +186,20 @@ def add_vad_chunks(audio, main_lang, model_config):
     queue = []
     # audio = seperate_vocal(audio)
 
-    speech_timestamps = get_speech_timestamps(
-        audio,
-        model_vad,
-        threshold=0.6,
-        sampling_rate=16000,
-        min_silence_duration_ms=500,
-        min_speech_duration_ms=1000,
-        speech_pad_ms=100,
-        return_seconds=True,
-    )
+    while len(speech_timestamps) <= int((len(audio) / 16000) / 10):
+        speech_timestamps = get_speech_timestamps(
+            audio,
+            model_vad,
+            threshold=0.6,
+            sampling_rate=16000,
+            min_silence_duration_ms=silence_duration,
+            min_speech_duration_ms=1000,
+            speech_pad_ms=silence_duration * 0.1,
+            return_seconds=True,
+        )
+        silence_duration = silence_duration * 0.9
+        if silence_duration < 2:
+            break
     audio_batch = [
         audio[
             int(float(speech_timestamps[st]["start"]) * 16000) : int(
