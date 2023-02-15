@@ -121,14 +121,3 @@ def set_in_progress(hs):
             transkript.transcript = INPROGRESS
             session.commit()
             session.refresh(transkript)
-
-
-@timeit
-def delete_by_hashes(hashes):
-    with Session(engine) as session:
-        for hs in hashes:
-            statement = select(QueueData).where(QueueData.hash == hs)
-            res = session.exec(statement).first()
-            session.delete(res)
-
-        session.commit()
