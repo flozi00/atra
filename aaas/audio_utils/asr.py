@@ -3,7 +3,6 @@ from transformers.pipelines import AutomaticSpeechRecognitionPipeline as pipelin
 from aaas.model_utils import get_model_and_processor
 from aaas.statics import LANG_MAPPING
 from aaas.utils import timeit
-import torch
 
 
 @timeit
