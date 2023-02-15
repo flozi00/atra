@@ -23,6 +23,8 @@ class _OverviewScreenState extends State<OverviewScreen> {
   List<String> modes = ['ocr', 'asr'];
   String activeMode = 'ocr';
   Woozy<dynamic> woozy = Woozy();
+  String question = "";
+  String answer = "";
 
   @override
   void initState() {
@@ -30,12 +32,39 @@ class _OverviewScreenState extends State<OverviewScreen> {
     build_cards_list();
   }
 
-  Widget cardItem(String value, String hash) {
+  void textDialog(BuildContext context, String recognizedText) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0)),
+              child: Padding(
+                  padding: const EdgeInsets.only(
+                      left: 20, top: 20, bottom: 20, right: 20),
+                  child: SingleChildScrollView(
+                      child: Column(children: [
+                    // if answer length > 2, display Text
+                    if (answer.length > 2) Text("$question --> $answer"),
+                    TextHighlight(
+                      text: recognizedText,
+                      words: words,
+                      textStyle: TextStyle(
+                        color: Theme.of(context).colorScheme.onBackground,
+                      ),
+                    )
+                  ]))));
+        });
+  }
+
+  Widget cardItem(String recognizedText, String hash) {
     return Card(
         child: Column(children: [
       ListTile(
-        title: Text(hash.substring(0, 10)),
-        subtitle: Text(value.length > 50 ? value.substring(0, 50) : value),
+        title: Text(hash),
+        subtitle: Text(recognizedText.length > 250
+            ? recognizedText.substring(0, 250)
+            : recognizedText),
       ),
       ButtonBar(
         children: <Widget>[
@@ -67,26 +96,17 @@ class _OverviewScreenState extends State<OverviewScreen> {
             2. The text will be displayed in the dialog box. The text is taken from the variable value.
             3. The variable value is a string that contains the transcription of a speech. */
           ElevatedButton(
-            onPressed: () async {
-              showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return Dialog(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20.0)),
-                        child: Padding(
-                            padding: const EdgeInsets.only(
-                                left: 20, top: 20, bottom: 20, right: 20),
-                            child: SingleChildScrollView(
-                                child: TextHighlight(
-                              text: value,
-                              words: words,
-                              textStyle: TextStyle(
-                                color:
-                                    Theme.of(context).colorScheme.onBackground,
-                              ),
-                            ))));
-                  });
+            onPressed: () {
+              if (question.endsWith("?")) {
+                print("do qa");
+                question_answering(question, recognizedText).then((result) {
+                  answer = result;
+                  textDialog(context, recognizedText);
+                });
+              } else {
+                answer = "";
+                textDialog(context, recognizedText);
+              }
             },
             child: const Text('Transkription'),
           ),
@@ -157,6 +177,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
         return cards;
       },
       asyncListFilter: (q, list) {
+        question = q;
         words = {};
         List<String> hashes = [];
         for (String word in q.split(" ")) {

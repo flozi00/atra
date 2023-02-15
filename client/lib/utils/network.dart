@@ -13,8 +13,8 @@ final headers = {
   'Accept-Encoding': 'gzip',
 };
 
-String baseURL = "https://asr.a-ware.io/gradio";
-//String baseURL = "http://127.0.0.1:7860/gradio";
+//String baseURL = "https://asr.a-ware.io/gradio";
+String baseURL = "http://127.0.0.1:7860/gradio";
 
 //The function sendtotask sends the audio file to the server and returns the hash string of the task.
 Future<String> SendToASR(
@@ -158,4 +158,28 @@ Future<bool> update_transcript(String hash, String text) async {
     throw Exception('http.post error: statusCode= ${res.statusCode}');
   }
   return true;
+}
+
+Future<String> question_answering(String question, String context) async {
+  var params = {
+    "data": [
+      question,
+      context,
+    ]
+  };
+
+  // Send the request to the server.
+  var res = await http.post(Uri.parse('$baseURL/run/question_answering'),
+      headers: headers, body: jsonEncode(params));
+
+  // Check that the request was successful.
+  if (res.statusCode != 200) {
+    throw Exception('http.post error: statusCode= ${res.statusCode}');
+  }
+
+  // Get the name of the file that the server sent back.
+  String answer = jsonDecode(utf8.decode(res.bodyBytes))["data"][0];
+
+  // Return the byte array.
+  return answer;
 }

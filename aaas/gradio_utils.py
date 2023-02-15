@@ -9,6 +9,8 @@ from aaas.datastore import add_to_queue, get_transkript, set_transkript
 from aaas.silero_vad import silero_vad
 import numpy as np
 
+from aaas.text_utils import question_answering
+
 langs = sorted(list(LANG_MAPPING.keys()))
 
 model_vad, get_speech_timestamps = silero_vad(True)
@@ -93,6 +95,21 @@ def build_ocr_ui():
     )
 
 
+def build_qa_ui():
+    question = gr.Textbox(label="Question", max_lines=3)
+    context = gr.Textbox(label="Context", max_lines=10)
+    answer = gr.Textbox(label="Answer", max_lines=3)
+
+    send = gr.Button(value="Send")
+
+    send.click(
+        fn=question_answering,
+        inputs=[question, context],
+        outputs=[answer],
+        api_name="question_answering",
+    )
+
+
 def build_results_ui():
     task_id = gr.Textbox(label="Task ID", max_lines=3)
 
@@ -119,6 +136,8 @@ def build_gradio():
                 build_asr_ui()
             with gr.Tab("OCR"):
                 build_ocr_ui()
+            with gr.Tab("QA"):
+                build_qa_ui()
             with gr.Tab("Subtitles"):
                 build_subtitle_ui()
             with gr.Tab("Results"):
