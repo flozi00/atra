@@ -6,7 +6,7 @@ from transformers.pipelines.audio_utils import ffmpeg_read
 
 from aaas.statics import LANG_MAPPING, TO_VAD, TO_OCR
 from aaas.datastore import add_to_queue, get_transkript, set_transkript
-from aaas.silero_vad import silero_vad
+from aaas.silero_vad import get_speech_probs, silero_vad
 import numpy as np
 
 from aaas.text_utils import question_answering
@@ -182,6 +182,10 @@ def add_to_vad_queue(audio, main_lang, model_config):
         audio = ffmpeg_read(payload, sampling_rate=16000)
         os.remove(audio_path)
 
+    queue_string = add_vad_chunks(audio, main_lang, model_config)
+
+    return queue_string
+
     queue = add_to_queue(
         audio_batch=[audio.tobytes()],
         master="",
@@ -205,10 +209,16 @@ def add_vad_chunks(audio, main_lang, model_config):
     queue = []
     # audio = seperate_vocal(audio)
 
+    speech_probs = get_speech_probs(
+        audio,
+        model_vad,
+        sampling_rate=16000,
+    )
     while len(speech_timestamps) <= int((len(audio) / 16000) / 10):
         speech_timestamps = get_speech_timestamps(
             audio,
             model_vad,
+            speech_probs=speech_probs,
             threshold=0.6,
             sampling_rate=16000,
             min_silence_duration_ms=silence_duration,
@@ -242,20 +252,17 @@ def add_vad_chunks(audio, main_lang, model_config):
 
 def get_transcription(queue_string: str):
     full_transcription, chunks = "", []
-    queue_string = get_transkript(str(queue_string))
-    if queue_string is None:
-        return "", []
-    elif queue_string.metas == TO_OCR:
-        return queue_string.transcript, []
-    else:
-        queue_string = str(queue_string.transcript)
-        if len(queue_string) < 5 or "***" in queue_string:
-            return queue_string, []
+    queue = queue_string.split(",")
+    for x in range(len(queue)):
+        result = get_transkript(queue[x])
+        if result is None:
+            return "", []
+        elif result.metas == TO_OCR:
+            return result.transcript, []
+        else:
+            if len(queue_string) < 5 or "***" in queue_string:
+                return queue_string, []
 
-        queue = queue_string.split(",")
-
-        for x in range(len(queue)):
-            result = get_transkript(queue[x])
             chunks.append({"id": queue[x]})
             if result is not None:
                 try:
