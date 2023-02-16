@@ -11,6 +11,7 @@ def get_model(model_class, model_id):
     model = model_class.from_pretrained(
         model_id,
         cache_dir="./model_cache",
+        device_map="auto",
     )
     try:
         model = BetterTransformer.transform(model)

@@ -11,11 +11,8 @@ sqlmodel
 pymysql
 soundfile
 accelerate
-evaluate
 unidecode
 demucs>=4.0.0
 librosa 
 pillow
-yt-dlp
-youtube-transcript-api
 pydub
