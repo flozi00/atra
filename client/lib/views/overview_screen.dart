@@ -61,7 +61,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
     return Card(
         child: Column(children: [
       ListTile(
-        title: Text(hash),
+        title: Text(hash.substring(0, 20)),
         subtitle: Text(recognizedText.length > 250
             ? recognizedText.substring(0, 250)
             : recognizedText),
@@ -96,7 +96,10 @@ class _OverviewScreenState extends State<OverviewScreen> {
             2. The text will be displayed in the dialog box. The text is taken from the variable value.
             3. The variable value is a string that contains the transcription of a speech. */
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
+              await get_transcription(hash).then((values) {
+                recognizedText = values[0];
+              });
               if (question.endsWith("?")) {
                 print("do qa");
                 question_answering(question, recognizedText).then((result) {
