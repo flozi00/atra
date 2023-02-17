@@ -8,16 +8,6 @@ from transformers import (
 MODEL_MAPPING = {
     "asr": {
         "small": {
-            "german": {
-                "name": "flozi00/whisper-small-german",
-                "class": WhisperForConditionalGeneration,
-                "processor": WhisperProcessor,
-            },
-            "english": {
-                "name": "openai/whisper-small.en",
-                "class": WhisperForConditionalGeneration,
-                "processor": WhisperProcessor,
-            },
             "universal": {
                 "name": "openai/whisper-small",
                 "class": WhisperForConditionalGeneration,
@@ -25,11 +15,6 @@ MODEL_MAPPING = {
             },
         },
         "medium": {
-            "english": {
-                "name": "openai/whisper-medium.en",
-                "class": WhisperForConditionalGeneration,
-                "processor": WhisperProcessor,
-            },
             "universal": {
                 "name": "openai/whisper-medium",
                 "class": WhisperForConditionalGeneration,
@@ -37,6 +22,7 @@ MODEL_MAPPING = {
             },
         },
         "large": {
+            "german": {"adapter_id": "flozi00/whisper-large-german"},
             "universal": {
                 "name": "openai/whisper-large-v2",
                 "class": WhisperForConditionalGeneration,

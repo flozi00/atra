@@ -7,6 +7,7 @@ sentencepiece
 torch>=1.13.0
 torchaudio
 https://github.com/huggingface/transformers/archive/refs/heads/main.zip
+https://github.com/huggingface/peft/archive/refs/heads/main.zip
 sqlmodel
 pymysql
 soundfile
@@ -16,3 +17,4 @@ demucs>=4.0.0
 librosa 
 pillow
 pydub
+peft

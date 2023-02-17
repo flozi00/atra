@@ -3,6 +3,7 @@ from transformers.pipelines import AutomaticSpeechRecognitionPipeline as pipelin
 from aaas.model_utils import get_model_and_processor
 from aaas.statics import LANG_MAPPING
 from aaas.utils import timeit
+import torch
 
 
 @timeit
@@ -16,6 +17,7 @@ def inference_asr(data, main_lang: str, model_config: str) -> list:
         ignore_warning=True,
         chunk_length_s=30,
         stride_length_s=[5, 0],
+        torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
     )
 
     transcription = transcriber(
