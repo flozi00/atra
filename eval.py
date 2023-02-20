@@ -8,9 +8,9 @@ predicted = []
 
 ds = (
     datasets.load_dataset(
-        "mozilla-foundation/common_voice_11_0",
+        "common_voice",
         "de",
-        split="validation",
+        split="test",
         streaming=True,
     )
     ._resolve_features()
