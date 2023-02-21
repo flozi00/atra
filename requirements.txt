@@ -18,3 +18,4 @@ librosa
 pillow
 pydub
 peft
+text2num

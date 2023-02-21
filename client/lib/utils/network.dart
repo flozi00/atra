@@ -13,8 +13,11 @@ final headers = {
   'Accept-Encoding': 'gzip',
 };
 
-//String baseURL = "https://asr.a-ware.io/gradio";
-String baseURL = "http://127.0.0.1:7860/gradio";
+String myurl = Uri.base.origin.toString();
+
+String baseURL = myurl.contains("localhost")
+    ? "http://127.0.0.1:7860/gradio"
+    : "$myurl/gradio";
 
 //The function sendtotask sends the audio file to the server and returns the hash string of the task.
 Future<String> SendToASR(
