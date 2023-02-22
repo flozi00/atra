@@ -3,12 +3,13 @@ from transformers.pipelines import AutomaticSpeechRecognitionPipeline as pipelin
 from aaas.model_utils import get_model_and_processor
 from aaas.statics import LANG_MAPPING
 from aaas.utils import timeit
-import torch
 from functools import cache
+import torch
 
 
 @cache
-def get_pipeline(model, processor):
+def get_pipeline(main_lang: str, model_config: str):
+    model, processor = get_model_and_processor(main_lang, "asr", model_config)
     transcriber = pipeline(
         model=model,
         tokenizer=processor.tokenizer,
@@ -23,9 +24,7 @@ def get_pipeline(model, processor):
 
 @timeit
 def inference_asr(data, main_lang: str, model_config: str) -> list:
-    model, processor = get_model_and_processor(main_lang, "asr", model_config)
-
-    transcriber = get_pipeline(model, processor)
+    transcriber = get_pipeline(main_lang, model_config)
 
     transcription = transcriber(
         data,
@@ -33,6 +32,8 @@ def inference_asr(data, main_lang: str, model_config: str) -> list:
             "task": "transcribe",
             "language": f"<|{LANG_MAPPING[main_lang]}|>",
             "use_cache": True,
+            "num_beams": 1,
+            "max_new_tokens": int((len(data) / 16000) * 10) + 10,
         },
     )["text"].strip()
 

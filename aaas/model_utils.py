@@ -4,26 +4,20 @@ from aaas.utils import timeit
 from aaas.statics import MODEL_MAPPING
 from transformers import AutoProcessor
 import torch
-from peft import PeftModel
+from peft import PeftModel, PeftConfig
 from functools import cache
 
 
-@cache
 @timeit
 def get_model(model_class, model_id):
     model = model_class.from_pretrained(
         model_id,
         cache_dir="./model_cache",
+        load_in_8bit=False,
         device_map="auto",
+        torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
     )
-    try:
-        model = BetterTransformer.transform(model)
-    except Exception as e:
-        print(e)
-    try:
-        model = torch.compile(model)
-    except Exception as e:
-        print(e)
+
     return model
 
 
@@ -36,9 +30,20 @@ def get_processor(processor_class, model_id):
 
 @cache
 @timeit
-def get_peft_model(model, peft_model_id):
-    model = PeftModel.from_pretrained(model, peft_model_id, device_map="auto")
-    return model
+def get_peft_model(peft_model_id, model_class):
+    peft_config = PeftConfig.from_pretrained(peft_model_id)
+    model = model_class.from_pretrained(
+        peft_config.base_model_name_or_path,
+        cache_dir="./model_cache",
+    )
+    model = PeftModel.from_pretrained(
+        model,
+        peft_model_id,
+    )
+    model = model.eval()
+    model.get_base_model().save_pretrained("temp_lora_model", cache_dir="./model_cache")
+    del model
+    return get_model(model_class, "temp_lora_model")
 
 
 @cache
@@ -46,14 +51,20 @@ def get_peft_model(model, peft_model_id):
 def get_model_and_processor(lang: str, task: str, config: str):
     # get model id
     model_id = MODEL_MAPPING[task][config].get(lang, {}).get("name", None)
-    # set universal model if no specific model is available
+    adapter_id = MODEL_MAPPING[task][config].get(lang, {}).get("adapter_id", None)
+
     if model_id is None:
         base_model_lang = "universal"
         model_id = MODEL_MAPPING[task][config][base_model_lang]["name"]
+    else:
+        base_model_lang = lang
 
-    # get model
     model_class = MODEL_MAPPING[task][config][base_model_lang].get("class", None)
-    model = get_model(model_class, model_id)
+
+    if adapter_id is not None:
+        model = get_peft_model(adapter_id, model_class)
+    else:
+        model = get_model(model_class, model_id)
 
     # get processor
     processor_class = MODEL_MAPPING[task][config][base_model_lang].get(
@@ -61,8 +72,14 @@ def get_model_and_processor(lang: str, task: str, config: str):
     )
     processor = get_processor(processor_class, model_id)
 
-    adapter_id = MODEL_MAPPING[task][config].get(lang, {}).get("adapter_id", None)
-    if adapter_id is not None:
-        model = get_peft_model(model, adapter_id)
+    try:
+        model = BetterTransformer.transform(model)
+    except Exception as e:
+        print(e)
+
+    try:
+        model = torch.compile(model)
+    except Exception as e:
+        print(e)
 
     return model, processor

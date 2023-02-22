@@ -8,3 +8,6 @@ data_cache/
 dummy.*
 dataset/*
 datasets/*
+temp_*
+*.csv
+huggingface
