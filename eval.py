@@ -46,7 +46,6 @@ for d in ds:
         dataset.append([base_str_orig, pred_str_orig])
 
         with open("dataset.csv", "w+") as f:
-
             # using csv.writer method from CSV package
             write = csv.writer(f)
 
