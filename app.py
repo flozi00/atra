@@ -20,6 +20,13 @@ import gradio as gr
 app = FastAPI()
 ui = build_gradio()
 
+app.mount("/gradio", gr.routes.App.create_app(ui))
+app.mount(
+    "/",
+    staticfiles.StaticFiles(directory="client/build/web", html=True),
+    name="static",
+)
+
 
 class BackgroundTasks(threading.Thread):
     def run(self, *args, **kwargs):
@@ -57,13 +64,6 @@ class BackgroundTasks(threading.Thread):
 if __name__ == "__main__":
     t = BackgroundTasks()
     t.start()
-
-    app.mount("/gradio", gr.routes.App.create_app(ui))
-    app.mount(
-        "/",
-        staticfiles.StaticFiles(directory="client/build/web", html=True),
-        name="static",
-    )
 
     uvicorn.run(
         app, host="0.0.0.0", port=int(os.getenv("PORT", 7860)), log_level="debug"

@@ -24,7 +24,7 @@ def get_pipeline(main_lang: str, model_config: str):
 
 
 @timeit
-def inference_asr(data, main_lang: str, model_config: str) -> list:
+def inference_asr(data, main_lang: str, model_config: str) -> str:
     transcriber = get_pipeline(main_lang, model_config)
 
     transcription = transcriber(
