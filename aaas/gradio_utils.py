@@ -198,6 +198,12 @@ def add_to_vad_queue(audio, main_lang, model_config):
 
 
 def add_vad_chunks(audio, main_lang, model_config):
+    def check_timestamp_length_limit(timestamps, limit):
+        for timestamp in timestamps:
+            if timestamp["start"] - timestamp["end"] > limit:
+                return True
+        return False
+
     queue_string = ""
     speech_timestamps = []
     silence_duration = 500
@@ -214,7 +220,9 @@ def add_vad_chunks(audio, main_lang, model_config):
         model_vad,
         sampling_rate=16000,
     )
-    while len(speech_timestamps) <= int((len(audio) / 16000) / 10):
+    while len(speech_timestamps) <= int(
+        (len(audio) / 16000) / 10
+    ) or check_timestamp_length_limit(speech_timestamps, 29):
         speech_timestamps = get_speech_timestamps(
             audio,
             model_vad,
