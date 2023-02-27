@@ -83,7 +83,6 @@ def get_tasks_queue():
                 select(QueueData)
                 .where(QueueData.transcript == TODO)
                 .where(QueueData.priority == priority)
-                .limit(3)
             )
             todos = session.exec(statement).all()
             return todos
@@ -95,9 +94,7 @@ def get_tasks_queue():
         if len(todos) != 0:
             sample = random.choice(todos)
         else:
-            statement = (
-                select(QueueData).where(QueueData.transcript == INPROGRESS).limit(3)
-            )
+            statement = select(QueueData).where(QueueData.transcript == INPROGRESS)
             todos = session.exec(statement).all()
             if len(todos) != 0:
                 sample = random.choice(todos)
