@@ -3,9 +3,12 @@ import soundfile as sf
 import torch
 from transformers.pipelines.audio_utils import ffmpeg_read
 
+from aaas.utils import timeit
+
 demucs_model = "htdemucs"
 
 
+@timeit
 def seperate_vocal(audio):
     os.makedirs("out", exist_ok=True)
     sf.write("dummy.wav", audio, samplerate=16000)
@@ -16,4 +19,3 @@ def seperate_vocal(audio):
         payload = f.read()
     audio = ffmpeg_read(payload, sampling_rate=16000)
     return audio
-
