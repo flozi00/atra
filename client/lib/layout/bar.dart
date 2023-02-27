@@ -25,7 +25,7 @@ Widget build_app_bar(
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
               SliverAppBar(
-                expandedHeight: 250.0,
+                expandedHeight: 150.0,
                 floating: false,
                 pinned: false,
                 stretch: false,
