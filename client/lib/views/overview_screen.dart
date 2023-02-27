@@ -155,7 +155,11 @@ class _OverviewScreenState extends State<OverviewScreen> {
           String firstElement = hash.split(",")[0];
           await get_transcription(firstElement).then((values) {
             cards.add(Transcription(hash: hash, transcription: values[0]));
-            woozy.addEntry(values[0], value: hash);
+
+            for (int i = 0; i < values[1].length; i++) {
+              woozy.addEntry(values[1][i]["text"], value: hash);
+            }
+            //woozy.addEntry(values[0], value: hash);
             setState(() {});
           });
         }
@@ -191,7 +195,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
             ),
           );
           woozy.search(word).forEach((element) {
-            if (element.score > 0.7) {
+            if (element.score > 0.8) {
               hashes.add(element.value);
             }
           });
