@@ -42,7 +42,6 @@ for d in ds:
     # print results
     print(wer(base, predicted) * 100, cer(base, predicted) * 100)
     if base_str != pred_str:
-        print(base_str, " --> ", pred_str)
         dataset.append([base_str_orig, pred_str_orig])
 
         with open("dataset.csv", "w+") as f:

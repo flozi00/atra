@@ -7,14 +7,19 @@ from sqlmodel import Field, Session, SQLModel, create_engine, select
 
 from aaas.statics import INPROGRESS, TODO
 from aaas.utils import timeit
+import fsspec
+import time
 
 db_backend = os.getenv("DBBACKEND", "sqlite:///database.db")
+ftp_backend = os.getenv("FTPBACKEND")
+ftp_user = ftp_backend.split("@")[0]
+ftp_pass = ftp_backend.split("@")[1]
+ftp_server = ftp_backend.split("@")[2]
 
 
 class QueueData(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     metas: str
-    data: bytes = Field(max_length=(2**32) - 1)
     transcript: str = Field(max_length=4096)
     langs: str
     model_config: str
@@ -48,12 +53,12 @@ def add_to_queue(audio_batch, master, main_lang, model_config, times=None):
             if entry is None:
                 entry = QueueData(
                     metas=timesstamps,
-                    data=audio_data,
                     transcript=TODO,
                     langs=main_lang,
                     model_config=model_config,
                     hash=hs,
                 )
+                set_data_to_hash(entry, audio_data)
                 session.add(entry)
                 session.commit()
 
@@ -121,3 +126,44 @@ def set_in_progress(hs):
             transkript.transcript = INPROGRESS
             session.commit()
             session.refresh(transkript)
+
+
+@timeit
+def get_data_from_hash(hash: str):
+    if ftp_backend is not None:
+        fs = fsspec.filesystem(
+            "ftp",
+            host=ftp_server,
+            username=ftp_user,
+            password=ftp_pass,
+            port=21,
+            block_size=2**20,
+        )
+    else:
+        fs = fsspec.filesystem("file")
+    with fs.open(f"data/{hash}", "rb") as f:
+        bytes_data = f.read()
+
+    return bytes_data
+
+
+@timeit
+def set_data_to_hash(data: QueueData, bytes_data: bytes):
+    if ftp_backend is not None:
+        fs = fsspec.filesystem(
+            "ftp",
+            host=ftp_server,
+            username=ftp_user,
+            password=ftp_pass,
+            port=21,
+            block_size=2**20,
+        )
+    else:
+        fs = fsspec.filesystem("file")
+    try:
+        with fs.open(f"data/{data.hash}", "wb") as f:
+            f.write(bytes_data)
+    except Exception as e:
+        print(e)
+        time.sleep(1)
+        set_data_to_hash(data, bytes_data)

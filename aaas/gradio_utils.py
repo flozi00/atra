@@ -5,7 +5,12 @@ import gradio as gr
 from transformers.pipelines.audio_utils import ffmpeg_read
 
 from aaas.statics import LANG_MAPPING, TO_VAD, TO_OCR
-from aaas.datastore import add_to_queue, get_transkript, set_transkript
+from aaas.datastore import (
+    add_to_queue,
+    get_data_from_hash,
+    get_transkript,
+    set_transkript,
+)
 from aaas.silero_vad import get_speech_probs, silero_vad
 import numpy as np
 
@@ -291,7 +296,8 @@ def get_transcription(queue_string: str):
 
 def get_audio(task_id):
     result = get_transkript(task_id)
-    return (16000, np.frombuffer(result.data, dtype=np.float32)), result.transcript
+    bytes_data = get_data_from_hash(result.hash)
+    return (16000, np.frombuffer(bytes_data, dtype=np.float32)), result.transcript
 
 
 def get_sub_video(task_id, video_file):

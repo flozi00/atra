@@ -19,3 +19,4 @@ pillow
 pydub
 peft
 text2num
+fsspec
