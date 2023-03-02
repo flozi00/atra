@@ -61,10 +61,10 @@ class BackgroundTasks(threading.Thread):
                         )
                     set_transkript(task.hash, result)
                 else:
-                    time.sleep(3)
+                    time.sleep(10)
             except Exception as e:
                 print(e)
-                time.sleep(3)
+                time.sleep(10)
 
 
 if __name__ == "__main__":

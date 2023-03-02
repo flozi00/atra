@@ -5,10 +5,11 @@ from typing import Optional
 
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 
-from aaas.statics import INPROGRESS, TODO
+from aaas.statics import CACHE_SIZE, INPROGRESS, TODO
 from aaas.utils import timeit
 import fsspec
 import time
+from functools import lru_cache
 
 db_backend = os.getenv("DBBACKEND", "sqlite:///database.db")
 ftp_backend = os.getenv("FTPBACKEND")
@@ -66,6 +67,7 @@ def add_to_queue(audio_batch, master, main_lang, model_config, times=None):
 
 
 @timeit
+@lru_cache(maxsize=CACHE_SIZE)
 def get_transkript(hs):
     with Session(engine) as session:
         statement = select(QueueData).where(QueueData.hash == hs)
@@ -126,6 +128,7 @@ def set_in_progress(hs):
 
 
 @timeit
+@lru_cache(maxsize=CACHE_SIZE)
 def get_data_from_hash(hash: str):
     if ftp_backend is not None:
         fs = fsspec.filesystem(

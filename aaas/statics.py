@@ -167,3 +167,5 @@ INPROGRESS = "***PROGRESS***"
 TO_VAD = "***DETECT VOICE***"
 TO_OCR = "***TO OCR***"
 TO_ASR = "***TO ASR***"
+
+CACHE_SIZE = 128
