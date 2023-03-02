@@ -78,7 +78,8 @@ class _ASRUploadState extends State<ASRUpload> {
             // 1. Add the FormBuilderFilePicker widget to the form
             FormBuilderFilePicker(
               name: 'media',
-              maxFiles: 1,
+              maxFiles: 10,
+              allowMultiple: true,
               previewImages: false,
               decoration: const InputDecoration(
                 labelText: 'Audio / Video',
@@ -113,36 +114,40 @@ class _ASRUploadState extends State<ASRUpload> {
                 if (uploadFormKey.currentState!.validate()) {
                   uploadFormKey.currentState?.save();
                   context.loaderOverlay.show();
-                  var audio =
-                      uploadFormKey.currentState!.value["media"][0].bytes;
-                  if (audio == null) {
-                    await File(
-                            uploadFormKey.currentState!.value["media"][0].path)
-                        .readAsBytes()
-                        .then((value) => audio = value);
-                  }
-                  String audioName =
-                      uploadFormKey.currentState!.value["media"][0].name;
-                  var base64Audio = uint8ListTob64(audio);
-
-                  SendToASR(
-                          base64Audio,
-                          audioName,
-                          uploadFormKey.currentState!.value["srclang"]
-                              .toString()
-                              .toLowerCase(),
-                          "large")
-                      .then((String newhash) async {
-                    SharedPreferences prefs =
-                        await SharedPreferences.getInstance();
-                    List<String> hashes = prefs.getStringList("asr") ?? [];
-                    if (hashes.contains(newhash) == false) {
-                      hashes.add(newhash);
+                  for (int i = 0;
+                      i < uploadFormKey.currentState!.value["media"].length;
+                      i++) {
+                    var audio =
+                        uploadFormKey.currentState!.value["media"][i].bytes;
+                    if (audio == null) {
+                      await File(uploadFormKey
+                              .currentState!.value["media"][i].path)
+                          .readAsBytes()
+                          .then((value) => audio = value);
                     }
-                    prefs.setStringList("asr", hashes);
-                    context.loaderOverlay.hide();
-                    Navigator.pushReplacementNamed(context, "/");
-                  });
+                    String audioName =
+                        uploadFormKey.currentState!.value["media"][i].name;
+                    var base64Audio = uint8ListTob64(audio);
+
+                    await SendToASR(
+                            base64Audio,
+                            audioName,
+                            uploadFormKey.currentState!.value["srclang"]
+                                .toString()
+                                .toLowerCase(),
+                            "large")
+                        .then((String newhash) async {
+                      SharedPreferences prefs =
+                          await SharedPreferences.getInstance();
+                      List<String> hashes = prefs.getStringList("asr") ?? [];
+                      if (hashes.contains(newhash) == false) {
+                        hashes.add(newhash);
+                      }
+                      prefs.setStringList("asr", hashes);
+                    });
+                  }
+                  context.loaderOverlay.hide();
+                  Navigator.pushReplacementNamed(context, "/");
                 }
               },
               child: const Text('Transcribe Audio'),
