@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 Widget build_app_bar(
     BuildContext context, List<Tab> tabs, List<Widget> children) {
@@ -36,7 +37,13 @@ Widget build_app_bar(
                       "https://images.pexels.com/photos/1044988/pexels-photo-1044988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
                       fit: BoxFit.fitWidth,
                     )),
-                actions: const [],
+                actions: [
+                  IconButton(
+                      onPressed: () {
+                        launchUrl(Uri.parse("https://a-ware.io/atra"));
+                      },
+                      icon: const Icon(Icons.help_outline))
+                ],
               ),
               SliverPersistentHeader(
                 delegate: _SliverAppBarDelegate(

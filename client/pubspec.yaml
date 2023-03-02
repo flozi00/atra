@@ -26,6 +26,7 @@ dependencies:
   searchable_listview: ^2.2.1
   shared_preferences: ^2.0.15
   timeline_tile: ^2.0.0
+  url_launcher: ^6.1.10
   woozy_search: ^2.0.3
 
 
