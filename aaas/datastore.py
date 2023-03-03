@@ -67,7 +67,6 @@ def add_to_queue(audio_batch, master, main_lang, model_config, times=None):
 
 
 @timeit
-@lru_cache(maxsize=CACHE_SIZE)
 def get_transkript(hs):
     with Session(engine) as session:
         statement = select(QueueData).where(QueueData.hash == hs)
@@ -77,7 +76,6 @@ def get_transkript(hs):
 
 
 @timeit
-@lru_cache(maxsize=CACHE_SIZE)
 def get_transkript_batch(hs):
     with Session(engine) as session:
         statement = select(QueueData).where(QueueData.hash.in_(hs.split(",")))

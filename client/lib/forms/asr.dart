@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 
@@ -10,6 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../utils/data.dart';
 import '../utils/network.dart';
+import 'package:microphone/microphone.dart';
 
 class ASRUpload extends StatefulWidget {
   const ASRUpload({Key? key}) : super(key: key);
@@ -20,6 +22,9 @@ class ASRUpload extends StatefulWidget {
 
 class _ASRUploadState extends State<ASRUpload> {
   late GlobalKey<FormBuilderState> uploadFormKey;
+  late MicrophoneRecorder microphoneRecorder;
+  Uint8List audioBytes = Uint8List(0);
+  bool isRecording = false;
   List<String> languages = [
     'English',
     'French',
@@ -32,8 +37,23 @@ class _ASRUploadState extends State<ASRUpload> {
   @override
   void initState() {
     super.initState();
+    microphoneRecorder = MicrophoneRecorder()..init();
 
     uploadFormKey = GlobalKey<FormBuilderState>();
+  }
+
+  Future<void> uploadASR(Uint8List audio, String lang, String audioName) async {
+    var base64Audio = uint8ListTob64(audio);
+
+    await SendToASR(base64Audio, audioName, lang, "large")
+        .then((String newhash) async {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      List<String> hashes = prefs.getStringList("asr") ?? [];
+      if (hashes.contains(newhash) == false) {
+        hashes.add(newhash);
+      }
+      prefs.setStringList("asr", hashes);
+    });
   }
 
   @override
@@ -103,6 +123,30 @@ class _ASRUploadState extends State<ASRUpload> {
             const SizedBox(
               height: 5,
             ),
+            IconButton(
+                onPressed: () async {
+                  if (isRecording) {
+                    isRecording = false;
+                    await microphoneRecorder.stop();
+                    await microphoneRecorder.toBytes().then((value) {
+                      setState(() {
+                        audioBytes = value;
+                      });
+                    });
+                    microphoneRecorder.dispose();
+                    microphoneRecorder = MicrophoneRecorder()..init();
+                  } else {
+                    isRecording = true;
+                    await microphoneRecorder.start();
+                    setState(() {});
+                  }
+                },
+                icon: isRecording
+                    ? const Icon(Icons.mic_off)
+                    : const Icon(Icons.mic)),
+            const SizedBox(
+              height: 10,
+            ),
             ElevatedButton(
               /* The code does the following:
                 1. Makes a call to a function that will upload the audio file to the server.
@@ -127,24 +171,17 @@ class _ASRUploadState extends State<ASRUpload> {
                     }
                     String audioName =
                         uploadFormKey.currentState!.value["media"][i].name;
-                    var base64Audio = uint8ListTob64(audio);
-
-                    await SendToASR(
-                            base64Audio,
-                            audioName,
-                            uploadFormKey.currentState!.value["srclang"]
-                                .toString()
-                                .toLowerCase(),
-                            "large")
-                        .then((String newhash) async {
-                      SharedPreferences prefs =
-                          await SharedPreferences.getInstance();
-                      List<String> hashes = prefs.getStringList("asr") ?? [];
-                      if (hashes.contains(newhash) == false) {
-                        hashes.add(newhash);
-                      }
-                      prefs.setStringList("asr", hashes);
-                    });
+                    String lang = uploadFormKey.currentState!.value["srclang"]
+                        .toString()
+                        .toLowerCase();
+                    await uploadASR(audio, lang, audioName);
+                  }
+                  if (audioBytes.length > 10) {
+                    String audioName = "microphone";
+                    String lang = uploadFormKey.currentState!.value["srclang"]
+                        .toString()
+                        .toLowerCase();
+                    await uploadASR(audioBytes, lang, audioName);
                   }
                   context.loaderOverlay.hide();
                   Navigator.pushReplacementNamed(context, "/");

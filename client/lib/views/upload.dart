@@ -17,7 +17,7 @@ class _UploadState extends State<Upload> {
         Card(
           child: Column(children: [
             const ListTile(
-              title: Text("Speech"),
+              title: Text("Speech to text"),
               subtitle: Text(
                   "Upload a media file containing speech you want to transcribe."),
             ),
@@ -43,7 +43,7 @@ class _UploadState extends State<Upload> {
         Card(
           child: Column(children: [
             const ListTile(
-              title: Text("Text"),
+              title: Text("Text Recognition"),
               subtitle: Text(
                   "Upload a media file containing text you want to recognize."),
             ),
