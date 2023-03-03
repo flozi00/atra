@@ -8,51 +8,50 @@ import '../utils/network.dart';
 import 'package:just_audio/just_audio.dart';
 
 Future<_TimelineActivity> build_timeline(String args, BuildContext context,
-    Map<String, HighlightedWord> words) async {
+    Map<String, HighlightedWord> words, List<dynamic> values) async {
   List<Step> details = [];
   _TimelineActivity widget = const _TimelineActivity(
     steps: [],
     words: {},
   );
-  await get_transcription(args).then((values) {
-    for (int count = 0; count < values[1].length; count++) {
-      var value = values[1][count];
-      int startTime = value['start_timestamp'];
-      int stopTime = value["stop_timestamp"];
-      Step tile = Step(
-        type: Type.checkpoint,
-        hour: formatedTime(timeInSecond: startTime),
-        message: "",
-        duration: 0,
-        color: Theme.of(context).colorScheme.onPrimary,
-        icon: Icons.mic_none,
-        hash: value["id"],
-      );
-      Step bind = Step(
+  for (int count = 0; count < values.length; count++) {
+    var value = values[count];
+    int startTime = value['start_timestamp'];
+    int stopTime = value["stop_timestamp"];
+    Step tile = Step(
+      type: Type.checkpoint,
+      hour: formatedTime(timeInSecond: startTime),
+      message: value["text"],
+      duration: 0,
+      color: Theme.of(context).colorScheme.onPrimary,
+      icon: Icons.mic_none,
+      hash: value["id"],
+    );
+    Step bind = Step(
+      type: Type.line,
+      hour: "",
+      message: "",
+      duration: stopTime - startTime,
+      color: Theme.of(context).colorScheme.onSecondary,
+      icon: Icons.mic_none,
+      hash: value["id"],
+    );
+    details.add(tile);
+    details.add(bind);
+    if (count + 1 < values.length) {
+      details.add(Step(
         type: Type.line,
         hour: "",
-        message: value["text"],
-        duration: stopTime - startTime,
+        message: "",
+        duration: values[count + 1]['start_timestamp'] - stopTime,
         color: Theme.of(context).colorScheme.onSecondary,
         icon: Icons.mic_none,
         hash: value["id"],
-      );
-      details.add(tile);
-      details.add(bind);
-      if (count + 1 < values[1].length) {
-        details.add(Step(
-          type: Type.line,
-          hour: "",
-          message: "",
-          duration: values[1][count + 1]['start_timestamp'] - stopTime,
-          color: Theme.of(context).colorScheme.onSecondary,
-          icon: Icons.mic_none,
-          hash: value["id"],
-        ));
-      }
+      ));
     }
-    widget = _TimelineActivity(steps: details, words: words);
-  });
+  }
+  widget = _TimelineActivity(steps: details, words: words);
+
   return widget;
 }
 
@@ -148,7 +147,7 @@ class _RightChildTimeline extends StatelessWidget {
         children: <Widget>[
           Padding(
               padding:
-                  const EdgeInsets.only(left: 20, top: 0, bottom: 8, right: 8),
+                  const EdgeInsets.only(left: 20, top: 8, bottom: 8, right: 8),
               child: InkWell(
                 child: TextHighlight(
                   text: step.message,

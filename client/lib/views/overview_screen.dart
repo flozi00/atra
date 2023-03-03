@@ -57,7 +57,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
         });
   }
 
-  Widget cardItem(String recognizedText, String hash) {
+  Widget cardItem(String recognizedText, String hash, List<dynamic> listWords) {
     return Card(
         child: Column(children: [
       ListTile(
@@ -77,14 +77,18 @@ class _OverviewScreenState extends State<OverviewScreen> {
           activeMode == "asr"
               ? ElevatedButton(
                   onPressed: () {
-                    build_timeline(hash, context, words).then((value) {
+                    build_timeline(hash, context, words, listWords)
+                        .then((value) {
                       showDialog(
                           context: context,
                           builder: (BuildContext context) {
                             return Dialog(
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20.0)),
-                                child: value);
+                                child: Padding(
+                                    padding: const EdgeInsets.fromLTRB(
+                                        15, 35, 15, 35),
+                                    child: value));
                           });
                     });
                   },
@@ -97,9 +101,6 @@ class _OverviewScreenState extends State<OverviewScreen> {
             3. The variable value is a string that contains the transcription of a speech. */
           ElevatedButton(
             onPressed: () async {
-              await get_transcription(hash).then((values) {
-                recognizedText = values[0];
-              });
               if (question.endsWith("?")) {
                 print("do qa");
                 question_answering(question, recognizedText).then((result) {
@@ -152,9 +153,9 @@ class _OverviewScreenState extends State<OverviewScreen> {
         activeMode = mode;
         List<String> hashes = prefs.getStringList(mode) ?? [];
         for (String hash in hashes) {
-          String firstElement = hash.split(",")[0];
-          await get_transcription(firstElement).then((values) {
-            cards.add(Transcription(hash: hash, transcription: values[0]));
+          await get_transcription(hash).then((values) {
+            cards.add(Transcription(
+                hash: hash, transcription: values[0], words: values[1]));
 
             for (int i = 0; i < values[1].length; i++) {
               woozy.addEntry(values[1][i]["text"], value: hash);
@@ -172,7 +173,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
   Widget build(BuildContext context) {
     return SearchableList<Transcription>(
       builder: (Transcription trscp) =>
-          cardItem(trscp.transcription, trscp.hash),
+          cardItem(trscp.transcription, trscp.hash, trscp.words),
       initialList: cards,
       asyncListCallback: () async {
         await build_cards_list();
@@ -223,9 +224,11 @@ class _OverviewScreenState extends State<OverviewScreen> {
 class Transcription {
   String hash;
   String transcription;
+  List<dynamic> words;
 
   Transcription({
     required this.hash,
     required this.transcription,
+    required this.words,
   });
 }
