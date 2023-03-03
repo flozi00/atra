@@ -9,6 +9,7 @@ from aaas.datastore import (
     add_to_queue,
     get_data_from_hash,
     get_transkript,
+    get_transkript_batch,
     set_transkript,
 )
 from aaas.silero_vad import get_speech_probs, silero_vad
@@ -266,8 +267,9 @@ def add_vad_chunks(audio, main_lang, model_config):
 def get_transcription(queue_string: str):
     full_transcription, chunks = "", []
     queue = queue_string.split(",")
-    for x in range(len(queue)):
-        result = get_transkript(queue[x])
+    results = get_transkript_batch(queue_string)
+    for x in range(len(results)):
+        result = results[x]
         if result is None:
             return "", []
         elif result.metas == TO_OCR:

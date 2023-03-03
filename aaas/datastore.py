@@ -77,6 +77,16 @@ def get_transkript(hs):
 
 
 @timeit
+@lru_cache(maxsize=CACHE_SIZE)
+def get_transkript_batch(hs):
+    with Session(engine) as session:
+        statement = select(QueueData).where(QueueData.hash.in_(hs.split(",")))
+        transkript = session.exec(statement).all()
+
+    return transkript
+
+
+@timeit
 def get_tasks_queue():
     with Session(engine) as session:
 
