@@ -99,21 +99,24 @@ class _OverviewScreenState extends State<OverviewScreen> {
             1. Creates a dialog box with a Scrollview that displays a text.
             2. The text will be displayed in the dialog box. The text is taken from the variable value.
             3. The variable value is a string that contains the transcription of a speech. */
-          ElevatedButton(
-            onPressed: () async {
-              if (question.endsWith("?")) {
-                print("do qa");
-                question_answering(question, recognizedText).then((result) {
-                  answer = result;
-                  textDialog(context, recognizedText);
-                });
-              } else {
-                answer = "";
-                textDialog(context, recognizedText);
-              }
-            },
-            child: const Text('Transkription'),
-          ),
+          activeMode != "asr"
+              ? ElevatedButton(
+                  onPressed: () async {
+                    if (question.endsWith("?")) {
+                      print("do qa");
+                      question_answering(question, recognizedText)
+                          .then((result) {
+                        answer = result;
+                        textDialog(context, recognizedText);
+                      });
+                    } else {
+                      answer = "";
+                      textDialog(context, recognizedText);
+                    }
+                  },
+                  child: const Text('Transkription'),
+                )
+              : const SizedBox(),
           /* The code does the following:
           1. Creates an ElevatedButton that, when pressed, generates a Dialog that contains a file picker to select a video file
           2. Creates an ElevatedButton inside the dialog that, when pressed, uploads the video file to the server 
