@@ -25,6 +25,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
   Woozy<dynamic> woozy = Woozy();
   String question = "";
   String answer = "";
+  Map<String, String> most_relevant = {};
 
   @override
   void initState() {
@@ -45,7 +46,13 @@ class _OverviewScreenState extends State<OverviewScreen> {
                   child: SingleChildScrollView(
                       child: Column(children: [
                     // if answer length > 2, display Text
-                    if (answer.length > 2) Text("$question --> $answer"),
+                    if (answer.length > 2)
+                      Card(
+                        child: ListTile(
+                          title: Text(question),
+                          subtitle: Text(answer),
+                        ),
+                      ),
                     TextHighlight(
                       text: recognizedText,
                       words: words,
@@ -99,14 +106,23 @@ class _OverviewScreenState extends State<OverviewScreen> {
             1. Creates a dialog box with a Scrollview that displays a text.
             2. The text will be displayed in the dialog box. The text is taken from the variable value.
             3. The variable value is a string that contains the transcription of a speech. */
-          activeMode != "asr"
+          activeMode != "asrr"
               ? ElevatedButton(
-                  onPressed: () async {
+                  onPressed: () {
+                    question = question.trim();
+                    print(question);
                     if (question.endsWith("?")) {
                       print("do qa");
-                      question_answering(question, recognizedText)
+                      question_answering(question, most_relevant[hash]!)
                           .then((result) {
                         answer = result;
+                        print(answer);
+                        for (String word in answer.split(" ")) {
+                          words[word] = HighlightedWord(
+                              textStyle: TextStyle(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  fontWeight: FontWeight.bold));
+                        }
                         textDialog(context, recognizedText);
                       });
                     } else {
@@ -190,7 +206,9 @@ class _OverviewScreenState extends State<OverviewScreen> {
       asyncListFilter: (q, list) {
         question = q;
         words = {};
+        most_relevant = {};
         List<String> hashes = [];
+        if (q.length < 5) return list;
         for (String word in q.split(" ")) {
           words[word] = HighlightedWord(
             textStyle: TextStyle(
@@ -198,17 +216,17 @@ class _OverviewScreenState extends State<OverviewScreen> {
               fontWeight: FontWeight.bold,
             ),
           );
-          woozy.search(word).forEach((element) {
-            if (element.score > 0.8) {
-              hashes.add(element.value);
-            }
-          });
         }
+        woozy.search(q).forEach((element) {
+          hashes.add(element.value);
+          if (most_relevant[element.value] == null) {
+            most_relevant[element.value] = "";
+          }
+          most_relevant[element.value] =
+              "${most_relevant[element.value]}\n${element.text}";
+        });
         var result =
             list.where((element) => hashes.contains(element.hash)).toList();
-        if (result.isEmpty) {
-          return list;
-        }
         return result;
       },
       inputDecoration: InputDecoration(

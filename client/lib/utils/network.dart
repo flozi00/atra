@@ -164,24 +164,23 @@ Future<bool> update_transcript(String hash, String text) async {
 }
 
 Future<String> question_answering(String question, String context) async {
-  var params = {
-    "data": [
-      question,
-      context,
-    ]
+  var headers = {
+    //'Authorization': 'Bearer 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',
+    'Content-Type': 'application/json',
   };
 
-  // Send the request to the server.
-  var res = await http.post(Uri.parse('$baseURL/run/question_answering'),
-      headers: headers, body: jsonEncode(params));
+  var data = jsonEncode({"inputs": "$context \n $question"});
 
-  // Check that the request was successful.
+  var url =
+      Uri.parse('https://api-inference.huggingface.co/models/google/flan-ul2');
+  var res = await http.post(url, headers: headers, body: data);
   if (res.statusCode != 200) {
+    print(res.body);
     throw Exception('http.post error: statusCode= ${res.statusCode}');
   }
 
   // Get the name of the file that the server sent back.
-  String answer = jsonDecode(utf8.decode(res.bodyBytes))["data"][0];
+  String answer = jsonDecode(utf8.decode(res.bodyBytes))[0]["generated_text"];
 
   // Return the byte array.
   return answer;
