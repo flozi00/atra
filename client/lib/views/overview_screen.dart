@@ -83,7 +83,21 @@ class _OverviewScreenState extends State<OverviewScreen> {
           This is the code for the build_timeline function: */
           activeMode == "asr"
               ? ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
+                    if (question.endsWith("?")) {
+                      await question_answering(question, most_relevant[hash]!)
+                          .then((result) {
+                        answer = result;
+                        for (String word in answer.split(" ")) {
+                          words[word] = HighlightedWord(
+                              textStyle: TextStyle(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onPrimaryContainer,
+                          ));
+                        }
+                      });
+                    }
                     build_timeline(hash, context, words, listWords)
                         .then((value) {
                       showDialog(
@@ -94,8 +108,22 @@ class _OverviewScreenState extends State<OverviewScreen> {
                                     borderRadius: BorderRadius.circular(20.0)),
                                 child: Padding(
                                     padding: const EdgeInsets.fromLTRB(
-                                        15, 35, 15, 35),
-                                    child: value));
+                                        15, 0, 15, 10),
+                                    child: Column(children: [
+                                      // if answer length > 2, display Text
+                                      if (answer.length > 2)
+                                        Center(
+                                            child: Card(
+                                          child: ListTile(
+                                            title: Text(question),
+                                            subtitle: Text(answer),
+                                          ),
+                                        )),
+                                      const SizedBox(
+                                        height: 35,
+                                      ),
+                                      value
+                                    ])));
                           });
                     });
                   },
@@ -106,22 +134,19 @@ class _OverviewScreenState extends State<OverviewScreen> {
             1. Creates a dialog box with a Scrollview that displays a text.
             2. The text will be displayed in the dialog box. The text is taken from the variable value.
             3. The variable value is a string that contains the transcription of a speech. */
-          activeMode != "asrr"
+          activeMode != "asr"
               ? ElevatedButton(
                   onPressed: () {
-                    question = question.trim();
-                    print(question);
                     if (question.endsWith("?")) {
-                      print("do qa");
                       question_answering(question, most_relevant[hash]!)
                           .then((result) {
                         answer = result;
-                        print(answer);
                         for (String word in answer.split(" ")) {
                           words[word] = HighlightedWord(
                               textStyle: TextStyle(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  fontWeight: FontWeight.bold));
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onPrimaryContainer));
                         }
                         textDialog(context, recognizedText);
                       });
@@ -213,7 +238,6 @@ class _OverviewScreenState extends State<OverviewScreen> {
           words[word] = HighlightedWord(
             textStyle: TextStyle(
               color: Theme.of(context).colorScheme.onPrimaryContainer,
-              fontWeight: FontWeight.bold,
             ),
           );
         }

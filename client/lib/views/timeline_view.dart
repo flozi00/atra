@@ -7,7 +7,7 @@ import '../utils/data.dart';
 import '../utils/network.dart';
 import 'package:just_audio/just_audio.dart';
 
-Future<_TimelineActivity> build_timeline(String args, BuildContext context,
+Future<Widget> build_timeline(String args, BuildContext context,
     Map<String, HighlightedWord> words, List<dynamic> values) async {
   List<Step> details = [];
   _TimelineActivity widget = const _TimelineActivity(
@@ -52,7 +52,8 @@ Future<_TimelineActivity> build_timeline(String args, BuildContext context,
   }
   widget = _TimelineActivity(steps: details, words: words);
 
-  return widget;
+  return SizedBox(
+      height: MediaQuery.of(context).size.height - 250, child: widget);
 }
 
 class _TimelineActivity extends StatelessWidget {
@@ -65,6 +66,7 @@ class _TimelineActivity extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
+      shrinkWrap: true,
       physics: const AlwaysScrollableScrollPhysics(),
       itemCount: steps.length,
       itemBuilder: (BuildContext context, int index) {
