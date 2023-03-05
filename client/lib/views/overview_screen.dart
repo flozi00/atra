@@ -204,7 +204,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
         return cards;
       },
       asyncListFilter: (q, list) {
-        question = q;
+        question = q.toLowerCase().trim();
         words = {};
         most_relevant = {};
         List<String> hashes = [];
