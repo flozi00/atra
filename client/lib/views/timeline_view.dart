@@ -165,32 +165,52 @@ class _RightChildTimeline extends StatelessWidget {
                         TextEditingController controller =
                             TextEditingController(text: step.message);
                         return Dialog(
-                            child: Column(
-                          children: [
-                            const Text("Edit Transcript"),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            TextFormField(
-                              controller: controller,
-                              maxLines: 20,
-                              minLines: 3,
-                              decoration: const InputDecoration(
-                                  border: OutlineInputBorder()),
-                            ),
-                            ElevatedButton(
-                                onPressed: () async {
-                                  await update_transcript(
-                                      step.hash, controller.text);
-                                  step.message = controller.text;
-                                  Navigator.pop(context);
-                                },
-                                child: const Text("Save"))
-                          ],
-                        ));
+                            child: Padding(
+                                padding: const EdgeInsets.all(25.0),
+                                child: Column(
+                                  children: [
+                                    const Text("Edit Transcript"),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    TextFormField(
+                                      controller: controller,
+                                      maxLines: 20,
+                                      minLines: 3,
+                                      decoration: const InputDecoration(
+                                          border: OutlineInputBorder()),
+                                    ),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    ElevatedButton(
+                                        onPressed: () async {
+                                          await update_transcript(
+                                              step.hash, controller.text);
+                                          step.message = controller.text;
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Text("Save"))
+                                  ],
+                                )));
                       });
                 },
               )),
+          if (step.isCheckpoint)
+            Row(
+              children: [
+                IconButton(
+                    onPressed: () {
+                      do_voting(step.hash, "good");
+                    },
+                    icon: const Icon(Icons.arrow_circle_up_sharp)),
+                IconButton(
+                    onPressed: () {
+                      do_voting(step.hash, "bad");
+                    },
+                    icon: const Icon(Icons.arrow_circle_down_sharp))
+              ],
+            )
         ],
       ),
     );

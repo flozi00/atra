@@ -26,6 +26,7 @@ class QueueData(SQLModel, table=True):
     model_config: str
     hash: str
     priority: int = 0
+    votings: int = 0
 
 
 engine = create_engine(db_backend, pool_recycle=3600, pool_pre_ping=True)
@@ -120,6 +121,18 @@ def set_transkript(hs, transcription):
         transkript = session.exec(statement).first()
         if transkript is not None:
             transkript.transcript = transcription
+            transkript.votings = 0
+            session.commit()
+            session.refresh(transkript)
+
+
+def set_voting(hs, vote):
+    vote = 1 if vote == "good" else -1
+    with Session(engine) as session:
+        statement = select(QueueData).where(QueueData.hash == hs)
+        transkript = session.exec(statement).first()
+        if transkript is not None:
+            transkript.votings = transkript.votings + vote
             session.commit()
             session.refresh(transkript)
 

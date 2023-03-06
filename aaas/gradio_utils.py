@@ -11,6 +11,7 @@ from aaas.datastore import (
     get_transkript,
     get_transkript_batch,
     set_transkript,
+    set_voting,
 )
 from aaas.silero_vad import get_speech_probs, silero_vad
 import numpy as np
@@ -101,21 +102,6 @@ def build_ocr_ui():
     )
 
 
-def build_qa_ui():
-    question = gr.Textbox(label="Question", max_lines=3)
-    context = gr.Textbox(label="Context", max_lines=10)
-    answer = gr.Textbox(label="Answer", max_lines=3)
-
-    send = gr.Button(value="Send")
-
-    send.click(
-        fn=question_answering,
-        inputs=[question, context],
-        outputs=[answer],
-        api_name="question_answering",
-    )
-
-
 def build_results_ui():
     task_id = gr.Textbox(label="Task ID", max_lines=3)
 
@@ -133,6 +119,20 @@ def build_results_ui():
     )
 
 
+def build_voting_ui():
+    task_id = gr.Textbox(label="Task ID", max_lines=3)
+
+    with gr.Row():
+        rating = gr.Radio(choices=["good", "bad"], value="good")
+
+    task_id.change(
+        fn=set_voting,
+        inputs=[task_id, rating],
+        outputs=[],
+        api_name="vote_result",
+    )
+
+
 def build_gradio():
     ui = gr.Blocks()
 
@@ -142,14 +142,14 @@ def build_gradio():
                 build_asr_ui()
             with gr.Tab("OCR"):
                 build_ocr_ui()
-            with gr.Tab("QA"):
-                build_qa_ui()
             with gr.Tab("Subtitles"):
                 build_subtitle_ui()
             with gr.Tab("Results"):
                 build_results_ui()
             with gr.Tab("Edit"):
                 build_edit_ui()
+            with gr.Tab("Voting"):
+                build_voting_ui()
 
     return ui
 
@@ -191,16 +191,6 @@ def add_to_vad_queue(audio, main_lang, model_config):
     queue_string = add_vad_chunks(audio, main_lang, model_config)
 
     return queue_string
-
-    queue = add_to_queue(
-        audio_batch=[audio.tobytes()],
-        master="",
-        main_lang=f"{main_lang}",
-        model_config=model_config,
-        times=TO_VAD,
-    )
-
-    return queue[0]
 
 
 def add_vad_chunks(audio, main_lang, model_config):

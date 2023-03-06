@@ -185,3 +185,21 @@ Future<String> question_answering(String question, String context) async {
   // Return the byte array.
   return answer;
 }
+
+Future<void> do_voting(String hash, String text) async {
+  var params = {
+    "data": [
+      hash,
+      text,
+    ]
+  };
+
+  // Send the request to the server.
+  var res = await http.post(Uri.parse('$baseURL/run/vote_result'),
+      headers: headers, body: jsonEncode(params));
+
+  // Check that the request was successful.
+  if (res.statusCode != 200) {
+    throw Exception('http.post error: statusCode= ${res.statusCode}');
+  }
+}
