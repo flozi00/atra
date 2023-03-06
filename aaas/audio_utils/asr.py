@@ -19,6 +19,7 @@ def get_pipeline(main_lang: str, model_config: str):
         stride_length_s=[15, 0],
         torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
         device=0 if torch.cuda.is_available() else -1,
+        return_timestamps=False,
     )
     return transcriber
 

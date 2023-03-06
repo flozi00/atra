@@ -110,7 +110,12 @@ def get_tasks_queue():
             if len(todos) != 0:
                 sample = random.choice(todos)
             else:
-                sample = False
+                statement = select(QueueData).where(QueueData.votings < 0)
+                todos = session.exec(statement).all()
+                if len(todos) != 0:
+                    sample = random.choice(todos)
+                else:
+                    sample = False
     return sample
 
 
