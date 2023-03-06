@@ -10,6 +10,10 @@ GoogleSignIn _googleSignIn = GoogleSignIn(
     'email',
   ],
 );
+GoogleSignInAccount? _currentUser;
+String _bearerToken = '';
+
+String bearerToken() => _bearerToken;
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -19,7 +23,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class LoginPageState extends State<LoginPage> {
-  GoogleSignInAccount? _currentUser;
   final String _contactText = '';
 
   @override
@@ -30,7 +33,9 @@ class LoginPageState extends State<LoginPage> {
         _currentUser = account;
       });
       if (_currentUser != null) {
-        print(_currentUser?.authHeaders);
+        _currentUser?.authHeaders.then((Map<String, String> headers) {
+          _bearerToken = headers["Authorization"] ?? '';
+        });
       }
     });
     _googleSignIn.signInSilently();

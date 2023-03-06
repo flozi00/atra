@@ -130,7 +130,7 @@ def set_transkript(hs, transcription):
             session.commit()
             session.refresh(transkript)
 
-
+@timeit
 def set_voting(hs, vote):
     vote = 1 if vote == "good" else -1
     with Session(engine) as session:

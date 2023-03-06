@@ -4,7 +4,7 @@ import os
 import gradio as gr
 from transformers.pipelines.audio_utils import ffmpeg_read
 
-from aaas.statics import LANG_MAPPING, TO_VAD, TO_OCR
+from aaas.statics import LANG_MAPPING, TO_OCR
 from aaas.datastore import (
     add_to_queue,
     get_data_from_hash,
@@ -16,7 +16,7 @@ from aaas.datastore import (
 from aaas.silero_vad import get_speech_probs, silero_vad
 import numpy as np
 
-from aaas.text_utils import question_answering
+from aaas.utils import get_mail_from_google
 
 langs = sorted(list(LANG_MAPPING.keys()))
 
@@ -126,7 +126,7 @@ def build_voting_ui():
         rating = gr.Radio(choices=["good", "bad"], value="good")
 
     task_id.change(
-        fn=set_voting,
+        fn=do_voting,
         inputs=[task_id, rating],
         outputs=[],
         api_name="vote_result",
@@ -154,7 +154,15 @@ def build_gradio():
     return ui
 
 
-def add_to_ocr_queue(image, model_config, mode):
+def do_voting(task_id, rating, request: gr.Request):
+    token = request.request.headers.get("Authorization", "")
+    if len(token) > 10:
+        mail = get_mail_from_google(token)
+        if mail is not None:
+            set_voting(task_id, rating)
+
+
+def add_to_ocr_queue(image, model_config, mode, request: gr.Request):
     if image is not None and len(image) > 8:
 
         with open(image, "rb") as f:
@@ -173,7 +181,7 @@ def add_to_ocr_queue(image, model_config, mode):
     return queue[0]
 
 
-def add_to_vad_queue(audio, main_lang, model_config):
+def add_to_vad_queue(audio, main_lang, model_config, request: gr.Request):
     if main_lang not in langs:
         main_lang = "german"
     if model_config not in ["small", "medium", "large"]:
@@ -193,7 +201,7 @@ def add_to_vad_queue(audio, main_lang, model_config):
     return queue_string
 
 
-def add_vad_chunks(audio, main_lang, model_config):
+def add_vad_chunks(audio, main_lang, model_config, request: gr.Request):
     def check_timestamp_length_limit(timestamps, limit):
         for timestamp in timestamps:
             if timestamp["start"] - timestamp["end"] > limit:
@@ -254,7 +262,7 @@ def add_vad_chunks(audio, main_lang, model_config):
     return queue_string
 
 
-def get_transcription(queue_string: str):
+def get_transcription(queue_string: str, request: gr.Request):
     full_transcription, chunks = "", []
     queue = queue_string.split(",")
     results = get_transkript_batch(queue_string)
@@ -286,13 +294,13 @@ def get_transcription(queue_string: str):
     return full_transcription, chunks
 
 
-def get_audio(task_id):
+def get_audio(task_id, request: gr.Request):
     result = get_transkript(task_id)
     bytes_data = get_data_from_hash(result.hash)
     return (16000, np.frombuffer(bytes_data, dtype=np.float32)), result.transcript
 
 
-def get_sub_video(task_id, video_file):
+def get_sub_video(task_id, video_file, request: gr.Request):
     segments = get_transcription(task_id)[1]
     srtFilename = "subs.srt"
     if os.path.exists(srtFilename):

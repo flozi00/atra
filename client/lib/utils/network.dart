@@ -3,15 +3,17 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 
 import 'package:http/http.dart' as http;
+import '../views/login.dart' as login;
 
-final headers = {
-  'authority': 'asr.a-ware.io',
-  'accept': '*/*',
-  'accept-language': 'de-DE,de;q=0.9,en-US;q=0.8,en;q=0.7',
-  'content-type': 'application/json',
-  'origin': 'https://asr.a-ware.io',
-  'Accept-Encoding': 'gzip',
-};
+Map<String, String> headers() {
+  return {
+    'accept': '*/*',
+    'accept-language': 'de-DE,de;q=0.9,en-US;q=0.8,en;q=0.7',
+    'content-type': 'application/json',
+    'Accept-Encoding': 'gzip',
+    "Authorization": login.bearerToken(),
+  };
+}
 
 String myurl = Uri.base.origin.toString();
 
@@ -32,7 +34,7 @@ Future<String> SendToASR(
 
   // send audio data to the translation task
   var res = await http.post(Uri.parse('$baseURL/run/transcription'),
-      headers: headers, body: jsonEncode(params));
+      headers: headers(), body: jsonEncode(params));
   if (res.statusCode != 200) {
     throw Exception('http.post error: statusCode= ${res.statusCode}');
   }
@@ -53,7 +55,7 @@ Future<String> SendToOCR(var image, String name, String model) async {
 
   // send audio data to the translation task
   var res = await http.post(Uri.parse('$baseURL/run/ocr'),
-      headers: headers, body: jsonEncode(params));
+      headers: headers(), body: jsonEncode(params));
   if (res.statusCode != 200) {
     throw Exception('http.post error: statusCode= ${res.statusCode}');
   }
@@ -72,7 +74,7 @@ Future<List<dynamic>> get_transcription(String hash) async {
 
   // Send a POST request to the server with the parameters.
   var res = await http.post(Uri.parse('$baseURL/run/get_transcription'),
-      headers: headers, body: jsonEncode(params));
+      headers: headers(), body: jsonEncode(params));
   // Check that the response from the server is valid.
   if (res.statusCode != 200) {
     throw Exception('http.post error: statusCode= ${res.statusCode}');
@@ -96,7 +98,7 @@ Future<Uint8List> get_video(String hash, String mediafile) async {
 
   // Send the request to the server.
   var res = await http.post(Uri.parse('$baseURL/run/subtitle'),
-      headers: headers, body: jsonEncode(params));
+      headers: headers(), body: jsonEncode(params));
 
   // Check that the request was successful.
   if (res.statusCode != 200) {
@@ -129,7 +131,7 @@ Future<String> get_audio(String hash) async {
 
   // Send the request to the server.
   var res = await http.post(Uri.parse('$baseURL/run/get_audio'),
-      headers: headers, body: jsonEncode(params));
+      headers: headers(), body: jsonEncode(params));
 
   // Check that the request was successful.
   if (res.statusCode != 200) {
@@ -154,7 +156,7 @@ Future<bool> update_transcript(String hash, String text) async {
 
   // Send the request to the server.
   var res = await http.post(Uri.parse('$baseURL/run/correct_transcription'),
-      headers: headers, body: jsonEncode(params));
+      headers: headers(), body: jsonEncode(params));
 
   // Check that the request was successful.
   if (res.statusCode != 200) {
@@ -165,7 +167,6 @@ Future<bool> update_transcript(String hash, String text) async {
 
 Future<String> question_answering(String question, String context) async {
   var headers = {
-    //'Authorization': 'Bearer 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',
     'Content-Type': 'application/json',
   };
 
@@ -196,7 +197,7 @@ Future<void> do_voting(String hash, String text) async {
 
   // Send the request to the server.
   var res = await http.post(Uri.parse('$baseURL/run/vote_result'),
-      headers: headers, body: jsonEncode(params));
+      headers: headers(), body: jsonEncode(params));
 
   // Check that the request was successful.
   if (res.statusCode != 200) {
