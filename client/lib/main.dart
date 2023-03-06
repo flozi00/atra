@@ -6,6 +6,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:json_theme/json_theme.dart';
 
 import './layout/bar.dart';
+import 'views/login.dart';
 import 'views/overview_screen.dart';
 import 'views/upload.dart';
 
@@ -51,6 +52,9 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     //WidgetsBinding.instance.addPostFrameCallback((_) => check_login());
+    googleSignIn()
+        .signInSilently(reAuthenticate: true)
+        .then((value) => currentUser = value!);
   }
 
   @override

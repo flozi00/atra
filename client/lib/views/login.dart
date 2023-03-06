@@ -14,6 +14,8 @@ GoogleSignInAccount? _currentUser;
 String _bearerToken = '';
 
 String bearerToken() => _bearerToken;
+GoogleSignIn googleSignIn() => _googleSignIn;
+set currentUser(GoogleSignInAccount user) => _currentUser = user;
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -38,7 +40,9 @@ class LoginPageState extends State<LoginPage> {
         });
       }
     });
-    _googleSignIn.signInSilently(reAuthenticate: true);
+    if (_bearerToken == '') {
+      _googleSignIn.signInSilently(reAuthenticate: true);
+    }
   }
 
   Future<void> _handleSignIn() async {
