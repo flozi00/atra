@@ -1,3 +1,4 @@
+import 'package:atra/views/login.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -38,6 +39,15 @@ Widget build_app_bar(
                       fit: BoxFit.fitWidth,
                     )),
                 actions: [
+                  IconButton(
+                      onPressed: () {
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return const Dialog(child: LoginPage());
+                            });
+                      },
+                      icon: const Icon(Icons.login)),
                   IconButton(
                       onPressed: () {
                         launchUrl(Uri.parse("https://a-ware.io/atra"));
