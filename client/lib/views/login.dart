@@ -38,7 +38,7 @@ class LoginPageState extends State<LoginPage> {
         });
       }
     });
-    _googleSignIn.signInSilently();
+    _googleSignIn.signInSilently(reAuthenticate: true);
   }
 
   Future<void> _handleSignIn() async {
