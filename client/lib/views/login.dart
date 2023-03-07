@@ -42,9 +42,6 @@ class LoginPageState extends State<LoginPage> {
         });
       }
     });
-    if (_bearerToken == '') {
-      _googleSignIn.signInSilently(reAuthenticate: true);
-    }
   }
 
   Future<void> _handleSignIn() async {
