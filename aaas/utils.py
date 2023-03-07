@@ -30,10 +30,23 @@ def get_mail_from_google(auth_token):
         "personFields": "emailAddresses",
     }
 
-    response = requests.get(
-        "https://content-people.googleapis.com/v1/people/me",
-        params=params,
-        headers=headers,
-    ).json()["emailAddresses"][0]["value"]
+    try:
+        response = requests.get(
+            "https://content-people.googleapis.com/v1/people/me",
+            params=params,
+            headers=headers,
+        ).json()["emailAddresses"][0]["value"]
 
-    return response
+        return response
+    except:
+        return None
+
+
+def check_valid_auth(request):
+    token = request.request.headers.get("Authorization", "")
+    if len(token) > 10:
+        mail = get_mail_from_google(token)
+        if mail is not None:
+            return mail
+
+    return False

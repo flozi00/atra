@@ -9,6 +9,8 @@ import '../utils/network.dart';
 import './timeline_view.dart';
 import 'package:woozy_search/woozy_search.dart';
 
+import 'login.dart';
+
 class OverviewScreen extends StatefulWidget {
   const OverviewScreen({Key? key}) : super(key: key);
 
@@ -192,6 +194,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
     if (isFetching == false) {
       isFetching = true;
       cards = [];
+      String tokenValid = "Invalid";
       SharedPreferences prefs = await SharedPreferences.getInstance();
       for (String mode in modes) {
         activeMode = mode;
@@ -200,13 +203,24 @@ class _OverviewScreenState extends State<OverviewScreen> {
           await get_transcription(hash).then((values) {
             cards.add(Transcription(
                 hash: hash, transcription: values[0], words: values[1]));
-
+            tokenValid = values[2];
             for (int i = 0; i < values[1].length; i++) {
               woozy.addEntry(values[1][i]["text"], value: hash);
             }
             //woozy.addEntry(values[0], value: hash);
             setState(() {});
           });
+        }
+      }
+      if (tokenValid != "Valid") {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        if (prefs.getString('token') != null &&
+            prefs.getString('token') != '') {
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return const Dialog(child: LoginPage());
+              });
         }
       }
     }

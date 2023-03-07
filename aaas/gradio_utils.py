@@ -16,7 +16,7 @@ from aaas.datastore import (
 from aaas.silero_vad import get_speech_probs, silero_vad
 import numpy as np
 
-from aaas.utils import get_mail_from_google
+from aaas.utils import get_mail_from_google, check_valid_auth
 
 langs = sorted(list(LANG_MAPPING.keys()))
 
@@ -111,10 +111,12 @@ def build_results_ui():
         with gr.TabItem("details"):
             chunks = gr.JSON()
 
+    token = gr.Textbox(label="Token", max_lines=1, visible=False)
+
     task_id.change(
         fn=get_transcription,
         inputs=task_id,
-        outputs=[transcription, chunks],
+        outputs=[transcription, chunks, token],
         api_name="get_transcription",
     )
 
@@ -155,11 +157,8 @@ def build_gradio():
 
 
 def do_voting(task_id, rating, request: gr.Request):
-    token = request.request.headers.get("Authorization", "")
-    if len(token) > 10:
-        mail = get_mail_from_google(token)
-        if mail is not None:
-            set_voting(task_id, rating)
+    if check_valid_auth(request) is not False:
+        set_voting(task_id, rating)
 
 
 def add_to_ocr_queue(image, model_config, mode, request: gr.Request):
@@ -263,18 +262,22 @@ def add_vad_chunks(audio, main_lang, model_config, request: gr.Request):
 
 
 def get_transcription(queue_string: str, request: gr.Request):
+    if check_valid_auth(request=request) is not False:
+        tok = "Valid"
+    else:
+        tok = "Invalid"
     full_transcription, chunks = "", []
     queue = queue_string.split(",")
     results = get_transkript_batch(queue_string)
     for x in range(len(results)):
         result = results[x]
         if result is None:
-            return "", []
+            return "", [], tok
         elif result.metas == TO_OCR:
-            return result.transcript, []
+            return result.transcript, [], tok
         else:
             if len(queue_string) < 5 or "***" in queue_string:
-                return queue_string, []
+                return queue_string, [], tok
 
             chunks.append({"id": queue[x]})
             if result is not None:
@@ -291,7 +294,7 @@ def get_transcription(queue_string: str, request: gr.Request):
     for c in chunks:
         full_transcription += c.get("text", "") + "\n"
 
-    return full_transcription, chunks
+    return full_transcription, chunks, tok
 
 
 def get_audio(task_id, request: gr.Request):
