@@ -100192,7 +100192,9 @@ s($,"b7t","aQp",()=>new A.agj())
 r($,"b7n","aQm",()=>{var q=A.To()
 return q.gw7(q)})
 r($,"b75","n5",()=>{var q=$.aQm()
-return J.z7(q,"localhost")?"http://127.0.0.1:7860/gradio":q+"/gradio"})
+if(J.z7(q,"localhost"))q="http://127.0.0.1:7860/gradio"
+else q=B.c.p(q,"github.io")?"https://atra.ai/gradio":q+"/gradio"
+return q})
 r($,"b5S","aC0",()=>new A.ab8(A.a(["email"],t.s),"118506021544-1bmtqohoa26r5e52169o4gp38pmf6g7m.apps.googleusercontent.com",A.aWM(null,null,!1,t.z1)))
 s($,"b2o","aBP",()=>new A.ad1(A.a([],t.Zh)))
 r($,"b2m","aNG",()=>A.ap9().gakr())
