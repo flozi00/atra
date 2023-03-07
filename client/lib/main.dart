@@ -52,9 +52,12 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     //WidgetsBinding.instance.addPostFrameCallback((_) => check_login());
-    googleSignIn()
-        .signInSilently(reAuthenticate: true)
-        .then((value) => currentUser = value!);
+    googleSignIn().signInSilently(reAuthenticate: true).then((value) {
+      currentUser = value!;
+      getCurrentUser().authHeaders.then((Map<String, String> headers) {
+        BearerToken = headers["Authorization"] ?? '';
+      });
+    });
   }
 
   @override

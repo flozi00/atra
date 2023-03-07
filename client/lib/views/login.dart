@@ -15,7 +15,9 @@ String _bearerToken = '';
 
 String bearerToken() => _bearerToken;
 GoogleSignIn googleSignIn() => _googleSignIn;
+GoogleSignInAccount getCurrentUser() => _currentUser!;
 set currentUser(GoogleSignInAccount user) => _currentUser = user;
+set BearerToken(String token) => _bearerToken = token;
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
