@@ -56,6 +56,7 @@ class _MyHomePageState extends State<MyHomePage> {
       currentUser = value!;
       getCurrentUser().authHeaders.then((Map<String, String> headers) {
         BearerToken = headers["Authorization"] ?? '';
+        print(headers["Authorization"]);
       });
     });
   }
