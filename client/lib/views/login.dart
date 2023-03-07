@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 GoogleSignIn _googleSignIn = GoogleSignIn(
   clientId:
@@ -39,6 +40,9 @@ class LoginPageState extends State<LoginPage> {
       if (_currentUser != null) {
         _currentUser?.authHeaders.then((Map<String, String> headers) {
           _bearerToken = headers["Authorization"] ?? '';
+          SharedPreferences.getInstance().then((prefs) {
+            prefs.setString('token', _bearerToken);
+          });
         });
       }
     });
@@ -91,13 +95,8 @@ class LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: const Text('Google Sign In'),
-        ),
-        body: ConstrainedBox(
-          constraints: const BoxConstraints.expand(),
-          child: _buildBody(),
-        ));
+    return Padding(
+        padding: const EdgeInsets.fromLTRB(50, 10, 50, 10),
+        child: _buildBody());
   }
 }

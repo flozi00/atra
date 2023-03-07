@@ -6,8 +6,10 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:json_theme/json_theme.dart';
 
 import './layout/bar.dart';
+import 'views/login.dart';
 import 'views/overview_screen.dart';
 import 'views/upload.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -50,7 +52,21 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    check_login();
     //WidgetsBinding.instance.addPostFrameCallback((_) => check_login());
+  }
+
+  void check_login() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (prefs.getString('token') == null || prefs.getString('token') == '') {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return const Dialog(child: LoginPage());
+          });
+    } else {
+      BearerToken = prefs.getString('token')!;
+    }
   }
 
   @override
