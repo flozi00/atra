@@ -178,6 +178,18 @@ class _OverviewScreenState extends State<OverviewScreen> {
                   child: const Text('Generate Video'),
                 )
               : const SizedBox(),
+          ElevatedButton(
+              onPressed: () async {
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                for (String mode in modes) {
+                  activeMode = mode;
+                  List<String> hashList = prefs.getStringList(mode) ?? [];
+                  hashList.remove(hash);
+                  await prefs.setStringList(mode, hashList);
+                }
+                build_cards_list();
+              },
+              child: const Text('Delete'))
         ],
       ),
     ]));
