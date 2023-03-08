@@ -6,7 +6,6 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_file_picker/form_builder_file_picker.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:loader_overlay/loader_overlay.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../utils/data.dart';
 import '../utils/network.dart';
@@ -134,13 +133,7 @@ class _OCRUploadState extends State<OCRUpload> {
                         .toString()
                         .toLowerCase(),
                   ).then((String newhash) async {
-                    SharedPreferences prefs =
-                        await SharedPreferences.getInstance();
-                    List<String> hashes = prefs.getStringList("ocr") ?? [];
-                    if (hashes.contains(newhash) == false) {
-                      hashes.add(newhash);
-                    }
-                    prefs.setStringList("ocr", hashes);
+                    await add_to_list(newhash, "ocr");
                     context.loaderOverlay.hide();
                     Navigator.pushReplacementNamed(context, "/");
                   });

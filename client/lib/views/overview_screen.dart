@@ -8,6 +8,7 @@ import '../forms/subtitle.dart';
 import '../utils/network.dart';
 import './timeline_view.dart';
 import 'package:woozy_search/woozy_search.dart';
+import 'package:share_plus/share_plus.dart';
 
 import 'login.dart';
 
@@ -178,6 +179,14 @@ class _OverviewScreenState extends State<OverviewScreen> {
                   child: const Text('Generate Video'),
                 )
               : const SizedBox(),
+          ElevatedButton(
+              onPressed: () {
+                String base = Uri.base.origin.toString();
+                String url = "$base/?hash=${Uri.parse(hash)}&mode=$activeMode";
+                print(url);
+                Share.share(url, subject: url);
+              },
+              child: const Text('Share')),
           ElevatedButton(
               onPressed: () async {
                 SharedPreferences prefs = await SharedPreferences.getInstance();

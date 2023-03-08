@@ -7,7 +7,6 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_file_picker/form_builder_file_picker.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:loader_overlay/loader_overlay.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../utils/data.dart';
 import '../utils/network.dart';
@@ -47,12 +46,7 @@ class _ASRUploadState extends State<ASRUpload> {
 
     await SendToASR(base64Audio, audioName, lang, "large")
         .then((String newhash) async {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      List<String> hashes = prefs.getStringList("asr") ?? [];
-      if (hashes.contains(newhash) == false) {
-        hashes.add(newhash);
-      }
-      prefs.setStringList("asr", hashes);
+      await add_to_list(newhash, "asr");
     });
   }
 
@@ -141,9 +135,13 @@ class _ASRUploadState extends State<ASRUpload> {
                     setState(() {});
                   }
                 },
-                icon: isRecording
+                icon: isRecording == false
                     ? const Icon(Icons.mic_off)
                     : const Icon(Icons.mic)),
+            const SizedBox(height: 5),
+            Text(isRecording == false
+                ? "Click to start recording"
+                : "Click to stop recording"),
             const SizedBox(
               height: 10,
             ),

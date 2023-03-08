@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 // The function uint8ListTob64 converts a Uint8List into a base64 encoded string.
 String uint8ListTob64(Uint8List uint8list) {
   String base64String = base64Encode(uint8list);
@@ -25,4 +27,13 @@ String formatedTime({required int timeInSecond}) {
   String second = sec.toString().length <= 1 ? "0$sec" : "$sec";
   //return formated time
   return "$minute : $second";
+}
+
+Future<void> add_to_list(String hash, String mode) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  List<String> hashes = prefs.getStringList(mode) ?? [];
+  if (hashes.contains(hash) == false) {
+    hashes.add(hash);
+  }
+  prefs.setStringList(mode, hashes);
 }

@@ -1,6 +1,6 @@
 # This is a generated file; do not edit or check into version control.
 audio_session=C:\\Users\\flozi\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\audio_session-0.1.13\\
-file_picker=C:\\Users\\flozi\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\file_picker-4.6.1\\
+file_picker=C:\\Users\\flozi\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\file_picker-5.2.5\\
 file_saver=C:\\Users\\flozi\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\file_saver-0.1.1\\
 flutter_plugin_android_lifecycle=C:\\Users\\flozi\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\flutter_plugin_android_lifecycle-2.0.7\\
 google_sign_in=C:\\Users\\flozi\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\google_sign_in-6.0.2\\
@@ -15,11 +15,12 @@ path_provider=C:\\Users\\flozi\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\pat
 path_provider_android=C:\\Users\\flozi\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\path_provider_android-2.0.22\\
 path_provider_foundation=C:\\Users\\flozi\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\path_provider_foundation-2.1.1\\
 path_provider_linux=C:\\Users\\flozi\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\path_provider_linux-2.1.7\\
-path_provider_windows=C:\\Users\\flozi\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\path_provider_windows-2.0.7\\
+path_provider_windows=C:\\Users\\flozi\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\path_provider_windows-2.1.5\\
 permission_handler=C:\\Users\\flozi\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\permission_handler-10.2.0\\
 permission_handler_android=C:\\Users\\flozi\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\permission_handler_android-10.2.0\\
 permission_handler_apple=C:\\Users\\flozi\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\permission_handler_apple-9.0.7\\
 permission_handler_windows=C:\\Users\\flozi\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\permission_handler_windows-0.1.2\\
+share_plus=C:\\Users\\flozi\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\share_plus-6.3.1\\
 shared_preferences=C:\\Users\\flozi\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\shared_preferences-2.0.17\\
 shared_preferences_android=C:\\Users\\flozi\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\shared_preferences_android-2.0.15\\
 shared_preferences_foundation=C:\\Users\\flozi\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\shared_preferences_foundation-2.1.3\\
