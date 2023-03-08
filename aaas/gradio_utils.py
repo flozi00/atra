@@ -90,7 +90,7 @@ def build_ocr_ui():
         ocr_mode = gr.Radio(choices=["handwritten", "printed"], label="OCR Mode")
 
     with gr.Row():
-        image_file = gr.Image(source="upload", type="filepath", label="Imagefile")
+        image_file = gr.File(source="upload", type="file", label="Imagefile")
 
     task_id = gr.Textbox(label="Task ID", max_lines=3)
 
@@ -162,12 +162,11 @@ def do_voting(task_id, rating, request: gr.Request):
 
 
 def add_to_ocr_queue(image, model_config, mode, request: gr.Request):
+    image = image.name
     if image is not None and len(image) > 8:
-
+        file_format = image.split(".")[-1]
         with open(image, "rb") as f:
             payload = f.read()
-
-        os.remove(image)
 
     queue = add_to_queue(
         audio_batch=[payload],
@@ -175,6 +174,7 @@ def add_to_ocr_queue(image, model_config, mode, request: gr.Request):
         main_lang=mode,
         model_config=model_config,
         times=TO_OCR,
+        file_format=file_format,
     )
 
     return queue[0]
@@ -195,7 +195,7 @@ def add_to_vad_queue(audio, main_lang, model_config, request: gr.Request):
         audio = ffmpeg_read(payload, sampling_rate=16000)
         os.remove(audio_path)
 
-    queue_string = add_vad_chunks(audio, main_lang, model_config)
+    queue_string = add_vad_chunks(audio, main_lang, model_config, request=request)
 
     return queue_string
 

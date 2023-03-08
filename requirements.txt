@@ -20,3 +20,4 @@ pydub
 peft
 text2num
 fsspec
+pdfminer.six

@@ -23,7 +23,6 @@ class _OverviewScreenState extends State<OverviewScreen> {
   bool isFetching = false;
   Map<String, HighlightedWord> words = {};
   List<String> modes = ['ocr', 'asr'];
-  String activeMode = 'ocr';
   Woozy<dynamic> woozy = Woozy();
   String question = "";
   String answer = "";
@@ -66,13 +65,14 @@ class _OverviewScreenState extends State<OverviewScreen> {
         });
   }
 
-  Widget cardItem(String recognizedText, String hash, List<dynamic> listWords) {
+  Widget cardItem(String recognizedText, String hash, List<dynamic> listWords,
+      String activeMode) {
     return Card(
         child: Column(children: [
       ListTile(
         title: Text(hash.substring(0, 20)),
         subtitle: Text(recognizedText.length > 250
-            ? recognizedText.substring(0, 250)
+            ? recognizedText.substring(0, 250).replaceAll("\n", " ")
             : recognizedText),
       ),
       ButtonBar(
@@ -206,7 +206,8 @@ class _OverviewScreenState extends State<OverviewScreen> {
     if (isFetching == false) {
       isFetching = true;
       cards = [];
-      String tokenValid = "Invalid";
+      String tokenValid = "Valid";
+      String activeMode = 'ocr';
       SharedPreferences prefs = await SharedPreferences.getInstance();
       for (String mode in modes) {
         activeMode = mode;
@@ -214,11 +215,15 @@ class _OverviewScreenState extends State<OverviewScreen> {
         for (String hash in hashes) {
           await get_transcription(hash).then((values) {
             cards.add(Transcription(
-                hash: hash, transcription: values[0], words: values[1]));
+                hash: hash,
+                transcription: values[0],
+                words: values[1],
+                activeMode: activeMode));
             tokenValid = values[2];
             for (int i = 0; i < values[1].length; i++) {
               woozy.addEntry(values[1][i]["text"], value: hash);
             }
+
             //woozy.addEntry(values[0], value: hash);
             setState(() {});
           });
@@ -242,8 +247,8 @@ class _OverviewScreenState extends State<OverviewScreen> {
   @override
   Widget build(BuildContext context) {
     return SearchableList<Transcription>(
-      builder: (Transcription trscp) =>
-          cardItem(trscp.transcription, trscp.hash, trscp.words),
+      builder: (Transcription trscp) => cardItem(
+          trscp.transcription, trscp.hash, trscp.words, trscp.activeMode),
       initialList: cards,
       asyncListCallback: () async {
         await build_cards_list();
@@ -296,10 +301,12 @@ class Transcription {
   String hash;
   String transcription;
   List<dynamic> words;
+  String activeMode;
 
   Transcription({
     required this.hash,
     required this.transcription,
     required this.words,
+    required this.activeMode,
   });
 }

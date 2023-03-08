@@ -49,7 +49,7 @@ Future<String> SendToASR(
 Future<String> SendToOCR(var image, String name, String model) async {
   var params = {
     "data": [
-      "data:@file/octet-stream;base64,$image",
+      {"data": "data:@file/octet-stream;base64,$image", "name": name},
       "large",
       model,
     ]

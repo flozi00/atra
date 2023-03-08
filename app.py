@@ -45,10 +45,11 @@ class BackgroundTasks(threading.Thread):
                             model_config=task.model_config,
                         )
                     elif task.metas == TO_OCR:
-                        with open("dummy.png", "wb") as f:
+                        file_format = task.hash.split(".")[-1]
+                        with open(f"dummy.{file_format}", "wb") as f:
                             f.write(bytes_data)
                         result = inference_ocr(
-                            data="dummy.png",
+                            data=f"dummy.{file_format}",
                             mode=task.langs.split(",")[0],
                             config=task.model_config,
                         )

@@ -34,7 +34,9 @@ SQLModel.metadata.create_all(engine)
 
 
 @timeit
-def add_to_queue(audio_batch, master, main_lang, model_config, times=None):
+def add_to_queue(
+    audio_batch, master, main_lang, model_config, times=None, file_format="wav"
+):
     hashes = []
     with Session(engine) as session:
         for x in range(len(audio_batch)):
@@ -50,6 +52,7 @@ def add_to_queue(audio_batch, master, main_lang, model_config, times=None):
                     "utf-8"
                 )
             ).hexdigest()
+            hs = f"{hs}.{file_format}"
             hashes.append(hs)
             entry = get_transkript(hs)
             if entry is None:
@@ -129,6 +132,7 @@ def set_transkript(hs, transcription):
             transkript.votings = 0
             session.commit()
             session.refresh(transkript)
+
 
 @timeit
 def set_voting(hs, vote):

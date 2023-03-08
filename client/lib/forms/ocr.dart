@@ -82,7 +82,10 @@ class _OCRUploadState extends State<OCRUpload> {
               decoration: const InputDecoration(
                 labelText: 'Image',
               ),
-              allowedExtensions: const ['png', 'jpg', 'JPEG'],
+              validator: FormBuilderValidators.compose(
+                [FormBuilderValidators.required()],
+              ),
+              allowedExtensions: const ['png', 'jpg', 'JPEG', "pdf"],
               typeSelectors: [
                 // 2. Add a TypeSelector to the list of typeSelectors
                 TypeSelector(
