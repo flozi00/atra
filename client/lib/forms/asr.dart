@@ -156,26 +156,28 @@ class _ASRUploadState extends State<ASRUpload> {
                 if (uploadFormKey.currentState!.validate()) {
                   uploadFormKey.currentState?.save();
                   context.loaderOverlay.show();
-                  for (int i = 0;
-                      i < uploadFormKey.currentState!.value["media"].length;
-                      i++) {
-                    var audio =
-                        uploadFormKey.currentState!.value["media"][i].bytes;
-                    if (audio == null) {
-                      await File(uploadFormKey
-                              .currentState!.value["media"][i].path)
-                          .readAsBytes()
-                          .then((value) => audio = value);
+                  if (uploadFormKey.currentState!.value["media"] != null) {
+                    for (int i = 0;
+                        i < uploadFormKey.currentState!.value["media"].length;
+                        i++) {
+                      var audio =
+                          uploadFormKey.currentState!.value["media"][i].bytes;
+                      if (audio == null) {
+                        await File(uploadFormKey
+                                .currentState!.value["media"][i].path)
+                            .readAsBytes()
+                            .then((value) => audio = value);
+                      }
+                      String audioName =
+                          uploadFormKey.currentState!.value["media"][i].name;
+                      String lang = uploadFormKey.currentState!.value["srclang"]
+                          .toString()
+                          .toLowerCase();
+                      await uploadASR(audio, lang, audioName);
                     }
-                    String audioName =
-                        uploadFormKey.currentState!.value["media"][i].name;
-                    String lang = uploadFormKey.currentState!.value["srclang"]
-                        .toString()
-                        .toLowerCase();
-                    await uploadASR(audio, lang, audioName);
                   }
                   if (audioBytes.length > 10) {
-                    String audioName = "microphone";
+                    String audioName = "microphone.wav";
                     String lang = uploadFormKey.currentState!.value["srclang"]
                         .toString()
                         .toLowerCase();

@@ -48288,33 +48288,36 @@ p=t.ph
 o=g.j3(p)
 if(o!=null)$.eQ().a=o
 $.eQ().Cx(0)
-o=t.T,n=0
-case 4:if(!(m=h.d.gR(),n<J.bq(m.gl(m).h(0,"media")))){s=6
+o=h.d.gR()
+s=o.gl(o).h(0,"media")!=null?4:5
+break
+case 4:o=t.T,n=0
+case 6:if(!(m=h.d.gR(),n<J.bq(m.gl(m).h(0,"media")))){s=8
 break}m={}
 l=h.d.gR()
 k=J.X(l.gl(l).h(0,"media"),n).glw()
 m.a=k
-s=k==null?7:8
+s=k==null?9:10
 break
-case 7:l=h.d.gR()
-s=9
+case 9:l=h.d.gR()
+s=11
 return A.z(A.a9G(J.aGt(J.X(l.gl(l).h(0,"media"),n))).Jk().aJ(new A.apr(m),o),$async$$0)
-case 9:case 8:l=h.d.gR()
+case 11:case 10:l=h.d.gR()
 j=J.aGs(J.X(l.gl(l).h(0,"media"),n))
 l=h.d.gR()
 i=J.d7(l.gl(l).h(0,"srclang")).toLowerCase()
-s=10
+s=12
 return A.z(h.wy(m.a,i,j),$async$$0)
-case 10:case 5:++n
-s=4
+case 12:case 7:++n
+s=6
 break
-case 6:s=h.f.length>10?11:12
+case 8:case 5:s=h.f.length>10?13:14
 break
-case 11:o=h.d.gR()
+case 13:o=h.d.gR()
 i=J.d7(o.gl(o).h(0,"srclang")).toLowerCase()
-s=13
-return A.z(h.wy(h.f,i,"microphone"),$async$$0)
-case 13:case 12:h=g.j3(p)
+s=15
+return A.z(h.wy(h.f,i,"microphone.wav"),$async$$0)
+case 15:case 14:h=g.j3(p)
 if(h!=null)$.eQ().a=h
 $.eQ().lS()
 h=t.X
