@@ -98,7 +98,7 @@ class _ASRUploadState extends State<ASRUpload> {
               decoration: const InputDecoration(
                 labelText: 'Audio / Video',
               ),
-              allowedExtensions: const ['mp4', 'mp3', 'wav'],
+              allowedExtensions: const ['mp4', 'mp3', 'wav', "m4a"],
               typeSelectors: [
                 // 2. Add a TypeSelector to the list of typeSelectors
                 TypeSelector(
