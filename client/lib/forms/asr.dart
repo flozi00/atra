@@ -98,11 +98,34 @@ class _ASRUploadState extends State<ASRUpload> {
               decoration: const InputDecoration(
                 labelText: 'Audio / Video',
               ),
+              // list of allowed file extensions for audio files and video files
+              allowedExtensions: const [
+                'mp3',
+                'wav',
+                "m4a",
+                "mp4",
+                "mov",
+                "avi",
+                "mkv",
+                "flv",
+                "wmv",
+                "webm",
+                "ogg",
+                "3gp",
+                "3g2",
+                "mpeg",
+                "mpg",
+                "m4v",
+                "f4v",
+                "f4p",
+                "f4a",
+                "f4b"
+              ],
               typeSelectors: [
                 // 2. Add a TypeSelector to the list of typeSelectors
                 TypeSelector(
                   // 3. Set the type to FileType.custom
-                  type: FileType.media,
+                  type: FileType.custom,
                   // 4. Set the selector to a widget of your choice
                   selector: Row(
                     children: const <Widget>[
