@@ -1,9 +1,9 @@
 name: Gh-Pages
 
 on:
-  push:
-    branches:
-      - "main"
+  release:
+    types: [published]
+
       
 jobs:
   build:
