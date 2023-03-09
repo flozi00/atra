@@ -197,6 +197,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
                   await prefs.setStringList(mode, hashList);
                 }
                 build_cards_list();
+                Navigator.pushNamed(context, '/');
               },
               child: const Text('Delete'))
         ],

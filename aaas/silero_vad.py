@@ -179,7 +179,6 @@ def get_speech_probs(
     return speech_probs
 
 
-@timeit
 def get_speech_timestamps(
     audio: torch.Tensor,
     model,

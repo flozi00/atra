@@ -88,7 +88,6 @@ def get_transkript_batch(hs):
     return transkript
 
 
-@timeit
 def get_tasks_queue():
     with Session(engine) as session:
 

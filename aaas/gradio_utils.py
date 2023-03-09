@@ -16,7 +16,7 @@ from aaas.datastore import (
 from aaas.silero_vad import get_speech_probs, silero_vad
 import numpy as np
 
-from aaas.utils import get_mail_from_google, check_valid_auth
+from aaas.utils import check_valid_auth
 
 langs = sorted(list(LANG_MAPPING.keys()))
 
@@ -209,7 +209,7 @@ def add_vad_chunks(audio, main_lang, model_config, request: gr.Request):
 
     queue_string = ""
     speech_timestamps = []
-    silence_duration = 500
+    silence_duration = 1000
     if main_lang not in langs:
         main_lang = "german"
     if model_config not in ["small", "medium", "large"]:
@@ -223,18 +223,18 @@ def add_vad_chunks(audio, main_lang, model_config, request: gr.Request):
         model_vad,
         sampling_rate=16000,
     )
-    while len(speech_timestamps) <= int(
-        (len(audio) / 16000) / 10
-    ) or check_timestamp_length_limit(speech_timestamps, 29):
+    while len(speech_timestamps) < 1 or check_timestamp_length_limit(
+        speech_timestamps, 29
+    ):
         speech_timestamps = get_speech_timestamps(
             audio,
             model_vad,
             speech_probs=speech_probs,
-            threshold=0.6,
+            threshold=0.4,
             sampling_rate=16000,
             min_silence_duration_ms=silence_duration,
             min_speech_duration_ms=1000,
-            speech_pad_ms=silence_duration * 0.1,
+            speech_pad_ms=500,
             return_seconds=True,
         )
         silence_duration = silence_duration * 0.9
@@ -249,6 +249,7 @@ def add_vad_chunks(audio, main_lang, model_config, request: gr.Request):
         for st in range(len(speech_timestamps))
     ]
 
+    print(len(audio_batch), len(audio) / 16000)
     queue = add_to_queue(
         audio_batch=audio_batch,
         master=speech_timestamps,
