@@ -201,7 +201,10 @@ class _OverviewScreenState extends State<OverviewScreen> {
                   return Dialog(
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20.0)),
-                      child: const Center(child: ASRUpload()));
+                      child: const Center(
+                          child: Padding(
+                              padding: EdgeInsets.fromLTRB(15, 15, 15, 10),
+                              child: ASRUpload())));
                 });
           },
           child: const Icon(Icons.add_circle_outline),

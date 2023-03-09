@@ -12,7 +12,7 @@ Widget build_app_bar(
         constraints: const BoxConstraints(
             minWidth: 5, maxWidth: 512, maxHeight: double.infinity),
         // Set padding for each container
-        padding: const EdgeInsets.fromLTRB(25, 100, 25, 10),
+        padding: const EdgeInsets.fromLTRB(50, 50, 50, 10),
         // Set alignment for each container
         alignment: Alignment.center,
         // Wrap each child in a SingleChildScrollView to enable scrolling
@@ -27,17 +27,10 @@ Widget build_app_bar(
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
               SliverAppBar(
-                expandedHeight: 100.0,
-                floating: false,
+                expandedHeight: 1,
+                floating: true,
                 pinned: true,
                 stretch: false,
-                flexibleSpace: FlexibleSpaceBar(
-                    centerTitle: true,
-                    collapseMode: CollapseMode.parallax,
-                    background: Image.network(
-                      "https://images.pexels.com/photos/1044988/pexels-photo-1044988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-                      fit: BoxFit.fitWidth,
-                    )),
                 actions: [
                   IconButton(
                       onPressed: () {
