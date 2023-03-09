@@ -4,10 +4,10 @@ import 'package:highlight_text/highlight_text.dart';
 import 'package:searchable_listview/searchable_listview.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../forms/asr.dart';
 import '../utils/network.dart';
 import './timeline_view.dart';
 import 'package:woozy_search/woozy_search.dart';
-import 'package:share_plus/share_plus.dart';
 
 import 'login.dart';
 
@@ -74,73 +74,55 @@ class _OverviewScreenState extends State<OverviewScreen> {
         subtitle: Text(recognizedText.length > 250
             ? recognizedText.substring(0, 250).replaceAll("\n", " ")
             : recognizedText),
+        onTap: () async {
+          if (question.endsWith("?")) {
+            await question_answering(question, most_relevant[hash]!)
+                .then((result) {
+              answer = result;
+              for (String word in answer.split(" ")) {
+                words[word] = HighlightedWord(
+                    textStyle: TextStyle(
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                ));
+              }
+            });
+          } else {
+            answer = "";
+          }
+          if (activeMode == "asr") {
+            build_timeline(hash, context, words, listWords).then((value) {
+              showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return Dialog(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20.0)),
+                        child: Padding(
+                            padding: const EdgeInsets.fromLTRB(15, 0, 15, 10),
+                            child: Column(children: [
+                              // if answer length > 2, display Text
+                              if (answer.length > 2)
+                                Center(
+                                    child: Card(
+                                  child: ListTile(
+                                    title: Text(question),
+                                    subtitle: Text(answer),
+                                  ),
+                                )),
+                              const SizedBox(
+                                height: 35,
+                              ),
+                              value
+                            ])));
+                  });
+            });
+          } else {
+            textDialog(context, recognizedText);
+          }
+        },
       ),
       ButtonBar(
         children: <Widget>[
-          /* The code does the following:
-          1. Calls the build_timeline function and passes it the hash and context.
-          2. The build_timeline function returns a Future with a Widget value.
-          3. The Future is then checked for its value using "then".
-          4. The Future's value is then used to generate a Dialog box.
-          This is the code for the build_timeline function: */
-          ElevatedButton(
-            onPressed: () async {
-              if (question.endsWith("?")) {
-                await question_answering(question, most_relevant[hash]!)
-                    .then((result) {
-                  answer = result;
-                  for (String word in answer.split(" ")) {
-                    words[word] = HighlightedWord(
-                        textStyle: TextStyle(
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
-                    ));
-                  }
-                });
-              } else {
-                answer = "";
-              }
-              if (activeMode == "asr") {
-                build_timeline(hash, context, words, listWords).then((value) {
-                  showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return Dialog(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20.0)),
-                            child: Padding(
-                                padding:
-                                    const EdgeInsets.fromLTRB(15, 0, 15, 10),
-                                child: Column(children: [
-                                  // if answer length > 2, display Text
-                                  if (answer.length > 2)
-                                    Center(
-                                        child: Card(
-                                      child: ListTile(
-                                        title: Text(question),
-                                        subtitle: Text(answer),
-                                      ),
-                                    )),
-                                  const SizedBox(
-                                    height: 35,
-                                  ),
-                                  value
-                                ])));
-                      });
-                });
-              } else {
-                textDialog(context, recognizedText);
-              }
-            },
-            child: const Text('Transcription'),
-          ),
-          ElevatedButton(
-              onPressed: () {
-                String base = Uri.base.origin.toString();
-                String url = "$base/?hash=${Uri.parse(hash)}&mode=$activeMode";
-                print(url);
-                Share.share(url, subject: url);
-              },
-              child: const Text('Share')),
           ElevatedButton(
               onPressed: () async {
                 SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -210,54 +192,68 @@ class _OverviewScreenState extends State<OverviewScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SearchableList<Transcription>(
-      builder: (Transcription trscp) => cardItem(
-          trscp.transcription, trscp.hash, trscp.words, trscp.activeMode),
-      initialList: cards,
-      asyncListCallback: () async {
-        await build_cards_list();
-        while (isFetching == true) {
-          await Future.delayed(const Duration(milliseconds: 10000));
-        }
-        print("asyncListCallback");
-
-        return cards;
-      },
-      asyncListFilter: (q, list) {
-        question = q.toLowerCase().trim();
-        words = {};
-        most_relevant = {};
-        List<String> hashes = [];
-        if (q.length < 5) return list;
-        for (String word in q.split(" ")) {
-          words[word] = HighlightedWord(
-            textStyle: TextStyle(
-              color: Theme.of(context).colorScheme.onPrimaryContainer,
-            ),
-          );
-        }
-        woozy.search(q).forEach((element) {
-          hashes.add(element.value);
-          if (most_relevant[element.value] == null) {
-            most_relevant[element.value] = "";
-          }
-          most_relevant[element.value] =
-              "${most_relevant[element.value]}\n${element.text}";
-        });
-        var result =
-            list.where((element) => hashes.contains(element.hash)).toList();
-        return result;
-      },
-      inputDecoration: InputDecoration(
-        labelText: "Search",
-        focusedBorder: OutlineInputBorder(
-          borderSide: const BorderSide(
-            width: 1.0,
-          ),
-          borderRadius: BorderRadius.circular(10.0),
+    return Scaffold(
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return Dialog(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0)),
+                      child: const Center(child: ASRUpload()));
+                });
+          },
+          child: const Icon(Icons.add_circle_outline),
         ),
-      ),
-    );
+        body: SearchableList<Transcription>(
+          builder: (Transcription trscp) => cardItem(
+              trscp.transcription, trscp.hash, trscp.words, trscp.activeMode),
+          initialList: cards,
+          asyncListCallback: () async {
+            await build_cards_list();
+            while (isFetching == true) {
+              await Future.delayed(const Duration(milliseconds: 10000));
+            }
+            print("asyncListCallback");
+
+            return cards;
+          },
+          asyncListFilter: (q, list) {
+            question = q.toLowerCase().trim();
+            words = {};
+            most_relevant = {};
+            List<String> hashes = [];
+            if (q.length < 5) return list;
+            for (String word in q.split(" ")) {
+              words[word] = HighlightedWord(
+                textStyle: TextStyle(
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                ),
+              );
+            }
+            woozy.search(q).forEach((element) {
+              hashes.add(element.value);
+              if (most_relevant[element.value] == null) {
+                most_relevant[element.value] = "";
+              }
+              most_relevant[element.value] =
+                  "${most_relevant[element.value]}\n${element.text}";
+            });
+            var result =
+                list.where((element) => hashes.contains(element.hash)).toList();
+            return result;
+          },
+          inputDecoration: InputDecoration(
+            labelText: "Search",
+            focusedBorder: OutlineInputBorder(
+              borderSide: const BorderSide(
+                width: 1.0,
+              ),
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+          ),
+        ));
   }
 }
 

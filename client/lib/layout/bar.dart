@@ -27,9 +27,9 @@ Widget build_app_bar(
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
               SliverAppBar(
-                expandedHeight: 150.0,
+                expandedHeight: 100.0,
                 floating: false,
-                pinned: false,
+                pinned: true,
                 stretch: false,
                 flexibleSpace: FlexibleSpaceBar(
                     centerTitle: true,
@@ -55,7 +55,7 @@ Widget build_app_bar(
                       icon: const Icon(Icons.help_outline))
                 ],
               ),
-              SliverPersistentHeader(
+              /*SliverPersistentHeader(
                 delegate: _SliverAppBarDelegate(
                   TabBar(
                     indicatorSize: TabBarIndicatorSize.label,
@@ -64,7 +64,7 @@ Widget build_app_bar(
                 ),
                 pinned: true,
                 floating: false,
-              ),
+              ),*/
             ];
           },
           body: TabBarView(

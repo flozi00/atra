@@ -9,7 +9,6 @@ import './layout/bar.dart';
 import 'utils/data.dart';
 import 'views/login.dart';
 import 'views/overview_screen.dart';
-import 'views/upload.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
@@ -80,11 +79,9 @@ class _MyHomePageState extends State<MyHomePage> {
       context,
       [
         const Tab(icon: Icon(Icons.list), text: "Home"),
-        const Tab(icon: Icon(Icons.upload_file), text: "Upload"),
       ],
       [
         const OverviewScreen(),
-        const Upload(),
         //const Assistant(),
       ],
     );
