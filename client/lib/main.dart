@@ -69,13 +69,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void check_login() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (prefs.getString('token') == null || prefs.getString('token') == '') {
-      showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return const Dialog(child: LoginPage());
-          });
-    } else {
+    if (prefs.getString('token') != null && prefs.getString('token') != '') {
       BearerToken = prefs.getString('token')!;
     }
   }

@@ -4,7 +4,6 @@ import 'package:highlight_text/highlight_text.dart';
 import 'package:searchable_listview/searchable_listview.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../forms/subtitle.dart';
 import '../utils/network.dart';
 import './timeline_view.dart';
 import 'package:woozy_search/woozy_search.dart';
@@ -84,101 +83,56 @@ class _OverviewScreenState extends State<OverviewScreen> {
           3. The Future is then checked for its value using "then".
           4. The Future's value is then used to generate a Dialog box.
           This is the code for the build_timeline function: */
-          activeMode == "asr"
-              ? ElevatedButton(
-                  onPressed: () async {
-                    if (question.endsWith("?")) {
-                      await question_answering(question, most_relevant[hash]!)
-                          .then((result) {
-                        answer = result;
-                        for (String word in answer.split(" ")) {
-                          words[word] = HighlightedWord(
-                              textStyle: TextStyle(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onPrimaryContainer,
-                          ));
-                        }
-                      });
-                    }
-                    build_timeline(hash, context, words, listWords)
-                        .then((value) {
-                      showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return Dialog(
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20.0)),
-                                child: Padding(
-                                    padding: const EdgeInsets.fromLTRB(
-                                        15, 0, 15, 10),
-                                    child: Column(children: [
-                                      // if answer length > 2, display Text
-                                      if (answer.length > 2)
-                                        Center(
-                                            child: Card(
-                                          child: ListTile(
-                                            title: Text(question),
-                                            subtitle: Text(answer),
-                                          ),
-                                        )),
-                                      const SizedBox(
-                                        height: 35,
+          ElevatedButton(
+            onPressed: () async {
+              if (question.endsWith("?")) {
+                await question_answering(question, most_relevant[hash]!)
+                    .then((result) {
+                  answer = result;
+                  for (String word in answer.split(" ")) {
+                    words[word] = HighlightedWord(
+                        textStyle: TextStyle(
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    ));
+                  }
+                });
+              } else {
+                answer = "";
+              }
+              if (activeMode == "asr") {
+                build_timeline(hash, context, words, listWords).then((value) {
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return Dialog(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20.0)),
+                            child: Padding(
+                                padding:
+                                    const EdgeInsets.fromLTRB(15, 0, 15, 10),
+                                child: Column(children: [
+                                  // if answer length > 2, display Text
+                                  if (answer.length > 2)
+                                    Center(
+                                        child: Card(
+                                      child: ListTile(
+                                        title: Text(question),
+                                        subtitle: Text(answer),
                                       ),
-                                      value
-                                    ])));
-                          });
-                    });
-                  },
-                  child: const Text('Timeline'),
-                )
-              : const SizedBox(),
-          /* The code does the following:
-            1. Creates a dialog box with a Scrollview that displays a text.
-            2. The text will be displayed in the dialog box. The text is taken from the variable value.
-            3. The variable value is a string that contains the transcription of a speech. */
-          activeMode != "asr"
-              ? ElevatedButton(
-                  onPressed: () {
-                    if (question.endsWith("?")) {
-                      question_answering(question, most_relevant[hash]!)
-                          .then((result) {
-                        answer = result;
-                        for (String word in answer.split(" ")) {
-                          words[word] = HighlightedWord(
-                              textStyle: TextStyle(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onPrimaryContainer));
-                        }
-                        textDialog(context, recognizedText);
+                                    )),
+                                  const SizedBox(
+                                    height: 35,
+                                  ),
+                                  value
+                                ])));
                       });
-                    } else {
-                      answer = "";
-                      textDialog(context, recognizedText);
-                    }
-                  },
-                  child: const Text('Transkription'),
-                )
-              : const SizedBox(),
-          /* The code does the following:
-          1. Creates an ElevatedButton that, when pressed, generates a Dialog that contains a file picker to select a video file
-          2. Creates an ElevatedButton inside the dialog that, when pressed, uploads the video file to the server 
-          and downloads the generated subtitled video file */
-          activeMode == "asr"
-              ? ElevatedButton(
-                  onPressed: () async {
-                    BuildContext dialogContext;
-                    showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          dialogContext = context;
-                          return subtitle_form(context, hash);
-                        });
-                  },
-                  child: const Text('Generate Video'),
-                )
-              : const SizedBox(),
+                });
+              } else {
+                textDialog(context, recognizedText);
+              }
+            },
+            child: const Text('Transcription'),
+          ),
           ElevatedButton(
               onPressed: () {
                 String base = Uri.base.origin.toString();

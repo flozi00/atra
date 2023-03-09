@@ -209,7 +209,7 @@ def add_vad_chunks(audio, main_lang, model_config, request: gr.Request):
 
     queue_string = ""
     speech_timestamps = []
-    silence_duration = 1000
+    silence_duration = 750
     if main_lang not in langs:
         main_lang = "german"
     if model_config not in ["small", "medium", "large"]:
@@ -224,7 +224,7 @@ def add_vad_chunks(audio, main_lang, model_config, request: gr.Request):
         sampling_rate=16000,
     )
     while len(speech_timestamps) < 1 or check_timestamp_length_limit(
-        speech_timestamps, 29
+        speech_timestamps, 20
     ):
         speech_timestamps = get_speech_timestamps(
             audio,
@@ -290,6 +290,8 @@ def get_transcription(queue_string: str, request: gr.Request):
                 except Exception as e:
                     print(e)
                 chunks[x]["text"] = result.transcript
+
+    chunks = sorted(chunks, key=lambda d: d["start_timestamp"])
 
     full_transcription = ""
     for c in chunks:
