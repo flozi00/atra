@@ -51,6 +51,89 @@ class _ASRUploadState extends State<ASRUpload> {
     });
   }
 
+  Widget defaultFileViewer(
+      List<PlatformFile>? files, FormFieldSetter<List<PlatformFile>>? setter) {
+    final theme = Theme.of(context);
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const count = 10;
+        const spacing = 10;
+        final itemSize =
+            (constraints.biggest.width - (count * spacing)) / count;
+        return Wrap(
+          alignment: WrapAlignment.start,
+          runAlignment: WrapAlignment.start,
+          runSpacing: 10,
+          spacing: 10,
+          children: List.generate(
+            files!.length,
+            (index) {
+              return Container(
+                height: itemSize,
+                width: itemSize,
+                margin: const EdgeInsets.only(right: 2),
+                child: Stack(
+                  alignment: Alignment.bottomCenter,
+                  children: <Widget>[
+                    Container(
+                      alignment: Alignment.center,
+                      child: Container(
+                        alignment: Alignment.center,
+                        color: theme.primaryColor,
+                        child: const Icon(
+                          Icons.file_open,
+                          color: Colors.white,
+                          size: 25,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 2),
+                      width: double.infinity,
+                      color: Colors.white.withOpacity(.8),
+                      child: Text(
+                        files[index].name,
+                        style: theme.textTheme.bodySmall,
+                        maxLines: 2,
+                        overflow: TextOverflow.clip,
+                      ),
+                    ),
+                    Positioned(
+                      top: 0,
+                      right: 0,
+                      child: InkWell(
+                        onTap: () {
+                          files.removeAt(index);
+                          setter!.call([...files]);
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.all(3),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.withOpacity(.7),
+                            shape: BoxShape.circle,
+                          ),
+                          alignment: Alignment.center,
+                          height: 22,
+                          width: 22,
+                          child: const Icon(
+                            Icons.close,
+                            size: 18,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -91,55 +174,56 @@ class _ASRUploadState extends State<ASRUpload> {
         ),
         // 1. Add the FormBuilderFilePicker widget to the form
         FormBuilderFilePicker(
-          name: 'media',
-          maxFiles: 10,
-          allowMultiple: true,
-          previewImages: false,
-          decoration: const InputDecoration(
-            labelText: 'Audio / Video',
-          ),
-          // list of allowed file extensions for audio files and video files
-          allowedExtensions: const [
-            'mp3',
-            'wav',
-            "m4a",
-            "mp4",
-            "mov",
-            "avi",
-            "mkv",
-            "flv",
-            "wmv",
-            "webm",
-            "ogg",
-            "3gp",
-            "3g2",
-            "mpeg",
-            "mpg",
-            "m4v",
-            "f4v",
-            "f4p",
-            "f4a",
-            "f4b"
-          ],
-          typeSelectors: [
-            // 2. Add a TypeSelector to the list of typeSelectors
-            TypeSelector(
-              // 3. Set the type to FileType.custom
-              type: FileType.custom,
-              // 4. Set the selector to a widget of your choice
-              selector: Row(
-                children: const <Widget>[
-                  Icon(Icons.file_upload),
-                  Text('Upload'),
-                ],
-              ),
-            )
-          ],
-        ),
+            name: 'media',
+            maxFiles: 10,
+            allowMultiple: true,
+            previewImages: false,
+            decoration: const InputDecoration(
+              labelText: 'Audio / Video',
+            ),
+            // list of allowed file extensions for audio files and video files
+            allowedExtensions: const [
+              'mp3',
+              'wav',
+              "m4a",
+              "mp4",
+              "mov",
+              "avi",
+              "mkv",
+              "flv",
+              "wmv",
+              "webm",
+              "ogg",
+              "3gp",
+              "3g2",
+              "mpeg",
+              "mpg",
+              "m4v",
+              "f4v",
+              "f4p",
+              "f4a",
+              "f4b"
+            ],
+            typeSelectors: [
+              // 2. Add a TypeSelector to the list of typeSelectors
+              TypeSelector(
+                // 3. Set the type to FileType.custom
+                type: FileType.custom,
+                // 4. Set the selector to a widget of your choice
+                selector: Row(
+                  children: const <Widget>[
+                    Icon(Icons.file_upload),
+                    Text('Upload'),
+                  ],
+                ),
+              )
+            ],
+            customFileViewerBuilder: defaultFileViewer),
         const SizedBox(
           height: 25,
         ),
         IconButton(
+            iconSize: 45,
             onPressed: () async {
               if (isRecording) {
                 isRecording = false;
