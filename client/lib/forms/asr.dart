@@ -140,7 +140,6 @@ class _ASRUploadState extends State<ASRUpload> {
           height: 25,
         ),
         IconButton(
-            iconSize: 45,
             onPressed: () async {
               if (isRecording) {
                 isRecording = false;
