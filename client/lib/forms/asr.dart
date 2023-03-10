@@ -57,7 +57,7 @@ class _ASRUploadState extends State<ASRUpload> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        const count = 10;
+        const count = 5;
         const spacing = 10;
         final itemSize =
             (constraints.biggest.width - (count * spacing)) / count;

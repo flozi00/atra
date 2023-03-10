@@ -48013,7 +48013,7 @@ $S:141}
 A.apl.prototype={
 $2(a,b){var s,r,q,p,o,n,m,l,k,j,i,h=null,g=A.H(1/0,b.a,b.b)
 A.H(1/0,b.c,b.d)
-s=(g-100)/10
+s=(g-50)/5
 g=this.a
 r=J.O(g)
 q=r.gt(g)
@@ -48422,7 +48422,7 @@ return A.ap(i,!0,i.$ti.i("A.E"))},
 $S:418}
 A.auX.prototype={
 $1(a){var s,r
-if(a.a>0.5){s=a.c
+if(a.a>0.1){s=a.c
 this.b.push(s)
 r=this.a
 if(r.z.h(0,s)==null)r.z.n(0,s,"")

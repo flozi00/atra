@@ -236,7 +236,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
               );
             }
             woozy.search(q).forEach((element) {
-              if (element.score > 0.5) {
+              if (element.score > 0.1) {
                 hashes.add(element.value);
                 if (most_relevant[element.value] == null) {
                   most_relevant[element.value] = "";
