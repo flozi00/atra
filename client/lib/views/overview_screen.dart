@@ -203,7 +203,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
                           borderRadius: BorderRadius.circular(20.0)),
                       child: const Center(
                           child: Padding(
-                              padding: EdgeInsets.fromLTRB(15, 15, 15, 10),
+                              padding: EdgeInsets.fromLTRB(25, 15, 25, 10),
                               child: ASRUpload())));
                 });
           },
@@ -227,7 +227,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
             words = {};
             most_relevant = {};
             List<String> hashes = [];
-            if (q.length < 5) return list;
+            if (q.length < 3) return list;
             for (String word in q.split(" ")) {
               words[word] = HighlightedWord(
                 textStyle: TextStyle(
@@ -236,12 +236,14 @@ class _OverviewScreenState extends State<OverviewScreen> {
               );
             }
             woozy.search(q).forEach((element) {
-              hashes.add(element.value);
-              if (most_relevant[element.value] == null) {
-                most_relevant[element.value] = "";
+              if (element.score > 0.5) {
+                hashes.add(element.value);
+                if (most_relevant[element.value] == null) {
+                  most_relevant[element.value] = "";
+                }
+                most_relevant[element.value] =
+                    "${most_relevant[element.value]}\n${element.text}";
               }
-              most_relevant[element.value] =
-                  "${most_relevant[element.value]}\n${element.text}";
             });
             var result =
                 list.where((element) => hashes.contains(element.hash)).toList();

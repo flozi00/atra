@@ -11,6 +11,7 @@ import 'package:loader_overlay/loader_overlay.dart';
 import '../utils/data.dart';
 import '../utils/network.dart';
 import 'package:microphone/microphone.dart';
+import 'package:siri_wave/siri_wave.dart';
 
 class ASRUpload extends StatefulWidget {
   const ASRUpload({Key? key}) : super(key: key);
@@ -136,9 +137,10 @@ class _ASRUploadState extends State<ASRUpload> {
           ],
         ),
         const SizedBox(
-          height: 5,
+          height: 25,
         ),
         IconButton(
+            iconSize: 45,
             onPressed: () async {
               if (isRecording) {
                 isRecording = false;
@@ -149,7 +151,8 @@ class _ASRUploadState extends State<ASRUpload> {
                   });
                 });
                 microphoneRecorder.dispose();
-                microphoneRecorder = MicrophoneRecorder()..init();
+                microphoneRecorder = MicrophoneRecorder();
+                await microphoneRecorder.init();
               } else {
                 isRecording = true;
                 await microphoneRecorder.start();
@@ -159,12 +162,10 @@ class _ASRUploadState extends State<ASRUpload> {
             icon: isRecording == false
                 ? const Icon(Icons.mic_off)
                 : const Icon(Icons.mic)),
-        const SizedBox(height: 5),
-        Text(isRecording == false
-            ? "Click to start recording"
-            : "Click to stop recording"),
+        const SizedBox(height: 10),
+        isRecording ? SiriWave() : const Text("Click to start recording"),
         const SizedBox(
-          height: 10,
+          height: 25,
         ),
         ElevatedButton(
           /* The code does the following:

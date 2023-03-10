@@ -12,7 +12,7 @@ Widget build_app_bar(
         constraints: const BoxConstraints(
             minWidth: 5, maxWidth: 512, maxHeight: double.infinity),
         // Set padding for each container
-        padding: const EdgeInsets.fromLTRB(50, 50, 50, 10),
+        padding: const EdgeInsets.fromLTRB(25, 55, 25, 10),
         // Set alignment for each container
         alignment: Alignment.center,
         // Wrap each child in a SingleChildScrollView to enable scrolling
@@ -27,11 +27,15 @@ Widget build_app_bar(
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
               SliverAppBar(
-                expandedHeight: 1,
                 floating: true,
                 pinned: true,
                 stretch: false,
                 actions: [
+                  IconButton(
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, "/");
+                      },
+                      icon: const Icon(Icons.replay_outlined)),
                   IconButton(
                       onPressed: () {
                         showDialog(
@@ -55,7 +59,7 @@ Widget build_app_bar(
                     tabs: tabs,
                   ),
                 ),
-                pinned: true,
+                pinned: false,
                 floating: false,
               ),*/
             ];

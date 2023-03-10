@@ -188,7 +188,8 @@ class _RightChildTimeline extends StatelessWidget {
                                           await update_transcript(
                                               step.hash, controller.text);
                                           step.message = controller.text;
-                                          Navigator.pop(context);
+                                          Navigator.pushReplacementNamed(
+                                              context, "/");
                                         },
                                         child: const Text("Save"))
                                   ],
@@ -199,16 +200,16 @@ class _RightChildTimeline extends StatelessWidget {
           if (step.isCheckpoint)
             Row(
               children: [
-                IconButton(
-                    onPressed: () {
-                      do_voting(step.hash, "good");
+                const SizedBox(
+                  width: 15,
+                ),
+                ElevatedButton.icon(
+                    onPressed: () async {
+                      await do_voting(step.hash, "bad");
+                      Navigator.pushReplacementNamed(context, "/");
                     },
-                    icon: const Icon(Icons.arrow_circle_up_sharp)),
-                IconButton(
-                    onPressed: () {
-                      do_voting(step.hash, "bad");
-                    },
-                    icon: const Icon(Icons.arrow_circle_down_sharp))
+                    icon: const Icon(Icons.repeat),
+                    label: const Text("Regenerate")),
               ],
             )
         ],
