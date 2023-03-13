@@ -57,7 +57,7 @@ class _ASRUploadState extends State<ASRUpload> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        const count = 5;
+        const count = 3;
         const spacing = 10;
         final itemSize =
             (constraints.biggest.width - (count * spacing)) / count;
@@ -70,7 +70,7 @@ class _ASRUploadState extends State<ASRUpload> {
             files!.length,
             (index) {
               return Container(
-                height: itemSize,
+                height: itemSize / 3,
                 width: itemSize,
                 margin: const EdgeInsets.only(right: 2),
                 child: Stack(

@@ -26,6 +26,7 @@ Future<Widget> build_timeline(String args, BuildContext context,
       color: Theme.of(context).colorScheme.onPrimary,
       icon: Icons.mic_none,
       hash: value["id"],
+      full_hash: args,
     );
     Step bind = Step(
       type: Type.line,
@@ -35,6 +36,7 @@ Future<Widget> build_timeline(String args, BuildContext context,
       color: Theme.of(context).colorScheme.onSecondary,
       icon: Icons.mic_none,
       hash: value["id"],
+      full_hash: args,
     );
     details.add(tile);
     details.add(bind);
@@ -47,6 +49,7 @@ Future<Widget> build_timeline(String args, BuildContext context,
         color: Theme.of(context).colorScheme.onSecondary,
         icon: Icons.mic_none,
         hash: value["id"],
+        full_hash: args,
       ));
     }
   }
@@ -185,8 +188,8 @@ class _RightChildTimeline extends StatelessWidget {
                                     ),
                                     ElevatedButton(
                                         onPressed: () async {
-                                          await update_transcript(
-                                              step.hash, controller.text);
+                                          await update_transcript(step.hash,
+                                              controller.text, step.full_hash);
                                           step.message = controller.text;
                                           Navigator.pushReplacementNamed(
                                               context, "/");
@@ -253,6 +256,7 @@ class Step {
     required this.color,
     required this.icon,
     required this.hash,
+    required this.full_hash,
   });
 
   final Type type;
@@ -262,6 +266,7 @@ class Step {
   final Color color;
   final IconData icon;
   final String hash;
+  final String full_hash;
 
   bool get isCheckpoint => type == Type.checkpoint;
 

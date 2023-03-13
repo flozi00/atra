@@ -1,9 +1,9 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
-
 import 'package:http/http.dart' as http;
 import '../views/login.dart' as login;
+import 'package:hive/hive.dart';
+import 'package:crypto/crypto.dart';
 
 Map<String, String> headers() {
   return {
@@ -22,6 +22,8 @@ String baseURL = myurl.contains("localhost")
     : myurl.contains("github.io")
         ? "https://atra.ai/gradio"
         : "$myurl/gradio";
+
+var transcription_box;
 
 //The function sendtotask sends the audio file to the server and returns the hash string of the task.
 Future<String> SendToASR(
@@ -46,109 +48,57 @@ Future<String> SendToASR(
   return newhash;
 }
 
-Future<String> SendToOCR(var image, String name, String model) async {
-  var params = {
-    "data": [
-      {"data": "data:@file/octet-stream;base64,$image", "name": name},
-      "large",
-      model,
-    ]
-  };
-
-  // send audio data to the translation task
-  var res = await http.post(Uri.parse('$baseURL/run/ocr'),
-      headers: headers(), body: jsonEncode(params));
-  if (res.statusCode != 200) {
-    throw Exception('http.post error: statusCode= ${res.statusCode}');
-  }
-
-  // get the hash of the translation result
-  String newhash = jsonDecode(utf8.decode(res.bodyBytes))["data"][0];
-  return newhash;
-}
-
 // This code fetches the transcription from the database for a given hash.
 Future<List<dynamic>> get_transcription(String hash) async {
-  // Define the parameters to be sent to the server.
   var params = {
     "data": [hash]
   };
 
-  // Send a POST request to the server with the parameters.
+  String compressedHash = sha256.convert(utf8.encode(hash)).toString();
+  transcription_box ??= await Hive.openBox("transcription");
+  // Check if the transcription is already in the local storage.
+  var timestamps = transcription_box.get(compressedHash, defaultValue: null);
+  if (timestamps != null) {
+    return timestamps;
+  }
+
   var res = await http.post(Uri.parse('$baseURL/run/get_transcription'),
       headers: headers(), body: jsonEncode(params));
-  // Check that the response from the server is valid.
   if (res.statusCode != 200) {
     throw Exception('http.post error: statusCode= ${res.statusCode}');
   }
 
-  // Parse the response from the server and return the result.
-  List<dynamic> timestamps = jsonDecode(utf8.decode(res.bodyBytes))["data"];
+  timestamps = jsonDecode(utf8.decode(res.bodyBytes))["data"];
+  if (timestamps[0].contains("***") == false) {
+    transcription_box.put(compressedHash, timestamps);
+  }
   return timestamps;
 }
 
 // This function takes a hash and a video file and returns a byte array
 // of the video file.
-Future<Uint8List> get_video(String hash, String mediafile) async {
-  // This is the body of the request that is sent to the server.
-  var params = {
-    "data": [
-      hash,
-      {"name": "media.mp4", "data": "data:@file/octet-stream;base64,$mediafile"}
-    ]
-  };
-
-  // Send the request to the server.
-  var res = await http.post(Uri.parse('$baseURL/run/subtitle'),
-      headers: headers(), body: jsonEncode(params));
-
-  // Check that the request was successful.
-  if (res.statusCode != 200) {
-    throw Exception('http.post error: statusCode= ${res.statusCode}');
-  }
-
-  // Get the name of the file that the server sent back.
-  String video =
-      Uri.encodeFull(jsonDecode(utf8.decode(res.bodyBytes))["data"][0]["name"]);
-
-  // Get the file from the server.
-  res = await http.get(Uri.parse('$baseURL/file=$video'));
-
-  // Convert the file to a byte array.
-  Uint8List myvideo = res.bodyBytes;
-
-  // Return the byte array.
-  return myvideo;
-}
-
-// This function takes a hash and a video file and returns a byte array
-// of the video file.
 Future<String> get_audio(String hash) async {
-  // This is the body of the request that is sent to the server.
   var params = {
     "data": [
       hash,
     ]
   };
 
-  // Send the request to the server.
   var res = await http.post(Uri.parse('$baseURL/run/get_audio'),
       headers: headers(), body: jsonEncode(params));
 
-  // Check that the request was successful.
   if (res.statusCode != 200) {
     throw Exception('http.post error: statusCode= ${res.statusCode}');
   }
 
-  // Get the name of the file that the server sent back.
   String video =
       Uri.encodeFull(jsonDecode(utf8.decode(res.bodyBytes))["data"][0]["name"]);
 
-  // Return the byte array.
   return Uri.parse('$baseURL/file=$video').toString();
 }
 
-Future<bool> update_transcript(String hash, String text) async {
+Future<bool> update_transcript(
+    String hash, String text, String fullHash) async {
   var params = {
     "data": [
       hash,
@@ -164,6 +114,11 @@ Future<bool> update_transcript(String hash, String text) async {
   if (res.statusCode != 200) {
     throw Exception('http.post error: statusCode= ${res.statusCode}');
   }
+
+  String compressedHash = sha256.convert(utf8.encode(fullHash)).toString();
+  transcription_box ??= await Hive.openBox("transcription");
+  transcription_box.put(compressedHash, null);
+
   return true;
 }
 
