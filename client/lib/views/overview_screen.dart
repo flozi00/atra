@@ -275,13 +275,16 @@ class _OverviewScreenState extends State<OverviewScreen> {
             const SizedBox(
               height: 25,
             ),
-            ListView.builder(
-                shrinkWrap: true,
-                itemCount: items.length,
-                itemBuilder: (context, i) {
-                  return cardItem(
-                      items[i].transcription, items[i].hash, items[i].words);
-                })
+            SizedBox(
+                height: MediaQuery.of(context).size.height - 200,
+                child: SingleChildScrollView(
+                    child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: items.length,
+                        itemBuilder: (context, i) {
+                          return cardItem(items[i].transcription, items[i].hash,
+                              items[i].words);
+                        })))
           ],
         ));
   }

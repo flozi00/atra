@@ -9,8 +9,10 @@ Widget build_app_bar(
       // Create a container for each child
       Container(
         // Set constraints for each container
-        constraints: const BoxConstraints(
-            minWidth: 5, maxWidth: 512, maxHeight: double.infinity),
+        constraints: BoxConstraints(
+            minWidth: 5,
+            maxWidth: 512,
+            maxHeight: MediaQuery.of(context).size.height - 200),
         // Set padding for each container
         padding: const EdgeInsets.fromLTRB(25, 55, 25, 10),
         // Set alignment for each container
