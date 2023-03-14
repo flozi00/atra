@@ -49,8 +49,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
     cards.sort((a, b) => b.score.compareTo(a.score));
   }
 
-  Widget cardItem(String recognizedText, String hash, List<dynamic> listWords,
-      String activeMode) {
+  Widget cardItem(String recognizedText, String hash, List<dynamic> listWords) {
     return Card(
         child: Column(children: [
       ListTile(
@@ -86,12 +85,14 @@ class _OverviewScreenState extends State<OverviewScreen> {
                             // if answer length > 2, display Text
                             if (answer.length >= 2)
                               Center(
-                                  child: Card(
-                                child: ListTile(
-                                  title: Text(question),
-                                  subtitle: Text(answer),
-                                ),
-                              )),
+                                  child: SizedBox(
+                                      width: 360,
+                                      child: Card(
+                                        child: ListTile(
+                                          title: Text(question),
+                                          subtitle: Text(answer),
+                                        ),
+                                      ))),
                             const SizedBox(
                               height: 35,
                             ),
@@ -107,7 +108,6 @@ class _OverviewScreenState extends State<OverviewScreen> {
               onPressed: () async {
                 SharedPreferences prefs = await SharedPreferences.getInstance();
                 for (String mode in modes) {
-                  activeMode = mode;
                   List<String> hashList = prefs.getStringList(mode) ?? [];
                   hashList.remove(hash);
                   await prefs.setStringList(mode, hashList);
@@ -126,21 +126,29 @@ class _OverviewScreenState extends State<OverviewScreen> {
       isFetching = true;
       cards = [];
       String tokenValid = "Valid";
-      String activeMode = 'ocr';
       SharedPreferences prefs = await SharedPreferences.getInstance();
       for (String mode in modes) {
-        activeMode = mode;
         List<String> hashes = prefs.getStringList(mode) ?? [];
         for (String hash in hashes) {
           await get_transcription(hash).then((values) {
             cards.add(Transcription(
-                hash: hash,
-                transcription: values[0],
-                words: values[1],
-                activeMode: activeMode));
+              hash: hash,
+              transcription: values[0],
+              words: values[1],
+            ));
             tokenValid = values[2];
             for (int i = 0; i < values[1].length; i++) {
-              woozy.addEntry(values[1][i]["text"], value: hash);
+              String text = values[1][i]["text"];
+              text = text.replaceAll("!", ".");
+              text = text.replaceAll("?", ".");
+
+              List<String> textList = text.split(".");
+
+              for (String text in textList) {
+                if (text != "") {
+                  woozy.addEntry(text, value: hash);
+                }
+              }
             }
             setState(() {});
           });
@@ -178,7 +186,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
       }
       List<String> hashes = [];
       woozy.search(question).forEach((element) {
-        if (element.score > 0.4) {
+        if (element.score > 0.1) {
           hashes.add(element.value);
           var result = cards
               .where((elementResult) => hashes.contains(elementResult.hash))
@@ -246,8 +254,16 @@ class _OverviewScreenState extends State<OverviewScreen> {
             ),
             TextField(
               controller: editingController,
-              onChanged: (value) {
+              onSubmitted: (value) {
                 filterSearchResults(value);
+              },
+              onChanged: (value) {
+                if (value.length <= 3) {
+                  setState(() {
+                    items.clear();
+                    items.addAll(cards);
+                  });
+                }
               },
               decoration: const InputDecoration(
                   labelText: "Search",
@@ -263,8 +279,8 @@ class _OverviewScreenState extends State<OverviewScreen> {
                 shrinkWrap: true,
                 itemCount: items.length,
                 itemBuilder: (context, i) {
-                  return cardItem(items[i].transcription, items[i].hash,
-                      items[i].words, items[i].activeMode);
+                  return cardItem(
+                      items[i].transcription, items[i].hash, items[i].words);
                 })
           ],
         ));
@@ -275,13 +291,11 @@ class Transcription {
   String hash;
   String transcription;
   List<dynamic> words;
-  String activeMode;
   double score = 0;
 
   Transcription({
     required this.hash,
     required this.transcription,
     required this.words,
-    required this.activeMode,
   });
 }
