@@ -157,8 +157,7 @@ def build_gradio():
 
 
 def do_voting(task_id, rating, request: gr.Request):
-    if check_valid_auth(request) is not False:
-        set_voting(task_id, rating)
+    set_voting(task_id, rating)
 
 
 def add_to_ocr_queue(image, model_config, mode, request: gr.Request):

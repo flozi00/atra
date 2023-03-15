@@ -140,9 +140,10 @@ def set_voting(hs, vote):
         statement = select(QueueData).where(QueueData.hash == hs)
         transkript = session.exec(statement).first()
         if transkript is not None:
-            transkript.votings = transkript.votings + vote
-            session.commit()
-            session.refresh(transkript)
+            if transkript.votings < 99:
+                transkript.votings = transkript.votings + vote
+                session.commit()
+                session.refresh(transkript)
 
 
 @timeit

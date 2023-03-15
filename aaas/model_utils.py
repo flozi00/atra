@@ -4,7 +4,7 @@ from aaas.utils import timeit
 from aaas.statics import MODEL_MAPPING
 from transformers import AutoProcessor
 import torch
-from peft import PeftModel, PeftConfig
+import peft
 from functools import cache
 
 
@@ -31,16 +31,28 @@ def get_processor(processor_class, model_id):
 @cache
 @timeit
 def get_peft_model(peft_model_id, model_class):
-    peft_config = PeftConfig.from_pretrained(peft_model_id)
+    peft_config = peft.PeftConfig.from_pretrained(peft_model_id)
     model = model_class.from_pretrained(
         peft_config.base_model_name_or_path,
         cache_dir="./model_cache",
     )
-    model = PeftModel.from_pretrained(
+    model = peft.PeftModel.from_pretrained(
         model,
         peft_model_id,
     )
     model = model.eval()
+    key_list = [
+        key for key, _ in model.base_model.model.named_modules() if "lora" not in key
+    ]
+    for key in key_list:
+        parent, target, target_name = model.base_model._get_submodules(key)
+        if isinstance(target, peft.tuners.lora.Linear):
+            bias = target.bias is not None
+            new_module = torch.nn.Linear(
+                target.in_features, target.out_features, bias=bias
+            )
+            model.base_model._replace_module(parent, target_name, new_module, target)
+
     model.get_base_model().save_pretrained("temp_lora_model", cache_dir="./model_cache")
     del model
     return get_model(model_class, "temp_lora_model")
