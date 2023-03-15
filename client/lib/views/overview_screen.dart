@@ -8,8 +8,6 @@ import '../utils/network.dart';
 import './timeline_view.dart';
 import 'package:woozy_search/woozy_search.dart';
 
-import 'login.dart';
-
 extension IterableExtension<T> on Iterable<T> {
   Iterable<T> distinctBy(Object Function(T e) getCompareValue) {
     var result = <T>[];
@@ -46,7 +44,6 @@ class _OverviewScreenState extends State<OverviewScreen> {
   void initState() {
     super.initState();
     build_cards_list();
-    cards.sort((a, b) => b.score.compareTo(a.score));
   }
 
   Widget cardItem(String recognizedText, String hash, List<dynamic> listWords) {
@@ -113,7 +110,6 @@ class _OverviewScreenState extends State<OverviewScreen> {
                   await prefs.setStringList(mode, hashList);
                 }
                 build_cards_list();
-                Navigator.pushNamed(context, '/');
               },
               child: const Text('Delete'))
         ],
@@ -122,52 +118,49 @@ class _OverviewScreenState extends State<OverviewScreen> {
   }
 
   Future<void> build_cards_list() async {
-    if (isFetching == false) {
-      isFetching = true;
-      cards = [];
-      String tokenValid = "Valid";
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      for (String mode in modes) {
-        List<String> hashes = prefs.getStringList(mode) ?? [];
-        for (String hash in hashes) {
-          await get_transcription(hash).then((values) {
-            cards.add(Transcription(
-              hash: hash,
-              transcription: values[0],
-              words: values[1],
-            ));
-            tokenValid = values[2];
-            for (int i = 0; i < values[1].length; i++) {
-              String text = values[1][i]["text"];
-              text = text.replaceAll("!", ".");
-              text = text.replaceAll("?", ".");
+    cards = [];
+    String tokenValid = "Valid";
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    for (String mode in modes) {
+      List<String> hashes = prefs.getStringList(mode) ?? [];
+      for (String hash in hashes) {
+        await get_transcription(hash).then((values) {
+          cards.add(Transcription(
+            hash: hash,
+            transcription: values[0],
+            words: values[1],
+          ));
+          tokenValid = values[2];
+          for (int i = 0; i < values[1].length; i++) {
+            String text = values[1][i]["text"];
+            text = text.replaceAll("!", ".");
+            text = text.replaceAll("?", ".");
 
-              List<String> textList = text.split(".");
+            List<String> textList = text.split(".");
 
-              for (String text in textList) {
-                if (text != "") {
-                  woozy.addEntry(text, value: hash);
-                }
+            for (String text in textList) {
+              if (text != "") {
+                woozy.addEntry(text, value: hash);
               }
             }
-            setState(() {});
+          }
+          setState(() {
+            items.clear();
+            items.addAll(cards);
           });
-        }
+        });
       }
-      if (tokenValid != "Valid") {
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        if (prefs.getString('token') != null &&
-            prefs.getString('token') != '') {
-          showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return const Dialog(child: LoginPage());
-              });
-        }
-      }
-      items.addAll(cards);
     }
-    isFetching = false;
+    /*if (tokenValid != "Valid") {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      if (prefs.getString('token') != null && prefs.getString('token') != '') {
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return const Dialog(child: LoginPage());
+            });
+      }
+    }*/
   }
 
   void filterSearchResults(String query) {
@@ -258,6 +251,9 @@ class _OverviewScreenState extends State<OverviewScreen> {
                 filterSearchResults(value);
               },
               onChanged: (value) {
+                if (value.isEmpty) {
+                  build_cards_list();
+                }
                 if (value.length <= 3) {
                   setState(() {
                     items.clear();
