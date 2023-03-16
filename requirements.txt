@@ -15,9 +15,7 @@ accelerate
 unidecode
 demucs>=4.0.0
 librosa 
-pillow
 pydub
 peft
 text2num
 fsspec
-pdfminer.six

@@ -4,12 +4,13 @@ import os
 import gradio as gr
 from transformers.pipelines.audio_utils import ffmpeg_read
 
-from aaas.statics import LANG_MAPPING, TO_OCR
+from aaas.statics import LANG_MAPPING
 from aaas.datastore import (
     add_to_queue,
     get_data_from_hash,
     get_transkript,
     get_transkript_batch,
+    get_vote_queue,
     set_transkript,
     set_voting,
 )
@@ -28,7 +29,10 @@ def build_edit_ui():
 
     audio_file = gr.Audio(label="Audiofile")
     transcription = gr.Textbox(max_lines=10)
-    send = gr.Button(value="Send")
+    label = gr.Radio(["good", "bad", "confirm"], label="Label")
+    with gr.Row():
+        send = gr.Button(value="Send")
+        rate = gr.Button(value="Rate")
 
     task_id.change(
         fn=get_audio,
@@ -43,23 +47,7 @@ def build_edit_ui():
         outputs=[],
         api_name="correct_transcription",
     )
-
-
-def build_subtitle_ui():
-    with gr.Row():
-        video_file_in = gr.Video(source="upload", type="filepath", label="VideoFile")
-        video_file_out = gr.Video(source="upload", type="filepath", label="VideoFile")
-
-    task_id = gr.Textbox(label="Task ID", max_lines=3)
-
-    refresh = gr.Button(value="Get Results")
-
-    refresh.click(
-        fn=get_sub_video,
-        inputs=[task_id, video_file_in],
-        outputs=[video_file_out],
-        api_name="subtitle",
-    )
+    rate.click(fn=do_voting, inputs=[task_id, label], outputs=[task_id])
 
 
 def build_asr_ui():
@@ -79,26 +67,6 @@ def build_asr_ui():
         inputs=[audio_file, lang, model_config],
         outputs=[task_id],
         api_name="transcription",
-    )
-
-
-def build_ocr_ui():
-    with gr.Row():
-        model_config = gr.Radio(
-            choices=["small", "large"], value="large", label="model size"
-        )
-        ocr_mode = gr.Radio(choices=["handwritten", "printed"], label="OCR Mode")
-
-    with gr.Row():
-        image_file = gr.File(source="upload", type="file", label="Imagefile")
-
-    task_id = gr.Textbox(label="Task ID", max_lines=3)
-
-    image_file.change(
-        fn=add_to_ocr_queue,
-        inputs=[image_file, model_config, ocr_mode],
-        outputs=[task_id],
-        api_name="ocr",
     )
 
 
@@ -142,10 +110,6 @@ def build_gradio():
         with gr.Tabs():
             with gr.Tab("ASR"):
                 build_asr_ui()
-            with gr.Tab("OCR"):
-                build_ocr_ui()
-            with gr.Tab("Subtitles"):
-                build_subtitle_ui()
             with gr.Tab("Results"):
                 build_results_ui()
             with gr.Tab("Edit"):
@@ -157,26 +121,12 @@ def build_gradio():
 
 
 def do_voting(task_id, rating, request: gr.Request):
-    set_voting(task_id, rating)
-
-
-def add_to_ocr_queue(image, model_config, mode, request: gr.Request):
-    image = image.name
-    if image is not None and len(image) > 8:
-        file_format = image.split(".")[-1]
-        with open(image, "rb") as f:
-            payload = f.read()
-
-    queue = add_to_queue(
-        audio_batch=[payload],
-        master="",
-        main_lang=mode,
-        model_config=model_config,
-        times=TO_OCR,
-        file_format=file_format,
-    )
-
-    return queue[0]
+    if request.client.host != "127.0.0.1" and rating != "confirm":
+        set_voting(task_id, rating)
+        return task_id
+    elif request.client.host == "127.0.0.1":
+        set_voting(task_id, rating)
+        return get_vote_queue().hash
 
 
 def add_to_vad_queue(audio, main_lang, model_config, request: gr.Request):
@@ -273,8 +223,6 @@ def get_transcription(queue_string: str, request: gr.Request):
         result = results[x]
         if result is None:
             return "", [], tok
-        elif result.metas == TO_OCR:
-            return result.transcript, [], tok
         else:
             if len(queue_string) < 5 or "***" in queue_string:
                 return queue_string, [], tok
@@ -303,34 +251,3 @@ def get_audio(task_id, request: gr.Request):
     result = get_transkript(task_id)
     bytes_data = get_data_from_hash(result.hash)
     return (16000, np.frombuffer(bytes_data, dtype=np.float32)), result.transcript
-
-
-def get_sub_video(task_id, video_file, request: gr.Request):
-    segments = get_transcription(task_id)[1]
-    srtFilename = "subs.srt"
-    if os.path.exists(srtFilename):
-        os.remove(srtFilename)
-    id = 0
-    for segment in segments:
-        startTime = (
-            str(0) + str(timedelta(seconds=int(segment["start_timestamp"]))) + ",000"
-        )
-        endTime = (
-            str(0) + str(timedelta(seconds=int(segment["stop_timestamp"]))) + ",000"
-        )
-        text = segment["text"]
-        seg = f"{id}\n{startTime} --> {endTime}\n{text}\n\n"
-        id = id + 1
-
-        with open(srtFilename, "a+", encoding="utf-8") as srtFile:
-            srtFile.write(seg)
-
-    os.system(
-        f'ffmpeg -i "{video_file}" -i watermark.png -filter_complex "[1][0]scale2ref=w=oh*mdar:h=ih*0.3[logo][video];[video][logo]overlay=main_w-overlay_w-5:5" "{video_file}watermarked.mp4"'
-    )
-
-    os.system(
-        f'ffmpeg -i "{video_file}watermarked.mp4" -vf subtitles="{srtFilename}" "{video_file}.mp4"'
-    )
-
-    return f"{video_file}.mp4"

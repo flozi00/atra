@@ -1,6 +1,4 @@
 from transformers import (
-    VisionEncoderDecoderModel,
-    TrOCRProcessor,
     WhisperProcessor,
     WhisperForConditionalGeneration,
 )
@@ -27,32 +25,6 @@ MODEL_MAPPING = {
                 "name": "openai/whisper-large-v2",
                 "class": WhisperForConditionalGeneration,
                 "processor": WhisperProcessor,
-            },
-        },
-    },
-    "ocr": {
-        "small": {
-            "handwritten": {
-                "name": "microsoft/trocr-base-handwritten",
-                "class": VisionEncoderDecoderModel,
-                "processor": TrOCRProcessor,
-            },
-            "universal": {
-                "name": "microsoft/trocr-base-printed",
-                "class": VisionEncoderDecoderModel,
-                "processor": TrOCRProcessor,
-            },
-        },
-        "large": {
-            "handwritten": {
-                "name": "microsoft/trocr-large-handwritten",
-                "class": VisionEncoderDecoderModel,
-                "processor": TrOCRProcessor,
-            },
-            "universal": {
-                "name": "microsoft/trocr-large-printed",
-                "class": VisionEncoderDecoderModel,
-                "processor": TrOCRProcessor,
             },
         },
     },
@@ -165,7 +137,6 @@ LANG_MAPPING = {v: k for k, v in LANGUAGE_CODES.items()}
 TODO = "***TODO***"
 INPROGRESS = "***PROGRESS***"
 TO_VAD = "***DETECT VOICE***"
-TO_OCR = "***TO OCR***"
 TO_ASR = "***TO ASR***"
 
 CACHE_SIZE = 128

@@ -121,12 +121,26 @@ def get_tasks_queue():
     return sample
 
 
+def get_vote_queue():
+    with Session(engine) as session:
+        statement = (
+            select(QueueData)
+            .where(QueueData.votings != 100)
+            .where(QueueData.transcript != TODO)
+            .where(QueueData.transcript != INPROGRESS)
+        )
+        todos = session.exec(statement).all()
+        sample = random.choice(todos)
+
+    return sample
+
+
 @timeit
 def set_transkript(hs, transcription):
     with Session(engine) as session:
         statement = select(QueueData).where(QueueData.hash == hs)
         transkript = session.exec(statement).first()
-        if transkript is not None:
+        if transkript is not None and transkript.votings < 99:
             transkript.transcript = transcription
             transkript.votings = 0
             session.commit()
@@ -135,7 +149,7 @@ def set_transkript(hs, transcription):
 
 @timeit
 def set_voting(hs, vote):
-    vote = 1 if vote == "good" else -1
+    vote = 1 if vote == "good" else 100 if vote == "confirm" else -1
     with Session(engine) as session:
         statement = select(QueueData).where(QueueData.hash == hs)
         transkript = session.exec(statement).first()

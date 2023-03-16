@@ -2,7 +2,6 @@ import os
 import time
 import threading
 from aaas.audio_utils.asr import inference_asr
-from aaas.vision_utils.ocr import inference_ocr
 from aaas.datastore import (
     get_data_from_hash,
     get_tasks_queue,
@@ -10,7 +9,7 @@ from aaas.datastore import (
     set_transkript,
 )
 from aaas.gradio_utils import add_vad_chunks
-from aaas.statics import TO_VAD, TO_OCR
+from aaas.statics import TO_VAD
 import numpy as np
 
 from aaas.gradio_utils import build_gradio
@@ -43,15 +42,6 @@ class BackgroundTasks(threading.Thread):
                             audio=array,
                             main_lang=task.langs.split(",")[0],
                             model_config=task.model_config,
-                        )
-                    elif task.metas == TO_OCR:
-                        file_format = task.hash.split(".")[-1]
-                        with open(f"dummy.{file_format}", "wb") as f:
-                            f.write(bytes_data)
-                        result = inference_ocr(
-                            data=f"dummy.{file_format}",
-                            mode=task.langs.split(",")[0],
-                            config=task.model_config,
                         )
                     else:
                         array = np.frombuffer(bytes_data, dtype=np.float32)
