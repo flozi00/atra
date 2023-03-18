@@ -48,7 +48,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
   void initState() {
     super.initState();
     build_cards_list();
-    Timer.periodic(const Duration(seconds: 15), (arg) async {
+    Timer.periodic(const Duration(seconds: 1), (arg) async {
       if (inProgress) {
         await build_cards_list();
       }

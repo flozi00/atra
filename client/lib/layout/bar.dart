@@ -34,11 +34,6 @@ Widget build_app_bar(
                 actions: [
                   IconButton(
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/");
-                      },
-                      icon: const Icon(Icons.replay_outlined)),
-                  IconButton(
-                      onPressed: () {
                         launchUrl(Uri.parse("https://a-ware.io/atra"));
                       },
                       icon: const Icon(Icons.help_outline))
