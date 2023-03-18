@@ -5,6 +5,7 @@ from aaas.statics import LANG_MAPPING
 from aaas.utils import timeit
 from functools import cache
 import torch
+from text_to_num import alpha2digit
 
 
 @cache
@@ -38,5 +39,7 @@ def inference_asr(data, main_lang: str, model_config: str) -> str:
             "max_new_tokens": int((len(data) / 16000) * 10) + 10,
         },
     )["text"].strip()
+
+    transcription = alpha2digit(transcription, lang=LANG_MAPPING[main_lang])
 
     return transcription

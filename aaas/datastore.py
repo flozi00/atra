@@ -125,7 +125,7 @@ def get_vote_queue():
     with Session(engine) as session:
         statement = (
             select(QueueData)
-            .where(QueueData.votings != 100)
+            .where(QueueData.votings < 50)
             .where(QueueData.transcript != TODO)
             .where(QueueData.transcript != INPROGRESS)
         )

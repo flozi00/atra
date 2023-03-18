@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'package:highlight_text/highlight_text.dart';
@@ -7,6 +9,7 @@ import '../forms/asr.dart';
 import '../utils/network.dart';
 import './timeline_view.dart';
 import 'package:woozy_search/woozy_search.dart';
+import 'package:flutter/services.dart';
 
 extension IterableExtension<T> on Iterable<T> {
   Iterable<T> distinctBy(Object Function(T e) getCompareValue) {
@@ -39,11 +42,17 @@ class _OverviewScreenState extends State<OverviewScreen> {
   String answer = "";
   Map<String, String> most_relevant = {};
   TextEditingController editingController = TextEditingController();
+  bool inProgress = false;
 
   @override
   void initState() {
     super.initState();
     build_cards_list();
+    Timer.periodic(const Duration(seconds: 15), (arg) async {
+      if (inProgress) {
+        await build_cards_list();
+      }
+    });
   }
 
   Widget cardItem(String recognizedText, String hash, List<dynamic> listWords) {
@@ -103,6 +112,15 @@ class _OverviewScreenState extends State<OverviewScreen> {
         children: <Widget>[
           ElevatedButton(
               onPressed: () async {
+                Clipboard.setData(ClipboardData(text: recognizedText))
+                    .then((_) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Copied to clipboard")));
+                });
+              },
+              child: const Text('Copy to clipboard')),
+          ElevatedButton(
+              onPressed: () async {
                 SharedPreferences prefs = await SharedPreferences.getInstance();
                 for (String mode in modes) {
                   List<String> hashList = prefs.getStringList(mode) ?? [];
@@ -121,10 +139,14 @@ class _OverviewScreenState extends State<OverviewScreen> {
     cards = [];
     String tokenValid = "Valid";
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    inProgress = false;
     for (String mode in modes) {
       List<String> hashes = prefs.getStringList(mode) ?? [];
       for (String hash in hashes) {
         await get_transcription(hash).then((values) {
+          if (values[0].contains("***")) {
+            inProgress = true;
+          }
           cards.add(Transcription(
             hash: hash,
             transcription: values[0],
