@@ -4,11 +4,6 @@ from aaas.audio_utils.asr import inference_asr
 import re
 from text_to_num import alpha2digit
 from tqdm.auto import tqdm
-import language_tool_python
-import language_tool_python.download_lt
-
-language_tool_python.download_lt.LATEST_VERSION = "stable"
-tool = language_tool_python.LanguageTool("de-DE")
 
 base = []
 predicted = []
@@ -27,7 +22,6 @@ ds = ds.cast_column("audio", datasets.features.Audio(sampling_rate=16000, decode
 for d in tqdm(ds):
     # normalize base transcription
     base_str_orig = alpha2digit(d["sentence"], "de")
-    base_str_orig = tool.correct(base_str_orig)
     base_str = (
         re.sub(r"[^\w\s]", "", base_str_orig).lower().replace("-", " ").replace(",", "")
     )
@@ -38,7 +32,6 @@ for d in tqdm(ds):
 
         # normalize prediction
         pred_str = inference_asr(audio_data, "german", "large")
-        pred_str = tool.correct(pred_str)
         pred_str_orig = alpha2digit(pred_str, "de")
         pred_str = (
             re.sub(r"[^\w\s]", "", pred_str_orig)
