@@ -19,3 +19,4 @@ pydub
 peft
 text2num
 fsspec
+language_tool_python
