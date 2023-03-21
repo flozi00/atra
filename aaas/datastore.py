@@ -10,12 +10,15 @@ from aaas.utils import timeit
 import fsspec
 import time
 from functools import lru_cache
+import datasets
+from tqdm.auto import tqdm
 
 db_backend = os.getenv("DBBACKEND", "sqlite:///database.db")
 ftp_backend = os.getenv("FTPBACKEND")
 ftp_user = ftp_backend.split("@")[0]
 ftp_pass = ftp_backend.split("@")[1]
 ftp_server = ftp_backend.split("@")[2]
+build_dataset = os.getenv("BUILDDATASET", "false") == "true"
 
 
 class QueueData(SQLModel, table=True):
@@ -125,14 +128,41 @@ def get_vote_queue():
     with Session(engine) as session:
         statement = (
             select(QueueData)
-            .where(QueueData.votings < 50)
+            .where(QueueData.votings < 3)
+            .where(QueueData.votings >= 0)
             .where(QueueData.transcript != TODO)
             .where(QueueData.transcript != INPROGRESS)
         )
         todos = session.exec(statement).all()
-        sample = random.choice(todos)
+        sample = todos[-1]
 
     return sample
+
+
+def get_validated_dataset():
+    dataset = []
+    with Session(engine) as session:
+        statement = (
+            select(QueueData)
+            .where(QueueData.votings >= 100)
+            .where(QueueData.transcript != TODO)
+            .where(QueueData.transcript != INPROGRESS)
+        )
+        d_set = session.exec(statement).all()
+
+    for x in tqdm(d_set):
+        dataset.append(
+            {
+                "lang": x.langs,
+                "text": x.transcript,
+                "hash": x.hash,
+                "bytes": get_data_from_hash(x.hash),
+            }
+        )
+
+    dataset = datasets.Dataset.from_list(dataset)
+
+    dataset.push_to_hub("atra", private=True)
 
 
 @timeit
@@ -211,3 +241,7 @@ def set_data_to_hash(data: QueueData, bytes_data: bytes):
         print(e)
         time.sleep(1)
         set_data_to_hash(data, bytes_data)
+
+
+if build_dataset:
+    get_validated_dataset()

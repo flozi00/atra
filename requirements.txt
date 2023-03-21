@@ -19,3 +19,5 @@ pydub
 peft
 text2num
 fsspec
+datasets
+tqdm

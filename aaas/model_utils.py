@@ -5,7 +5,7 @@ from aaas.statics import MODEL_MAPPING
 from transformers import AutoProcessor
 import torch
 import peft
-from functools import cache
+from functools import lru_cache
 
 
 @timeit
@@ -21,14 +21,12 @@ def get_model(model_class, model_id):
     return model
 
 
-@cache
 @timeit
 def get_processor(processor_class, model_id):
     processor = processor_class.from_pretrained(model_id)
     return processor
 
 
-@cache
 @timeit
 def get_peft_model(peft_model_id, model_class):
     peft_config = peft.PeftConfig.from_pretrained(peft_model_id)
@@ -58,7 +56,7 @@ def get_peft_model(peft_model_id, model_class):
     return get_model(model_class, "temp_lora_model")
 
 
-@cache
+@lru_cache(maxsize=1)
 @timeit
 def get_model_and_processor(lang: str, task: str, config: str):
     # get model id
