@@ -152,7 +152,7 @@ def add_to_vad_queue(audio, main_lang, model_config, request: gr.Request):
 def add_vad_chunks(audio, main_lang, model_config, request: gr.Request):
     def check_timestamp_length_limit(timestamps, limit):
         for timestamp in timestamps:
-            if timestamp["start"] - timestamp["end"] > limit:
+            if timestamp["end"] - timestamp["start"] > limit:
                 return True
         return False
 
@@ -172,7 +172,7 @@ def add_vad_chunks(audio, main_lang, model_config, request: gr.Request):
         model_vad,
         sampling_rate=16000,
     )
-    while len(speech_timestamps) < 1 or check_timestamp_length_limit(
+    while len(speech_timestamps) == 0 or check_timestamp_length_limit(
         speech_timestamps, 20
     ):
         speech_timestamps = get_speech_timestamps(
@@ -183,10 +183,10 @@ def add_vad_chunks(audio, main_lang, model_config, request: gr.Request):
             sampling_rate=16000,
             min_silence_duration_ms=silence_duration,
             min_speech_duration_ms=1000,
-            speech_pad_ms=500,
+            speech_pad_ms=250,
             return_seconds=True,
         )
-        silence_duration = silence_duration * 0.9
+        silence_duration = silence_duration * 0.95
         if silence_duration < 2:
             break
     audio_batch = [
@@ -198,7 +198,7 @@ def add_vad_chunks(audio, main_lang, model_config, request: gr.Request):
         for st in range(len(speech_timestamps))
     ]
 
-    print(len(audio_batch), len(audio) / 16000)
+    print(len(audio_batch), len(audio) / 16000, silence_duration)
     queue = add_to_queue(
         audio_batch=audio_batch,
         master=speech_timestamps,
