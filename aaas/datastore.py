@@ -39,7 +39,7 @@ SQLModel.metadata.create_all(engine)
 @timeit
 def add_to_queue(
     audio_batch, master, main_lang, model_config, times=None, file_format="wav"
-) -> list(str):
+) -> list:
     # Create a list to store the hashes of the audio files
     hashes = []
     # Create a session to the database
@@ -104,7 +104,7 @@ def get_transkript(hs: str) -> QueueData:
 
 
 @timeit
-def get_transkript_batch(hs: str) -> list(QueueData):
+def get_transkript_batch(hs: str) -> list:
     """Get a transkript from the database by its hash in a batch
 
     Args:
