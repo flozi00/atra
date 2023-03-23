@@ -29,6 +29,7 @@ def get_processor(processor_class, model_id):
 
 @timeit
 def get_peft_model(peft_model_id, model_class):
+    # Load the PEFT model
     peft_config = peft.PeftConfig.from_pretrained(peft_model_id)
     model = model_class.from_pretrained(
         peft_config.base_model_name_or_path,
@@ -39,6 +40,8 @@ def get_peft_model(peft_model_id, model_class):
         peft_model_id,
     )
     model = model.eval()
+
+    # Remove the LORA modules
     key_list = [
         key for key, _ in model.base_model.model.named_modules() if "lora" not in key
     ]
@@ -51,6 +54,7 @@ def get_peft_model(peft_model_id, model_class):
             )
             model.base_model._replace_module(parent, target_name, new_module, target)
 
+    # Save the model
     model.get_base_model().save_pretrained("temp_lora_model", cache_dir="./model_cache")
     del model
     return get_model(model_class, "temp_lora_model")
@@ -82,6 +86,7 @@ def get_model_and_processor(lang: str, task: str, config: str):
     )
     processor = get_processor(processor_class, model_id)
 
+    # convert the model to a BetterTransformer model
     try:
         model = BetterTransformer.transform(model)
     except Exception as e:

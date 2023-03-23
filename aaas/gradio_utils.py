@@ -1,4 +1,3 @@
-from datetime import timedelta
 import os
 
 import gradio as gr
@@ -25,6 +24,9 @@ model_vad, get_speech_timestamps = silero_vad(True)
 
 
 def build_edit_ui():
+    """
+    UI for editing transcriptions and voting like confirm, good, bad
+    """
     task_id = gr.Textbox(label="Task ID", max_lines=3)
 
     audio_file = gr.Audio(label="Audiofile")
@@ -51,6 +53,9 @@ def build_edit_ui():
 
 
 def build_asr_ui():
+    """
+    UI for ASR
+    """
     with gr.Row():
         lang = gr.Radio(langs, value=langs[0], label="Source Language")
         model_config = gr.Radio(
@@ -71,6 +76,9 @@ def build_asr_ui():
 
 
 def build_results_ui():
+    """
+    UI for results page
+    """
     task_id = gr.Textbox(label="Task ID", max_lines=3)
 
     with gr.Row():
@@ -90,6 +98,9 @@ def build_results_ui():
 
 
 def build_voting_ui():
+    """
+    UI for voting page
+    """
     task_id = gr.Textbox(label="Task ID", max_lines=3)
 
     with gr.Row():
@@ -104,6 +115,9 @@ def build_voting_ui():
 
 
 def build_gradio():
+    """
+    Merge all UIs into one
+    """
     ui = gr.Blocks()
 
     with ui:
@@ -120,7 +134,7 @@ def build_gradio():
     return ui
 
 
-def do_voting(task_id, rating, request: gr.Request):
+def do_voting(task_id: str, rating: str, request: gr.Request):
     if request.client.host != "127.0.0.1" and rating != "confirm":
         set_voting(task_id, rating)
         return task_id
@@ -129,7 +143,9 @@ def do_voting(task_id, rating, request: gr.Request):
         return get_vote_queue().hash
 
 
-def add_to_vad_queue(audio, main_lang, model_config, request: gr.Request):
+def add_to_vad_queue(
+    audio: str, main_lang: str, model_config: str, request: gr.Request
+):
     if main_lang not in langs:
         main_lang = "german"
     if model_config not in ["small", "medium", "large"]:
@@ -149,7 +165,7 @@ def add_to_vad_queue(audio, main_lang, model_config, request: gr.Request):
     return queue_string
 
 
-def add_vad_chunks(audio, main_lang, model_config, request: gr.Request):
+def add_vad_chunks(audio, main_lang: str, model_config: str, request: gr.Request):
     def check_timestamp_length_limit(timestamps, limit):
         for timestamp in timestamps:
             if timestamp["end"] - timestamp["start"] > limit:
@@ -247,7 +263,7 @@ def get_transcription(queue_string: str, request: gr.Request):
     return full_transcription, chunks, tok
 
 
-def get_audio(task_id, request: gr.Request):
+def get_audio(task_id: str, request: gr.Request):
     result = get_transkript(task_id)
     bytes_data = get_data_from_hash(result.hash)
     return (16000, np.frombuffer(bytes_data, dtype=np.float32)), result.transcript
