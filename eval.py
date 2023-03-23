@@ -12,19 +12,35 @@ predicted = []
 
 dmp = dmp_module.diff_match_patch()
 
-ds = datasets.load_dataset(
-    "common_voice",
-    "de",
-    split="test",
-).cast_column("audio", datasets.features.Audio(sampling_rate=16000, decode=False))
 
-ds = (
-    ds.filter(lambda x: x["down_votes"] == 0)
-    .filter(lambda x: x["up_votes"] >= 2)
-    .filter(lambda x: len(x["sentence"]) >= 16)
-    .sort("up_votes", reverse=False)
-    .cast_column("audio", datasets.features.Audio(sampling_rate=16000, decode=True))
-)
+def get_cv():
+    ds = datasets.load_dataset(
+        "common_voice",
+        "de",
+        split="test",
+    ).cast_column("audio", datasets.features.Audio(sampling_rate=16000, decode=False))
+
+    ds = (
+        ds.filter(lambda x: x["down_votes"] == 0)
+        .filter(lambda x: x["up_votes"] >= 2)
+        .filter(lambda x: len(x["sentence"]) >= 16)
+        .sort("up_votes", reverse=False)
+        .cast_column("audio", datasets.features.Audio(sampling_rate=16000, decode=True))
+    )
+
+    return ds
+
+
+def get_fleurs():
+    ds = datasets.load_dataset("google/fleurs", "de_de", split="test").cast_column(
+        "audio", datasets.features.Audio(sampling_rate=16000, decode=True)
+    )
+    ds = ds.rename_column("transcription", "sentence")
+
+    return ds
+
+
+ds = get_fleurs()
 
 for d in tqdm(ds):
     # normalize base transcription
