@@ -1,21 +1,14 @@
 import os
 
 import gradio as gr
+import numpy as np
 from transformers.pipelines.audio_utils import ffmpeg_read
 
-from aaas.statics import LANG_MAPPING
-from aaas.datastore import (
-    add_to_queue,
-    get_data_from_hash,
-    get_transkript,
-    get_transkript_batch,
-    get_vote_queue,
-    set_transkript,
-    set_voting,
-)
+from aaas.datastore import (add_to_queue, get_data_from_hash, get_transkript,
+                            get_transkript_batch, get_vote_queue,
+                            set_transkript, set_voting)
 from aaas.silero_vad import get_speech_probs, silero_vad
-import numpy as np
-
+from aaas.statics import LANG_MAPPING
 from aaas.utils import check_valid_auth
 
 langs = sorted(list(LANG_MAPPING.keys()))

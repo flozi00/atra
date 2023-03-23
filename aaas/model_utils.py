@@ -1,11 +1,12 @@
-from optimum.bettertransformer import BetterTransformer
-
-from aaas.utils import timeit
-from aaas.statics import MODEL_MAPPING
-from transformers import AutoProcessor
-import torch
-import peft
 from functools import lru_cache
+
+import peft
+import torch
+from optimum.bettertransformer import BetterTransformer
+from transformers import AutoProcessor
+
+from aaas.statics import MODEL_MAPPING
+from aaas.utils import timeit
 
 
 @timeit

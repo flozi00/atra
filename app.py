@@ -1,6 +1,12 @@
 import os
-import time
 import threading
+import time
+
+import gradio as gr
+import numpy as np
+import uvicorn
+from fastapi import FastAPI, staticfiles
+
 from aaas.audio_utils.asr import inference_asr
 from aaas.datastore import (
     get_data_from_hash,
@@ -8,14 +14,8 @@ from aaas.datastore import (
     set_in_progress,
     set_transkript,
 )
-from aaas.gradio_utils import add_vad_chunks
+from aaas.gradio_utils import add_vad_chunks, build_gradio
 from aaas.statics import TO_VAD
-import numpy as np
-
-from aaas.gradio_utils import build_gradio
-from fastapi import FastAPI, staticfiles
-import uvicorn
-import gradio as gr
 
 app = FastAPI()
 ui = build_gradio()

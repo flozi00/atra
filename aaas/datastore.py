@@ -1,17 +1,17 @@
 import hashlib
 import os
 import random
+import time
+from functools import lru_cache
 from typing import Optional
 
+import datasets
+import fsspec
 from sqlmodel import Field, Session, SQLModel, create_engine, select
+from tqdm.auto import tqdm
 
 from aaas.statics import CACHE_SIZE, INPROGRESS, TODO
 from aaas.utils import timeit
-import fsspec
-import time
-from functools import lru_cache
-import datasets
-from tqdm.auto import tqdm
 
 db_backend = os.getenv("DBBACKEND", "sqlite:///database.db")
 ftp_backend = os.getenv("FTPBACKEND")

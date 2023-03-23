@@ -1,11 +1,12 @@
+from functools import cache
+
+import torch
+from text_to_num import alpha2digit
 from transformers.pipelines import AutomaticSpeechRecognitionPipeline as pipeline
 
 from aaas.model_utils import get_model_and_processor
 from aaas.statics import LANG_MAPPING
 from aaas.utils import timeit
-from functools import cache
-import torch
-from text_to_num import alpha2digit
 
 
 @cache

@@ -1,8 +1,9 @@
-import time
-from functools import wraps, cache
-import requests
-from datetime import datetime
 import logging
+import time
+from datetime import datetime
+from functools import cache, wraps
+
+import requests
 
 
 def timeit(func):
