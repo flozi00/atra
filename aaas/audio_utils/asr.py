@@ -23,18 +23,19 @@ def get_pipeline(main_lang: str, model_config: str):
         device=0 if torch.cuda.is_available() else -1,
         return_timestamps=False,
     )
-    return transcriber
+    return transcriber, processor
 
 
 @timeit
 def inference_asr(data, main_lang: str, model_config: str) -> str:
-    transcriber = get_pipeline(main_lang, model_config)
+    transcriber, processor = get_pipeline(main_lang, model_config)
 
+    forced_decoder_ids = processor.get_decoder_prompt_ids(language=main_lang, task="transcribe")
+    
     transcription = transcriber(
         data,
         generate_kwargs={
-            "task": "transcribe",
-            "language": f"<|{LANG_MAPPING[main_lang]}|>",
+            "forced_decoder_ids": forced_decoder_ids,
             "use_cache": True,
             "num_beams": 1,
             "max_new_tokens": int((len(data) / 16000) * 10) + 10,

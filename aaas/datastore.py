@@ -31,7 +31,6 @@ class QueueData(SQLModel, table=True):
     priority: int = 0
     votings: int = 0
 
-
 engine = create_engine(db_backend, pool_recycle=3600, pool_pre_ping=True)
 SQLModel.metadata.create_all(engine)
 

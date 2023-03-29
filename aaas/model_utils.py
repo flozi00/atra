@@ -14,7 +14,7 @@ def get_model(model_class, model_id):
     model = model_class.from_pretrained(
         model_id,
         cache_dir="./model_cache",
-        load_in_8bit=False,
+        load_in_8bit=torch.cuda.is_available(),
         device_map="auto",
         torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
     )
@@ -29,18 +29,26 @@ def get_processor(processor_class, model_id):
 
 
 @timeit
-def get_peft_model(peft_model_id, model_class):
+def get_peft_model(peft_model_id, model_class) -> peft.PeftModel:
     # Load the PEFT model
     peft_config = peft.PeftConfig.from_pretrained(peft_model_id)
     model = model_class.from_pretrained(
         peft_config.base_model_name_or_path,
         cache_dir="./model_cache",
+        load_in_8bit=torch.cuda.is_available(),
+        device_map="auto",
+        torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
     )
     model = peft.PeftModel.from_pretrained(
         model,
         peft_model_id,
+        cache_dir="./model_cache",
+        load_in_8bit=torch.cuda.is_available(),
+        device_map="auto",
+        torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
     )
     model = model.eval()
+
 
     # Remove the LORA modules
     key_list = [
@@ -55,10 +63,7 @@ def get_peft_model(peft_model_id, model_class):
             )
             model.base_model._replace_module(parent, target_name, new_module, target)
 
-    # Save the model
-    model.get_base_model().save_pretrained("temp_lora_model", cache_dir="./model_cache")
-    del model
-    return get_model(model_class, "temp_lora_model")
+    return model
 
 
 @lru_cache(maxsize=1)

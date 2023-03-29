@@ -6,12 +6,13 @@ sacremoses
 sentencepiece
 torch>=1.13.0
 torchaudio
-transformers>=4.27.0
+transformers>=4.27.3
 peft>=0.2.0
 sqlmodel
 pymysql
 soundfile
 accelerate
+bitsandbytes
 unidecode
 demucs>=4.0.0
 librosa 

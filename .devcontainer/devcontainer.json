@@ -4,20 +4,15 @@
     },
     "runArgs": [
         "--gpus",
-        "all",
-        "--ipc=host",
-        "--ulimit",
-        "memlock=-1",
-        "--ulimit",
-        "stack=67108864",
-        "-v",
-        "${localWorkspaceFolder}\\.devcontainer\\huggingface:/root/.cache/huggingface"
+        "all"
     ],
     "customizations": {
         "vscode": {
             "extensions": [
                 "ms-python.python",
-                "ms-python.vscode-pylance"
+                "ms-python.vscode-pylance",
+                "github.copilot-nightly",
+                "github.copilot-labs"
             ]
         }
     }
