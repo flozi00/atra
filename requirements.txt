@@ -22,3 +22,5 @@ text2num
 fsspec
 datasets
 tqdm
+diff-match-patch
+jiwer

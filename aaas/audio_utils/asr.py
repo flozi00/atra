@@ -3,6 +3,7 @@ from functools import cache
 import torch
 from text_to_num import alpha2digit
 from transformers.pipelines import AutomaticSpeechRecognitionPipeline as pipeline
+from aaas.audio_utils.demucs import seperate_vocal
 
 from aaas.model_utils import get_model_and_processor
 from aaas.statics import LANG_MAPPING
@@ -27,10 +28,13 @@ def get_pipeline(main_lang: str, model_config: str):
 
 
 @timeit
-def inference_asr(data, main_lang: str, model_config: str) -> str:
+def inference_asr(data, main_lang: str, model_config: str, is_reclamation: bool) -> str:
     transcriber, processor = get_pipeline(main_lang, model_config)
 
     forced_decoder_ids = processor.get_decoder_prompt_ids(language=main_lang, task="transcribe")
+    
+    if is_reclamation is True:
+        data = seperate_vocal(data)
     
     transcription = transcriber(
         data,

@@ -125,6 +125,7 @@ def get_tasks_queue() -> QueueData:
     Returns:
         QueueData: A random item from the queue
     """
+    is_reclamation = False
     with Session(engine) as session:
 
         def get_queue(priority=1):
@@ -161,7 +162,10 @@ def get_tasks_queue() -> QueueData:
                     sample = random.choice(todos)
                 else:
                     sample = False
-    return sample
+                    
+    if(sample is not False):
+        is_reclamation = sample.votings < 0
+    return sample, is_reclamation
 
 
 def get_vote_queue() -> QueueData:
@@ -243,6 +247,8 @@ def set_voting(hs: str, vote: str):
         if transkript is not None:
             if transkript.votings < 99:
                 transkript.votings = transkript.votings + vote
+                if(vote < 0):
+                    transkript.transcript = TODO
                 session.commit()
                 session.refresh(transkript)
 

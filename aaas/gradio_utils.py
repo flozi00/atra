@@ -42,7 +42,7 @@ def build_edit_ui():
         outputs=[],
         api_name="correct_transcription",
     )
-    rate.click(fn=do_voting, inputs=[task_id, label], outputs=[task_id])
+    rate.click(fn=do_voting_labeling, inputs=[task_id, label, transcription], outputs=[task_id])
 
 
 def build_asr_ui():
@@ -134,6 +134,15 @@ def do_voting(task_id: str, rating: str, request: gr.Request):
     elif request.client.host == "127.0.0.1":
         set_voting(task_id, rating)
         return get_vote_queue().hash
+    
+def do_voting_labeling(task_id: str, rating: str, transcription: str, request: gr.Request):
+    if request.client.host != "127.0.0.1" and rating != "confirm":
+        set_voting(task_id, rating)
+        return task_id
+    elif request.client.host == "127.0.0.1":
+        set_transkript(task_id, transcription)
+        set_voting(task_id, rating)
+        return get_vote_queue().hash
 
 
 def add_to_vad_queue(
@@ -188,7 +197,7 @@ def add_vad_chunks(audio, main_lang: str, model_config: str, request: gr.Request
             audio,
             model_vad,
             speech_probs=speech_probs,
-            threshold=0.4,
+            threshold=0.6,
             sampling_rate=16000,
             min_silence_duration_ms=silence_duration,
             min_speech_duration_ms=1000,

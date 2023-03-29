@@ -32,8 +32,9 @@ class BackgroundTasks(threading.Thread):
     def run(self, *args, **kwargs):
         while True:
             try:
-                task = get_tasks_queue()
+                task, is_reclamation = get_tasks_queue()
                 if task is not False:
+                    print(is_reclamation)
                     bytes_data = get_data_from_hash(task.hash)
                     set_in_progress(task.hash)
                     if task.metas == TO_VAD:
@@ -49,6 +50,7 @@ class BackgroundTasks(threading.Thread):
                             data=array,
                             main_lang=task.langs.split(",")[0],
                             model_config=task.model_config,
+                            is_reclamation = is_reclamation
                         )
                     set_transkript(task.hash, result)
                 else:
@@ -63,5 +65,5 @@ if __name__ == "__main__":
     t.start()
 
     uvicorn.run(
-        app, host="0.0.0.0", port=int(os.getenv("PORT", 7860)), log_level="debug"
+        app, host="0.0.0.0", port=int(os.getenv("PORT", 7860)), log_level="error"
     )
