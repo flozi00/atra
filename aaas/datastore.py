@@ -31,6 +31,7 @@ class QueueData(SQLModel, table=True):
     priority: int = 0
     votings: int = 0
 
+
 engine = create_engine(db_backend, pool_recycle=3600, pool_pre_ping=True)
 SQLModel.metadata.create_all(engine)
 
@@ -162,8 +163,8 @@ def get_tasks_queue() -> QueueData:
                     sample = random.choice(todos)
                 else:
                     sample = False
-                    
-    if(sample is not False):
+
+    if sample is not False:
         is_reclamation = sample.votings < 0
     return sample, is_reclamation
 
@@ -190,6 +191,8 @@ def get_vote_queue() -> QueueData:
 
 def get_validated_dataset():
     dataset = []
+    existing_dataset = datasets.load_dataset("flozi00/atra", split="train")
+    hses = [x["hash"] for x in existing_dataset]
     with Session(engine) as session:
         statement = (
             select(QueueData)
@@ -200,16 +203,18 @@ def get_validated_dataset():
         d_set = session.exec(statement).all()
 
     for x in tqdm(d_set):
-        dataset.append(
-            {
-                "lang": x.langs,
-                "text": x.transcript,
-                "hash": x.hash,
-                "bytes": get_data_from_hash(x.hash),
-            }
-        )
+        if x.hash not in hses:
+            dataset.append(
+                {
+                    "lang": x.langs,
+                    "text": x.transcript,
+                    "hash": x.hash,
+                    "bytes": get_data_from_hash(x.hash),
+                }
+            )
 
     dataset = datasets.Dataset.from_list(dataset)
+    dataset = datasets.concatenate_datasets([existing_dataset, dataset])
 
     dataset.push_to_hub("atra", private=True)
 
@@ -247,7 +252,7 @@ def set_voting(hs: str, vote: str):
         if transkript is not None:
             if transkript.votings < 99:
                 transkript.votings = transkript.votings + vote
-                if(vote < 0):
+                if vote < 0:
                     transkript.transcript = TODO
                 session.commit()
                 session.refresh(transkript)

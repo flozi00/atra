@@ -49,7 +49,7 @@ class BackgroundTasks(threading.Thread):
                             data=array,
                             main_lang=task.langs.split(",")[0],
                             model_config=task.model_config,
-                            is_reclamation = is_reclamation
+                            is_reclamation=is_reclamation,
                         )
                     set_transkript(task.hash, result)
                 else:
@@ -64,5 +64,5 @@ if __name__ == "__main__":
     t.start()
 
     uvicorn.run(
-        app, host="0.0.0.0", port=int(os.getenv("PORT", 7860)), log_level="error"
+        app, host="0.0.0.0", port=int(os.getenv("PORT", 7860)), log_level="info"
     )
