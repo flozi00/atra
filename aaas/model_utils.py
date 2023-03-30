@@ -35,7 +35,7 @@ def get_peft_model(peft_model_id, model_class) -> peft.PeftModel:
     model = model_class.from_pretrained(
         peft_config.base_model_name_or_path,
         cache_dir="./model_cache",
-        load_in_8bit=torch.cuda.is_available(),
+        load_in_8bit=False,
         device_map="auto",
         torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
     )
@@ -43,7 +43,7 @@ def get_peft_model(peft_model_id, model_class) -> peft.PeftModel:
         model,
         peft_model_id,
         cache_dir="./model_cache",
-        load_in_8bit=torch.cuda.is_available(),
+        load_in_8bit=False,
         device_map="auto",
         torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
     )
@@ -96,11 +96,11 @@ def get_model_and_processor(lang: str, task: str, config: str):
     try:
         model = BetterTransformer.transform(model)
     except Exception as e:
-        print(e)
+        print("Bettertransformer exception: ",e)
 
-    try:
-        model = torch.compile(model)
-    except Exception as e:
-        print(e)
+    #try:
+    #    model = torch.compile(model, mode="reduce-overhead")
+    #except Exception as e:
+    #    print("Torch compile exception: ", e)
 
     return model, processor

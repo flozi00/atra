@@ -34,7 +34,6 @@ class BackgroundTasks(threading.Thread):
             try:
                 task, is_reclamation = get_tasks_queue()
                 if task is not False:
-                    print(is_reclamation)
                     bytes_data = get_data_from_hash(task.hash)
                     set_in_progress(task.hash)
                     if task.metas == TO_VAD:

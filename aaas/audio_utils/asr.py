@@ -1,4 +1,4 @@
-from functools import cache
+from functools import lru_cache
 
 import torch
 from text_to_num import alpha2digit
@@ -10,7 +10,8 @@ from aaas.statics import LANG_MAPPING
 from aaas.utils import timeit
 
 
-@cache
+@lru_cache(maxsize=1)
+@timeit
 def get_pipeline(main_lang: str, model_config: str):
     model, processor = get_model_and_processor(main_lang, "asr", model_config)
     transcriber = pipeline(
