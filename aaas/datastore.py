@@ -212,6 +212,7 @@ def get_validated_dataset():
                     "bytes": get_data_from_hash(x.hash),
                 }
             )
+            remove_data_from_hash(x.hash)
 
     dataset = datasets.Dataset.from_list(dataset)
     dataset = datasets.concatenate_datasets([existing_dataset, dataset])
@@ -328,6 +329,25 @@ def set_data_to_hash(hs: str, bytes_data: bytes):
         print(e)
         time.sleep(1)
         set_data_to_hash(hs, bytes_data)
+
+
+def remove_data_from_hash(hs: str):
+    if ftp_backend is not None:
+        fs = fsspec.filesystem(
+            "ftp",
+            host=ftp_server,
+            username=ftp_user,
+            password=ftp_pass,
+            port=21,
+            block_size=2**20,
+        )
+    else:
+        fs = fsspec.filesystem("file")
+
+    try:
+        fs.rm(f"data/{hs}")
+    except Exception as e:
+        print(e)
 
 
 if build_dataset:

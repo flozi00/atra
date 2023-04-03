@@ -1,12 +1,20 @@
+from datetime import timedelta
+import hashlib
 import os
 
 import gradio as gr
 import numpy as np
 from transformers.pipelines.audio_utils import ffmpeg_read
 
-from aaas.datastore import (add_to_queue, get_data_from_hash, get_transkript,
-                            get_transkript_batch, get_vote_queue,
-                            set_transkript, set_voting)
+from aaas.datastore import (
+    add_to_queue,
+    get_data_from_hash,
+    get_transkript,
+    get_transkript_batch,
+    get_vote_queue,
+    set_transkript,
+    set_voting,
+)
 from aaas.silero_vad import get_speech_probs, silero_vad
 from aaas.statics import LANG_MAPPING
 from aaas.utils import check_valid_auth
@@ -42,7 +50,9 @@ def build_edit_ui():
         outputs=[],
         api_name="correct_transcription",
     )
-    rate.click(fn=do_voting_labeling, inputs=[task_id, label, transcription], outputs=[task_id])
+    rate.click(
+        fn=do_voting_labeling, inputs=[task_id, label, transcription], outputs=[task_id]
+    )
 
 
 def build_asr_ui():
@@ -107,6 +117,20 @@ def build_voting_ui():
     )
 
 
+def build_subtitle_ui():
+    task_id = gr.Textbox(label="Task ID", max_lines=3)
+    srt_file = gr.File(label="SRT File")
+
+    refresh = gr.Button(value="Get Results")
+
+    refresh.click(
+        fn=get_subs,
+        inputs=[task_id],
+        outputs=[srt_file],
+        api_name="subtitle",
+    )
+
+
 def build_gradio():
     """
     Merge all UIs into one
@@ -123,6 +147,8 @@ def build_gradio():
                 build_edit_ui()
             with gr.Tab("Voting"):
                 build_voting_ui()
+            with gr.Tab("Subtitles"):
+                build_subtitle_ui()
 
     return ui
 
@@ -134,8 +160,11 @@ def do_voting(task_id: str, rating: str, request: gr.Request):
     elif request.client.host == "127.0.0.1":
         set_voting(task_id, rating)
         return get_vote_queue().hash
-    
-def do_voting_labeling(task_id: str, rating: str, transcription: str, request: gr.Request):
+
+
+def do_voting_labeling(
+    task_id: str, rating: str, transcription: str, request: gr.Request
+):
     if request.client.host != "127.0.0.1" and rating != "confirm":
         set_voting(task_id, rating)
         return task_id
@@ -269,3 +298,26 @@ def get_audio(task_id: str, request: gr.Request):
     result = get_transkript(task_id)
     bytes_data = get_data_from_hash(result.hash)
     return (16000, np.frombuffer(bytes_data, dtype=np.float32)), result.transcript
+
+
+def get_subs(task_id: str, request: gr.Request):
+    segments = get_transcription(task_id, request)[1]
+    srtFilename = hashlib.sha256(task_id.encode("utf-8")).hexdigest() + ".srt"
+    if os.path.exists(srtFilename):
+        os.remove(srtFilename)
+    id = 0
+    for segment in segments:
+        startTime = (
+            str(0) + str(timedelta(seconds=int(segment["start_timestamp"]))) + ",000"
+        )
+        endTime = (
+            str(0) + str(timedelta(seconds=int(segment["stop_timestamp"]))) + ",000"
+        )
+        text = segment["text"]
+        seg = f"{id}\n{startTime} --> {endTime}\n{text}\n\n"
+        id = id + 1
+
+        with open(srtFilename, "a+", encoding="utf-8") as srtFile:
+            srtFile.write(seg)
+
+    return srtFilename

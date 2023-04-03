@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:highlight_text/highlight_text.dart';
@@ -10,6 +11,7 @@ import '../utils/network.dart';
 import './timeline_view.dart';
 import 'package:woozy_search/woozy_search.dart';
 import 'package:flutter/services.dart';
+import 'dart:html' as webFile;
 
 extension IterableExtension<T> on Iterable<T> {
   Iterable<T> distinctBy(Object Function(T e) getCompareValue) {
@@ -110,6 +112,23 @@ class _OverviewScreenState extends State<OverviewScreen> {
       ),
       ButtonBar(
         children: <Widget>[
+          ElevatedButton(
+              onPressed: () async {
+                await get_video_subs(hash).then((srtString) async {
+                  if (kIsWeb) {
+                    var blob =
+                        webFile.Blob([srtString], 'text/plain', 'native');
+
+                    var anchorElement = webFile.AnchorElement(
+                      href:
+                          webFile.Url.createObjectUrlFromBlob(blob).toString(),
+                    )
+                      ..setAttribute("download", "subtitles.srt")
+                      ..click();
+                  }
+                });
+              },
+              child: const Text('Download subtitles')),
           ElevatedButton(
               onPressed: () async {
                 Clipboard.setData(ClipboardData(text: recognizedText))

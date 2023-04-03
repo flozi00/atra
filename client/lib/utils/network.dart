@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../views/login.dart' as login;
 import 'package:hive/hive.dart';
@@ -160,4 +161,35 @@ Future<void> do_voting(String hash, String text) async {
   if (res.statusCode != 200) {
     throw Exception('http.post error: statusCode= ${res.statusCode}');
   }
+}
+
+Future<String> get_video_subs(String hash) async {
+  // This is the body of the request that is sent to the server.
+  var params = {
+    "data": [
+      hash,
+    ]
+  };
+
+  // Send the request to the server.
+  var res = await http.post(Uri.parse('$baseURL/run/subtitle'),
+      headers: headers(), body: jsonEncode(params));
+
+  // Check that the request was successful.
+  if (res.statusCode != 200) {
+    throw Exception('http.post error: statusCode= ${res.statusCode}');
+  }
+
+  // Get the name of the file that the server sent back.
+  String subs =
+      Uri.encodeFull(jsonDecode(utf8.decode(res.bodyBytes))["data"][0]["name"]);
+
+  // Get the file from the server.
+  var sub = await http.get(Uri.parse('$baseURL/file=$subs'));
+
+  // Convert the file to a byte array.
+  Uint8List subBytes = sub.bodyBytes;
+
+  // Return the byte array.
+  return utf8.decode(subBytes);
 }
