@@ -305,7 +305,7 @@ def get_subs(task_id: str, request: gr.Request):
     srtFilename = hashlib.sha256(task_id.encode("utf-8")).hexdigest() + ".srt"
     if os.path.exists(srtFilename):
         os.remove(srtFilename)
-    id = 0
+    id = 1
     for segment in segments:
         startTime = (
             str(0) + str(timedelta(seconds=int(segment["start_timestamp"]))) + ",000"
