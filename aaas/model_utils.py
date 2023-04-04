@@ -14,7 +14,7 @@ def get_model(model_class, model_id):
     model = model_class.from_pretrained(
         model_id,
         cache_dir="./model_cache",
-        load_in_8bit=torch.cuda.is_available(),
+        load_in_8bit=False,
         device_map="auto",
         torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
     )
@@ -48,7 +48,6 @@ def get_peft_model(peft_model_id, model_class) -> peft.PeftModel:
         torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
     )
     model = model.eval()
-
 
     # Remove the LORA modules
     key_list = [
@@ -96,11 +95,11 @@ def get_model_and_processor(lang: str, task: str, config: str):
     try:
         model = BetterTransformer.transform(model)
     except Exception as e:
-        print("Bettertransformer exception: ",e)
+        print("Bettertransformer exception: ", e)
 
-    #try:
+    # try:
     #    model = torch.compile(model, mode="reduce-overhead")
-    #except Exception as e:
+    # except Exception as e:
     #    print("Torch compile exception: ", e)
 
     return model, processor

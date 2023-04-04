@@ -232,10 +232,11 @@ def set_transkript(hs: str, transcription: str):
         statement = select(QueueData).where(QueueData.hash == hs)
         transkript = session.exec(statement).first()
         if transkript is not None and transkript.votings < 99:
-            transkript.transcript = transcription
-            transkript.votings = 0
-            session.commit()
-            session.refresh(transkript)
+            if transcription != transkript.transcript:
+                transkript.transcript = transcription
+                transkript.votings = 0
+                session.commit()
+                session.refresh(transkript)
 
 
 @timeit
