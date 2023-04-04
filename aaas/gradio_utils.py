@@ -29,6 +29,7 @@ def build_edit_ui():
     UI for editing transcriptions and voting like confirm, good, bad
     """
     task_id = gr.Textbox(label="Task ID", max_lines=3)
+    lang = gr.Radio(langs, value=langs[0], label="Source Language")
 
     audio_file = gr.Audio(label="Audiofile")
     transcription = gr.Textbox(max_lines=10)
@@ -51,7 +52,7 @@ def build_edit_ui():
         api_name="correct_transcription",
     )
     rate.click(
-        fn=do_voting_labeling, inputs=[task_id, label, transcription], outputs=[task_id]
+        fn=do_voting_labeling, inputs=[task_id, label, transcription, lang], outputs=[task_id]
     )
 
 
@@ -156,14 +157,12 @@ def build_gradio():
 def do_voting(task_id: str, rating: str, request: gr.Request):
     if request.client.host != "127.0.0.1" and rating != "confirm":
         set_voting(task_id, rating)
-        return task_id
     elif request.client.host == "127.0.0.1":
         set_voting(task_id, rating)
-        return get_vote_queue().hash
 
 
 def do_voting_labeling(
-    task_id: str, rating: str, transcription: str, request: gr.Request
+    task_id: str, rating: str, transcription: str, lang: str, request: gr.Request
 ):
     if request.client.host != "127.0.0.1" and rating != "confirm":
         set_voting(task_id, rating)
@@ -171,7 +170,7 @@ def do_voting_labeling(
     elif request.client.host == "127.0.0.1":
         set_transkript(task_id, transcription)
         set_voting(task_id, rating)
-        return get_vote_queue().hash
+        return get_vote_queue(lang).hash
 
 
 def add_to_vad_queue(

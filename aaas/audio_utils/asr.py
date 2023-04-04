@@ -32,17 +32,19 @@ def get_pipeline(main_lang: str, model_config: str):
 def inference_asr(data, main_lang: str, model_config: str, is_reclamation: bool) -> str:
     transcriber, processor = get_pipeline(main_lang, model_config)
 
-    forced_decoder_ids = processor.get_decoder_prompt_ids(language=main_lang, task="transcribe")
-    
+    forced_decoder_ids = processor.get_decoder_prompt_ids(
+        language=main_lang, task="transcribe"
+    )
+
     if is_reclamation is True:
         data = seperate_vocal(data)
-    
+
     transcription = transcriber(
         data,
         generate_kwargs={
             "forced_decoder_ids": forced_decoder_ids,
             "use_cache": True,
-            "num_beams": 1,
+            "num_beams": 5,
             "max_new_tokens": int((len(data) / 16000) * 10) + 10,
         },
     )["text"].strip()

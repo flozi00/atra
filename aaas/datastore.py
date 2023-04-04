@@ -169,7 +169,7 @@ def get_tasks_queue() -> QueueData:
     return sample, is_reclamation
 
 
-def get_vote_queue() -> QueueData:
+def get_vote_queue(lang: str = None) -> QueueData:
     """Get last item from the queue with a voting score of 3 or less, but greater or equal than 0
 
     Returns:
@@ -183,6 +183,8 @@ def get_vote_queue() -> QueueData:
             .where(QueueData.transcript != TODO)
             .where(QueueData.transcript != INPROGRESS)
         )
+        if lang is not None:
+            statement = statement.where(QueueData.langs == lang)
         todos = session.exec(statement).all()
         sample = todos[-1]
 
