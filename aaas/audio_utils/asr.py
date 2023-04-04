@@ -49,6 +49,9 @@ def inference_asr(data, main_lang: str, model_config: str, is_reclamation: bool)
         },
     )["text"].strip()
 
-    transcription = alpha2digit(transcription, lang=LANG_MAPPING[main_lang])
+    try:
+        transcription = alpha2digit(transcription, lang=LANG_MAPPING[main_lang])
+    except Exception:
+        pass
 
     return transcription
