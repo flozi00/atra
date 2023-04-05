@@ -226,7 +226,7 @@ def get_validated_dataset():
 
 
 @timeit
-def set_transkript(hs: str, transcription: str):
+def set_transkript(hs: str, transcription: str, from_queue: bool = False):
     """Set the transcription of an audio file
 
     Args:
@@ -236,12 +236,15 @@ def set_transkript(hs: str, transcription: str):
     with Session(engine) as session:
         statement = select(QueueData).where(QueueData.hash == hs)
         transkript = session.exec(statement).first()
-        if transkript is not None and transkript.votings < 99:
-            if transcription != transkript.transcript:
-                transkript.transcript = transcription
-                transkript.votings = 0
-                session.commit()
-                session.refresh(transkript)
+        if from_queue is True and "***" not in transcription:
+            pass
+        else:
+            if transkript is not None and transkript.votings < 99:
+                if transcription != transkript.transcript:
+                    transkript.transcript = transcription
+                    transkript.votings = 0
+                    session.commit()
+                    session.refresh(transkript)
 
 
 @timeit

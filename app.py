@@ -51,7 +51,7 @@ class BackgroundTasks(threading.Thread):
                             model_config=task.model_config,
                             is_reclamation=is_reclamation,
                         )
-                    set_transkript(task.hash, result)
+                    set_transkript(task.hash, result, from_queue=True)
                 else:
                     time.sleep(10)
             except Exception as e:
