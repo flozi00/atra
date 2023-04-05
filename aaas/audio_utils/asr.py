@@ -44,7 +44,7 @@ def inference_asr(data, main_lang: str, model_config: str, is_reclamation: bool)
         generate_kwargs={
             "forced_decoder_ids": forced_decoder_ids,
             "use_cache": True,
-            "num_beams": 5,
+            "num_beams": 1,
             "max_new_tokens": int((len(data) / 16000) * 10) + 10,
         },
     )["text"].strip()
