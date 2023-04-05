@@ -15,9 +15,12 @@ from aaas.utils import timeit
 
 db_backend = os.getenv("DBBACKEND", "sqlite:///database.db")
 ftp_backend = os.getenv("FTPBACKEND")
-ftp_user = ftp_backend.split("@")[0]
-ftp_pass = ftp_backend.split("@")[1]
-ftp_server = ftp_backend.split("@")[2]
+try:
+    ftp_user = ftp_backend.split("@")[0]
+    ftp_pass = ftp_backend.split("@")[1]
+    ftp_server = ftp_backend.split("@")[2]
+except:
+    ftp_user, ftp_pass, ftp_server = None, None, None
 build_dataset = os.getenv("BUILDDATASET", "false") == "true"
 
 

@@ -23,6 +23,8 @@ langs = sorted(list(LANG_MAPPING.keys()))
 
 model_vad, get_speech_timestamps = silero_vad(True)
 
+is_admin_node = os.getenv("ADMINMODE", "false") == "true"
+
 
 def build_edit_ui():
     """
@@ -36,7 +38,8 @@ def build_edit_ui():
     label = gr.Radio(["good", "bad", "confirm"], label="Label")
     with gr.Row():
         send = gr.Button(value="Send")
-        rate = gr.Button(value="Rate")
+        if is_admin_node is True:
+            rate = gr.Button(value="Rate")
 
     task_id.change(
         fn=get_audio,
@@ -51,11 +54,12 @@ def build_edit_ui():
         outputs=[],
         api_name="correct_transcription",
     )
-    rate.click(
-        fn=do_voting_labeling,
-        inputs=[task_id, label, transcription, lang],
-        outputs=[task_id],
-    )
+    if is_admin_node is True:
+        rate.click(
+            fn=do_voting_labeling,
+            inputs=[task_id, label, transcription, lang],
+            outputs=[task_id],
+        )
 
 
 def build_asr_ui():
@@ -157,19 +161,14 @@ def build_gradio():
 
 
 def do_voting(task_id: str, rating: str, request: gr.Request):
-    if request.client.host != "127.0.0.1" and rating != "confirm":
-        set_voting(task_id, rating)
-    elif request.client.host == "127.0.0.1":
+    if rating != "confirm":
         set_voting(task_id, rating)
 
 
 def do_voting_labeling(
     task_id: str, rating: str, transcription: str, lang: str, request: gr.Request
 ):
-    if request.client.host != "127.0.0.1" and rating != "confirm":
-        set_voting(task_id, rating)
-        return task_id
-    elif request.client.host == "127.0.0.1":
+    if is_admin_node is True:
         set_transkript(task_id, transcription)
         set_voting(task_id, rating)
         return get_vote_queue(lang).hash
