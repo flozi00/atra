@@ -192,16 +192,10 @@ class _OverviewScreenState extends State<OverviewScreen> {
         });
       }
     }
-    /*if (tokenValid != "Valid") {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      if (prefs.getString('token') != null && prefs.getString('token') != '') {
-        showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return const Dialog(child: LoginPage());
-            });
-      }
-    }*/
+    setState(() {
+      items.clear();
+      items.addAll(cards);
+    });
   }
 
   void filterSearchResults(String query) {
