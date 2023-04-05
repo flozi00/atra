@@ -52,7 +52,9 @@ def build_edit_ui():
         api_name="correct_transcription",
     )
     rate.click(
-        fn=do_voting_labeling, inputs=[task_id, label, transcription, lang], outputs=[task_id]
+        fn=do_voting_labeling,
+        inputs=[task_id, label, transcription, lang],
+        outputs=[task_id],
     )
 
 
@@ -204,7 +206,7 @@ def add_vad_chunks(audio, main_lang: str, model_config: str, request: gr.Request
 
     queue_string = ""
     speech_timestamps = []
-    silence_duration = 750
+    silence_duration = 3000
     if main_lang not in langs:
         main_lang = "german"
     if model_config not in ["small", "medium", "large"]:
