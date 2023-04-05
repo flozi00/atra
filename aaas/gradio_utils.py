@@ -18,6 +18,8 @@ from aaas.datastore import (
 from aaas.silero_vad import get_speech_probs, silero_vad
 from aaas.statics import LANG_MAPPING
 from aaas.utils import check_valid_auth
+import noisereduce as nr
+
 
 langs = sorted(list(LANG_MAPPING.keys()))
 
@@ -236,6 +238,20 @@ def add_vad_chunks(audio, main_lang: str, model_config: str, request: gr.Request
         silence_duration = silence_duration * 0.95
         if silence_duration < 2:
             break
+
+    noise_batch = [
+        audio[
+            int(float(speech_timestamps[st]["end"]) * 16000) : int(
+                float(speech_timestamps[st + 1]["start"]) * 16000
+            )
+        ]
+        for st in range(len(speech_timestamps) - 1)
+    ]
+    noise_batch.append(audio[0 : int(float(speech_timestamps[0]["start"]) * 16000)])
+
+    for noise in noise_batch:
+        audio = nr.reduce_noise(y=audio, sr=16000, y_noise=noise)
+
     audio_batch = [
         audio[
             int(float(speech_timestamps[st]["start"]) * 16000) : int(

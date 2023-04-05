@@ -236,7 +236,7 @@ def set_transkript(hs: str, transcription: str, from_queue: bool = False):
     with Session(engine) as session:
         statement = select(QueueData).where(QueueData.hash == hs)
         transkript = session.exec(statement).first()
-        if from_queue is True and "***" not in transcription:
+        if from_queue is True and "***" not in transkript.transcript:
             pass
         else:
             if transkript is not None and transkript.votings < 99:
