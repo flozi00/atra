@@ -189,7 +189,10 @@ def get_vote_queue(lang: str = None) -> QueueData:
         if lang is not None:
             statement = statement.where(QueueData.langs == lang)
         todos = session.exec(statement).all()
-        sample = todos[-1]
+        if len(todos) == 0:
+            sample = False
+        else:
+            sample = todos[-1]
 
     return sample
 

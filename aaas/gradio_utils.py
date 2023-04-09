@@ -171,7 +171,11 @@ def do_voting_labeling(
     if is_admin_node is True:
         set_transkript(task_id, transcription)
         set_voting(task_id, rating)
-        return get_vote_queue(lang).hash
+        queue_obj = get_vote_queue(lang)
+        if queue_obj is False:
+            return ""
+        else:
+            return queue_obj.hash
 
 
 def add_to_vad_queue(
