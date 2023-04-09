@@ -1,6 +1,6 @@
-from datetime import timedelta
 import hashlib
 import os
+from datetime import timedelta
 
 import gradio as gr
 import numpy as np
@@ -18,8 +18,6 @@ from aaas.datastore import (
 from aaas.silero_vad import get_speech_probs, silero_vad
 from aaas.statics import LANG_MAPPING
 from aaas.utils import check_valid_auth
-import noisereduce as nr
-
 
 langs = sorted(list(LANG_MAPPING.keys()))
 
@@ -226,7 +224,6 @@ def add_vad_chunks(audio, main_lang: str, model_config: str, request: gr.Request
     ):
         speech_timestamps = get_speech_timestamps(
             audio,
-            model_vad,
             speech_probs=speech_probs,
             threshold=0.6,
             sampling_rate=16000,
@@ -235,8 +232,9 @@ def add_vad_chunks(audio, main_lang: str, model_config: str, request: gr.Request
             speech_pad_ms=250,
             return_seconds=True,
         )
-        silence_duration = silence_duration * 0.95
-        if silence_duration < 2:
+        subtract = 1 if silence_duration < 1000 else 100
+        silence_duration = silence_duration - subtract
+        if silence_duration == 1:
             break
 
     noise_batch = [
@@ -248,9 +246,6 @@ def add_vad_chunks(audio, main_lang: str, model_config: str, request: gr.Request
         for st in range(len(speech_timestamps) - 1)
     ]
     noise_batch.append(audio[0 : int(float(speech_timestamps[0]["start"]) * 16000)])
-
-    for noise in noise_batch:
-        audio = nr.reduce_noise(y=audio, sr=16000, y_noise=noise)
 
     audio_batch = [
         audio[

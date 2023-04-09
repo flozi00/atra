@@ -24,4 +24,3 @@ datasets
 tqdm
 diff-match-patch
 jiwer
-noisereduce>=2.0.1

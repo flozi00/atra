@@ -181,7 +181,6 @@ def get_speech_probs(
 
 def get_speech_timestamps(
     audio: torch.Tensor,
-    model,
     speech_probs,
     threshold: float = 0.5,
     sampling_rate: int = 16000,
@@ -277,7 +276,6 @@ def get_speech_timestamps(
             [256, 512, 768] for 8000 sampling_rate"""
         )
 
-    model.reset_states()
     min_speech_samples = sampling_rate * min_speech_duration_ms / 1000
     min_silence_samples = sampling_rate * min_silence_duration_ms / 1000
     speech_pad_samples = sampling_rate * speech_pad_ms / 1000
@@ -290,48 +288,75 @@ def get_speech_timestamps(
     neg_threshold = threshold - 0.15
     temp_end = 0
 
+    # iterate over the speech probabilities
     for i, speech_prob in enumerate(speech_probs):
+        # if we've found speech and haven't already found the end of a speech segment
         if (speech_prob >= threshold) and temp_end:
+            # set temp_end to 0 to indicate we've found the end of the speech segment
             temp_end = 0
 
+        # if we've found speech and haven't already found the start of a speech segment
         if (speech_prob >= threshold) and not triggered:
+            # set triggered to True to indicate we've found the start of the speech segment
             triggered = True
+            # set the start of the speech segment to the current sample
             current_speech["start"] = window_size_samples * i
+            # continue to the next iteration of the loop
             continue
 
+        # if we haven't found speech, but we have found the start of a speech segment
         if (speech_prob < neg_threshold) and triggered:
+            # if we haven't already found the end of the speech segment, set it to the current sample
             if not temp_end:
                 temp_end = window_size_samples * i
+            # if the current sample is not within min_silence_samples of the last sample we found
             if (window_size_samples * i) - temp_end < min_silence_samples:
+                # continue to the next iteration of the loop
                 continue
+            # if the current sample is within min_silence_samples of the last sample we found
             else:
+                # set the end of the speech segment to the last sample we found
                 current_speech["end"] = temp_end
+                # if the length of the speech segment is greater than min_speech_samples
                 if (
                     current_speech["end"] - current_speech["start"]
                 ) > min_speech_samples:
+                    # append the speech segment to the list of speeches
                     speeches.append(current_speech)
+                # set temp_end to 0 to indicate we've found the end of the speech segment
                 temp_end = 0
+                # reset current_speech to an empty dict
                 current_speech = {}
+                # set triggered to False to indicate we haven't found the start of the speech segment
                 triggered = False
+                # continue to the next iteration of the loop
                 continue
 
     if (
         current_speech
         and (audio_length_samples - current_speech["start"]) > min_speech_samples
     ):
+        # When the current speech is longer than the minimum speech length,
+        # set the end of the current speech to the end of the audio.
         current_speech["end"] = audio_length_samples
+        # Add the current speech to the list of speeches.
         speeches.append(current_speech)
 
+    # Iterate over each speech segment and adjust the start and end indices
     for i, speech in enumerate(speeches):
+        # If first speech segment, adjust the start index
         if i == 0:
             speech["start"] = int(max(0, speech["start"] - speech_pad_samples))
+        # If not the last speech segment, adjust the start and end indices
         if i != len(speeches) - 1:
             silence_duration = speeches[i + 1]["start"] - speech["end"]
+            # If the silence duration is too short, adjust the end index of the current speech segment and the start index of the next speech segment
             if silence_duration < 2 * speech_pad_samples:
                 speech["end"] += int(silence_duration // 2)
                 speeches[i + 1]["start"] = int(
                     max(0, speeches[i + 1]["start"] - silence_duration // 2)
                 )
+            # If the silence duration is long enough, adjust the end index of the current speech segment and the start index of the next speech segment
             else:
                 speech["end"] = int(
                     min(audio_length_samples, speech["end"] + speech_pad_samples)
@@ -339,6 +364,7 @@ def get_speech_timestamps(
                 speeches[i + 1]["start"] = int(
                     max(0, speeches[i + 1]["start"] - speech_pad_samples)
                 )
+        # If the current speech segment is the last speech segment, adjust the end index
         else:
             speech["end"] = int(
                 min(audio_length_samples, speech["end"] + speech_pad_samples)
