@@ -27,6 +27,8 @@ is_admin_node = os.getenv("ADMINMODE", "false") == "true"
 
 
 def build_edit_ui():
+    def set_transkription(task_id, transcription):
+        set_transkript(task_id, transcription)
     """
     UI for editing transcriptions and voting like confirm, good, bad
     """
@@ -49,7 +51,7 @@ def build_edit_ui():
     )
 
     send.click(
-        fn=set_transkript,
+        fn=set_transkription,
         inputs=[task_id, transcription],
         outputs=[],
         api_name="correct_transcription",
@@ -159,14 +161,12 @@ def build_gradio():
     return ui
 
 
-def do_voting(task_id: str, rating: str, request: gr.Request):
+def do_voting(task_id: str, rating: str):
     if rating != "confirm":
         set_voting(task_id, rating)
 
 
-def do_voting_labeling(
-    task_id: str, rating: str, transcription: str, lang: str, request: gr.Request
-):
+def do_voting_labeling(task_id: str, rating: str, transcription: str, lang: str):
     if is_admin_node is True:
         set_transkript(task_id, transcription)
         set_voting(task_id, rating)
@@ -177,7 +177,7 @@ def do_voting_labeling(
             return queue_obj.hash
 
 
-def add_to_vad_queue(audio: str, model_config: str, request: gr.Request):
+def add_to_vad_queue(audio: str, model_config: str):
     if model_config not in ["small", "medium", "large"]:
         model_config = "small"
 
@@ -190,12 +190,12 @@ def add_to_vad_queue(audio: str, model_config: str, request: gr.Request):
         audio = ffmpeg_read(payload, sampling_rate=16000)
         os.remove(audio_path)
 
-    queue_string = add_vad_chunks(audio, model_config, request=request)
+    queue_string = add_vad_chunks(audio, model_config)
 
     return queue_string
 
 
-def add_vad_chunks(audio, model_config: str, request: gr.Request):
+def add_vad_chunks(audio, model_config: str):
     def check_timestamp_length_limit(timestamps, limit):
         for timestamp in timestamps:
             if timestamp["end"] - timestamp["start"] > limit:
@@ -265,11 +265,8 @@ def add_vad_chunks(audio, model_config: str, request: gr.Request):
     return queue_string
 
 
-def get_transcription(queue_string: str, request: gr.Request):
-    if check_valid_auth(request=request) is not False:
-        tok = "Valid"
-    else:
-        tok = "Invalid"
+def get_transcription(queue_string: str):
+    tok = "Invalid"
     full_transcription, chunks = "", []
     queue = queue_string.split(",")
     results = get_transkript_batch(queue_string)
@@ -301,14 +298,14 @@ def get_transcription(queue_string: str, request: gr.Request):
     return full_transcription, chunks, tok
 
 
-def get_audio(task_id: str, request: gr.Request):
+def get_audio(task_id: str):
     result = get_transkript(task_id)
     bytes_data = get_data_from_hash(result.hash)
     return (16000, np.frombuffer(bytes_data, dtype=np.float32)), result.transcript
 
 
-def get_subs(task_id: str, request: gr.Request):
-    segments = get_transcription(task_id, request)[1]
+def get_subs(task_id: str):
+    segments = get_transcription(task_id)[1]
     srtFilename = hashlib.sha256(task_id.encode("utf-8")).hexdigest() + ".srt"
     if os.path.exists(srtFilename):
         os.remove(srtFilename)
