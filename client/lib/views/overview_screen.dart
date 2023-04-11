@@ -185,10 +185,6 @@ class _OverviewScreenState extends State<OverviewScreen> {
               }
             }
           }
-          setState(() {
-            items.clear();
-            items.addAll(cards);
-          });
         });
       }
     }

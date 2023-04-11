@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_file_picker/form_builder_file_picker.dart';
-import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 
 import '../utils/data.dart';
@@ -25,14 +24,6 @@ class _ASRUploadState extends State<ASRUpload> {
   late MicrophoneRecorder microphoneRecorder;
   Uint8List audioBytes = Uint8List(0);
   bool isRecording = false;
-  List<String> languages = [
-    'English',
-    'French',
-    'German',
-    'Italian',
-    'Russian',
-    'Spanish'
-  ];
 
   @override
   void initState() {
@@ -42,10 +33,10 @@ class _ASRUploadState extends State<ASRUpload> {
     uploadFormKey = GlobalKey<FormBuilderState>();
   }
 
-  Future<void> uploadASR(Uint8List audio, String lang, String audioName) async {
+  Future<void> uploadASR(Uint8List audio, String audioName) async {
     var base64Audio = uint8ListTob64(audio);
 
-    await SendToASR(base64Audio, audioName, lang, "large")
+    await SendToASR(base64Audio, audioName, "large")
         .then((String newhash) async {
       await add_to_list(newhash, "asr");
     });
@@ -143,34 +134,6 @@ class _ASRUploadState extends State<ASRUpload> {
       child: Column(children: <Widget>[
         const SizedBox(
           height: 50,
-        ),
-        // Add the FormBuilderDropdown to the form
-        FormBuilderDropdown<String>(
-          name: 'srclang',
-          decoration: const InputDecoration(
-            labelText: 'Target language',
-            helperText:
-                'Select the target language to translate the Audio / Video file',
-          ),
-
-          // Add the validator to ensure that the user has selected a language
-          validator:
-              FormBuilderValidators.compose([FormBuilderValidators.required()]),
-
-          // Add the list of languages that will be displayed in the drop down
-          items: languages
-              .map((lang) => DropdownMenuItem(
-                    alignment: AlignmentDirectional.center,
-                    value: lang,
-                    child: Text(lang),
-                  ))
-              .toList(),
-
-          // Transform the value to a string to be used in the MediaInfo call
-          valueTransformer: (val) => val?.toString(),
-        ),
-        const SizedBox(
-          height: 5,
         ),
         // 1. Add the FormBuilderFilePicker widget to the form
         FormBuilderFilePicker(
@@ -275,18 +238,12 @@ class _ASRUploadState extends State<ASRUpload> {
                   }
                   String audioName =
                       uploadFormKey.currentState!.value["media"][i].name;
-                  String lang = uploadFormKey.currentState!.value["srclang"]
-                      .toString()
-                      .toLowerCase();
-                  await uploadASR(audio, lang, audioName);
+                  await uploadASR(audio, audioName);
                 }
               }
               if (audioBytes.length > 10) {
                 String audioName = "microphone.wav";
-                String lang = uploadFormKey.currentState!.value["srclang"]
-                    .toString()
-                    .toLowerCase();
-                await uploadASR(audioBytes, lang, audioName);
+                await uploadASR(audioBytes, audioName);
               }
               context.loaderOverlay.hide();
               Navigator.pushReplacementNamed(context, "/");

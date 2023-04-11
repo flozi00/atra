@@ -67,7 +67,6 @@ def build_asr_ui():
     UI for ASR
     """
     with gr.Row():
-        lang = gr.Radio(langs, value=langs[0], label="Source Language")
         model_config = gr.Radio(
             choices=["small", "medium", "large"], value="large", label="model size"
         )
@@ -79,7 +78,7 @@ def build_asr_ui():
 
     audio_file.change(
         fn=add_to_vad_queue,
-        inputs=[audio_file, lang, model_config],
+        inputs=[audio_file, model_config],
         outputs=[task_id],
         api_name="transcription",
     )
@@ -178,11 +177,7 @@ def do_voting_labeling(
             return queue_obj.hash
 
 
-def add_to_vad_queue(
-    audio: str, main_lang: str, model_config: str, request: gr.Request
-):
-    if main_lang not in langs:
-        main_lang = "german"
+def add_to_vad_queue(audio: str, model_config: str, request: gr.Request):
     if model_config not in ["small", "medium", "large"]:
         model_config = "small"
 
@@ -195,12 +190,12 @@ def add_to_vad_queue(
         audio = ffmpeg_read(payload, sampling_rate=16000)
         os.remove(audio_path)
 
-    queue_string = add_vad_chunks(audio, main_lang, model_config, request=request)
+    queue_string = add_vad_chunks(audio, model_config, request=request)
 
     return queue_string
 
 
-def add_vad_chunks(audio, main_lang: str, model_config: str, request: gr.Request):
+def add_vad_chunks(audio, model_config: str, request: gr.Request):
     def check_timestamp_length_limit(timestamps, limit):
         for timestamp in timestamps:
             if timestamp["end"] - timestamp["start"] > limit:
@@ -210,8 +205,6 @@ def add_vad_chunks(audio, main_lang: str, model_config: str, request: gr.Request
     queue_string = ""
     speech_timestamps = []
     silence_duration = 3000
-    if main_lang not in langs:
-        main_lang = "german"
     if model_config not in ["small", "medium", "large"]:
         model_config = "small"
 
@@ -264,7 +257,6 @@ def add_vad_chunks(audio, main_lang: str, model_config: str, request: gr.Request
     queue = add_to_queue(
         audio_batch=audio_batch,
         master=speech_timestamps,
-        main_lang=f"{main_lang}",
         model_config=model_config,
     )
 

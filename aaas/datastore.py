@@ -28,9 +28,9 @@ class QueueData(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     metas: str
     transcript: str = Field(max_length=4096)
-    langs: str
     model_config: str
     hash: str
+    langs: str = ""
     priority: int = 0
     votings: int = 0
 
@@ -41,7 +41,7 @@ SQLModel.metadata.create_all(engine)
 
 @timeit
 def add_to_queue(
-    audio_batch, master, main_lang, model_config, times=None, file_format="wav"
+    audio_batch, master, model_config, times=None, file_format="wav"
 ) -> list:
     # Create a list to store the hashes of the audio files
     hashes = []
@@ -59,9 +59,7 @@ def add_to_queue(
                 timesstamps = times
             # Create a hash from the audio data, language, model configuration, and timestamps
             hs = hashlib.sha256(
-                f"{audio_data} {main_lang}, {model_config}, {timesstamps}".encode(
-                    "utf-8"
-                )
+                f"{audio_data} {model_config}, {timesstamps}".encode("utf-8")
             ).hexdigest()
             # Add the file format to the hash
             hs = f"{hs}.{file_format}"
@@ -75,7 +73,6 @@ def add_to_queue(
                 entry = QueueData(
                     metas=timesstamps,
                     transcript=TODO,
-                    langs=main_lang,
                     model_config=model_config,
                     hash=hs,
                 )
@@ -229,7 +226,9 @@ def get_validated_dataset():
 
 
 @timeit
-def set_transkript(hs: str, transcription: str, from_queue: bool = False):
+def set_transkript(
+    hs: str, transcription: str, from_queue: bool = False, lang: str = None
+):
     """Set the transcription of an audio file
 
     Args:
@@ -246,6 +245,8 @@ def set_transkript(hs: str, transcription: str, from_queue: bool = False):
                 if transcription != transkript.transcript:
                     transkript.transcript = transcription
                     transkript.votings = 0
+                    if lang is not None:
+                        transkript.langs = lang
                     session.commit()
                     session.refresh(transkript)
 

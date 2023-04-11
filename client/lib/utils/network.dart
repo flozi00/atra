@@ -27,12 +27,10 @@ String baseURL = myurl.contains("localhost")
 var transcription_box;
 
 //The function sendtotask sends the audio file to the server and returns the hash string of the task.
-Future<String> SendToASR(
-    var audio, String name, String source, String model) async {
+Future<String> SendToASR(var audio, String name, String model) async {
   var params = {
     "data": [
       {"name": name, "data": "data:@file/octet-stream;base64,$audio"},
-      source,
       model
     ]
   };
