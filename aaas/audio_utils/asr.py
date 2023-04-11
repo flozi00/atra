@@ -7,7 +7,9 @@ from aaas.model_utils import get_model_and_processor
 from aaas.statics import LANGUAGE_CODES
 from aaas.utils import timeit
 
-lang_model, lang_processor = get_model_and_processor("universal", "asr", "small")
+lang_model, lang_processor = get_model_and_processor(
+    "universal", "asr", "small", activate_cache=False
+)
 
 
 def detect_language(data) -> list:

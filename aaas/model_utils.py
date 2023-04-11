@@ -1,5 +1,3 @@
-from functools import lru_cache
-
 import peft
 import torch
 from optimum.bettertransformer import BetterTransformer
@@ -7,6 +5,8 @@ from transformers import AutoProcessor
 
 from aaas.statics import MODEL_MAPPING
 from aaas.utils import timeit
+
+last_request, last_response = None, None
 
 
 @timeit
@@ -63,7 +63,13 @@ def get_peft_model(peft_model_id, model_class) -> peft.PeftModel:
 
 
 @timeit
-def get_model_and_processor(lang: str, task: str, config: str):
+def get_model_and_processor(lang: str, task: str, config: str, activate_cache=True):
+    global last_request, last_response
+
+    this_request = f"{lang}-{task}-{config}"
+    if activate_cache and this_request == last_request:
+        return last_response
+
     # get model id
     model_id = MODEL_MAPPING[task][config].get(lang, {}).get("name", None)
     adapter_id = MODEL_MAPPING[task][config].get(lang, {}).get("adapter_id", None)
@@ -93,7 +99,12 @@ def get_model_and_processor(lang: str, task: str, config: str):
     except Exception as e:
         print("Bettertransformer exception: ", e)
 
-    if torch.cuda.is_available():
-        torch.cuda.empty_cache()
+    if last_request is not None and activate_cache:
+        last_request = this_request
+        last_response[0].cpu()
+        del last_response
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+        last_response = model, processor
 
     return model, processor
