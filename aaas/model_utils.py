@@ -100,11 +100,13 @@ def get_model_and_processor(lang: str, task: str, config: str, activate_cache=Tr
         print("Bettertransformer exception: ", e)
 
     if last_request is not None and activate_cache:
-        last_request = this_request
         last_response[0].cpu()
         del last_response
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
+
+    if activate_cache:
+        last_request = this_request
         last_response = model, processor
 
     return model, processor

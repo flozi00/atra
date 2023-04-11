@@ -39,7 +39,6 @@ engine = create_engine(db_backend, pool_recycle=3600, pool_pre_ping=True)
 SQLModel.metadata.create_all(engine)
 
 
-@timeit
 def add_to_queue(
     audio_batch, master, model_config, times=None, file_format="wav"
 ) -> list:
@@ -87,7 +86,6 @@ def add_to_queue(
     return hashes
 
 
-@timeit
 def get_transkript(hs: str) -> QueueData:
     """Get a transkript from the database by its hash
     Args:
@@ -103,7 +101,6 @@ def get_transkript(hs: str) -> QueueData:
     return transkript
 
 
-@timeit
 def get_transkript_batch(hs: str) -> list:
     """Get a transkript from the database by its hash in a batch
 
@@ -225,7 +222,6 @@ def get_validated_dataset():
     dataset.push_to_hub("atra", private=True)
 
 
-@timeit
 def set_transkript(
     hs: str, transcription: str, from_queue: bool = False, lang: str = None
 ):
@@ -251,7 +247,6 @@ def set_transkript(
                     session.refresh(transkript)
 
 
-@timeit
 def set_voting(hs: str, vote: str):
     """Set the voting of an audio file
 
@@ -272,7 +267,6 @@ def set_voting(hs: str, vote: str):
                 session.refresh(transkript)
 
 
-@timeit
 def set_in_progress(hs: str):
     """Set the transcription of an audio file to "INPROGRESS"
 
@@ -288,7 +282,6 @@ def set_in_progress(hs: str):
             session.refresh(transkript)
 
 
-@timeit
 @lru_cache(maxsize=CACHE_SIZE)
 def get_data_from_hash(hash: str) -> bytes:
     """Get the bytes of a file from the path which is the hash of the file
@@ -316,7 +309,6 @@ def get_data_from_hash(hash: str) -> bytes:
     return bytes_data
 
 
-@timeit
 def set_data_to_hash(hs: str, bytes_data: bytes):
     """Store the bytes of a file to the path which is the hash of the file
 

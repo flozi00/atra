@@ -1,4 +1,3 @@
-import logging
 import time
 from datetime import datetime
 from functools import cache, wraps
@@ -15,9 +14,7 @@ def timeit(func):
         total_time = end_time - start_time
         now = datetime.now()
         dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
-        logging.debug(
-            f"Function {func.__name__} Took {total_time:.4f} seconds at {dt_string}"
-        )
+        print(f"Function {func.__name__} Took {total_time:.4f} seconds at {dt_string}")
         return result
 
     return timeit_wrapper
