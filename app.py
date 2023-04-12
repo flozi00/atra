@@ -19,7 +19,7 @@ from aaas.gradio_utils import build_gradio
 app = FastAPI()
 ui = build_gradio()
 
-app.mount("/gradio", gr.routes.App.create_app(ui))
+app.mount("/gradio/", gr.routes.App.create_app(ui))
 app.mount(
     "/",
     staticfiles.StaticFiles(directory="client/build/web", html=True),
@@ -50,5 +50,5 @@ if __name__ == "__main__":
     t.start()
 
     uvicorn.run(
-        app, host="0.0.0.0", port=int(os.getenv("PORT", 7860)), log_level="warning"
+        app, host="0.0.0.0", port=int(os.getenv("PORT", 7860)), log_level="info"
     )
