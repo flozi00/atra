@@ -5,7 +5,6 @@ import 'package:timeline_tile/timeline_tile.dart';
 
 import '../utils/data.dart';
 import '../utils/network.dart';
-import 'package:just_audio/just_audio.dart';
 
 Future<Widget> build_timeline(String args, BuildContext context,
     Map<String, HighlightedWord> words, List<dynamic> values) async {
@@ -119,13 +118,7 @@ class _TimelineActivity extends StatelessWidget {
             size: 32,
             color: Colors.white,
           ),
-          onTap: () async {
-            final player = AudioPlayer(); // Create a player
-            await get_audio(step.hash).then((value) async {
-              await player.setUrl(value);
-              await player.play();
-            });
-          },
+          onTap: () async {},
         )),
       ),
     );
@@ -208,7 +201,7 @@ class _RightChildTimeline extends StatelessWidget {
                 ),
                 ElevatedButton.icon(
                     onPressed: () async {
-                      await do_voting(step.hash, "bad");
+                      await do_voting(step.hash, "bad", step.full_hash);
                       Navigator.pushReplacementNamed(context, "/");
                     },
                     icon: const Icon(Icons.repeat),

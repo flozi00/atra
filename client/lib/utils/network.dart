@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import '../views/login.dart' as login;
 import 'package:hive/hive.dart';
 import 'package:crypto/crypto.dart';
 
@@ -12,7 +11,7 @@ Map<String, String> headers() {
     'accept-language': 'de-DE,de;q=0.9,en-US;q=0.8,en;q=0.7',
     'content-type': 'application/json',
     'Accept-Encoding': 'gzip',
-    "Authorization": login.bearerToken(),
+    "Authorization": "",
   };
 }
 
@@ -143,13 +142,17 @@ Future<String> question_answering(String question, String context) async {
   return answer;
 }
 
-Future<void> do_voting(String hash, String text) async {
+Future<void> do_voting(String hash, String text, String fullHash) async {
   var params = {
     "data": [
       hash,
       text,
     ]
   };
+
+  String compressedHash = sha256.convert(utf8.encode(fullHash)).toString();
+  transcription_box ??= await Hive.openBox("transcription");
+  transcription_box.put(compressedHash, null);
 
   // Send the request to the server.
   var res = await http.post(Uri.parse('$baseURL/run/vote_result'),

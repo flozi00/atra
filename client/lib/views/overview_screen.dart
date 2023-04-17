@@ -12,6 +12,7 @@ import './timeline_view.dart';
 import 'package:woozy_search/woozy_search.dart';
 import 'package:flutter/services.dart';
 import 'dart:html' as webFile;
+import 'package:card_banner/card_banner.dart';
 
 extension IterableExtension<T> on Iterable<T> {
   Iterable<T> distinctBy(Object Function(T e) getCompareValue) {
@@ -58,100 +59,124 @@ class _OverviewScreenState extends State<OverviewScreen> {
   }
 
   Widget cardItem(String recognizedText, String hash, List<dynamic> listWords) {
-    return Card(
-        child: Column(children: [
-      ListTile(
-        title: Text(hash.substring(0, 20)),
-        subtitle: Text(recognizedText.length > 250
-            ? recognizedText.substring(0, 250).replaceAll("\n", " ")
-            : recognizedText),
-        onTap: () async {
-          if (question.endsWith("?")) {
-            await question_answering(question, most_relevant[hash]!)
-                .then((result) {
-              answer = result;
-              for (String word in answer.split(" ")) {
-                words[word] = HighlightedWord(
-                    textStyle: TextStyle(
-                  color: Theme.of(context).colorScheme.onPrimaryContainer,
-                ));
-              }
-            });
-          } else {
-            answer = "";
-          }
-          build_timeline(hash, context, words, listWords).then((value) {
-            showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return Dialog(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20.0)),
-                      child: Padding(
-                          padding: const EdgeInsets.fromLTRB(15, 0, 15, 10),
-                          child: Column(children: [
-                            // if answer length > 2, display Text
-                            if (answer.length >= 2)
-                              Center(
-                                  child: SizedBox(
-                                      width: 360,
-                                      child: Card(
-                                        child: ListTile(
-                                          title: Text(question),
-                                          subtitle: Text(answer),
+    return CardBanner(
+        text: recognizedText.contains("***") ? "IN PROGRESS" : "DONE",
+        color: recognizedText.contains("***")
+            ? Colors.yellow
+            : Theme.of(context).colorScheme.primaryContainer,
+        position: CardBannerPosition.TOPLEFT,
+        child: Card(
+            child: Padding(
+                padding: const EdgeInsets.fromLTRB(35, 10, 20, 10),
+                child: Column(children: [
+                  ListTile(
+                    title: Text(hash.substring(0, 20)),
+                    subtitle: Text(recognizedText.length > 125
+                        ? "${recognizedText.substring(0, 125).replaceAll("\n", " ")}..."
+                        : recognizedText),
+                    onTap: () async {
+                      if (question.endsWith("?")) {
+                        await question_answering(question, most_relevant[hash]!)
+                            .then((result) {
+                          answer = result;
+                          for (String word in answer.split(" ")) {
+                            words[word] = HighlightedWord(
+                                textStyle: TextStyle(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onPrimaryContainer,
+                            ));
+                          }
+                        });
+                      } else {
+                        answer = "";
+                      }
+                      build_timeline(hash, context, words, listWords)
+                          .then((value) {
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return Dialog(
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius:
+                                          BorderRadius.circular(20.0)),
+                                  child: Padding(
+                                      padding: const EdgeInsets.fromLTRB(
+                                          15, 0, 15, 10),
+                                      child: Column(children: [
+                                        // if answer length > 2, display Text
+                                        if (answer.length >= 2)
+                                          Center(
+                                              child: SizedBox(
+                                                  width: 360,
+                                                  child: Card(
+                                                    child: ListTile(
+                                                      title: Text(question),
+                                                      subtitle: Text(answer),
+                                                    ),
+                                                  ))),
+                                        const SizedBox(
+                                          height: 35,
                                         ),
-                                      ))),
-                            const SizedBox(
-                              height: 35,
-                            ),
-                            value
-                          ])));
-                });
-          });
-        },
-      ),
-      ButtonBar(
-        children: <Widget>[
-          ElevatedButton(
-              onPressed: () async {
-                await get_video_subs(hash).then((srtString) async {
-                  if (kIsWeb) {
-                    var blob =
-                        webFile.Blob([srtString], 'text/plain', 'native');
+                                        value
+                                      ])));
+                            });
+                      });
+                    },
+                  ),
+                  Row(children: [
+                    Text(
+                        "Words: ${recognizedText.split(" ").length + recognizedText.split("\n").length}"),
+                    const Spacer(),
+                    ButtonBar(
+                      children: <Widget>[
+                        ElevatedButton(
+                            onPressed: () async {
+                              await get_video_subs(hash)
+                                  .then((srtString) async {
+                                if (kIsWeb) {
+                                  var blob = webFile.Blob(
+                                      [srtString], 'text/plain', 'native');
 
-                    var anchorElement = webFile.AnchorElement(
-                      href:
-                          webFile.Url.createObjectUrlFromBlob(blob).toString(),
-                    )
-                      ..setAttribute("download", "subtitles.srt")
-                      ..click();
-                  }
-                });
-              },
-              child: const Text('Download subtitles')),
-          ElevatedButton(
-              onPressed: () async {
-                Clipboard.setData(ClipboardData(text: recognizedText))
-                    .then((_) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Copied to clipboard")));
-                });
-              },
-              child: const Text('Copy to clipboard')),
-          ElevatedButton(
-              onPressed: () async {
-                SharedPreferences prefs = await SharedPreferences.getInstance();
-                for (String mode in modes) {
-                  List<String> hashList = prefs.getStringList(mode) ?? [];
-                  hashList.remove(hash);
-                  await prefs.setStringList(mode, hashList);
-                }
-                build_cards_list();
-              },
-              child: const Text('Delete'))
-        ],
-      ),
-    ]));
+                                  var anchorElement = webFile.AnchorElement(
+                                    href: webFile.Url.createObjectUrlFromBlob(
+                                            blob)
+                                        .toString(),
+                                  )
+                                    ..setAttribute("download", "subtitles.srt")
+                                    ..click();
+                                }
+                              });
+                            },
+                            child: const Text('Download subtitles')),
+                        ElevatedButton(
+                            onPressed: () async {
+                              Clipboard.setData(
+                                      ClipboardData(text: recognizedText))
+                                  .then((_) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content: Text("Copied to clipboard")));
+                              });
+                            },
+                            child: const Text('Copy to clipboard')),
+                        ElevatedButton(
+                            onPressed: () async {
+                              SharedPreferences prefs =
+                                  await SharedPreferences.getInstance();
+                              for (String mode in modes) {
+                                List<String> hashList =
+                                    prefs.getStringList(mode) ?? [];
+                                hashList.remove(hash);
+                                await prefs.setStringList(mode, hashList);
+                              }
+                              build_cards_list();
+                            },
+                            child: const Text('Delete'))
+                      ],
+                    ),
+                  ])
+                ]))));
   }
 
   Future<void> build_cards_list() async {

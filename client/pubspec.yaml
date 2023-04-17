@@ -12,18 +12,16 @@ environment:
   sdk: '>=2.18.5'
 
 dependencies:
+  card_banner: ^0.0.1+2
   crypto: ^3.0.2
   flutter:
     sdk: flutter
   flutter_form_builder: ^7.7.0
   form_builder_file_picker: ^2.3.0
   form_builder_validators: ^8.4.0
-  google_sign_in: ^6.0.2
-  google_sign_in_web: ^0.11.0+1
   highlight_text: ^1.6.0
   hive: ^2.2.3
   json_theme: ^4.0.0
-  just_audio: ^0.9.31
   loader_overlay: ^2.1.0
   microphone: ^0.1.0
   shared_preferences: ^2.0.15
