@@ -159,7 +159,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
                                         content: Text("Copied to clipboard")));
                               });
                             },
-                            child: const Text('Copy to clipboard')),
+                            child: const Text('Copy')),
                         ElevatedButton(
                             onPressed: () async {
                               SharedPreferences prefs =
