@@ -46933,7 +46933,7 @@ n=s==null?n.b:s}s=A.eK(B.c.N(b,0,20),o,o,o,o,o,o,o)
 if(a.length>125){r=B.c.N(a,0,125)
 r=A.i_(r,"\n"," ")+"..."}else r=a
 q=t.D
-return new A.J6(A.aBB(new A.c0(B.Et,A.jK(A.a([A.aCW(new A.aqm(p,b,c),A.eK(r,o,o,o,o,o,o,o),s),A.lO(A.a([A.eK("Words: "+(a.split(" ").length+a.split("\n").length),o,o,o,o,o,o,o),B.Nm,new A.IY(A.a([A.Le(!1,B.TV,B.z,o,o,o,o,o,new A.aqn(b),o,o),A.Le(!1,B.TZ,B.z,o,o,o,o,o,new A.aqo(p,a),o,o),A.Le(!1,B.TX,B.z,o,o,o,o,o,new A.aqp(p,b),o,o)],q),o)],q),B.ag,B.av,B.an)],q),B.ag,B.av,B.an),o)),m,n,B.BR,o)},
+return new A.J6(A.aBB(new A.c0(B.Et,A.jK(A.a([A.aCW(new A.aqm(p,b,c),A.eK(r,o,o,o,o,o,o,o),s),A.lO(A.a([A.eK("Words: "+(a.split(" ").length+a.split("\n").length),o,o,o,o,o,o,o),B.Nm,new A.IY(A.a([A.Le(!1,B.TY,B.z,o,o,o,o,o,new A.aqn(b),o,o),A.Le(!1,B.TZ,B.z,o,o,o,o,o,new A.aqo(p,a),o,o),A.Le(!1,B.TW,B.z,o,o,o,o,o,new A.aqp(p,b),o,o)],q),o)],q),B.ag,B.av,B.an)],q),B.ag,B.av,B.an),o)),m,n,B.BR,o)},
 m8(){return this.aed()},
 aed(){var s=0,r=A.P(t.H),q=this,p,o,n,m,l,k,j,i,h,g
 var $async$m8=A.Q(function(a,b){if(a===1)return A.M(b,r)
@@ -47203,7 +47203,7 @@ $0(){A.aA7(new A.aru(this.a),this.b,t.z)},
 $S:0}
 A.aru.prototype={
 $1(a){var s=null,r=this.a,q=A.aEn(r.c.c)
-return A.axn(new A.c0(B.Eq,A.jK(A.a([B.TY,B.h7,A.aQW(q,B.Fz,20,3),B.h7,A.Le(!1,B.TW,B.z,s,s,s,s,s,new A.art(r,q,a),s,s)],t.D),B.ag,B.av,B.an),s),s)},
+return A.axn(new A.c0(B.Eq,A.jK(A.a([B.TX,B.h7,A.aQW(q,B.Fz,20,3),B.h7,A.Le(!1,B.TV,B.z,s,s,s,s,s,new A.art(r,q,a),s,s)],t.D),B.ag,B.av,B.an),s),s)},
 $S:78}
 A.art.prototype={
 $0(){var s=0,r=A.P(t.H),q=this,p,o
@@ -95013,10 +95013,10 @@ B.P5=new A.l(!1,null,null,null,null,null,11,B.j,null,1.5,null,B.k,null,null,null
 B.S8=new A.l(!1,null,null,null,null,null,10,B.j,null,1.5,null,B.k,null,null,null,null,null,null,null,null,null,"englishLike labelSmall 2018",null,null,null,null)
 B.TT=new A.df(B.R9,B.QQ,B.Tv,B.QR,B.RG,B.S3,B.SF,B.SE,B.RB,B.QL,B.Sg,B.QD,B.Rt,B.P5,B.S8)
 B.yV=new A.Dw(1,"longestLine")
-B.TV=new A.fH("Download subtitles",null,null,null,null,null,null,null,null,null)
-B.TW=new A.fH("Save",null,null,null,null,null,null,null,null,null)
-B.TX=new A.fH("Delete",null,null,null,null,null,null,null,null,null)
-B.TY=new A.fH("Edit Transcript",null,null,null,null,null,null,null,null,null)
+B.TV=new A.fH("Save",null,null,null,null,null,null,null,null,null)
+B.TW=new A.fH("Delete",null,null,null,null,null,null,null,null,null)
+B.TX=new A.fH("Edit Transcript",null,null,null,null,null,null,null,null,null)
+B.TY=new A.fH("Download",null,null,null,null,null,null,null,null,null)
 B.TZ=new A.fH("Copy to clipboard",null,null,null,null,null,null,null,null,null)
 B.U0=new A.fH("Click to start recording",null,null,null,null,null,null,null,null,null)
 B.U1=new A.fH("Regenerate",null,null,null,null,null,null,null,null,null)

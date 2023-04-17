@@ -148,7 +148,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
                                 }
                               });
                             },
-                            child: const Text('Download subtitles')),
+                            child: const Text('Download')),
                         ElevatedButton(
                             onPressed: () async {
                               Clipboard.setData(
