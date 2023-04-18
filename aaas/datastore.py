@@ -186,7 +186,7 @@ def get_vote_queue(lang: str = None) -> QueueData:
         if len(todos) == 0:
             sample = False
         else:
-            sample = todos[-1]
+            sample = todos[0]
 
     return sample
 

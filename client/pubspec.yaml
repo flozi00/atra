@@ -23,7 +23,10 @@ dependencies:
   hive: ^2.2.3
   json_theme: ^4.0.0
   loader_overlay: ^2.1.0
-  microphone: ^0.1.0
+  microphone:
+      git:
+        url: https://github.com/flozi00/flutter-web-microphone.git
+        path: microphone
   shared_preferences: ^2.0.15
   siri_wave: ^0.3.0
   timeline_tile: ^2.0.0
