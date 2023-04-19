@@ -11,7 +11,6 @@ from sqlmodel import Field, Session, SQLModel, create_engine, select
 from tqdm.auto import tqdm
 
 from aaas.statics import CACHE_SIZE, INPROGRESS, TODO
-from aaas.utils import timeit
 
 db_backend = os.getenv("DBBACKEND", "sqlite:///database.db")
 ftp_backend = os.getenv("FTPBACKEND")
@@ -167,10 +166,13 @@ def get_tasks_queue() -> QueueData:
 
 
 def get_vote_queue(lang: str = None) -> QueueData:
-    """Get last item from the queue with a voting score of 3 or less, but greater or equal than 0
+    """Get the oldest item from the queue that has a voting score of 0 - 3 and is not in progress
+
+    Args:
+        lang (str, optional): language code string. Defaults to None.
 
     Returns:
-        QueueData: A random item from the queue
+        QueueData
     """
     with Session(engine) as session:
         statement = (
