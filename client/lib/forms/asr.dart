@@ -125,6 +125,33 @@ class _ASRUploadState extends State<ASRUpload> {
     );
   }
 
+  void sendAudio() async {
+    if (uploadFormKey.currentState!.validate()) {
+      uploadFormKey.currentState?.save();
+      context.loaderOverlay.show();
+      if (uploadFormKey.currentState!.value["media"] != null) {
+        for (int i = 0;
+            i < uploadFormKey.currentState!.value["media"].length;
+            i++) {
+          var audio = uploadFormKey.currentState!.value["media"][i].bytes;
+          if (audio == null) {
+            await File(uploadFormKey.currentState!.value["media"][i].path)
+                .readAsBytes()
+                .then((value) => audio = value);
+          }
+          String audioName = uploadFormKey.currentState!.value["media"][i].name;
+          await uploadASR(audio, audioName);
+        }
+      }
+      if (audioBytes.length > 10) {
+        String audioName = "microphone.wav";
+        await uploadASR(audioBytes, audioName);
+      }
+      context.loaderOverlay.hide();
+      Navigator.pushReplacementNamed(context, "/");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -197,8 +224,7 @@ class _ASRUploadState extends State<ASRUpload> {
                   });
                 });
                 microphoneRecorder.dispose();
-                microphoneRecorder = MicrophoneRecorder();
-                await microphoneRecorder.init();
+                sendAudio();
               } else {
                 isRecording = true;
                 await microphoneRecorder.start();
@@ -221,33 +247,7 @@ class _ASRUploadState extends State<ASRUpload> {
                 4. Hides the loader overlay.
                 5. Pushes "/" to the Navigator, which will take the user back to the home page. */
           onPressed: () async {
-            if (uploadFormKey.currentState!.validate()) {
-              uploadFormKey.currentState?.save();
-              context.loaderOverlay.show();
-              if (uploadFormKey.currentState!.value["media"] != null) {
-                for (int i = 0;
-                    i < uploadFormKey.currentState!.value["media"].length;
-                    i++) {
-                  var audio =
-                      uploadFormKey.currentState!.value["media"][i].bytes;
-                  if (audio == null) {
-                    await File(
-                            uploadFormKey.currentState!.value["media"][i].path)
-                        .readAsBytes()
-                        .then((value) => audio = value);
-                  }
-                  String audioName =
-                      uploadFormKey.currentState!.value["media"][i].name;
-                  await uploadASR(audio, audioName);
-                }
-              }
-              if (audioBytes.length > 10) {
-                String audioName = "microphone.wav";
-                await uploadASR(audioBytes, audioName);
-              }
-              context.loaderOverlay.hide();
-              Navigator.pushReplacementNamed(context, "/");
-            }
+            sendAudio();
           },
           child: const Text('Transcribe Audio'),
         ),
