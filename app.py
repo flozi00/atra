@@ -46,8 +46,11 @@ class BackgroundTasks(threading.Thread):
 
 
 if __name__ == "__main__":
-    t = BackgroundTasks()
-    t.start()
+    worker = os.getenv("RUNWORKER", "false").lower() == "true"
+    if worker is True:
+        print("Starting worker")
+        t = BackgroundTasks()
+        t.start()
 
     uvicorn.run(
         app, host="0.0.0.0", port=int(os.getenv("PORT", 7860)), log_level="info"

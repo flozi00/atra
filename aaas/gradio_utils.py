@@ -17,7 +17,7 @@ from aaas.datastore import (
 )
 from aaas.silero_vad import get_speech_probs, silero_vad
 from aaas.statics import LANG_MAPPING
-from aaas.utils import check_valid_auth
+import pyloudnorm as pyln
 
 langs = sorted(list(LANG_MAPPING.keys()))
 
@@ -29,6 +29,7 @@ is_admin_node = os.getenv("ADMINMODE", "false") == "true"
 def build_edit_ui():
     def set_transkription(task_id, transcription):
         set_transkript(task_id, transcription)
+
     """
     UI for editing transcriptions and voting like confirm, good, bad
     """
@@ -190,6 +191,10 @@ def add_to_vad_queue(audio: str, model_config: str):
         audio = ffmpeg_read(payload, sampling_rate=16000)
         os.remove(audio_path)
 
+    meter = pyln.Meter(16000)  # create BS.1770 meter
+    loudness = meter.integrated_loudness(audio)
+    audio = pyln.normalize.loudness(audio, loudness, -1.0)
+
     queue_string = add_vad_chunks(audio, model_config)
 
     return queue_string
@@ -300,6 +305,8 @@ def get_transcription(queue_string: str):
 
 def get_audio(task_id: str):
     result = get_transkript(task_id)
+    if result is None:
+        return (16000, np.zeros(16000)), ""
     bytes_data = get_data_from_hash(result.hash)
     return (16000, np.frombuffer(bytes_data, dtype=np.float32)), result.transcript
 
