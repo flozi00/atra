@@ -128,54 +128,53 @@ class _OverviewScreenState extends State<OverviewScreen> {
                     Text(
                         "Words: ${recognizedText.split(" ").length + recognizedText.split("\n").length}"),
                     const Spacer(),
-                    ButtonBar(
-                      children: <Widget>[
-                        ElevatedButton(
-                            onPressed: () async {
-                              await get_video_subs(hash)
-                                  .then((srtString) async {
-                                if (kIsWeb) {
-                                  var blob = webFile.Blob(
-                                      [srtString], 'text/plain', 'native');
+                  ]),
+                  ButtonBar(
+                    children: <Widget>[
+                      ElevatedButton(
+                          onPressed: () async {
+                            await get_video_subs(hash).then((srtString) async {
+                              if (kIsWeb) {
+                                var blob = webFile.Blob(
+                                    [srtString], 'text/plain', 'native');
 
-                                  var anchorElement = webFile.AnchorElement(
-                                    href: webFile.Url.createObjectUrlFromBlob(
-                                            blob)
-                                        .toString(),
-                                  )
-                                    ..setAttribute("download", "subtitles.srt")
-                                    ..click();
-                                }
-                              });
-                            },
-                            child: const Text('Download')),
-                        ElevatedButton(
-                            onPressed: () async {
-                              Clipboard.setData(
-                                      ClipboardData(text: recognizedText))
-                                  .then((_) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                        content: Text("Copied to clipboard")));
-                              });
-                            },
-                            child: const Text('Copy')),
-                        ElevatedButton(
-                            onPressed: () async {
-                              SharedPreferences prefs =
-                                  await SharedPreferences.getInstance();
-                              for (String mode in modes) {
-                                List<String> hashList =
-                                    prefs.getStringList(mode) ?? [];
-                                hashList.remove(hash);
-                                await prefs.setStringList(mode, hashList);
+                                var anchorElement = webFile.AnchorElement(
+                                  href:
+                                      webFile.Url.createObjectUrlFromBlob(blob)
+                                          .toString(),
+                                )
+                                  ..setAttribute("download", "subtitles.srt")
+                                  ..click();
                               }
-                              build_cards_list();
-                            },
-                            child: const Text('Delete'))
-                      ],
-                    ),
-                  ])
+                            });
+                          },
+                          child: const Text('Download')),
+                      ElevatedButton(
+                          onPressed: () async {
+                            Clipboard.setData(
+                                    ClipboardData(text: recognizedText))
+                                .then((_) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text("Copied to clipboard")));
+                            });
+                          },
+                          child: const Text('Copy')),
+                      ElevatedButton(
+                          onPressed: () async {
+                            SharedPreferences prefs =
+                                await SharedPreferences.getInstance();
+                            for (String mode in modes) {
+                              List<String> hashList =
+                                  prefs.getStringList(mode) ?? [];
+                              hashList.remove(hash);
+                              await prefs.setStringList(mode, hashList);
+                            }
+                            build_cards_list();
+                          },
+                          child: const Text('Delete'))
+                    ],
+                  ),
                 ]))));
   }
 
