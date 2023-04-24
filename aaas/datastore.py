@@ -18,7 +18,7 @@ try:
     ftp_user = ftp_backend.split("@")[0]
     ftp_pass = ftp_backend.split("@")[1]
     ftp_server = ftp_backend.split("@")[2]
-except:
+except Exception:
     ftp_user, ftp_pass, ftp_server = None, None, None
 build_dataset = os.getenv("BUILDDATASET", "false") == "true"
 
@@ -50,12 +50,13 @@ def add_to_queue(
             # Get the audio data
             audio_data = audio_batch[x]
             # Get the timestamps for the current audio file
-            if times == None:
+            if times is None:
                 time_dict = master[x]
                 timesstamps = f"{time_dict['start']},{time_dict['end']}"
             else:
                 timesstamps = times
-            # Create a hash from the audio data, language, model configuration, and timestamps
+            # Create a hash from the audio data, language,
+            # model configuration, and timestamps
             hs = hashlib.sha256(
                 f"{audio_data} {model_config}, {timesstamps}".encode("utf-8")
             ).hexdigest()
@@ -166,7 +167,8 @@ def get_tasks_queue() -> QueueData:
 
 
 def get_vote_queue(lang: str = None) -> QueueData:
-    """Get the oldest item from the queue that has a voting score of 0 - 3 and is not in progress
+    """Get the oldest item from the queue that has a
+    voting score of 0 - 3 and is not in progress
 
     Args:
         lang (str, optional): language code string. Defaults to None.

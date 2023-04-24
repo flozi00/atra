@@ -42,7 +42,7 @@ def get_mail_from_google(auth_token):
         ).json()["emailAddresses"][0]["value"]
 
         return response
-    except:
+    except Exception:
         return None
 
 

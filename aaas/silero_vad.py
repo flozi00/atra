@@ -87,36 +87,14 @@ def get_speech_probs(
 
     model: preloaded .jit silero VAD model
 
-    threshold: float (default - 0.5)
-        Speech threshold. Silero VAD outputs speech probabilities for each audio chunk,
-        probabilities ABOVE this value are considered as SPEECH.
-        It is better to tune this parameter for each dataset separately,
-        but "lazy" 0.5 is pretty good for most datasets.
-
     sampling_rate: int (default - 16000)
         Currently silero VAD models support 8000 and 16000 sample rates
-
-    min_speech_duration_ms: int (default - 250 milliseconds)
-        Final speech chunks shorter min_speech_duration_ms are thrown out
-
-    min_silence_duration_ms: int (default - 100 milliseconds)
-        In the end of each speech chunk
-        wait for min_silence_duration_ms before separating it
 
     window_size_samples: int (default - 1536 samples)
         Audio chunks of window_size_samples size are fed to the silero VAD model.
         WARNING! Silero VAD models were trained using 512, 1024, 1536 samples
         for 16000 sample rate and 256, 512, 768 samples for 8000 sample rate.
         Values other than these may affect model perfomance!!
-
-    speech_pad_ms: int (default - 30 milliseconds)
-        Final speech chunks are padded by speech_pad_ms each side
-
-    return_seconds: bool (default - False)
-        whether return timestamps in seconds (default - samples)
-
-    visualize_probs: bool (default - False)
-        whether draw prob hist or not
 
     Returns
     ----------
@@ -199,8 +177,6 @@ def get_speech_timestamps(
     audio: torch.Tensor, one dimensional
         One dimensional float torch.Tensor, other types are casted to torch if possible
 
-    model: preloaded .jit silero VAD model
-
     threshold: float (default - 0.5)
         Speech threshold. Silero VAD outputs speech probabilities for each audio chunk,
         probabilities ABOVE this value are considered as SPEECH.
@@ -228,9 +204,6 @@ def get_speech_timestamps(
 
     return_seconds: bool (default - False)
         whether return timestamps in seconds (default - samples)
-
-    visualize_probs: bool (default - False)
-        whether draw prob hist or not
 
     Returns
     ----------
@@ -290,30 +263,38 @@ def get_speech_timestamps(
 
     # iterate over the speech probabilities
     for i, speech_prob in enumerate(speech_probs):
-        # if we've found speech and haven't already found the end of a speech segment
+        # if we've found speech and haven't already found
+        # the end of a speech segment
         if (speech_prob >= threshold) and temp_end:
-            # set temp_end to 0 to indicate we've found the end of the speech segment
+            # set temp_end to 0 to indicate we've found
+            # the end of the speech segment
             temp_end = 0
 
-        # if we've found speech and haven't already found the start of a speech segment
+        # if we've found speech and haven't already found
+        # the start of a speech segment
         if (speech_prob >= threshold) and not triggered:
-            # set triggered to True to indicate we've found the start of the speech segment
+            # set triggered to True to indicate we've found
+            # the start of the speech segment
             triggered = True
             # set the start of the speech segment to the current sample
             current_speech["start"] = window_size_samples * i
             # continue to the next iteration of the loop
             continue
 
-        # if we haven't found speech, but we have found the start of a speech segment
+        # if we haven't found speech, but we have found the
+        # start of a speech segment
         if (speech_prob < neg_threshold) and triggered:
-            # if we haven't already found the end of the speech segment, set it to the current sample
+            # if we haven't already found the end of the
+            # speech segment, set it to the current sample
             if not temp_end:
                 temp_end = window_size_samples * i
-            # if the current sample is not within min_silence_samples of the last sample we found
+            # if the current sample is not within
+            # min_silence_samples of the last sample we found
             if (window_size_samples * i) - temp_end < min_silence_samples:
                 # continue to the next iteration of the loop
                 continue
-            # if the current sample is within min_silence_samples of the last sample we found
+            # if the current sample is within
+            # min_silence_samples of the last sample we found
             else:
                 # set the end of the speech segment to the last sample we found
                 current_speech["end"] = temp_end
@@ -323,11 +304,13 @@ def get_speech_timestamps(
                 ) > min_speech_samples:
                     # append the speech segment to the list of speeches
                     speeches.append(current_speech)
-                # set temp_end to 0 to indicate we've found the end of the speech segment
+                # set temp_end to 0 to indicate we've found
+                # the end of the speech segment
                 temp_end = 0
                 # reset current_speech to an empty dict
                 current_speech = {}
-                # set triggered to False to indicate we haven't found the start of the speech segment
+                # set triggered to False to indicate we haven't
+                # found the start of the speech segment
                 triggered = False
                 # continue to the next iteration of the loop
                 continue
@@ -350,13 +333,15 @@ def get_speech_timestamps(
         # If not the last speech segment, adjust the start and end indices
         if i != len(speeches) - 1:
             silence_duration = speeches[i + 1]["start"] - speech["end"]
-            # If the silence duration is too short, adjust the end index of the current speech segment and the start index of the next speech segment
+            # If the silence duration is too short, adjust the end index of the
+            # current speech segment and the start index of the next speech segment
             if silence_duration < 2 * speech_pad_samples:
                 speech["end"] += int(silence_duration // 2)
                 speeches[i + 1]["start"] = int(
                     max(0, speeches[i + 1]["start"] - silence_duration // 2)
                 )
-            # If the silence duration is long enough, adjust the end index of the current speech segment and the start index of the next speech segment
+            # If the silence duration is long enough, adjust the end index of the
+            # current speech segment and the start index of the next speech segment
             else:
                 speech["end"] = int(
                     min(audio_length_samples, speech["end"] + speech_pad_samples)

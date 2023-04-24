@@ -209,12 +209,11 @@ def add_vad_chunks(audio, model_config: str):
 
     queue_string = ""
     speech_timestamps = []
-    silence_duration = 3000
+    silence_duration = 2000
     if model_config not in ["small", "medium", "large"]:
         model_config = "small"
 
     queue = []
-    # audio = seperate_vocal(audio)
 
     speech_probs = get_speech_probs(
         audio,
@@ -230,8 +229,8 @@ def add_vad_chunks(audio, model_config: str):
             threshold=0.6,
             sampling_rate=16000,
             min_silence_duration_ms=silence_duration,
-            min_speech_duration_ms=1000,
-            speech_pad_ms=250,
+            min_speech_duration_ms=500,
+            speech_pad_ms=400,
             return_seconds=True,
         )
         subtract = 1 if silence_duration < 1000 else 100

@@ -1,19 +1,9 @@
 import os
 import threading
-import time
-
 import gradio as gr
-import numpy as np
 import uvicorn
 from fastapi import FastAPI, staticfiles
 
-from aaas.audio_utils.asr import inference_asr
-from aaas.datastore import (
-    get_data_from_hash,
-    get_tasks_queue,
-    set_in_progress,
-    set_transkript,
-)
 from aaas.gradio_utils import build_gradio
 
 app = FastAPI()
@@ -29,6 +19,16 @@ app.mount(
 
 class BackgroundTasks(threading.Thread):
     def run(self, *args, **kwargs):
+        import numpy as np
+        from aaas.audio_utils.asr import inference_asr
+        from aaas.datastore import (
+            get_data_from_hash,
+            get_tasks_queue,
+            set_in_progress,
+            set_transkript,
+        )
+        import time
+
         while True:
             task, is_reclamation = get_tasks_queue()
             if task is not False:

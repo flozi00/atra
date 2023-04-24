@@ -66,22 +66,30 @@ def get_peft_model(peft_model_id, model_class) -> peft.PeftModel:
 def get_model_and_processor(lang: str, task: str, config: str, activate_cache=True):
     global last_request, last_response
 
-    this_request = f"{lang}-{task}-{config}"
-    if activate_cache and this_request == last_request:
-        return last_response
-
-    # get model id
+    # get all the model information from the mapping
+    # for the requested task, config and lang
     model_id = MODEL_MAPPING[task][config].get(lang, {}).get("name", None)
     adapter_id = MODEL_MAPPING[task][config].get(lang, {}).get("adapter_id", None)
-
     if model_id is None:
         base_model_lang = "universal"
         model_id = MODEL_MAPPING[task][config][base_model_lang]["name"]
     else:
         base_model_lang = lang
-
     model_class = MODEL_MAPPING[task][config][base_model_lang].get("class", None)
 
+    # construct the request string for the cache
+    # the request string is a combination of model_id, task and config
+    if adapter_id is not None:
+        this_request = f"{adapter_id}-{task}-{config}"
+    else:
+        this_request = f"{model_id}-{task}-{config}"
+
+    # check if the request is the same as the last request
+    # if yes, return the last response (model, processor)
+    if activate_cache and this_request == last_request:
+        return last_response
+
+    # load the model
     if adapter_id is not None:
         model = get_peft_model(adapter_id, model_class)
     else:
@@ -99,12 +107,15 @@ def get_model_and_processor(lang: str, task: str, config: str, activate_cache=Tr
     except Exception as e:
         print("Bettertransformer exception: ", e)
 
+    # if the cache is activated and the last request is not None
+    # delete the last response and empty the cache for the GPU
     if last_request is not None and activate_cache:
         last_response[0].cpu()
         del last_response
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
 
+    # if the cache is activated, save the response as the last request and response
     if activate_cache:
         last_request = this_request
         last_response = model, processor
