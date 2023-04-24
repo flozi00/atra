@@ -57,46 +57,43 @@ for d in tqdm(ds):
         .replace("ß", "ss")
     )
 
-    try:
-        # load audio
-        audio_data = d["audio"]["array"]
+    # load audio
+    audio_data = d["audio"]["array"]
 
-        # normalize prediction
-        pred_str_orig = unidecode(
-            alpha2digit(inference_asr(audio_data, "german", "large", False), "de")
-        )
-        pred_str = (
-            re.sub(r"[^\w\s]", "", pred_str_orig.strip())
-            .lower()
-            .replace("-", " ")
-            .replace(",", "")
-            .replace("  ", " ")
-            .replace("ph", "f")
-            .replace("ß", "ss")
-        )
+    # normalize prediction
+    pred_str_orig = unidecode(
+        alpha2digit(inference_asr(audio_data, "large", False)[0], "de")
+    )
+    pred_str = (
+        re.sub(r"[^\w\s]", "", pred_str_orig.strip())
+        .lower()
+        .replace("-", " ")
+        .replace(",", "")
+        .replace("  ", " ")
+        .replace("ph", "f")
+        .replace("ß", "ss")
+    )
 
-        diff_score = 0
-        diff = dmp.diff_main(base_str.replace(" ", ""), pred_str.replace(" ", ""))
+    diff_score = 0
+    diff = dmp.diff_main(base_str.replace(" ", ""), pred_str.replace(" ", ""))
+    dmp.diff_cleanupSemantic(diff)
+    for d in diff:
+        if d[0] != 0:
+            if len(d[1]) > 1:
+                diff_score += 1
+
+    # append to lists
+    base.append(pred_str if diff_score == 0 else base_str)
+    predicted.append(pred_str)
+
+    # print results
+    if diff_score != 0:
+        diff = dmp.diff_main(base_str, pred_str)
         dmp.diff_cleanupSemantic(diff)
-        for d in diff:
-            if d[0] != 0:
-                if len(d[1]) > 1:
-                    diff_score += 1
-
-        # append to lists
-        base.append(pred_str if diff_score == 0 else base_str)
-        predicted.append(pred_str)
-
-        # print results
-        if diff_score != 0:
-            diff = dmp.diff_main(base_str, pred_str)
-            dmp.diff_cleanupSemantic(diff)
-            print()
-            print(diff)
-            print("normalized", wer(base, predicted) * 100, cer(base, predicted) * 100)
-            print()
-    except Exception as e:
-        print(e)
+        print()
+        print(diff)
+        print("normalized", wer(base, predicted) * 100, cer(base, predicted) * 100)
+        print()
 
     if len(base) > 100000:
         break

@@ -12,6 +12,7 @@ lang_model, lang_processor = get_model_and_processor(
 )
 
 
+@timeit
 def detect_language(data) -> list:
     possible_languages = list(LANGUAGE_CODES.keys())
 
@@ -95,7 +96,6 @@ def inference_asr(data, model_config: str, is_reclamation: bool) -> str:
             "num_beams": 5,
             "max_new_tokens": int((len(data) / 16000) * 10) + 10,
         },
-        batch_size=1,
     )["text"].strip()
 
     try:

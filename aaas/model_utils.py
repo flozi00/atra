@@ -44,20 +44,8 @@ def get_peft_model(peft_model_id, model_class) -> peft.PeftModel:
         peft_model_id,
         cache_dir="./model_cache",
     )
+    model = model.merge_and_unload()
     model = model.eval()
-
-    # Remove the LORA modules
-    key_list = [
-        key for key, _ in model.base_model.model.named_modules() if "lora" not in key
-    ]
-    for key in key_list:
-        parent, target, target_name = model.base_model._get_submodules(key)
-        if isinstance(target, peft.tuners.lora.Linear):
-            bias = target.bias is not None
-            new_module = torch.nn.Linear(
-                target.in_features, target.out_features, bias=bias
-            )
-            model.base_model._replace_module(parent, target_name, new_module, target)
 
     return model
 
