@@ -28,7 +28,7 @@ class QueueData(SQLModel, table=True):
     metas: str
     transcript: str = Field(max_length=4096)
     model_config: str
-    hash: str
+    hash: str = Field(unique=True)
     langs: str = ""
     priority: int = 0
     votings: int = 0
@@ -142,9 +142,7 @@ def get_tasks_queue() -> QueueData:
             todos = get_queue(priority=0)
 
         # Check if there are any items in the queue
-        if len(todos) != 0:
-            sample = random.choice(todos)
-        else:
+        if len(todos) == 0:
             # Get all items that are in progress
             statement = select(QueueData).where(QueueData.transcript == INPROGRESS)
             todos = session.exec(statement).all()
@@ -155,14 +153,15 @@ def get_tasks_queue() -> QueueData:
                 # Get all items that have a negative voting score
                 statement = select(QueueData).where(QueueData.votings < 0)
                 todos = session.exec(statement).all()
-                # Check if there are any items with a negative voting score
-                if len(todos) != 0:
-                    sample = random.choice(todos)
-                else:
-                    sample = False
+
+        if len(todos) != 0:
+            sample = todos[0]
+        else:
+            sample = False
 
     if sample is not False:
         is_reclamation = sample.votings < 0
+        print("open todos ", len(todos))
     return sample, is_reclamation
 
 
