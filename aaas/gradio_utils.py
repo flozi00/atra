@@ -17,7 +17,6 @@ from aaas.datastore import (
 )
 from aaas.silero_vad import get_speech_probs, silero_vad
 from aaas.statics import LANG_MAPPING
-import pyloudnorm as pyln
 
 langs = sorted(list(LANG_MAPPING.keys()))
 
@@ -191,10 +190,6 @@ def add_to_vad_queue(audio: str, model_config: str):
         audio = ffmpeg_read(payload, sampling_rate=16000)
         os.remove(audio_path)
 
-    meter = pyln.Meter(16000)  # create BS.1770 meter
-    loudness = meter.integrated_loudness(audio)
-    audio = pyln.normalize.loudness(audio, loudness, -1.0)
-
     queue_string = add_vad_chunks(audio, model_config)
 
     return queue_string
@@ -238,16 +233,6 @@ def add_vad_chunks(audio, model_config: str):
         if silence_duration == 1:
             break
 
-    noise_batch = [
-        audio[
-            int(float(speech_timestamps[st]["end"]) * 16000) : int(
-                float(speech_timestamps[st + 1]["start"]) * 16000
-            )
-        ]
-        for st in range(len(speech_timestamps) - 1)
-    ]
-    noise_batch.append(audio[0 : int(float(speech_timestamps[0]["start"]) * 16000)])
-
     audio_batch = [
         audio[
             int(float(speech_timestamps[st]["start"]) * 16000) : int(
@@ -257,7 +242,6 @@ def add_vad_chunks(audio, model_config: str):
         for st in range(len(speech_timestamps))
     ]
 
-    print(len(audio_batch), len(audio) / 16000, silence_duration)
     queue = add_to_queue(
         audio_batch=audio_batch,
         master=speech_timestamps,

@@ -6,6 +6,8 @@ from aaas.audio_utils.demucs import seperate_vocal
 from aaas.model_utils import get_model_and_processor
 from aaas.statics import LANGUAGE_CODES
 from aaas.utils import timeit
+import pyloudnorm as pyln
+
 
 lang_model, lang_processor = get_model_and_processor(
     "universal", "asr", "small", activate_cache=False
@@ -74,6 +76,10 @@ def get_pipeline(main_lang: str, model_config: str):
 def inference_asr(data, model_config: str, is_reclamation: bool) -> str:
     if is_reclamation is True:
         data = seperate_vocal(data)
+
+    meter = pyln.Meter(16000)  # create BS.1770 meter
+    loudness = meter.integrated_loudness(data)
+    data = pyln.normalize.loudness(data, loudness, 0.0)
 
     lang = detect_language(data)[0]
 
