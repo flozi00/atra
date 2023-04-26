@@ -228,9 +228,8 @@ def add_vad_chunks(audio, model_config: str):
             speech_pad_ms=400,
             return_seconds=True,
         )
-        subtract = 1 if silence_duration < 1000 else 100
-        silence_duration = silence_duration - subtract
-        if silence_duration <= 100:
+        silence_duration = silence_duration - 20
+        if silence_duration <= 200:
             break
 
     audio_batch = [
