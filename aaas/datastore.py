@@ -38,32 +38,17 @@ engine = create_engine(db_backend, pool_recycle=3600, pool_pre_ping=True)
 SQLModel.metadata.create_all(engine)
 
 
-def add_to_queue(
-    audio_batch, master, model_config, times=None, file_format="wav"
-) -> list:
-    # Create a list to store the hashes of the audio files
-    hashes = []
+async def add_to_queue(audio_batch, hashes, master, model_config):
     # Create a session to the database
     with Session(engine) as session:
         # Loop over all audio files in the batch
         for x in range(len(audio_batch)):
             # Get the audio data
             audio_data = audio_batch[x]
+            hs = hashes[x]
             # Get the timestamps for the current audio file
-            if times is None:
-                time_dict = master[x]
-                timesstamps = f"{time_dict['start']},{time_dict['end']}"
-            else:
-                timesstamps = times
-            # Create a hash from the audio data, language,
-            # model configuration, and timestamps
-            hs = hashlib.sha256(
-                f"{audio_data} {model_config}, {timesstamps}".encode("utf-8")
-            ).hexdigest()
-            # Add the file format to the hash
-            hs = f"{hs}.{file_format}"
-            # Add the hash to the list of hashes
-            hashes.append(hs)
+            time_dict = master[x]
+            timesstamps = f"{time_dict['start']},{time_dict['end']}"
             # Get the entry from the database. If there is no entry, it returns None
             entry = get_transkript(hs)
             # If there is no entry in the database
@@ -81,9 +66,6 @@ def add_to_queue(
                 session.add(entry)
                 # Commit the changes to the database
                 session.commit()
-
-    # Return the list of hashes
-    return hashes
 
 
 def get_transkript(hs: str) -> QueueData:

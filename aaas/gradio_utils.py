@@ -196,41 +196,45 @@ def add_to_vad_queue(audio: str, model_config: str):
 
 
 def add_vad_chunks(audio, model_config: str):
-    def check_timestamp_length_limit(timestamps, limit):
-        for timestamp in timestamps:
-            if timestamp["end"] - timestamp["start"] > limit:
-                return True
-        return False
-
-    queue_string = ""
-    speech_timestamps = []
-    silence_duration = 2000
     if model_config not in ["small", "medium", "large"]:
         model_config = "small"
 
-    queue = []
+    speech_timestamps = [{"start": 0, "end": len(audio) / 16000}]
+    for silence_duration in [2000, 1000, 500, 100, 10]:
+        temp_times = []
+        for ts in speech_timestamps:
+            if (ts["end"] - ts["start"]) > 20:
+                temp_audio = audio[
+                    int(float(ts["start"] * 16000)) : int(float(ts["end"] * 16000))
+                ]
+                speech_probs = get_speech_probs(
+                    temp_audio,
+                    model_vad,
+                    sampling_rate=16000,
+                )
 
-    speech_probs = get_speech_probs(
-        audio,
-        model_vad,
-        sampling_rate=16000,
-    )
-    while len(speech_timestamps) == 0 or check_timestamp_length_limit(
-        speech_timestamps, 20
-    ):
-        speech_timestamps = get_speech_timestamps(
-            audio,
-            speech_probs=speech_probs,
-            threshold=0.6,
-            sampling_rate=16000,
-            min_silence_duration_ms=silence_duration,
-            min_speech_duration_ms=500,
-            speech_pad_ms=400,
-            return_seconds=True,
-        )
-        silence_duration = silence_duration - 20
-        if silence_duration <= 200:
-            break
+                speech_timestamps_iteration = get_speech_timestamps(
+                    temp_audio,
+                    speech_probs=speech_probs,
+                    threshold=0.6,
+                    sampling_rate=16000,
+                    min_silence_duration_ms=silence_duration,
+                    min_speech_duration_ms=500,
+                    speech_pad_ms=400,
+                    return_seconds=True,
+                )
+                for temp_ts in speech_timestamps_iteration:
+                    temp_times.append(
+                        {
+                            "start": ts["start"] + temp_ts["start"],
+                            "end": ts["start"] + temp_ts["end"],
+                        }
+                    )
+
+            else:
+                temp_times += [ts]
+
+        speech_timestamps = temp_times
 
     audio_batch = [
         audio[
@@ -241,13 +245,25 @@ def add_vad_chunks(audio, model_config: str):
         for st in range(len(speech_timestamps))
     ]
 
-    queue = add_to_queue(
+    file_format = "wav"
+    hashes = []
+    for x in range(len(audio_batch)):
+        # Get the audio data
+        audio_data = audio_batch[x]
+        hs = hashlib.sha256(f"{audio_data} {model_config}".encode("utf-8")).hexdigest()
+        # Add the file format to the hash
+        hs = f"{hs}.{file_format}"
+        # Add the hash to the list of hashes
+        hashes.append(hs)
+
+    add_to_queue(
         audio_batch=audio_batch,
+        hashes=hashes,
         master=speech_timestamps,
         model_config=model_config,
     )
 
-    queue_string = ",".join(queue)
+    queue_string = ",".join(hashes)
 
     return queue_string
 
