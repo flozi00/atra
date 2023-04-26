@@ -1,5 +1,4 @@
 # copied from https://github.com/snakers4/silero-vad
-import warnings
 
 import numpy as np
 import torch
