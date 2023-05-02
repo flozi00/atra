@@ -23,3 +23,4 @@ tqdm
 diff-match-patch
 jiwer
 pyloudnorm
+bitsandbytes==0.37.0
