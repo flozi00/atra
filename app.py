@@ -46,7 +46,7 @@ class BackgroundTasks(threading.Thread):
 
 
 if __name__ == "__main__":
-    worker = os.getenv("RUNWORKER", "false").lower() == "true"
+    worker = os.getenv("RUNWORKER", "true").lower() == "true"
     if worker is True:
         print("Starting worker")
         t = BackgroundTasks()
