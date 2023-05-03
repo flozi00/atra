@@ -5,9 +5,6 @@ from transformers import AutoProcessor
 
 from aaas.statics import MODEL_MAPPING
 from aaas.utils import timeit
-import importlib.util
-
-bnb_available = importlib.util.find_spec("bitsandbytes") is not None
 
 last_request, last_response = None, None
 
@@ -17,7 +14,7 @@ def get_model(model_class, model_id):
     model = model_class.from_pretrained(
         model_id,
         cache_dir="./model_cache",
-        load_in_8bit=bnb_available,
+        load_in_8bit=False,
         device_map="auto",
         torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
     )
@@ -38,7 +35,7 @@ def get_peft_model(peft_model_id, model_class) -> peft.PeftModel:
     model = model_class.from_pretrained(
         peft_config.base_model_name_or_path,
         cache_dir="./model_cache",
-        load_in_8bit=bnb_available,
+        load_in_8bit=False,
         device_map="auto",
         torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
     )
