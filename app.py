@@ -37,7 +37,7 @@ class BackgroundTasks(threading.Thread):
                 array = np.frombuffer(bytes_data, dtype=np.float32)
                 result, lang = inference_asr(
                     data=array,
-                    model_config=task.model_config,
+                    model_config=None,
                     is_reclamation=is_reclamation,
                 )
                 set_transkript(task.hash, result, from_queue=True, lang=lang)

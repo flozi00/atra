@@ -6,6 +6,7 @@ from transformers import (
 MODEL_MAPPING = {
     "asr": {
         "small": {
+            "german": {"adapter_id": "flozi00/whisper-small-german-lora-cv13"},
             "universal": {
                 "name": "openai/whisper-small",
                 "class": WhisperForConditionalGeneration,

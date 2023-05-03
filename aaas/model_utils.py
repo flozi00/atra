@@ -54,8 +54,14 @@ def get_peft_model(peft_model_id, model_class) -> peft.PeftModel:
 
 
 @timeit
-def get_model_and_processor(lang: str, task: str, config: str, activate_cache=True):
+def get_model_and_processor(lang: str, task: str, config: str = None, activate_cache=True):
     global last_request, last_response
+    
+    if config is None:
+        if torch.cuda.is_available():
+            config = "large"
+        else:
+            config = "small"
 
     # get all the model information from the mapping
     # for the requested task, config and lang
