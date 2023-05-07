@@ -90,17 +90,13 @@ def inference_asr(data, model_config: str, is_reclamation: bool) -> str:
 
     transcriber, processor = get_pipeline(LANGUAGE_CODES[lang], model_config)
 
-    forced_decoder_ids = processor.get_decoder_prompt_ids(
-        language=lang, task="transcribe"
-    )
+    forced_decoder_ids = processor.get_decoder_prompt_ids(task="transcribe")
 
     transcription = transcriber(
         data,
         generate_kwargs={
             "forced_decoder_ids": forced_decoder_ids,
-            "use_cache": True,
-            "num_beams": 5,
-            "max_new_tokens": int((len(data) / 16000) * 10) + 10,
+            "max_new_tokens": 448,
         },
     )["text"].strip()
 
