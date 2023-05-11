@@ -1,12 +1,16 @@
 import torch
 from text_to_num import alpha2digit
-from transformers.pipelines import AutomaticSpeechRecognitionPipeline as pipeline
 from aaas.audio_utils.demucs import seperate_vocal
 
 from aaas.model_utils import get_model_and_processor
 from aaas.statics import LANGUAGE_CODES
 from aaas.utils import timeit
 import pyloudnorm as pyln
+from transformers.pipelines.audio_utils import ffmpeg_read
+
+import warnings
+
+warnings.filterwarnings("ignore")
 
 
 lang_model, lang_processor = get_model_and_processor(
@@ -14,7 +18,6 @@ lang_model, lang_processor = get_model_and_processor(
 )
 
 
-@timeit
 def detect_language(data) -> list:
     possible_languages = list(LANGUAGE_CODES.keys())
 
@@ -56,24 +59,13 @@ def detect_language(data) -> list:
 
 
 @timeit
-def get_pipeline(main_lang: str, model_config: str):
-    model, processor = get_model_and_processor(main_lang, "asr", model_config)
-    transcriber = pipeline(
-        model=model,
-        tokenizer=processor.tokenizer,
-        feature_extractor=processor.feature_extractor,
-        ignore_warning=True,
-        chunk_length_s=30,
-        stride_length_s=[15, 0],
-        torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
-        device=0 if torch.cuda.is_available() else -1,
-        return_timestamps=False,
-    )
-    return transcriber, processor
-
-
-@timeit
 def inference_asr(data, model_config: str, is_reclamation: bool) -> str:
+    if isinstance(data, str):
+        with open(data, "rb") as f:
+            payload = f.read()
+
+        data = ffmpeg_read(payload, sampling_rate=16000)
+
     if is_reclamation is True:
         data = seperate_vocal(data)
 
@@ -88,25 +80,32 @@ def inference_asr(data, model_config: str, is_reclamation: bool) -> str:
     }.keys()
     lang = list(lang)[0].split("|")[1]
 
-    transcriber, processor = get_pipeline(LANGUAGE_CODES[lang], model_config)
+    model, processor = get_model_and_processor(
+        LANGUAGE_CODES[lang], "asr", model_config
+    )
 
-    forced_decoder_ids = processor.get_decoder_prompt_ids(task="transcribe")
+    model.config.forced_decoder_ids = processor.get_decoder_prompt_ids(
+        task="transcribe"
+    )
 
-    transcription = transcriber(
-        data,
-        generate_kwargs={
-            "forced_decoder_ids": forced_decoder_ids,
-            "max_new_tokens": 448,
-        },
-    )["text"].strip()
+    inputs = processor(data, sampling_rate=16000, return_tensors="pt")
+    input_features = inputs.input_features.half()
+
+    if torch.cuda.is_available():
+        input_features = input_features.cuda()
+
+    with torch.inference_mode():
+        generated_ids = model.generate(
+            inputs=input_features, max_new_tokens=448, num_beams=10
+        )
+
+    transcription = processor.batch_decode(generated_ids, skip_special_tokens=True)[
+        0
+    ].strip()
 
     try:
         transcription = alpha2digit(transcription, lang=lang)
     except Exception:
         pass
-
-    if torch.cuda.is_available():
-        transcriber.model.cpu()
-        torch.cuda.empty_cache()
 
     return transcription, LANGUAGE_CODES[lang]

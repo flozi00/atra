@@ -51,9 +51,11 @@ def get_peft_model(peft_model_id, model_class) -> peft.PeftModel:
 
 
 @timeit
-def get_model_and_processor(lang: str, task: str, config: str = None, activate_cache=True):
+def get_model_and_processor(
+    lang: str, task: str, config: str = None, activate_cache=True
+):
     global last_request, last_response
-    
+
     if config is None:
         if torch.cuda.is_available():
             config = "large"
@@ -104,8 +106,11 @@ def get_model_and_processor(lang: str, task: str, config: str = None, activate_c
     # if the cache is activated and the last request is not None
     # delete the last response and empty the cache for the GPU
     if last_request is not None and activate_cache:
-        last_response[0].cpu()
-        del last_response
+        try:
+            last_response[0].cpu()
+            del last_response
+        except Exception as e:
+            print("Error deleting last response: ", e)
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
 

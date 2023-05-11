@@ -5,6 +5,7 @@ from datetime import timedelta
 import gradio as gr
 import numpy as np
 from transformers.pipelines.audio_utils import ffmpeg_read
+from aaas.audio_utils.asr import inference_asr
 
 from aaas.datastore import (
     add_to_queue,
@@ -86,6 +87,31 @@ def build_asr_ui():
     )
 
 
+def build_realtime_asr_ui():
+    """
+    UI for ASR
+    """
+    with gr.Row():
+        model_config = gr.Radio(
+            choices=["small", "medium", "large"], value="large", label="model size"
+        )
+
+    with gr.Row():
+        audio_file = gr.Audio(source="microphone", type="filepath", label="Audiofile")
+
+    remove_audio = gr.Checkbox(label="Remove Audio", checked=False)
+
+    transcript = gr.Textbox(label="Task ID", max_lines=3)
+    lang = gr.Textbox(label="Language", max_lines=1)
+
+    audio_file.change(
+        fn=inference_asr,
+        inputs=[audio_file, model_config, remove_audio],
+        outputs=[transcript, lang],
+        api_name="realtime_transcription",
+    )
+
+
 def build_results_ui():
     """
     UI for results page
@@ -157,6 +183,9 @@ def build_gradio():
                 build_voting_ui()
             with gr.Tab("Subtitles"):
                 build_subtitle_ui()
+            if is_admin_node is True:
+                with gr.Tab("Realtime ASR"):
+                    build_realtime_asr_ui()
 
     return ui
 

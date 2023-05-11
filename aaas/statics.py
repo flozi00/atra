@@ -25,7 +25,7 @@ MODEL_MAPPING = {
             },
         },
         "large": {
-            "german": {"adapter_id": "flozi00/whisper-large-german-lora-cv13"},
+            "german": {"adapter_id": "flozi00/whisper-large-german-cv13-sounds"},
             "universal": {
                 "name": "openai/whisper-large-v2",
                 "class": WhisperForConditionalGeneration,
