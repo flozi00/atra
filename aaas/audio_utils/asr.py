@@ -86,10 +86,10 @@ def inference_asr(data, model_config: str) -> str:
     )
 
     inputs = processor(data, sampling_rate=16000, return_tensors="pt")
-    input_features = inputs.input_features.half()
+    input_features = inputs.input_features
 
     if torch.cuda.is_available():
-        input_features = input_features.cuda()
+        input_features = input_features.half().cuda()
 
     with torch.inference_mode():
         generated_ids = model.generate(

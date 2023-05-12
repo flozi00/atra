@@ -43,7 +43,7 @@ if __name__ == "__main__":
         t.start()
 
     ui.launch(
-        enable_queue=True,
+        enable_queue=False,
         server_name="0.0.0.0",
         server_port=int(os.getenv("PORT", 7860)),
     )
