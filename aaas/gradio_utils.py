@@ -51,6 +51,16 @@ def build_asr_ui():
                 with gr.TabItem("details"):
                     chunks = gr.JSON()
 
+    srt_file = gr.File(label="SRT File")
+    refresh = gr.Button(value="Get Subtitle File")
+
+    refresh.click(
+        fn=get_subs,
+        inputs=[task_id],
+        outputs=[srt_file],
+        api_name="subtitle",
+    )
+
     audio_file.change(
         fn=add_to_vad_queue,
         inputs=[audio_file, model_config],
@@ -72,20 +82,6 @@ def build_asr_ui():
     )
 
 
-def build_subtitle_ui():
-    task_id = gr.Textbox(label="Task ID", max_lines=3)
-    srt_file = gr.File(label="SRT File")
-
-    refresh = gr.Button(value="Get Results")
-
-    refresh.click(
-        fn=get_subs,
-        inputs=[task_id],
-        outputs=[srt_file],
-        api_name="subtitle",
-    )
-
-
 def build_gradio():
     """
     Merge all UIs into one
@@ -96,8 +92,6 @@ def build_gradio():
         with gr.Tabs():
             with gr.Tab("ASR"):
                 build_asr_ui()
-            with gr.Tab("Subtitles"):
-                build_subtitle_ui()
 
     return ui
 
