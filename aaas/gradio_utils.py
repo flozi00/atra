@@ -112,7 +112,9 @@ def add_to_vad_queue(audio: str):
         audio = ffmpeg_read(payload, sampling_rate=16000)
         os.remove(audio_path)
 
-    queue_string = add_vad_chunks(audio)
+        queue_string = add_vad_chunks(audio)
+    else:
+        queue_string = ""
 
     return queue_string
 
