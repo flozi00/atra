@@ -1,20 +1,10 @@
 import os
 import threading
-import gradio as gr
-import uvicorn
-from fastapi import FastAPI, staticfiles
+from aaas.datastore import remove_data_from_hash
 
 from aaas.gradio_utils import build_gradio
 
-app = FastAPI()
 ui = build_gradio()
-
-app.mount("/gradio/", gr.routes.App.create_app(ui))
-app.mount(
-    "/",
-    staticfiles.StaticFiles(directory="client/build/web", html=True),
-    name="static",
-)
 
 
 class BackgroundTasks(threading.Thread):
@@ -41,6 +31,7 @@ class BackgroundTasks(threading.Thread):
                     is_reclamation=is_reclamation,
                 )
                 set_transkript(task.hash, result, from_queue=True, lang=lang)
+                remove_data_from_hash(task.hash)
             else:
                 time.sleep(1)
 
@@ -52,6 +43,8 @@ if __name__ == "__main__":
         t = BackgroundTasks()
         t.start()
 
-    uvicorn.run(
-        app, host="0.0.0.0", port=int(os.getenv("PORT", 7860)), log_level="info"
+    ui.launch(
+        enable_queue=True,
+        server_name="0.0.0.0",
+        server_port=int(os.getenv("PORT", 7860)),
     )

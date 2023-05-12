@@ -34,7 +34,7 @@ engine = create_engine(db_backend, pool_recycle=3600, pool_pre_ping=True)
 SQLModel.metadata.create_all(engine)
 
 
-def add_to_queue(audio_batch, hashes, master, model_config):
+def add_to_queue(audio_batch, hashes, master):
     # Create a session to the database
     with Session(engine) as session:
         # Loop over all audio files in the batch
@@ -53,7 +53,7 @@ def add_to_queue(audio_batch, hashes, master, model_config):
                 entry = QueueData(
                     metas=timesstamps,
                     transcript=TODO,
-                    model_config=model_config,
+                    model_config="large",
                     hash=hs,
                 )
                 # Add the audio data to the database

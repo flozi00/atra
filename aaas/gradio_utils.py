@@ -18,32 +18,36 @@ model_vad, get_speech_timestamps = silero_vad(True)
 
 is_admin_node = os.getenv("ADMINMODE", "false") == "true"
 
+css = """
+#hidden_stuff {display: none} 
+"""
+
 
 def build_asr_ui():
     """
     UI for ASR
     """
+    # UI for getting audio
     with gr.Row():
-        model_config = gr.Radio(
-            choices=["small", "medium", "large"], value="large", label="model size"
-        )
+        with gr.TabItem("Microphone"):
+            microphone_file = gr.Audio(
+                source="microphone", type="filepath", label="Audio"
+            )
+        with gr.TabItem("File Upload"):
+            audio_file = gr.Audio(source="upload", type="filepath", label="Audiofile")
 
     with gr.Row():
-        audio_file = gr.Audio(source="upload", type="filepath", label="Audiofile")
+        with gr.TabItem("Transcription"):
+            transcription_finished = gr.Textbox(max_lines=10)
+        with gr.TabItem("details"):
+            chunks_finished = gr.JSON()
 
-    task_id = gr.Textbox(label="Task ID", max_lines=3)
+    srt_file = gr.File(label="SRT File")
+    refresh = gr.Button(value="Get Subtitle File")
 
-    """
-    UI for results
-    """
-    with gr.Row():
-        with gr.TabItem("Transcription results"):
-            with gr.Row():
-                with gr.TabItem("Transcription"):
-                    transcription_finished = gr.Textbox(max_lines=10)
-                with gr.TabItem("details"):
-                    chunks_finished = gr.JSON()
-
+    # hidden UI stuff
+    with gr.Row(elem_id="hidden_stuff"):
+        task_id = gr.Textbox(label="Task ID", max_lines=3)
         with gr.TabItem("Transcription State"):
             with gr.Row():
                 with gr.TabItem("Transcription"):
@@ -51,21 +55,16 @@ def build_asr_ui():
                 with gr.TabItem("details"):
                     chunks = gr.JSON()
 
-    srt_file = gr.File(label="SRT File")
-    refresh = gr.Button(value="Get Subtitle File")
-
-    refresh.click(
-        fn=get_subs,
-        inputs=[task_id],
-        outputs=[srt_file],
-        api_name="subtitle",
-    )
-
     audio_file.change(
         fn=add_to_vad_queue,
-        inputs=[audio_file, model_config],
+        inputs=[audio_file],
         outputs=[task_id],
         api_name="transcription",
+    )
+    microphone_file.change(
+        fn=add_to_vad_queue,
+        inputs=[microphone_file],
+        outputs=[task_id],
     )
 
     task_id.change(
@@ -81,12 +80,19 @@ def build_asr_ui():
         outputs=[transcription_finished, chunks_finished],
     )
 
+    refresh.click(
+        fn=get_subs,
+        inputs=[task_id],
+        outputs=[srt_file],
+        api_name="subtitle",
+    )
+
 
 def build_gradio():
     """
     Merge all UIs into one
     """
-    ui = gr.Blocks()
+    ui = gr.Blocks(css=css)
 
     with ui:
         with gr.Tabs():
@@ -96,10 +102,7 @@ def build_gradio():
     return ui
 
 
-def add_to_vad_queue(audio: str, model_config: str):
-    if model_config not in ["small", "medium", "large"]:
-        model_config = "small"
-
+def add_to_vad_queue(audio: str):
     if audio is not None and len(audio) > 8:
         audio_path = audio
 
@@ -109,15 +112,12 @@ def add_to_vad_queue(audio: str, model_config: str):
         audio = ffmpeg_read(payload, sampling_rate=16000)
         os.remove(audio_path)
 
-    queue_string = add_vad_chunks(audio, model_config)
+    queue_string = add_vad_chunks(audio)
 
     return queue_string
 
 
-def add_vad_chunks(audio, model_config: str):
-    if model_config not in ["small", "medium", "large"]:
-        model_config = "small"
-
+def add_vad_chunks(audio):
     speech_timestamps = [{"start": 0, "end": len(audio) / 16000}]
     for silence_duration in [2000, 1000, 500, 100, 10]:
         temp_times = []
@@ -169,7 +169,7 @@ def add_vad_chunks(audio, model_config: str):
     for x in range(len(audio_batch)):
         # Get the audio data
         audio_data = audio_batch[x]
-        hs = hashlib.sha256(f"{audio_data} {model_config}".encode("utf-8")).hexdigest()
+        hs = hashlib.sha256(f"{audio_data}".encode("utf-8")).hexdigest()
         # Add the file format to the hash
         hs = f"{hs}.{file_format}"
         # Add the hash to the list of hashes
@@ -179,7 +179,6 @@ def add_vad_chunks(audio, model_config: str):
         audio_batch=audio_batch,
         hashes=hashes,
         master=speech_timestamps,
-        model_config=model_config,
     )
 
     queue_string = ",".join(hashes)
