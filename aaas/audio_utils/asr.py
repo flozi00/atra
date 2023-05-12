@@ -59,15 +59,12 @@ def detect_language(data) -> list:
 
 
 @timeit
-def inference_asr(data, model_config: str, is_reclamation: bool) -> str:
+def inference_asr(data, model_config: str) -> str:
     if isinstance(data, str):
         with open(data, "rb") as f:
             payload = f.read()
 
         data = ffmpeg_read(payload, sampling_rate=16000)
-
-    if is_reclamation is True:
-        data = seperate_vocal(data)
 
     meter = pyln.Meter(16000)  # create BS.1770 meter
     loudness = meter.integrated_loudness(data)

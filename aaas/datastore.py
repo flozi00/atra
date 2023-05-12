@@ -26,15 +26,13 @@ class QueueData(SQLModel, table=True):
     model_config: str
     hash: str = Field(unique=True)
     langs: str = ""
-    priority: int = 0
-    votings: int = 0
 
 
 engine = create_engine(db_backend, pool_recycle=3600, pool_pre_ping=True)
 SQLModel.metadata.create_all(engine)
 
 
-def add_to_queue(audio_batch, hashes, master):
+def add_to_queue(audio_batch, hashes, times_list):
     # Create a session to the database
     with Session(engine) as session:
         # Loop over all audio files in the batch
@@ -43,7 +41,7 @@ def add_to_queue(audio_batch, hashes, master):
             audio_data = audio_batch[x]
             hs = hashes[x]
             # Get the timestamps for the current audio file
-            time_dict = master[x]
+            time_dict = times_list[x]
             timesstamps = f"{time_dict['start']},{time_dict['end']}"
             # Get the entry from the database. If there is no entry, it returns None
             entry = get_transkript(hs)
@@ -101,23 +99,14 @@ def get_tasks_queue() -> QueueData:
     Returns:
         QueueData: A random item from the queue
     """
-    is_reclamation = False
     with Session(engine) as session:
 
-        def get_queue(priority=1):
-            statement = (
-                select(QueueData)
-                .where(QueueData.transcript == TODO)
-                .where(QueueData.priority == priority)
-            )
+        def get_queue():
+            statement = select(QueueData).where(QueueData.transcript == TODO)
             todos = session.exec(statement).all()
             return todos
 
-        # Get the first priority items
-        todos = get_queue(1)
-        # If no first priority items, get the second priority items
-        if len(todos) == 0:
-            todos = get_queue(priority=0)
+        todos = get_queue()
 
         # Check if there are any items in the queue
         if len(todos) == 0:
@@ -128,19 +117,15 @@ def get_tasks_queue() -> QueueData:
             if len(todos) != 0:
                 sample = random.choice(todos)
             else:
-                # Get all items that have a negative voting score
-                statement = select(QueueData).where(QueueData.votings < 0)
-                todos = session.exec(statement).all()
+                todos = []
 
         if len(todos) != 0:
             sample = todos[0]
         else:
             sample = False
 
-    if sample is not False:
-        is_reclamation = sample.votings < 0
-        print("open todos ", len(todos))
-    return sample, is_reclamation
+    print("open todos ", len(todos))
+    return sample
 
 
 def set_transkript(
@@ -158,10 +143,9 @@ def set_transkript(
         if from_queue is True and "***" not in transkript.transcript:
             pass
         else:
-            if transkript is not None and transkript.votings < 99:
+            if transkript is not None:
                 if transcription != transkript.transcript:
                     transkript.transcript = transcription
-                    transkript.votings = 0
                     if lang is not None:
                         transkript.langs = lang
                     session.commit()

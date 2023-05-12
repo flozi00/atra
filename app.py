@@ -20,7 +20,7 @@ class BackgroundTasks(threading.Thread):
         import time
 
         while True:
-            task, is_reclamation = get_tasks_queue()
+            task = get_tasks_queue()
             if task is not False:
                 bytes_data = get_data_from_hash(task.hash)
                 set_in_progress(task.hash)
@@ -28,7 +28,6 @@ class BackgroundTasks(threading.Thread):
                 result, lang = inference_asr(
                     data=array,
                     model_config=None,
-                    is_reclamation=is_reclamation,
                 )
                 set_transkript(task.hash, result, from_queue=True, lang=lang)
                 remove_data_from_hash(task.hash)

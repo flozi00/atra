@@ -178,7 +178,7 @@ def add_vad_chunks(audio):
     add_to_queue(
         audio_batch=audio_batch,
         hashes=hashes,
-        master=speech_timestamps,
+        times_list=speech_timestamps,
     )
 
     queue_string = ",".join(hashes)
