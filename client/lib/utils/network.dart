@@ -73,53 +73,6 @@ Future<List<dynamic>> get_transcription(String hash) async {
   return timestamps;
 }
 
-// This function takes a hash and a video file and returns a byte array
-// of the video file.
-Future<String> get_audio(String hash) async {
-  var params = {
-    "data": [
-      hash,
-    ]
-  };
-
-  var res = await http.post(Uri.parse('$baseURL/run/get_audio'),
-      headers: headers(), body: jsonEncode(params));
-
-  if (res.statusCode != 200) {
-    throw Exception('http.post error: statusCode= ${res.statusCode}');
-  }
-
-  String video =
-      Uri.encodeFull(jsonDecode(utf8.decode(res.bodyBytes))["data"][0]["name"]);
-
-  return Uri.parse('$baseURL/file=$video').toString();
-}
-
-Future<bool> update_transcript(
-    String hash, String text, String fullHash) async {
-  var params = {
-    "data": [
-      hash,
-      text,
-    ]
-  };
-
-  // Send the request to the server.
-  var res = await http.post(Uri.parse('$baseURL/run/correct_transcription'),
-      headers: headers(), body: jsonEncode(params));
-
-  // Check that the request was successful.
-  if (res.statusCode != 200) {
-    throw Exception('http.post error: statusCode= ${res.statusCode}');
-  }
-
-  String compressedHash = sha256.convert(utf8.encode(fullHash)).toString();
-  transcription_box ??= await Hive.openBox("transcription");
-  transcription_box.put(compressedHash, null);
-
-  return true;
-}
-
 Future<String> question_answering(String question, String context) async {
   var headers = {
     'Content-Type': 'application/json',

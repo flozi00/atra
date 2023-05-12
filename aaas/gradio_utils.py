@@ -3,18 +3,11 @@ import os
 from datetime import timedelta
 
 import gradio as gr
-import numpy as np
 from transformers.pipelines.audio_utils import ffmpeg_read
-from aaas.audio_utils.asr import inference_asr
 
 from aaas.datastore import (
     add_to_queue,
-    get_data_from_hash,
-    get_transkript,
     get_transkript_batch,
-    get_vote_queue,
-    set_transkript,
-    set_voting,
 )
 from aaas.silero_vad import get_speech_probs, silero_vad
 from aaas.statics import LANG_MAPPING
@@ -24,45 +17,6 @@ langs = sorted(list(LANG_MAPPING.keys()))
 model_vad, get_speech_timestamps = silero_vad(True)
 
 is_admin_node = os.getenv("ADMINMODE", "false") == "true"
-
-
-def build_edit_ui():
-    def set_transkription(task_id, transcription):
-        set_transkript(task_id, transcription)
-
-    """
-    UI for editing transcriptions and voting like confirm, good, bad
-    """
-    task_id = gr.Textbox(label="Task ID", max_lines=3)
-    lang = gr.Radio(langs, value=langs[0], label="Source Language")
-
-    audio_file = gr.Audio(label="Audiofile")
-    transcription = gr.Textbox(max_lines=10)
-    label = gr.Radio(["good", "bad", "confirm"], label="Label")
-    with gr.Row():
-        send = gr.Button(value="Send")
-        if is_admin_node is True:
-            rate = gr.Button(value="Rate")
-
-    task_id.change(
-        fn=get_audio,
-        inputs=task_id,
-        outputs=[audio_file, transcription],
-        api_name="get_audio",
-    )
-
-    send.click(
-        fn=set_transkription,
-        inputs=[task_id, transcription],
-        outputs=[],
-        api_name="correct_transcription",
-    )
-    if is_admin_node is True:
-        rate.click(
-            fn=do_voting_labeling,
-            inputs=[task_id, label, transcription, lang],
-            outputs=[task_id],
-        )
 
 
 def build_asr_ui():
@@ -79,6 +33,24 @@ def build_asr_ui():
 
     task_id = gr.Textbox(label="Task ID", max_lines=3)
 
+    """
+    UI for results
+    """
+    with gr.Row():
+        with gr.TabItem("Transcription results"):
+            with gr.Row():
+                with gr.TabItem("Transcription"):
+                    transcription_finished = gr.Textbox(max_lines=10)
+                with gr.TabItem("details"):
+                    chunks_finished = gr.JSON()
+
+        with gr.TabItem("Transcription State"):
+            with gr.Row():
+                with gr.TabItem("Transcription"):
+                    transcription = gr.Textbox(max_lines=10)
+                with gr.TabItem("details"):
+                    chunks = gr.JSON()
+
     audio_file.change(
         fn=add_to_vad_queue,
         inputs=[audio_file, model_config],
@@ -86,68 +58,17 @@ def build_asr_ui():
         api_name="transcription",
     )
 
-
-def build_realtime_asr_ui():
-    """
-    UI for ASR
-    """
-    with gr.Row():
-        model_config = gr.Radio(
-            choices=["small", "medium", "large"], value="large", label="model size"
-        )
-
-    with gr.Row():
-        audio_file = gr.Audio(source="microphone", type="filepath", label="Audiofile")
-
-    remove_audio = gr.Checkbox(label="Remove Audio", checked=False)
-
-    transcript = gr.Textbox(label="Task ID", max_lines=3)
-    lang = gr.Textbox(label="Language", max_lines=1)
-
-    audio_file.change(
-        fn=inference_asr,
-        inputs=[audio_file, model_config, remove_audio],
-        outputs=[transcript, lang],
-        api_name="realtime_transcription",
-    )
-
-
-def build_results_ui():
-    """
-    UI for results page
-    """
-    task_id = gr.Textbox(label="Task ID", max_lines=3)
-
-    with gr.Row():
-        with gr.TabItem("Transcription"):
-            transcription = gr.Textbox(max_lines=10)
-        with gr.TabItem("details"):
-            chunks = gr.JSON()
-
-    token = gr.Textbox(label="Token", max_lines=1, visible=False)
-
     task_id.change(
         fn=get_transcription,
         inputs=task_id,
-        outputs=[transcription, chunks, token],
+        outputs=[transcription, chunks],
         api_name="get_transcription",
     )
 
-
-def build_voting_ui():
-    """
-    UI for voting page
-    """
-    task_id = gr.Textbox(label="Task ID", max_lines=3)
-
-    with gr.Row():
-        rating = gr.Radio(choices=["good", "bad"], value="good")
-
     task_id.change(
-        fn=do_voting,
-        inputs=[task_id, rating],
-        outputs=[],
-        api_name="vote_result",
+        fn=wait_for_transcription,
+        inputs=task_id,
+        outputs=[transcription_finished, chunks_finished],
     )
 
 
@@ -175,35 +96,10 @@ def build_gradio():
         with gr.Tabs():
             with gr.Tab("ASR"):
                 build_asr_ui()
-            with gr.Tab("Results"):
-                build_results_ui()
-            with gr.Tab("Edit"):
-                build_edit_ui()
-            with gr.Tab("Voting"):
-                build_voting_ui()
             with gr.Tab("Subtitles"):
                 build_subtitle_ui()
-            if is_admin_node is True:
-                with gr.Tab("Realtime ASR"):
-                    build_realtime_asr_ui()
 
     return ui
-
-
-def do_voting(task_id: str, rating: str):
-    if rating != "confirm":
-        set_voting(task_id, rating)
-
-
-def do_voting_labeling(task_id: str, rating: str, transcription: str, lang: str):
-    if is_admin_node is True:
-        set_transkript(task_id, transcription)
-        set_voting(task_id, rating)
-        queue_obj = get_vote_queue(lang)
-        if queue_obj is False:
-            return ""
-        else:
-            return queue_obj.hash
 
 
 def add_to_vad_queue(audio: str, model_config: str):
@@ -298,17 +194,16 @@ def add_vad_chunks(audio, model_config: str):
 
 
 def get_transcription(queue_string: str):
-    tok = "Invalid"
     full_transcription, chunks = "", []
     queue = queue_string.split(",")
     results = get_transkript_batch(queue_string)
     for x in range(len(results)):
         result = results[x]
         if result is None:
-            return "", [], tok
+            return "", []
         else:
             if len(queue_string) < 5 or "***" in queue_string:
-                return queue_string, [], tok
+                return queue_string, []
 
             chunks.append({"id": queue[x]})
             if result is not None:
@@ -327,15 +222,15 @@ def get_transcription(queue_string: str):
     for c in chunks:
         full_transcription += c.get("text", "") + "\n"
 
-    return full_transcription, chunks, tok
+    return full_transcription, chunks
 
 
-def get_audio(task_id: str):
-    result = get_transkript(task_id)
-    if result is None:
-        return (16000, np.zeros(16000)), ""
-    bytes_data = get_data_from_hash(result.hash)
-    return (16000, np.frombuffer(bytes_data, dtype=np.float32)), result.transcript
+def wait_for_transcription(task_id: str):
+    transcript, chunks = get_transcription(task_id)
+    while "***" in transcript:
+        transcript, chunks = get_transcription(task_id)
+
+    return transcript, chunks
 
 
 def get_subs(task_id: str):

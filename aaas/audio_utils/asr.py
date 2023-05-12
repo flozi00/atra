@@ -96,7 +96,7 @@ def inference_asr(data, model_config: str, is_reclamation: bool) -> str:
 
     with torch.inference_mode():
         generated_ids = model.generate(
-            inputs=input_features, max_new_tokens=448, num_beams=10
+            inputs=input_features, max_new_tokens=448, num_beams=5
         )
 
     transcription = processor.batch_decode(generated_ids, skip_special_tokens=True)[

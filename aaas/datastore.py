@@ -4,10 +4,8 @@ import time
 from functools import lru_cache
 from typing import Optional
 
-import datasets
 import fsspec
 from sqlmodel import Field, Session, SQLModel, create_engine, select
-from tqdm.auto import tqdm
 
 from aaas.statics import CACHE_SIZE, INPROGRESS, TODO
 
@@ -19,7 +17,6 @@ try:
     ftp_server = ftp_backend.split("@")[2]
 except Exception:
     ftp_user, ftp_pass, ftp_server = None, None, None
-build_dataset = os.getenv("BUILDDATASET", "false") == "true"
 
 
 class QueueData(SQLModel, table=True):
@@ -146,66 +143,6 @@ def get_tasks_queue() -> QueueData:
     return sample, is_reclamation
 
 
-def get_vote_queue(lang: str = None) -> QueueData:
-    """Get the oldest item from the queue that has a
-    voting score of 0 - 3 and is not in progress
-
-    Args:
-        lang (str, optional): language code string. Defaults to None.
-
-    Returns:
-        QueueData
-    """
-    with Session(engine) as session:
-        statement = (
-            select(QueueData)
-            .where(QueueData.votings < 3)
-            .where(QueueData.votings >= 0)
-            .where(QueueData.transcript != TODO)
-            .where(QueueData.transcript != INPROGRESS)
-        )
-        if lang is not None:
-            statement = statement.where(QueueData.langs == lang)
-        todos = session.exec(statement).all()
-        if len(todos) == 0:
-            sample = False
-        else:
-            sample = todos[0]
-
-    return sample
-
-
-def get_validated_dataset():
-    dataset = []
-    existing_dataset = datasets.load_dataset("flozi00/atra", split="train")
-    hses = [x["hash"] for x in existing_dataset]
-    with Session(engine) as session:
-        statement = (
-            select(QueueData)
-            .where(QueueData.votings >= 100)
-            .where(QueueData.transcript != TODO)
-            .where(QueueData.transcript != INPROGRESS)
-        )
-        d_set = session.exec(statement).all()
-
-    for x in tqdm(d_set):
-        if x.hash not in hses:
-            dataset.append(
-                {
-                    "lang": x.langs,
-                    "text": x.transcript,
-                    "hash": x.hash,
-                    "bytes": get_data_from_hash(x.hash),
-                }
-            )
-            remove_data_from_hash(x.hash)
-
-    dataset = datasets.Dataset.from_list(dataset)
-    dataset = datasets.concatenate_datasets([existing_dataset, dataset])
-
-    dataset.push_to_hub("atra", private=True)
-
-
 def set_transkript(
     hs: str, transcription: str, from_queue: bool = False, lang: str = None
 ):
@@ -229,26 +166,6 @@ def set_transkript(
                         transkript.langs = lang
                     session.commit()
                     session.refresh(transkript)
-
-
-def set_voting(hs: str, vote: str):
-    """Set the voting of an audio file
-
-    Args:
-        hs (str): The hash of the audio file
-        vote (str): The voting of the audio file, should be "good", "confirm" or "bad"
-    """
-    vote = 1 if vote == "good" else 100 if vote == "confirm" else -1
-    with Session(engine) as session:
-        statement = select(QueueData).where(QueueData.hash == hs)
-        transkript = session.exec(statement).first()
-        if transkript is not None:
-            if transkript.votings < 99:
-                transkript.votings = transkript.votings + vote
-                if vote < 0:
-                    transkript.transcript = TODO
-                session.commit()
-                session.refresh(transkript)
 
 
 def set_in_progress(hs: str):
@@ -337,7 +254,3 @@ def remove_data_from_hash(hs: str):
         fs.rm(f"data/{hs}")
     except Exception as e:
         print(e)
-
-
-if build_dataset:
-    get_validated_dataset()

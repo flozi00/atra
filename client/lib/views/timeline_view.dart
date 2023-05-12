@@ -146,52 +146,12 @@ class _RightChildTimeline extends StatelessWidget {
           Padding(
               padding:
                   const EdgeInsets.only(left: 20, top: 8, bottom: 8, right: 8),
-              child: InkWell(
-                child: TextHighlight(
-                  text: step.message,
-                  words: words,
-                  textStyle: TextStyle(
-                    color: Theme.of(context).colorScheme.onBackground,
-                  ),
+              child: TextHighlight(
+                text: step.message,
+                words: words,
+                textStyle: TextStyle(
+                  color: Theme.of(context).colorScheme.onBackground,
                 ),
-                onTap: () {
-                  showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        TextEditingController controller =
-                            TextEditingController(text: step.message);
-                        return Dialog(
-                            child: Padding(
-                                padding: const EdgeInsets.all(25.0),
-                                child: Column(
-                                  children: [
-                                    const Text("Edit Transcript"),
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    TextFormField(
-                                      controller: controller,
-                                      maxLines: 20,
-                                      minLines: 3,
-                                      decoration: const InputDecoration(
-                                          border: OutlineInputBorder()),
-                                    ),
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    ElevatedButton(
-                                        onPressed: () async {
-                                          await update_transcript(step.hash,
-                                              controller.text, step.full_hash);
-                                          step.message = controller.text;
-                                          Navigator.pushReplacementNamed(
-                                              context, "/");
-                                        },
-                                        child: const Text("Save"))
-                                  ],
-                                )));
-                      });
-                },
               )),
           if (step.isCheckpoint)
             Row(

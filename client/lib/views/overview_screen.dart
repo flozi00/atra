@@ -183,7 +183,6 @@ class _OverviewScreenState extends State<OverviewScreen> {
 
   Future<void> build_cards_list() async {
     cards = [];
-    String tokenValid = "Valid";
     SharedPreferences prefs = await SharedPreferences.getInstance();
     inProgress = false;
     for (String mode in modes) {
@@ -198,7 +197,6 @@ class _OverviewScreenState extends State<OverviewScreen> {
             transcription: values[0],
             words: values[1],
           ));
-          tokenValid = values[2];
           for (int i = 0; i < values[1].length; i++) {
             String text = values[1][i]["text"];
             text = text.replaceAll("!", ".");
