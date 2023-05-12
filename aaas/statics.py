@@ -17,13 +17,6 @@ MODEL_MAPPING = {
                 "processor": WhisperProcessor,
             },
         },
-        "medium": {
-            "universal": {
-                "name": "openai/whisper-medium",
-                "class": WhisperForConditionalGeneration,
-                "processor": WhisperProcessor,
-            },
-        },
         "large": {
             "german": {"adapter_id": "flozi00/whisper-large-german-lora-cv13"},
             "universal": {

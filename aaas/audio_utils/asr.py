@@ -1,6 +1,5 @@
 import torch
 from text_to_num import alpha2digit
-from aaas.audio_utils.demucs import seperate_vocal
 
 from aaas.model_utils import get_model_and_processor
 from aaas.statics import LANGUAGE_CODES

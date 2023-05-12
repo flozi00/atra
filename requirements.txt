@@ -6,14 +6,13 @@ sacremoses
 sentencepiece
 torch>=1.13.0
 torchaudio
-transformers>=4.27.3
+transformers>=4.29.1
 https://github.com/huggingface/peft/archive/refs/heads/main.zip
 sqlmodel
 pymysql
 soundfile
 accelerate
 unidecode
-demucs>=4.0.0
 librosa 
 pydub
 text2num
@@ -23,4 +22,3 @@ tqdm
 diff-match-patch
 jiwer
 pyloudnorm
-bitsandbytes==0.37.0
