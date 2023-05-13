@@ -137,3 +137,5 @@ INPROGRESS = "***PROGRESS***"
 TO_ASR = "***TO ASR***"
 
 CACHE_SIZE = 128
+
+TASK_MAPPING = {"asr": ["start", "end"], "translation": ["source", "target"]}

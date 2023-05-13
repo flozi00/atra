@@ -7,7 +7,7 @@ from typing import Optional
 import fsspec
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 
-from aaas.statics import CACHE_SIZE, INPROGRESS, TODO
+from aaas.statics import CACHE_SIZE, INPROGRESS, TODO, TASK_MAPPING
 
 db_backend = os.getenv("DBBACKEND", "sqlite:///database.db")
 ftp_backend = os.getenv("FTPBACKEND")
@@ -25,7 +25,6 @@ class QueueData(SQLModel, table=True):
     transcript: str = Field(max_length=4096)
     model_config: str
     hash: str = Field(unique=True)
-    langs: str = ""
 
 
 engine = create_engine(db_backend, pool_recycle=3600, pool_pre_ping=True)
@@ -42,7 +41,14 @@ def add_to_queue(audio_batch, hashes, times_list):
             hs = hashes[x]
             # Get the timestamps for the current audio file
             time_dict = times_list[x]
-            timesstamps = f"{time_dict['start']},{time_dict['end']}"
+            # in case its asr with timestamps
+            for task in list(TASK_MAPPING.keys()):
+                if (
+                    TASK_MAPPING[task][0] in time_dict
+                    and TASK_MAPPING[task][1] in time_dict
+                ):
+                    timesstamps = f"{time_dict[TASK_MAPPING[task][0]]},{time_dict[TASK_MAPPING[task][1]]},{task}"
+
             # Get the entry from the database. If there is no entry, it returns None
             entry = get_transkript(hs)
             # If there is no entry in the database
@@ -128,9 +134,7 @@ def get_tasks_queue() -> QueueData:
     return sample
 
 
-def set_transkript(
-    hs: str, transcription: str, from_queue: bool = False, lang: str = None
-):
+def set_transkript(hs: str, transcription: str, from_queue: bool = False):
     """Set the transcription of an audio file
 
     Args:
@@ -146,8 +150,6 @@ def set_transkript(
             if transkript is not None:
                 if transcription != transkript.transcript:
                     transkript.transcript = transcription
-                    if lang is not None:
-                        transkript.langs = lang
                     session.commit()
                     session.refresh(transkript)
 

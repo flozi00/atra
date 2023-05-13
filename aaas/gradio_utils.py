@@ -11,6 +11,10 @@ from aaas.datastore import (
 )
 from aaas.silero_vad import get_speech_probs, silero_vad
 from aaas.statics import LANG_MAPPING
+from transformers.tools.translation import LANGUAGE_CODES
+
+translation_codes = sorted(list(LANGUAGE_CODES.keys()))
+
 
 langs = sorted(list(LANG_MAPPING.keys()))
 
@@ -88,6 +92,25 @@ def build_asr_ui():
     )
 
 
+def build_translator_ui():
+    with gr.Row():
+        with gr.Column():
+            input_lang = gr.Dropdown(translation_codes)
+            input_text = gr.Textbox(label="Input Text")
+
+        with gr.Column():
+            output_lang = gr.Dropdown(translation_codes)
+            output_text = gr.Text(label="Output Text")
+
+    send = gr.Button(label="Translate")
+
+    send.click(
+        add_to_translation_queue,
+        inputs=[input_text, input_lang, output_lang],
+        outputs=[output_text],
+    )
+
+
 def build_gradio():
     """
     Merge all UIs into one
@@ -98,8 +121,28 @@ def build_gradio():
         with gr.Tabs():
             with gr.Tab("ASR"):
                 build_asr_ui()
+            with gr.Tab("Translator"):
+                build_translator_ui()
 
     return ui
+
+
+def add_to_translation_queue(input_text: str, input_lang: str, output_lang: str):
+    input_text = input_text.encode(encoding="UTF-8")
+    hs = hashlib.sha256(input_text).hexdigest()
+    hs = f"{hs}.txt"
+
+    add_to_queue(
+        audio_batch=[input_text],
+        hashes=[hs],
+        times_list=[{"source": input_lang, "target": output_lang}],
+    )
+
+    transcript, chunks = get_transcription(hs)
+    while "***" in transcript:
+        transcript, chunks = get_transcription(hs)
+
+    return transcript
 
 
 def add_to_vad_queue(audio: str):
@@ -202,16 +245,15 @@ def get_transcription(queue_string: str):
 
             chunks.append({"id": queue[x]})
             if result is not None:
-                try:
-                    chunks[x]["start_timestamp"] = int(
-                        float(result.metas.split(",")[0])
-                    )
-                    chunks[x]["stop_timestamp"] = int(float(result.metas.split(",")[1]))
-                except Exception as e:
-                    print(e)
+                metas = result.metas.split(",")
+                if metas[-1] == "asr":
+                    chunks[x]["start_timestamp"] = int(float(metas[0]))
+                    chunks[x]["stop_timestamp"] = int(float(metas[1]))
+
                 chunks[x]["text"] = result.transcript
 
-    chunks = sorted(chunks, key=lambda d: d["start_timestamp"])
+    if metas[-1] == "asr":
+        chunks = sorted(chunks, key=lambda d: d["start_timestamp"])
 
     full_transcription = ""
     for c in chunks:
