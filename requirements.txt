@@ -7,7 +7,7 @@ sentencepiece
 torch>=1.13.0
 torchaudio
 transformers>=4.29.1
-https://github.com/huggingface/peft/archive/refs/heads/main.zip
+peft
 sqlmodel
 pymysql
 soundfile

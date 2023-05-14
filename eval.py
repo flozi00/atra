@@ -61,9 +61,7 @@ for d in tqdm(ds):
     audio_data = d["audio"]["array"]
 
     # normalize prediction
-    pred_str_orig = unidecode(
-        alpha2digit(inference_asr(audio_data, "large", False)[0], "de")
-    )
+    pred_str_orig = unidecode(alpha2digit(inference_asr(audio_data, "large")[0], "de"))
     pred_str = (
         re.sub(r"[^\w\s]", "", pred_str_orig.strip())
         .lower()

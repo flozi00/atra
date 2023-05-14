@@ -8,6 +8,7 @@ import fsspec
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 
 from aaas.statics import CACHE_SIZE, INPROGRESS, TODO, TASK_MAPPING
+from aaas.utils import timeit
 
 db_backend = os.getenv("DBBACKEND", "sqlite:///database.db")
 ftp_backend = os.getenv("FTPBACKEND")
@@ -205,6 +206,7 @@ def get_data_from_hash(hash: str) -> bytes:
     return bytes_data
 
 
+@timeit
 def set_data_to_hash(hs: str, bytes_data: bytes):
     """Store the bytes of a file to the path which is the hash of the file
 

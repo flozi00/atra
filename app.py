@@ -3,6 +3,7 @@ import threading
 from aaas.datastore import remove_data_from_hash
 
 from aaas.gradio_utils import build_gradio
+from aaas.text_utils.summarization import summarize
 from aaas.text_utils.translation import translate
 
 ui = build_gradio()
@@ -33,6 +34,11 @@ class BackgroundTasks(threading.Thread):
                     result = translate(
                         input_text, input_lang, target_lang, model_config=None
                     )
+                elif task_metas[-1] == "summarization":
+                    input_text = bytes_data.decode("utf-8")
+                    input_lang = task_metas[0]
+                    target_lang = task_metas[1]
+                    result = summarize(input_text, input_lang, model_config=None)
                 elif task_metas[-1] == "asr":
                     array = np.frombuffer(bytes_data, dtype=np.float32)
                     result, lang = inference_asr(

@@ -3,6 +3,8 @@ from transformers import (
     WhisperForConditionalGeneration,
     M2M100ForConditionalGeneration,
     M2M100Tokenizer,
+    T5ForConditionalGeneration,
+    T5TokenizerFast,
 )
 
 MODEL_MAPPING = {
@@ -41,6 +43,22 @@ MODEL_MAPPING = {
                 "name": "facebook/m2m100_1.2B",
                 "class": M2M100ForConditionalGeneration,
                 "processor": M2M100Tokenizer,
+            }
+        },
+    },
+    "summarization": {
+        "small": {
+            "universal": {
+                "name": "philschmid/flan-t5-base-samsum",
+                "class": T5ForConditionalGeneration,
+                "processor": T5TokenizerFast,
+            }
+        },
+        "large": {
+            "universal": {
+                "name": "philschmid/flan-t5-base-samsum",
+                "class": T5ForConditionalGeneration,
+                "processor": T5TokenizerFast,
             }
         },
     },
@@ -156,4 +174,8 @@ TO_ASR = "***TO ASR***"
 
 CACHE_SIZE = 128
 
-TASK_MAPPING = {"asr": ["start", "end"], "translation": ["source", "target"]}
+TASK_MAPPING = {
+    "asr": ["start", "end"],
+    "translation": ["source", "target"],
+    "summarization": ["long_text", "short_text"],
+}

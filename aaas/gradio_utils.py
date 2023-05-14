@@ -108,6 +108,23 @@ def build_translator_ui():
     )
 
 
+def build_summarization_ui():
+    with gr.Row():
+        with gr.Column():
+            input_lang = gr.Dropdown(langs)
+            input_text = gr.Textbox(label="Input Text")
+
+        output_text = gr.Text(label="Output Text")
+
+    send = gr.Button(label="Translate")
+
+    send.click(
+        add_to_summarization_queue,
+        inputs=[input_text, input_lang],
+        outputs=[output_text],
+    )
+
+
 def build_gradio():
     """
     Merge all UIs into one
@@ -120,6 +137,8 @@ def build_gradio():
                 build_asr_ui()
             with gr.Tab("Translator"):
                 build_translator_ui()
+            with gr.Tab("Summarization"):
+                build_summarization_ui()
 
     return ui
 
@@ -133,6 +152,26 @@ def add_to_translation_queue(input_text: str, input_lang: str, output_lang: str)
         audio_batch=[input_text],
         hashes=[hs],
         times_list=[{"source": input_lang, "target": output_lang}],
+    )
+
+    transcript, chunks = get_transcription(hs)
+    while "***" in transcript:
+        transcript, chunks = get_transcription(hs)
+
+    delete_by_hash(hs)
+
+    return transcript
+
+
+def add_to_summarization_queue(input_text: str, input_lang: str):
+    input_text = input_text.encode(encoding="UTF-8")
+    hs = hashlib.sha256(input_text).hexdigest()
+    hs = f"{hs}.txt"
+
+    add_to_queue(
+        audio_batch=[input_text],
+        hashes=[hs],
+        times_list=[{"long_text": input_lang, "short_text": input_lang}],
     )
 
     transcript, chunks = get_transcription(hs)

@@ -4,6 +4,8 @@ from aaas.statics import LANG_MAPPING
 
 
 def translate(text, src, dest, model_config: str) -> str:
+    if src == dest:
+        return text
     src = LANG_MAPPING[src]
     dest = LANG_MAPPING[dest]
     model, tokenizer = get_model_and_processor("universal", "translation", model_config)
