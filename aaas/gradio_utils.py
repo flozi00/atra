@@ -239,17 +239,17 @@ def get_transcription(queue_string: str):
         if result is None:
             return "", []
         else:
-            if len(queue_string) < 5 or "***" in queue_string:
-                return queue_string, []
+            metas = result.metas.split(",")
 
-            chunks.append({"id": queue[x]})
-            if result is not None:
-                metas = result.metas.split(",")
-                if metas[-1] == "asr":
-                    chunks[x]["start_timestamp"] = int(float(metas[0]))
-                    chunks[x]["stop_timestamp"] = int(float(metas[1]))
+        if len(queue_string) < 5 or "***" in queue_string:
+            return queue_string, []
 
-                chunks[x]["text"] = result.transcript
+        chunks.append({"id": queue[x]})
+        if metas[-1] == "asr":
+            chunks[x]["start_timestamp"] = int(float(metas[0]))
+            chunks[x]["stop_timestamp"] = int(float(metas[1]))
+
+        chunks[x]["text"] = result.transcript
 
     if metas[-1] == "asr":
         chunks = sorted(chunks, key=lambda d: d["start_timestamp"])
