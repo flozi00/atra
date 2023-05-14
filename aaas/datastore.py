@@ -169,6 +169,15 @@ def set_in_progress(hs: str):
             session.refresh(transkript)
 
 
+def delete_by_hash(hs: str):
+    with Session(engine) as session:
+        statement = select(QueueData).where(QueueData.hash == hs)
+        transkript = session.exec(statement).first()
+        if transkript is not None:
+            session.delete(transkript)
+            session.commit()
+
+
 @lru_cache(maxsize=CACHE_SIZE)
 def get_data_from_hash(hash: str) -> bytes:
     """Get the bytes of a file from the path which is the hash of the file

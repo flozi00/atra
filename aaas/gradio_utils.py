@@ -7,14 +7,11 @@ from transformers.pipelines.audio_utils import ffmpeg_read
 
 from aaas.datastore import (
     add_to_queue,
+    delete_by_hash,
     get_transkript_batch,
 )
 from aaas.silero_vad import get_speech_probs, silero_vad
 from aaas.statics import LANG_MAPPING
-from transformers.tools.translation import LANGUAGE_CODES
-
-translation_codes = sorted(list(LANGUAGE_CODES.keys()))
-
 
 langs = sorted(list(LANG_MAPPING.keys()))
 
@@ -95,11 +92,11 @@ def build_asr_ui():
 def build_translator_ui():
     with gr.Row():
         with gr.Column():
-            input_lang = gr.Dropdown(translation_codes)
+            input_lang = gr.Dropdown(langs)
             input_text = gr.Textbox(label="Input Text")
 
         with gr.Column():
-            output_lang = gr.Dropdown(translation_codes)
+            output_lang = gr.Dropdown(langs)
             output_text = gr.Text(label="Output Text")
 
     send = gr.Button(label="Translate")
@@ -141,6 +138,8 @@ def add_to_translation_queue(input_text: str, input_lang: str, output_lang: str)
     transcript, chunks = get_transcription(hs)
     while "***" in transcript:
         transcript, chunks = get_transcription(hs)
+
+    delete_by_hash(hs)
 
     return transcript
 
@@ -266,6 +265,9 @@ def wait_for_transcription(task_id: str):
     transcript, chunks = get_transcription(task_id)
     while "***" in transcript:
         transcript, chunks = get_transcription(task_id)
+
+    for hs in task_id.split(","):
+        delete_by_hash(hs)
 
     return transcript, chunks
 

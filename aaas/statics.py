@@ -1,6 +1,8 @@
 from transformers import (
     WhisperProcessor,
     WhisperForConditionalGeneration,
+    M2M100ForConditionalGeneration,
+    M2M100Tokenizer,
 )
 
 MODEL_MAPPING = {
@@ -24,6 +26,22 @@ MODEL_MAPPING = {
                 "class": WhisperForConditionalGeneration,
                 "processor": WhisperProcessor,
             },
+        },
+    },
+    "translation": {
+        "small": {
+            "universal": {
+                "name": "facebook/m2m100_418M",
+                "class": M2M100ForConditionalGeneration,
+                "processor": M2M100Tokenizer,
+            }
+        },
+        "large": {
+            "universal": {
+                "name": "facebook/m2m100_1.2B",
+                "class": M2M100ForConditionalGeneration,
+                "processor": M2M100Tokenizer,
+            }
         },
     },
 }

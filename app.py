@@ -3,12 +3,9 @@ import threading
 from aaas.datastore import remove_data_from_hash
 
 from aaas.gradio_utils import build_gradio
+from aaas.text_utils.translation import translate
 
 ui = build_gradio()
-
-from transformers.tools import TranslationTool
-
-translator = TranslationTool()
 
 
 class BackgroundTasks(threading.Thread):
@@ -33,7 +30,9 @@ class BackgroundTasks(threading.Thread):
                     input_text = bytes_data.decode("utf-8")
                     input_lang = task_metas[0]
                     target_lang = task_metas[1]
-                    result = translator(input_text, input_lang, target_lang)
+                    result = translate(
+                        input_text, input_lang, target_lang, model_config=None
+                    )
                 elif task_metas[-1] == "asr":
                     array = np.frombuffer(bytes_data, dtype=np.float32)
                     result, lang = inference_asr(
