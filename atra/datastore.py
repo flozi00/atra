@@ -15,7 +15,7 @@ class QueueData(SQLModel, table=True):
     transcript: str = Field(max_length=4096)
     model_config: str
     hash: str = Field(unique=True)
-    file_object: bytes = Field(default=None)
+    file_object: bytes
 
 
 engine = create_engine(db_backend, pool_recycle=3600, pool_pre_ping=True)
