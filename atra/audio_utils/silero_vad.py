@@ -3,7 +3,7 @@
 import numpy as np
 import torch
 
-from aaas.utils import timeit
+from atra.utils import timeit
 
 languages = ["ru", "en", "de", "es"]
 
@@ -75,7 +75,6 @@ def get_speech_probs(
     sampling_rate: int = 16000,
     window_size_samples: int = 1536,
 ):
-
     """
     This method is used for splitting long audios into speech chunks using silero VAD
 
@@ -152,7 +151,6 @@ def get_speech_timestamps(
     speech_pad_ms: int = 30,
     return_seconds: bool = False,
 ):
-
     """
     This method is used for splitting long audios into speech chunks using silero VAD
 

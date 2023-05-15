@@ -1,6 +1,6 @@
 import torch
-from aaas.model_utils import get_model_and_processor
-from aaas.statics import LANG_MAPPING
+from atra.model_utils import get_model_and_processor
+from atra.statics import LANG_MAPPING
 
 
 def translate(text, src, dest, model_config: str) -> str:

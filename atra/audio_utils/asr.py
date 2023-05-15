@@ -1,9 +1,9 @@
 import torch
 from text_to_num import alpha2digit
 
-from aaas.model_utils import get_model_and_processor
-from aaas.statics import LANGUAGE_CODES
-from aaas.utils import timeit
+from atra.model_utils import get_model_and_processor
+from atra.statics import LANGUAGE_CODES
+from atra.utils import timeit
 import pyloudnorm as pyln
 from transformers.pipelines.audio_utils import ffmpeg_read
 

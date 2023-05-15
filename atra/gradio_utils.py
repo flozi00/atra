@@ -5,19 +5,17 @@ from datetime import timedelta
 import gradio as gr
 from transformers.pipelines.audio_utils import ffmpeg_read
 
-from aaas.datastore import (
+from atra.datastore import (
     add_to_queue,
     delete_by_hash,
     get_transkript_batch,
 )
-from aaas.silero_vad import get_speech_probs, silero_vad
-from aaas.statics import LANG_MAPPING
+from atra.audio_utils.silero_vad import get_speech_probs, silero_vad
+from atra.statics import LANG_MAPPING
 
 langs = sorted(list(LANG_MAPPING.keys()))
 
 model_vad, get_speech_timestamps = silero_vad(True)
-
-is_admin_node = os.getenv("ADMINMODE", "false") == "true"
 
 css = """
 #hidden_stuff {display: none} 
@@ -273,6 +271,7 @@ def get_transcription(queue_string: str):
     full_transcription, chunks = "", []
     queue = queue_string.split(",")
     results = get_transkript_batch(queue_string)
+    metas = ("", "", "")
     for x in range(len(results)):
         result = results[x]
         if result is None:

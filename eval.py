@@ -7,7 +7,7 @@ from text_to_num import alpha2digit
 from tqdm.auto import tqdm
 from unidecode import unidecode
 
-from aaas.audio_utils.asr import inference_asr
+from atra.audio_utils.asr import inference_asr
 
 base = []
 predicted = []

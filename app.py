@@ -1,10 +1,9 @@
 import os
 import threading
-from aaas.datastore import remove_data_from_hash
 
-from aaas.gradio_utils import build_gradio
-from aaas.text_utils.summarization import summarize
-from aaas.text_utils.translation import translate
+from atra.gradio_utils import build_gradio
+from atra.text_utils.summarization import summarize
+from atra.text_utils.translation import translate
 
 ui = build_gradio()
 
@@ -12,9 +11,8 @@ ui = build_gradio()
 class BackgroundTasks(threading.Thread):
     def run(self, *args, **kwargs):
         import numpy as np
-        from aaas.audio_utils.asr import inference_asr
-        from aaas.datastore import (
-            get_data_from_hash,
+        from atra.audio_utils.asr import inference_asr
+        from atra.datastore import (
             get_tasks_queue,
             set_in_progress,
             set_transkript,
@@ -24,7 +22,7 @@ class BackgroundTasks(threading.Thread):
         while True:
             task = get_tasks_queue()
             if task is not False:
-                bytes_data = get_data_from_hash(task.hash)
+                bytes_data = task.file_object
                 set_in_progress(task.hash)
                 task_metas = task.metas.split(",")
                 if task_metas[-1] == "translation":
@@ -46,7 +44,6 @@ class BackgroundTasks(threading.Thread):
                         model_config=None,
                     )
                 set_transkript(task.hash, result, from_queue=True)
-                remove_data_from_hash(task.hash)
             else:
                 time.sleep(1)
 

@@ -3,16 +3,11 @@ import torch
 from optimum.bettertransformer import BetterTransformer
 from transformers import AutoProcessor
 
-from aaas.statics import MODEL_MAPPING
-from aaas.utils import timeit
+from atra.statics import MODEL_MAPPING
+from atra.utils import timeit
 import importlib.util
 
 last_request, last_response = None, None
-
-if importlib.util.find_spec("bitsandbytes") is None:
-    bnb_available = False
-else:
-    bnb_available = True
 
 
 @timeit
@@ -20,7 +15,6 @@ def get_model(model_class, model_id):
     model = model_class.from_pretrained(
         model_id,
         cache_dir="./model_cache",
-        load_in_8bit=bnb_available,
         device_map="auto",
         torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
     )
@@ -41,7 +35,6 @@ def get_peft_model(peft_model_id, model_class) -> peft.PeftModel:
     model = model_class.from_pretrained(
         peft_config.base_model_name_or_path,
         cache_dir="./model_cache",
-        load_in_8bit=bnb_available,
         device_map="auto",
         torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
     )

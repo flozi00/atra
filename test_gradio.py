@@ -2,7 +2,7 @@ from fastapi.testclient import TestClient
 from app import app
 import datasets
 from transformers.pipelines.audio_utils import ffmpeg_read
-from aaas.audio_utils.asr import inference_asr
+from atra.audio_utils.asr import inference_asr
 
 client = TestClient(app)
 
