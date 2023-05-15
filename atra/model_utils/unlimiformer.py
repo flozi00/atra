@@ -1,9 +1,7 @@
 # from https://github.com/abertsch72/unlimiformer/blob/main/src/unlimiformer.py
 import logging
-import numpy as np
 import torch
 from torch import nn
-from enum import Enum, auto
 from transformers import (
     BartModel,
     BartForConditionalGeneration,
@@ -121,7 +119,8 @@ class Unlimiformer(Generic[ModelType]):
     def inject_hooks(self, model):
         if self.hooks_injected:
             return
-        # Inject our activation_capturer to capture the activations at every forward pass
+        # Inject our activation_capturer to
+        # capture the activations at every forward pass
         attention_layers_to_capture = self.attention_layer_to_capture(
             self.layer_begin, self.layer_end
         )
@@ -161,7 +160,8 @@ class Unlimiformer(Generic[ModelType]):
             )
 
         # Inject our hook function in the beginning of generation.
-        # When the "model.generate()" will be called, it will first call our "reset_generation()" function,
+        # When the "model.generate()" will be called,
+        # it will first call our "reset_generation()" function,
         # and only then call "model.generate()"
         self.original_generate_func = model.generate
         model.generate = self.pre_generate_hook
@@ -222,9 +222,9 @@ class Unlimiformer(Generic[ModelType]):
     def inject_hooks_for_unaffected_layers(self, model, decoder_layers_to_run):
         self.original_non_injected_decoder_layer_forward_funcs = []
         non_injected_decoder_layers = [
-            l
-            for l in self.attention_layer_to_run(0, None)
-            if l not in decoder_layers_to_run
+            non_inject_l
+            for non_inject_l in self.attention_layer_to_run(0, None)
+            if non_inject_l not in decoder_layers_to_run
         ]
         for decoder_layer in non_injected_decoder_layers:
             self.original_non_injected_decoder_layer_forward_funcs.append(
@@ -433,9 +433,9 @@ class Unlimiformer(Generic[ModelType]):
             decoder_layer.forward = original_func
 
         non_injected_decoder_layers = [
-            l
-            for l in self.attention_layer_to_run(0, None)
-            if l not in decoder_layers_to_run
+            non_inject_l
+            for non_inject_l in self.attention_layer_to_run(0, None)
+            if non_inject_l not in decoder_layers_to_run
         ]
         for decoder_layer, original_func in zip(
             non_injected_decoder_layers,
@@ -691,7 +691,8 @@ class Unlimiformer(Generic[ModelType]):
                     else None
                 )
                 # input_ids = input_ids[:, :self.model_encoder_max_len]
-                # labels = labels[:, :self.model_encoder_max_len] if labels is not None else None
+                # labels = labels[:, :self.model_encoder_max_len]
+                # if labels is not None else None
             else:
                 if kwargs.get("past_key_values") is None:
                     self.is_first_test_decoding_step = True
@@ -717,7 +718,8 @@ class Unlimiformer(Generic[ModelType]):
         ):
             self.cur_decoder_layer_index = i
             if kwargs.get("past_key_value") is not None:
-                # it's a tuple, and we convert it to a list to be able to perform assignment
+                # it's a tuple, and we convert it to a l
+                # ist to be able to perform assignment
                 # and modify its items from our attention_forward_hook
                 self.cur_layer_key_value_placeholder = kwargs["past_key_value"] = list(
                     kwargs["past_key_value"]
@@ -863,15 +865,18 @@ class Unlimiformer(Generic[ModelType]):
                 beam_size = query.shape[0] // batch_size
                 # query: (batch, beam, head, dim)
                 query = query.reshape(batch_size, beam_size, *query.shape[1:])
-                # this_layer_prompt_keys: (batch, head, source_len, dim)
-                # this_layer_prompt_keys.unsqueeze(1):  (batch, 1, head, source_len, dim)
+                # this_layer_prompt_keys:
+                # (batch, head, source_len, dim)
+                # this_layer_prompt_keys.unsqueeze(1):
+                # (batch, 1, head, source_len, dim)
                 # query.unsqueeze(-1):             (batch, beam, head, dim, 1)
                 # attn_weights:  (batch, beam, head, source_len)
                 attn_weights = torch.matmul(
                     this_layer_prompt_keys.unsqueeze(1)[:, :, self.head_nums],
                     query.unsqueeze(-1),
                 ).squeeze(-1)
-                # attn_weights = torch.matmul(query.unsqueeze(-2), this_layer_prompt_keys.unsqueeze(1)[:, :, self.head_nums]).squeeze(-2)
+                # attn_weights = torch.matmul(query.unsqueeze(-2),
+                # this_layer_prompt_keys.unsqueeze(1)[:, :, self.head_nums]).squeeze(-2)
                 prompt_attention_mask_to_add = (
                     1 - self.prompt_attention_mask
                 ) * -1e9  # (batch, source_len)
@@ -1021,7 +1026,8 @@ class Unlimiformer(Generic[ModelType]):
             # this_layer_prompt_keys: (batch, head, source_len, dim)
             # this_layer_prompt_keys.unsqueeze(1):  (batch, 1, head, source_len, dim)
             # attn_weights:  (batch, tgt_len, head, 1, source_len)
-            # attn_weights = torch.matmul(query.unsqueeze(-2), this_layer_prompt_keys.unsqueeze(1).permute(0,1,2,4,3))
+            # attn_weights = torch.matmul(query.unsqueeze(-2),
+            # this_layer_prompt_keys.unsqueeze(1).permute(0,1,2,4,3))
             attn_weights = torch.matmul(
                 this_layer_prompt_keys.unsqueeze(1), query.unsqueeze(-1)
             ).reshape(
@@ -1031,7 +1037,9 @@ class Unlimiformer(Generic[ModelType]):
                 1,
                 this_layer_prompt_keys.shape[-2],
             )
-            # attn_weights = torch.matmul(query.unsqueeze(-2), this_layer_prompt_keys.unsqueeze(1)[:, :, self.head_nums]).squeeze(-2)
+            # attn_weights = torch.matmul(query.unsqueeze(-2),
+            # this_layer_prompt_keys.unsqueeze(1)
+            # [:, :, self.head_nums]).squeeze(-2)
             prompt_attention_mask_to_add = (
                 1 - self.long_inputs_mask
             ) * -1e9  # (batch, source_len)
@@ -1157,7 +1165,8 @@ class UnlimiformerBART(Unlimiformer[BartModel]):
         attention = self.model.base_model.decoder.layers[-1].encoder_attn
 
         # query, key, value: (batch, heads, time, attn_dim)
-        # query = query.view(query.shape[0], query.shape[1], attention.num_heads, attention.head_dim).transpose(1, 2).contiguous()
+        # query = query.view(query.shape[0], query.shape[1], attention.num_heads,
+        # attention.head_dim).transpose(1, 2).contiguous()
         key = (
             key.view(key.shape[0], -1, attention.num_heads, attention.head_dim)
             .transpose(1, 2)
@@ -1175,7 +1184,8 @@ class UnlimiformerBART(Unlimiformer[BartModel]):
         # (batch, time, heads, attn_dim)
         attention = self.model.base_model.decoder.layers[-1].encoder_attn
         # query: (batch, heads, time, attn_dim)
-        # query = output.view(output.shape[0], output.shape[1], attention.num_heads, attention.head_dim).transpose(1, 2).contiguous()
+        # query = output.view(output.shape[0], output.shape[1], attention.num_heads,
+        # attention.head_dim).transpose(1, 2).contiguous()
         query = output.view(
             output.shape[0], output.shape[1], attention.num_heads, attention.head_dim
         ).contiguous()
@@ -1269,7 +1279,8 @@ class UnlimiformerT5(Unlimiformer[T5Model]):
         attention = self.model.base_model.decoder.block[-1].layer[1].EncDecAttention
 
         # query, key, value: (batch, heads, time, attn_dim)
-        # query = query.view(query.shape[0], query.shape[1], attention.num_heads, attention.head_dim).transpose(1, 2).contiguous()
+        # query = query.view(query.shape[0], query.shape[1],
+        # attention.num_heads, attention.head_dim).transpose(1, 2).contiguous()
         key = (
             key.view(key.shape[0], -1, attention.n_heads, attention.key_value_proj_dim)
             .transpose(1, 2)

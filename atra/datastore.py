@@ -4,7 +4,7 @@ from typing import Optional
 
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 
-from atra.statics import CACHE_SIZE, INPROGRESS, TODO, TASK_MAPPING
+from atra.statics import INPROGRESS, TODO, TASK_MAPPING
 
 db_backend = os.getenv("DBBACKEND", "sqlite:///database.db")
 
@@ -38,7 +38,9 @@ def add_to_queue(audio_batch, hashes, times_list):
                     TASK_MAPPING[task][0] in time_dict
                     and TASK_MAPPING[task][1] in time_dict
                 ):
-                    timesstamps = f"{time_dict[TASK_MAPPING[task][0]]},{time_dict[TASK_MAPPING[task][1]]},{task}"
+                    first_stamp = time_dict[TASK_MAPPING[task][0]]
+                    second_stamp = time_dict[TASK_MAPPING[task][1]]
+                    timesstamps = f"{first_stamp},{second_stamp},{task}"
 
             # Get the entry from the database. If there is no entry, it returns None
             entry = get_transkript(hs)

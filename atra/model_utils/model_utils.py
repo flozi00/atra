@@ -96,7 +96,8 @@ def get_model_and_processor(
     )
     processor = get_processor(processor_class, model_id)
 
-    # if Unlimiformer is available for the model type, convert the model to a Unlimiformer model
+    # if Unlimiformer is available for the model type,
+    # convert the model to a Unlimiformer model
     if model.config.model_type in ["bart", "led", "t5"]:
         model = Unlimiformer.convert_model(model).cuda()
         print("Unlimiformer model created")
