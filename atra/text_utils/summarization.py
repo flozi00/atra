@@ -1,6 +1,5 @@
 import torch
-from atra.model_utils import get_model_and_processor
-from atra.text_utils.translation import translate
+from atra.model_utils.model_utils import get_model_and_processor
 
 
 def summarize(text, input_lang, model_config: str) -> str:

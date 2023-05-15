@@ -1,7 +1,7 @@
 import torch
 from text_to_num import alpha2digit
 
-from atra.model_utils import get_model_and_processor
+from atra.model_utils.model_utils import get_model_and_processor
 from atra.statics import LANGUAGE_CODES
 from atra.utils import timeit
 import pyloudnorm as pyln

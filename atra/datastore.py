@@ -120,7 +120,6 @@ def get_tasks_queue() -> QueueData:
         else:
             sample = False
 
-    print("open todos ", len(todos))
     return sample
 
 

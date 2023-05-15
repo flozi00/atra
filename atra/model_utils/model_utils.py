@@ -5,7 +5,7 @@ from transformers import AutoProcessor
 
 from atra.statics import MODEL_MAPPING
 from atra.utils import timeit
-import importlib.util
+from atra.model_utils.unlimiformer import Unlimiformer
 
 last_request, last_response = None, None
 
@@ -96,11 +96,16 @@ def get_model_and_processor(
     )
     processor = get_processor(processor_class, model_id)
 
-    # convert the model to a BetterTransformer model
-    try:
-        model = BetterTransformer.transform(model)
-    except Exception as e:
-        print("Bettertransformer exception: ", e)
+    # if Unlimiformer is available for the model type, convert the model to a Unlimiformer model
+    if model.config.model_type in ["bart", "led", "t5"]:
+        model = Unlimiformer.convert_model(model).cuda()
+        print("Unlimiformer model created")
+    else:
+        # convert the model to a BetterTransformer model
+        try:
+            model = BetterTransformer.transform(model)
+        except Exception as e:
+            print("Bettertransformer exception: ", e)
 
     # if the cache is activated and the last request is not None
     # delete the last response and empty the cache for the GPU
