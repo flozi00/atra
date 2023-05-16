@@ -12,7 +12,6 @@ LAST_MODEL = None
 MODELS_CACHE = {}
 
 
-@timeit
 def get_model(model_class, model_id):
     global MODELS_CACHE
     model = MODELS_CACHE.get(model_id, None)
@@ -26,13 +25,11 @@ def get_model(model_class, model_id):
     return model
 
 
-@timeit
 def get_processor(processor_class, model_id):
     processor = processor_class.from_pretrained(model_id)
     return processor
 
 
-@timeit
 def get_peft_model(peft_model_id, model_class) -> peft.PeftModel:
     global MODELS_CACHE
     model = MODELS_CACHE.get(peft_model_id, None)
@@ -59,7 +56,7 @@ def get_peft_model(peft_model_id, model_class) -> peft.PeftModel:
 
 
 @timeit
-def get_model_and_processor(lang: str, task: str, activate_cache=True):
+def get_model_and_processor(lang: str, task: str):
     global LAST_MODEL
 
     try:

@@ -141,7 +141,6 @@ def set_transkript(hs: str, transcription: str, from_queue: bool = False):
                     transkript.transcript = transcription
                     transkript.file_object = bytes()
                     session.commit()
-                    session.refresh(transkript)
 
 
 def set_in_progress(hs: str):

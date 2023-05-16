@@ -20,28 +20,32 @@ class BackgroundTasks(threading.Thread):
         import time
 
         while True:
-            task = get_tasks_queue()
-            if task is not False:
-                bytes_data = task.file_object
-                set_in_progress(task.hash)
-                task_metas = task.metas.split(",")
-                if task_metas[-1] == "translation":
-                    input_text = bytes_data.decode("utf-8")
-                    input_lang = task_metas[0]
-                    target_lang = task_metas[1]
-                    result = translate(input_text, input_lang, target_lang)
-                elif task_metas[-1] == "summarization":
-                    input_text = bytes_data.decode("utf-8")
-                    input_lang = task_metas[0]
-                    target_lang = task_metas[1]
-                    result = summarize(input_text, input_lang)
-                elif task_metas[-1] == "asr":
-                    array = np.frombuffer(bytes_data, dtype=np.float32)
-                    result, lang = inference_asr(
-                        data=array,
-                    )
-                set_transkript(task.hash, result, from_queue=True)
-            else:
+            try:
+                task = get_tasks_queue()
+                if task is not False:
+                    bytes_data = task.file_object
+                    set_in_progress(task.hash)
+                    task_metas = task.metas.split(",")
+                    if task_metas[-1] == "translation":
+                        input_text = bytes_data.decode("utf-8")
+                        input_lang = task_metas[0]
+                        target_lang = task_metas[1]
+                        result = translate(input_text, input_lang, target_lang)
+                    elif task_metas[-1] == "summarization":
+                        input_text = bytes_data.decode("utf-8")
+                        input_lang = task_metas[0]
+                        target_lang = task_metas[1]
+                        result = summarize(input_text, input_lang)
+                    elif task_metas[-1] == "asr":
+                        array = np.frombuffer(bytes_data, dtype=np.float32)
+                        result, lang = inference_asr(
+                            data=array,
+                        )
+                    set_transkript(task.hash, result, from_queue=True)
+                else:
+                    time.sleep(1)
+            except Exception as e:
+                print(e)
                 time.sleep(1)
 
 

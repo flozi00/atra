@@ -15,7 +15,7 @@ warnings.filterwarnings("ignore")
 def detect_language(data) -> list:
     possible_languages = list(LANGUAGE_CODES.keys())
     lang_model, lang_processor = get_model_and_processor(
-        "universal", "speech_lang_detection", activate_cache=False
+        "universal", "speech_lang_detection"
     )
     input_features = lang_processor(
         data, sampling_rate=16000, return_tensors="pt"
@@ -81,7 +81,7 @@ def inference_asr(data) -> str:
     input_features = inputs.input_features
 
     if torch.cuda.is_available():
-        input_features = input_features.cuda()
+        input_features = input_features.cuda().half()
         model = model.cuda()
 
     with torch.inference_mode():
