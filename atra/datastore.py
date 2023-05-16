@@ -116,7 +116,7 @@ def get_tasks_queue() -> QueueData:
                 todos = []
 
         if len(todos) != 0:
-            sample = todos[0]
+            sample = random.choice(todos)
         else:
             sample = False
 

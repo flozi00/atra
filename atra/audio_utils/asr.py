@@ -81,12 +81,11 @@ def inference_asr(data) -> str:
     input_features = inputs.input_features
 
     if torch.cuda.is_available():
-        input_features = input_features.cuda().half()
-        model = model.cuda()
+        input_features = input_features.cuda()
 
     with torch.inference_mode():
         generated_ids = model.generate(
-            inputs=input_features, max_new_tokens=448, num_beams=5
+            inputs=input_features, max_new_tokens=448, num_beams=1
         )
 
     transcription = processor.batch_decode(generated_ids, skip_special_tokens=True)[
