@@ -1,6 +1,4 @@
-from datetime import timedelta
 import hashlib
-import os
 from atra.datastore import (
     add_to_queue,
     delete_by_hash,
