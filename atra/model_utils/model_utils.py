@@ -41,8 +41,6 @@ def get_peft_model(peft_model_id, model_class) -> peft.PeftModel:
         model = model_class.from_pretrained(
             peft_config.base_model_name_or_path,
             cache_dir="./model_cache",
-            device_map="auto",
-            torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
         )
         model = peft.PeftModel.from_pretrained(
             model,
