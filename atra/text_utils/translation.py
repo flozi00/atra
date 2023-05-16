@@ -1,8 +1,10 @@
 import torch
 from atra.model_utils.model_utils import get_model_and_processor
 from atra.statics import LANG_MAPPING
+from atra.utils import timeit
 
 
+@timeit
 def translate(text, src, dest) -> str:
     if src == dest:
         return text

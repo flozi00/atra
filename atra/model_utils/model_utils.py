@@ -15,14 +15,14 @@ MODELS_CACHE = {}
 def get_model(model_class, model_id):
     global MODELS_CACHE
     model = MODELS_CACHE.get(model_id, None)
-    cached = False
+    cached = True
     if model is None:
         model = model_class.from_pretrained(
             model_id,
             cache_dir="./model_cache",
         )
         MODELS_CACHE[model_id] = model
-        cached = True
+        cached = False
     return model, cached
 
 
@@ -34,7 +34,7 @@ def get_processor(processor_class, model_id):
 def get_peft_model(peft_model_id, model_class) -> peft.PeftModel:
     global MODELS_CACHE
     model = MODELS_CACHE.get(peft_model_id, None)
-    cached = False
+    cached = True
     if model is None:
         # Load the PEFT model
         peft_config = peft.PeftConfig.from_pretrained(peft_model_id)
@@ -52,7 +52,7 @@ def get_peft_model(peft_model_id, model_class) -> peft.PeftModel:
         model = model.merge_and_unload()
         model = model.eval()
         MODELS_CACHE[peft_model_id] = model
-        cached = True
+        cached = False
 
     return model, cached
 
