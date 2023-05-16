@@ -8,59 +8,34 @@ from transformers import (
 )
 
 MODEL_MAPPING = {
-    "asr": {
-        "small": {
-            "german": {
-                "name": "flozi00/whisper-small-german-cv13-simplepeft",
-                "class": WhisperForConditionalGeneration,
-                "processor": WhisperProcessor,
-            },
-            "universal": {
-                "name": "openai/whisper-small",
-                "class": WhisperForConditionalGeneration,
-                "processor": WhisperProcessor,
-            },
+    "speech_lang_detection": {
+        "universal": {
+            "name": "openai/whisper-large-v2",
+            "class": WhisperForConditionalGeneration,
+            "processor": WhisperProcessor,
         },
-        "large": {
-            "german": {"adapter_id": "flozi00/whisper-large-german-lora-cv13"},
-            "universal": {
-                "name": "openai/whisper-large-v2",
-                "class": WhisperForConditionalGeneration,
-                "processor": WhisperProcessor,
-            },
+    },
+    "asr": {
+        "german": {"adapter_id": "flozi00/whisper-large-german-lora-cv13"},
+        "universal": {
+            "name": "openai/whisper-large-v2",
+            "class": WhisperForConditionalGeneration,
+            "processor": WhisperProcessor,
         },
     },
     "translation": {
-        "small": {
-            "universal": {
-                "name": "facebook/m2m100_418M",
-                "class": M2M100ForConditionalGeneration,
-                "processor": M2M100Tokenizer,
-            }
-        },
-        "large": {
-            "universal": {
-                "name": "facebook/m2m100_1.2B",
-                "class": M2M100ForConditionalGeneration,
-                "processor": M2M100Tokenizer,
-            }
-        },
+        "universal": {
+            "name": "facebook/m2m100_1.2B",
+            "class": M2M100ForConditionalGeneration,
+            "processor": M2M100Tokenizer,
+        }
     },
     "summarization": {
-        "small": {
-            "universal": {
-                "name": "philschmid/flan-t5-base-samsum",
-                "class": T5ForConditionalGeneration,
-                "processor": T5TokenizerFast,
-            }
-        },
-        "large": {
-            "universal": {
-                "name": "philschmid/flan-t5-base-samsum",
-                "class": T5ForConditionalGeneration,
-                "processor": T5TokenizerFast,
-            }
-        },
+        "english": {
+            "name": "philschmid/flan-t5-base-samsum",
+            "class": T5ForConditionalGeneration,
+            "processor": T5TokenizerFast,
+        }
     },
 }
 

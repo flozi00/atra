@@ -13,7 +13,7 @@ warnings.filterwarnings("ignore")
 
 
 lang_model, lang_processor = get_model_and_processor(
-    "universal", "asr", "small", activate_cache=False
+    "universal", "speech_lang_detection", activate_cache=False
 )
 
 
@@ -58,7 +58,7 @@ def detect_language(data) -> list:
 
 
 @timeit
-def inference_asr(data, model_config: str) -> str:
+def inference_asr(data) -> str:
     if isinstance(data, str):
         with open(data, "rb") as f:
             payload = f.read()
@@ -76,9 +76,7 @@ def inference_asr(data, model_config: str) -> str:
     }.keys()
     lang = list(lang)[0].split("|")[1]
 
-    model, processor = get_model_and_processor(
-        LANGUAGE_CODES[lang], "asr", model_config
-    )
+    model, processor = get_model_and_processor(LANGUAGE_CODES[lang], "asr")
 
     model.config.forced_decoder_ids = processor.get_decoder_prompt_ids(
         task="transcribe"

@@ -6,9 +6,10 @@ from atra.gradio_utils.queues import (
     add_to_vad_queue,
 )
 from atra.gradio_utils.utils import get_subs, get_transcription, wait_for_transcription
-from atra.statics import LANG_MAPPING
+from atra.statics import LANG_MAPPING, MODEL_MAPPING
 
 langs = sorted(list(LANG_MAPPING.keys()))
+sum_langs = sorted(list(MODEL_MAPPING["summarization"].keys()))
 
 GLOBAL_CSS = """
 #hidden_stuff {display: none} 
@@ -102,7 +103,7 @@ def build_translator_ui():
 def build_summarization_ui():
     with gr.Row():
         with gr.Column():
-            input_lang = gr.Dropdown(langs)
+            input_lang = gr.Dropdown(sum_langs)
             input_text = gr.Textbox(label="Input Text")
 
         output_text = gr.Text(label="Output Text")

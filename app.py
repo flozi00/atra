@@ -29,19 +29,16 @@ class BackgroundTasks(threading.Thread):
                     input_text = bytes_data.decode("utf-8")
                     input_lang = task_metas[0]
                     target_lang = task_metas[1]
-                    result = translate(
-                        input_text, input_lang, target_lang, model_config=None
-                    )
+                    result = translate(input_text, input_lang, target_lang)
                 elif task_metas[-1] == "summarization":
                     input_text = bytes_data.decode("utf-8")
                     input_lang = task_metas[0]
                     target_lang = task_metas[1]
-                    result = summarize(input_text, input_lang, model_config=None)
+                    result = summarize(input_text, input_lang)
                 elif task_metas[-1] == "asr":
                     array = np.frombuffer(bytes_data, dtype=np.float32)
                     result, lang = inference_asr(
                         data=array,
-                        model_config=None,
                     )
                 set_transkript(task.hash, result, from_queue=True)
             else:

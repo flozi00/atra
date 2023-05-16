@@ -3,12 +3,12 @@ from atra.model_utils.model_utils import get_model_and_processor
 from atra.statics import LANG_MAPPING
 
 
-def translate(text, src, dest, model_config: str) -> str:
+def translate(text, src, dest) -> str:
     if src == dest:
         return text
     src = LANG_MAPPING[src]
     dest = LANG_MAPPING[dest]
-    model, tokenizer = get_model_and_processor("universal", "translation", model_config)
+    model, tokenizer = get_model_and_processor("universal", "translation")
     tokenizer.src_lang = src
     input_features = tokenizer(text, return_tensors="pt").input_ids
     if torch.cuda.is_available():

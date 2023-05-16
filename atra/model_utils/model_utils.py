@@ -50,34 +50,26 @@ def get_peft_model(peft_model_id, model_class) -> peft.PeftModel:
 
 
 @timeit
-def get_model_and_processor(
-    lang: str, task: str, config: str = None, activate_cache=True
-):
+def get_model_and_processor(lang: str, task: str, activate_cache=True):
     global last_request, last_response
-
-    if config is None:
-        if torch.cuda.is_available():
-            config = "large"
-        else:
-            config = "small"
 
     # get all the model information from the mapping
     # for the requested task, config and lang
-    model_id = MODEL_MAPPING[task][config].get(lang, {}).get("name", None)
-    adapter_id = MODEL_MAPPING[task][config].get(lang, {}).get("adapter_id", None)
+    model_id = MODEL_MAPPING[task].get(lang, {}).get("name", None)
+    adapter_id = MODEL_MAPPING[task].get(lang, {}).get("adapter_id", None)
     if model_id is None:
         base_model_lang = "universal"
-        model_id = MODEL_MAPPING[task][config][base_model_lang]["name"]
+        model_id = MODEL_MAPPING[task][base_model_lang]["name"]
     else:
         base_model_lang = lang
-    model_class = MODEL_MAPPING[task][config][base_model_lang].get("class", None)
+    model_class = MODEL_MAPPING[task][base_model_lang].get("class", None)
 
     # construct the request string for the cache
     # the request string is a combination of model_id, task and config
     if adapter_id is not None:
-        this_request = f"{adapter_id}-{task}-{config}"
+        this_request = f"{adapter_id}"
     else:
-        this_request = f"{model_id}-{task}-{config}"
+        this_request = f"{model_id}"
 
     # check if the request is the same as the last request
     # if yes, return the last response (model, processor)
@@ -91,7 +83,7 @@ def get_model_and_processor(
         model = get_model(model_class, model_id)
 
     # get processor
-    processor_class = MODEL_MAPPING[task][config][base_model_lang].get(
+    processor_class = MODEL_MAPPING[task][base_model_lang].get(
         "processor", AutoProcessor
     )
     processor = get_processor(processor_class, model_id)

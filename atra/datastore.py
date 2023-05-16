@@ -13,7 +13,6 @@ class QueueData(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     metas: str
     transcript: str = Field(max_length=4096)
-    model_config: str
     hash: str = Field(unique=True)
     file_object: bytes
 
@@ -50,7 +49,6 @@ def add_to_queue(audio_batch, hashes, times_list):
                 entry = QueueData(
                     metas=timesstamps,
                     transcript=TODO,
-                    model_config="large",
                     hash=hs,
                     file_object=audio_data,
                 )
