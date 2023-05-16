@@ -12,21 +12,16 @@ import warnings
 warnings.filterwarnings("ignore")
 
 
-lang_model, lang_processor = get_model_and_processor(
-    "universal", "speech_lang_detection", activate_cache=False
-)
-
-
 def detect_language(data) -> list:
     possible_languages = list(LANGUAGE_CODES.keys())
-
+    lang_model, lang_processor = get_model_and_processor(
+        "universal", "speech_lang_detection", activate_cache=False
+    )
     input_features = lang_processor(
         data, sampling_rate=16000, return_tensors="pt"
     ).input_features
 
-    if torch.cuda.is_available():
-        input_features = input_features.half()
-
+    lang_model.cpu()
     # hacky, but all language tokens and only language tokens are 6 characters long
     language_tokens = [
         t for t in lang_processor.tokenizer.additional_special_tokens if len(t) == 6
@@ -86,7 +81,8 @@ def inference_asr(data) -> str:
     input_features = inputs.input_features
 
     if torch.cuda.is_available():
-        input_features = input_features.half().cuda()
+        input_features = input_features.cuda()
+        model = model.cuda()
 
     with torch.inference_mode():
         generated_ids = model.generate(

@@ -10,7 +10,7 @@ from transformers import (
 MODEL_MAPPING = {
     "speech_lang_detection": {
         "universal": {
-            "name": "openai/whisper-large-v2",
+            "name": "openai/whisper-small",
             "class": WhisperForConditionalGeneration,
             "processor": WhisperProcessor,
         },
