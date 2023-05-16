@@ -121,26 +121,3 @@ def wait_for_transcription(task_id: str):
         delete_by_hash(hs)
 
     return transcript, chunks
-
-
-def get_subs(task_id: str):
-    segments = get_transcription(task_id)[1]
-    srtFilename = hashlib.sha256(task_id.encode("utf-8")).hexdigest() + ".srt"
-    if os.path.exists(srtFilename):
-        os.remove(srtFilename)
-    id = 1
-    for segment in segments:
-        startTime = (
-            str(0) + str(timedelta(seconds=int(segment["start_timestamp"]))) + ",000"
-        )
-        endTime = (
-            str(0) + str(timedelta(seconds=int(segment["stop_timestamp"]))) + ",000"
-        )
-        text = segment["text"]
-        seg = f"{id}\n{startTime} --> {endTime}\n{text}\n\n"
-        id = id + 1
-
-        with open(srtFilename, "a+", encoding="utf-8") as srtFile:
-            srtFile.write(seg)
-
-    return srtFilename

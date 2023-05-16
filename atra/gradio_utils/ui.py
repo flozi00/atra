@@ -5,7 +5,7 @@ from atra.gradio_utils.queues import (
     add_to_translation_queue,
     add_to_vad_queue,
 )
-from atra.gradio_utils.utils import get_subs, get_transcription, wait_for_transcription
+from atra.gradio_utils.utils import get_transcription, wait_for_transcription
 from atra.statics import LANG_MAPPING, MODEL_MAPPING
 
 langs = sorted(list(LANG_MAPPING.keys()))
@@ -34,9 +34,6 @@ def build_asr_ui():
             transcription_finished = gr.Textbox(max_lines=10)
         with gr.TabItem("details"):
             chunks_finished = gr.JSON()
-
-    srt_file = gr.File(label="SRT File")
-    refresh = gr.Button(value="Get Subtitle File")
 
     # hidden UI stuff
     with gr.Row(elem_id="hidden_stuff"):
@@ -71,13 +68,6 @@ def build_asr_ui():
         fn=wait_for_transcription,
         inputs=task_id,
         outputs=[transcription_finished, chunks_finished],
-    )
-
-    refresh.click(
-        fn=get_subs,
-        inputs=[task_id],
-        outputs=[srt_file],
-        api_name="subtitle",
     )
 
 
