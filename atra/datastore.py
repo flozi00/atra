@@ -101,12 +101,6 @@ def get_tasks_queue() -> Union[QueueData, None]:
         sample = None
         statement = select(QueueData).where(QueueData.transcript == TODO)
         todos = session.exec(statement).all()
-        
-        # Check if there are any items in the queue
-        if len(todos) == 0:
-            # Get all items that are in progress
-            statement = select(QueueData).where(QueueData.transcript == INPROGRESS)
-            todos = session.exec(statement).all()
 
         if len(todos) != 0:
             sample = random.choice(todos)
