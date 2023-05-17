@@ -1,7 +1,8 @@
+from typing import Union
 import peft
 import torch
 from optimum.bettertransformer import BetterTransformer
-from transformers import AutoProcessor
+from transformers import PreTrainedTokenizer, PreTrainedModel, AutoProcessor
 
 from atra.statics import MODEL_MAPPING
 from atra.utils import timeit
@@ -13,6 +14,15 @@ MODELS_CACHE = {}
 
 
 def get_model(model_class, model_id):
+    """This function loads a model from cache or from the Huggingface model hub
+
+    Args:
+        model_class (PretrainedModel): The Huggingface model class
+        model_id (str): The Huggingface model id to load
+
+    Returns:
+        PretrainedModel, bool: The loaded model and a boolean indicating if the model was loaded from cache
+    """
     global MODELS_CACHE
     model = MODELS_CACHE.get(model_id, None)
     cached = True
@@ -31,7 +41,16 @@ def get_processor(processor_class, model_id):
     return processor
 
 
-def get_peft_model(peft_model_id, model_class) -> peft.PeftModel:
+def get_peft_model(peft_model_id, model_class) -> tuple[peft.PeftModel, bool]:
+    """This function loads a model from cache or from the Huggingface model hub
+
+    Args:
+        model_class (PretrainedModel): The Huggingface model class
+        model_id (str): The Huggingface model id to load
+
+    Returns:
+        PretrainedModel, bool: The loaded model and a boolean indicating if the model was loaded from cache
+    """
     global MODELS_CACHE
     model = MODELS_CACHE.get(peft_model_id, None)
     cached = True
@@ -47,7 +66,7 @@ def get_peft_model(peft_model_id, model_class) -> peft.PeftModel:
             peft_model_id,
             cache_dir="./model_cache",
         )
-        model = model.merge_and_unload()
+        model = model.merge_and_unload() # type: ignore
         model = model.eval()
         MODELS_CACHE[peft_model_id] = model
         cached = False
@@ -56,11 +75,11 @@ def get_peft_model(peft_model_id, model_class) -> peft.PeftModel:
 
 
 @timeit
-def get_model_and_processor(lang: str, task: str):
+def get_model_and_processor(lang: str, task: str) -> tuple[PreTrainedModel, PreTrainedTokenizer]:
     global LAST_MODEL
 
     try:
-        LAST_MODEL.cpu()
+        LAST_MODEL.cpu() # type: ignore
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
     except Exception as e:
@@ -98,7 +117,7 @@ def get_model_and_processor(lang: str, task: str):
         else:
             # convert the model to a BetterTransformer model
             try:
-                model = BetterTransformer.transform(model)
+                model = BetterTransformer.transform(model) # type: ignore
             except Exception as e:
                 print("Bettertransformer exception: ", e)
 
@@ -107,4 +126,4 @@ def get_model_and_processor(lang: str, task: str):
 
     LAST_MODEL = model
 
-    return model, processor
+    return model, processor # type: ignore

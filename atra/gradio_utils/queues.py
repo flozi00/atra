@@ -7,12 +7,12 @@ from atra.gradio_utils.utils import add_vad_chunks, get_transcription
 
 
 def add_to_translation_queue(input_text: str, input_lang: str, output_lang: str):
-    input_text = input_text.encode(encoding="UTF-8")
-    hs = hashlib.sha256(input_text).hexdigest()
+    input_text_bytes = input_text.encode(encoding="UTF-8")
+    hs = hashlib.sha256(input_text_bytes).hexdigest()
     hs = f"{hs}.txt"
 
     add_to_queue(
-        audio_batch=[input_text],
+        audio_batch=[input_text_bytes],
         hashes=[hs],
         times_list=[{"source": input_lang, "target": output_lang}],
     )
@@ -27,12 +27,12 @@ def add_to_translation_queue(input_text: str, input_lang: str, output_lang: str)
 
 
 def add_to_summarization_queue(input_text: str, input_lang: str):
-    input_text = input_text.encode(encoding="UTF-8")
-    hs = hashlib.sha256(input_text).hexdigest()
+    input_text_bytes = input_text.encode(encoding="UTF-8")
+    hs = hashlib.sha256(input_text_bytes).hexdigest()
     hs = f"{hs}.txt"
 
     add_to_queue(
-        audio_batch=[input_text],
+        audio_batch=[input_text_bytes],
         hashes=[hs],
         times_list=[{"long_text": input_lang, "short_text": input_lang}],
     )

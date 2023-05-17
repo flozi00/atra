@@ -16,16 +16,18 @@ class BackgroundTasks(threading.Thread):
             get_tasks_queue,
             set_in_progress,
             set_transkript,
+            QueueData
         )
         import time
 
         while True:
             try:
                 task = get_tasks_queue()
-                if task is not False:
+                if isinstance(task, QueueData):
                     bytes_data = task.file_object
                     set_in_progress(task.hash)
                     task_metas = task.metas.split(",")
+                    result = None
                     if task_metas[-1] == "translation":
                         input_text = bytes_data.decode("utf-8")
                         input_lang = task_metas[0]
@@ -38,10 +40,11 @@ class BackgroundTasks(threading.Thread):
                         result = summarize(input_text, input_lang)
                     elif task_metas[-1] == "asr":
                         array = np.frombuffer(bytes_data, dtype=np.float32)
-                        result, lang = inference_asr(
+                        result = inference_asr(
                             data=array,
                         )
-                    set_transkript(task.hash, result, from_queue=True)
+                    if result is not None:
+                        set_transkript(hs=task.hash, transcription=result)
                 else:
                     time.sleep(1)
             except Exception as e:
@@ -56,8 +59,12 @@ if __name__ == "__main__":
         t = BackgroundTasks()
         t.start()
 
+    auth_name = os.getenv("AUTH_NAME", None)
+    auth_password = os.getenv("AUTH_PASSWORD", None)
+
     ui.launch(
         enable_queue=False,
         server_name="0.0.0.0",
         server_port=int(os.getenv("PORT", 7860)),
+        auth=(auth_name, auth_password) if auth_name is not None and auth_password is not None else None,
     )

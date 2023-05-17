@@ -19,6 +19,13 @@ GLOBAL_CSS = """
 def build_asr_ui():
     """
     UI for ASR
+    It has 2 tabs for getting audio:
+    1. Microphone
+    2. File Upload
+
+    It has 2 tabs for showing the results:
+    1. Transcription
+    2. Details in JSON format
     """
     # UI for getting audio
     with gr.Row():
@@ -72,6 +79,12 @@ def build_asr_ui():
 
 
 def build_translator_ui():
+    """
+    UI for Translation
+    It has one row with two columns
+    Left side is for input
+    Right side is for output
+    """
     with gr.Row():
         with gr.Column():
             input_lang = gr.Dropdown(langs, value=langs[0])

@@ -1,5 +1,5 @@
 import torch
-from text_to_num import alpha2digit
+from text_to_num.transforms import alpha2digit
 
 from atra.model_utils.model_utils import get_model_and_processor
 from atra.statics import LANGUAGE_CODES
@@ -24,11 +24,11 @@ def detect_language(data) -> list:
     lang_model.cpu()
     # hacky, but all language tokens and only language tokens are 6 characters long
     language_tokens = [
-        t for t in lang_processor.tokenizer.additional_special_tokens if len(t) == 6
+        t for t in lang_processor.tokenizer.additional_special_tokens if len(t) == 6 # type: ignore
     ]
     language_tokens = [t for t in language_tokens if t[2:-2] in possible_languages]
 
-    language_token_ids = lang_processor.tokenizer.convert_tokens_to_ids(language_tokens)
+    language_token_ids = lang_processor.tokenizer.convert_tokens_to_ids(language_tokens) # type: ignore
 
     # 50258 is the token for transcribing
     logits = lang_model(
@@ -73,7 +73,7 @@ def inference_asr(data) -> str:
 
     model, processor = get_model_and_processor(LANGUAGE_CODES[lang], "asr")
 
-    model.config.forced_decoder_ids = processor.get_decoder_prompt_ids(
+    model.config.forced_decoder_ids = processor.get_decoder_prompt_ids( # type: ignore
         task="transcribe"
     )
 
@@ -97,4 +97,4 @@ def inference_asr(data) -> str:
     except Exception:
         pass
 
-    return transcription, LANGUAGE_CODES[lang]
+    return transcription

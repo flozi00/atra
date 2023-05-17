@@ -12,12 +12,9 @@ sqlmodel
 pymysql
 soundfile
 accelerate
-unidecode
 librosa 
 pydub
 text2num
 datasets
 tqdm
-diff-match-patch
-jiwer
 pyloudnorm
