@@ -45,17 +45,20 @@ def add_to_queue(audio_batch, hashes, times_list):
 
             if timesstamps is not None:
                 # Create a new entry
-                entry = QueueData(
-                    metas=timesstamps,
-                    transcript=TODO,
-                    hash=hs,
-                    file_object=audio_data,
-                )
-                # Add the new entry to the session
-                session.add(entry)
-                # Commit the changes to the database
-                session.commit()
-
+                try:
+                    entry = QueueData(
+                        metas=timesstamps,
+                        transcript=TODO,
+                        hash=hs,
+                        file_object=audio_data,
+                    )
+                    # Add the new entry to the session
+                    session.add(entry)
+                    # Commit the changes to the database
+                    session.commit()
+                except Exception as e:
+                    print(e)
+                    session.rollback()
 
 def get_transkript_batch(hs: str) -> list:
     """Get a transkript from the database by its hash in a batch
