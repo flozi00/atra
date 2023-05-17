@@ -22,6 +22,7 @@ def free_gpu():
             for model in models_list:
                 if MODELS_CACHE[model]["on_gpu"] is True:
                     MODELS_CACHE[model]["model"] = MODELS_CACHE[model]["model"].cpu()
+                    MODELS_CACHE[model]["on_gpu"] = False
                     print("Model {} moved to CPU".format(model))
 
 def get_model(model_class, model_id) -> bool:
