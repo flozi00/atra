@@ -74,11 +74,11 @@ def build_asr_ui():
 def build_translator_ui():
     with gr.Row():
         with gr.Column():
-            input_lang = gr.Dropdown(langs)
+            input_lang = gr.Dropdown(langs, value=langs[0])
             input_text = gr.Textbox(label="Input Text")
 
         with gr.Column():
-            output_lang = gr.Dropdown(langs)
+            output_lang = gr.Dropdown(langs, value=langs[0])
             output_text = gr.Text(label="Output Text")
 
     send = gr.Button(label="Translate")
@@ -93,7 +93,7 @@ def build_translator_ui():
 def build_summarization_ui():
     with gr.Row():
         with gr.Column():
-            input_lang = gr.Dropdown(sum_langs)
+            input_lang = gr.Dropdown(sum_langs, value=sum_langs[0])
             input_text = gr.Textbox(label="Input Text")
 
         output_text = gr.Text(label="Output Text")
