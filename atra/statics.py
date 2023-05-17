@@ -3,8 +3,8 @@ from transformers import (
     WhisperForConditionalGeneration,
     M2M100ForConditionalGeneration,
     M2M100Tokenizer,
-    T5ForConditionalGeneration,
-    T5TokenizerFast,
+    AutoModelForSeq2SeqLM,
+    AutoTokenizer,
 )
 
 MODEL_MAPPING = {
@@ -33,8 +33,8 @@ MODEL_MAPPING = {
     "summarization": {
         "english": {
             "name": "philschmid/bart-large-cnn-samsum",
-            "class": T5ForConditionalGeneration,
-            "processor": T5TokenizerFast,
+            "class": AutoModelForSeq2SeqLM,
+            "processor": AutoTokenizer,
         }
     },
 }
