@@ -11,7 +11,7 @@ import warnings
 
 warnings.filterwarnings("ignore")
 
-
+@timeit
 def detect_language(data) -> list:
     possible_languages = list(LANGUAGE_CODES.keys())
     lang_model, lang_processor = get_model_and_processor(
@@ -52,8 +52,7 @@ def detect_language(data) -> list:
     ]
 
 
-@timeit
-def inference_asr(data) -> str:
+def speech_recognition(data) -> str:
     if isinstance(data, str):
         with open(data, "rb") as f:
             payload = f.read()
@@ -80,13 +79,7 @@ def inference_asr(data) -> str:
     inputs = processor(data, sampling_rate=16000, return_tensors="pt")
     input_features = inputs.input_features
 
-    if torch.cuda.is_available():
-        input_features = input_features.cuda()
-
-    with torch.inference_mode():
-        generated_ids = model.generate(
-            inputs=input_features, max_new_tokens=448, num_beams=1
-        )
+    generated_ids = inference_asr(model, input_features)
 
     transcription = processor.batch_decode(generated_ids, skip_special_tokens=True)[
         0
@@ -98,3 +91,15 @@ def inference_asr(data) -> str:
         pass
 
     return transcription
+
+@timeit
+def inference_asr(model, input_features):
+    if torch.cuda.is_available():
+        input_features = input_features.cuda()
+
+    with torch.inference_mode():
+        generated_ids = model.generate(
+            inputs=input_features, max_new_tokens=448, num_beams=1
+        )
+
+    return generated_ids

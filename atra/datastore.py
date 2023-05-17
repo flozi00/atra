@@ -5,6 +5,7 @@ from typing import Optional, Union
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 
 from atra.statics import INPROGRESS, TODO, TASK_MAPPING
+from atra.utils import timeit
 
 db_backend = os.getenv("DBBACKEND", "sqlite:///database.db")
 
@@ -42,37 +43,18 @@ def add_to_queue(audio_batch, hashes, times_list):
                     second_stamp = time_dict[TASK_MAPPING[task][1]]
                     timesstamps = f"{first_stamp},{second_stamp},{task}"
 
-            # Get the entry from the database. If there is no entry, it returns None
-            entry = get_transkript(hs)
             if timesstamps is not None:
-                # If there is no entry in the database
-                if entry is None:
-                    # Create a new entry
-                    entry = QueueData(
-                        metas=timesstamps,
-                        transcript=TODO,
-                        hash=hs,
-                        file_object=audio_data,
-                    )
-                    # Add the new entry to the session
-                    session.add(entry)
-                    # Commit the changes to the database
-                    session.commit()
-
-
-def get_transkript(hs: str) -> Union[QueueData, None]:
-    """Get a transkript from the database by its hash
-    Args:
-        hs (str): The hash of the transkript
-
-    Returns:
-        QueueData: The transkript from the database in a QueueData object
-    """
-    with Session(engine) as session:
-        statement = select(QueueData).where(QueueData.hash == hs)
-        transkript = session.exec(statement).first()
-
-    return transkript
+                # Create a new entry
+                entry = QueueData(
+                    metas=timesstamps,
+                    transcript=TODO,
+                    hash=hs,
+                    file_object=audio_data,
+                )
+                # Add the new entry to the session
+                session.add(entry)
+                # Commit the changes to the database
+                session.commit()
 
 
 def get_transkript_batch(hs: str) -> list:
@@ -90,7 +72,6 @@ def get_transkript_batch(hs: str) -> list:
 
     return transkript
 
-
 def get_tasks_queue() -> Union[QueueData, None]:
     """Get a random item from the queue
 
@@ -107,7 +88,7 @@ def get_tasks_queue() -> Union[QueueData, None]:
 
     return sample
 
-
+@timeit
 def set_transkript(hs: str, transcription: str):
     """Set the transcription of an audio file
 
@@ -124,22 +105,7 @@ def set_transkript(hs: str, transcription: str):
                 transkript.file_object = bytes()
                 session.commit()
 
-
-def set_in_progress(hs: str):
-    """Set the transcription of an audio file to "INPROGRESS"
-
-    Args:
-        hs (str): The hash of the audio file
-    """
-    with Session(engine) as session:
-        statement = select(QueueData).where(QueueData.hash == hs)
-        transkript = session.exec(statement).first()
-        if transkript is not None:
-            transkript.transcript = INPROGRESS
-            session.commit()
-            session.refresh(transkript)
-
-
+@timeit
 def delete_by_hash(hs: str):
     with Session(engine) as session:
         statement = select(QueueData).where(QueueData.hash == hs)

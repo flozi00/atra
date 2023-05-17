@@ -11,10 +11,9 @@ ui = build_gradio()
 class BackgroundTasks(threading.Thread):
     def run(self, *args, **kwargs):
         import numpy as np
-        from atra.audio_utils.asr import inference_asr
+        from atra.audio_utils.asr import speech_recognition
         from atra.datastore import (
             get_tasks_queue,
-            set_in_progress,
             set_transkript,
             QueueData
         )
@@ -25,7 +24,6 @@ class BackgroundTasks(threading.Thread):
                 task = get_tasks_queue()
                 if isinstance(task, QueueData):
                     bytes_data = task.file_object
-                    set_in_progress(task.hash)
                     task_metas = task.metas.split(",")
                     result = None
                     if task_metas[-1] == "translation":
@@ -40,7 +38,7 @@ class BackgroundTasks(threading.Thread):
                         result = summarize(input_text, input_lang)
                     elif task_metas[-1] == "asr":
                         array = np.frombuffer(bytes_data, dtype=np.float32)
-                        result = inference_asr(
+                        result = speech_recognition(
                             data=array,
                         )
                     if result is not None:
