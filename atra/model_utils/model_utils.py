@@ -1,4 +1,3 @@
-from typing import Union
 import peft
 import torch
 from optimum.bettertransformer import BetterTransformer
@@ -7,13 +6,25 @@ from transformers import PreTrainedTokenizer, PreTrainedModel, AutoProcessor
 from atra.statics import MODEL_MAPPING
 from atra.utils import timeit
 from atra.model_utils.unlimiformer import Unlimiformer
-
-LAST_MODEL = None
+import GPUtil
 
 MODELS_CACHE = {}
 
 
-def get_model(model_class, model_id):
+def free_gpu():
+    global MODELS_CACHE
+    gpus = GPUtil.getGPUs()
+    for gpu_num in range(len(gpus)):
+        gpu: GPUtil.GPU = gpus[gpu_num]
+
+        if gpu.memoryUtil * 100 > 60:
+            models_list = list(MODELS_CACHE.keys())
+            for model in models_list:
+                if MODELS_CACHE[model]["on_gpu"] is True:
+                    MODELS_CACHE[model]["model"] = MODELS_CACHE[model]["model"].cpu()
+                    print("Model {} moved to CPU".format(model))
+
+def get_model(model_class, model_id) -> bool:
     """This function loads a model from cache or from the Huggingface model hub
 
     Args:
@@ -24,16 +35,16 @@ def get_model(model_class, model_id):
         PretrainedModel, bool: The loaded model and a boolean indicating if the model was loaded from cache
     """
     global MODELS_CACHE
-    model = MODELS_CACHE.get(model_id, None)
-    cached = True
-    if model is None:
+    cached = MODELS_CACHE.get(model_id, None)
+    if cached is None:
         model = model_class.from_pretrained(
             model_id,
             cache_dir="./model_cache",
         )
-        MODELS_CACHE[model_id] = model
-        cached = False
-    return model, cached
+        MODELS_CACHE[model_id] = {"model": model, "on_gpu": False}
+        return False
+    else:
+        return True
 
 
 def get_processor(processor_class, model_id):
@@ -41,7 +52,7 @@ def get_processor(processor_class, model_id):
     return processor
 
 
-def get_peft_model(peft_model_id, model_class) -> tuple[peft.PeftModel, bool]:
+def get_peft_model(peft_model_id, model_class) -> bool:
     """This function loads a model from cache or from the Huggingface model hub
 
     Args:
@@ -52,9 +63,8 @@ def get_peft_model(peft_model_id, model_class) -> tuple[peft.PeftModel, bool]:
         PretrainedModel, bool: The loaded model and a boolean indicating if the model was loaded from cache
     """
     global MODELS_CACHE
-    model = MODELS_CACHE.get(peft_model_id, None)
-    cached = True
-    if model is None:
+    cached = MODELS_CACHE.get(peft_model_id, None)
+    if cached is None:
         # Load the PEFT model
         peft_config = peft.PeftConfig.from_pretrained(peft_model_id)
         model = model_class.from_pretrained(
@@ -68,22 +78,17 @@ def get_peft_model(peft_model_id, model_class) -> tuple[peft.PeftModel, bool]:
         )
         model = model.merge_and_unload() # type: ignore
         model = model.eval()
-        MODELS_CACHE[peft_model_id] = model
-        cached = False
-
-    return model, cached
-
+        MODELS_CACHE[peft_model_id] = {"model": model, "on_gpu": False}
+        return False
+    else:
+        return True
 
 @timeit
 def get_model_and_processor(lang: str, task: str) -> tuple[PreTrainedModel, PreTrainedTokenizer]:
-    global LAST_MODEL
+    global MODELS_CACHE
 
-    try:
-        LAST_MODEL.cpu() # type: ignore
-        if torch.cuda.is_available():
-            torch.cuda.empty_cache()
-    except Exception as e:
-        print(e)
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
 
     # get all the model information from the mapping
     # for the requested task, config and lang
@@ -98,9 +103,11 @@ def get_model_and_processor(lang: str, task: str) -> tuple[PreTrainedModel, PreT
 
     # load the model
     if adapter_id is not None:
-        model, cached = get_peft_model(adapter_id, model_class)
+        cached = get_peft_model(adapter_id, model_class)
+        id_to_use = adapter_id
     else:
-        model, cached = get_model(model_class, model_id)
+        cached = get_model(model_class, model_id)
+        id_to_use = model_id
 
     # get processor
     processor_class = MODEL_MAPPING[task][base_model_lang].get(
@@ -111,19 +118,20 @@ def get_model_and_processor(lang: str, task: str) -> tuple[PreTrainedModel, PreT
     if cached is False:
         # if Unlimiformer is available for the model type,
         # convert the model to a Unlimiformer model
-        if model.config.model_type in ["bart", "led", "t5"]:
-            model = Unlimiformer.convert_model(model)
+        if MODELS_CACHE[id_to_use]["model"].config.model_type in ["bart", "led", "t5"]:
+            MODELS_CACHE[id_to_use]["model"] = Unlimiformer.convert_model(MODELS_CACHE[id_to_use]["model"])
             print("Unlimiformer model created")
         else:
             # convert the model to a BetterTransformer model
             try:
-                model = BetterTransformer.transform(model) # type: ignore
+                MODELS_CACHE[id_to_use]["model"] = BetterTransformer.transform(MODELS_CACHE[id_to_use]["model"]) # type: ignore
             except Exception as e:
                 print("Bettertransformer exception: ", e)
 
     if torch.cuda.is_available():
-        model = model.cuda()
+        free_gpu()
+        if MODELS_CACHE[id_to_use]["on_gpu"] is False:
+            MODELS_CACHE[id_to_use]["model"] = MODELS_CACHE[id_to_use]["model"].cuda()
+            MODELS_CACHE[id_to_use]["on_gpu"] = True
 
-    LAST_MODEL = model
-
-    return model, processor # type: ignore
+    return MODELS_CACHE[id_to_use]["model"], processor # type: ignore

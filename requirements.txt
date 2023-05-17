@@ -18,3 +18,4 @@ text2num
 datasets
 tqdm
 pyloudnorm
+gputil
