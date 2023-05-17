@@ -32,7 +32,7 @@ MODEL_MAPPING = {
     },
     "summarization": {
         "english": {
-            "name": "philschmid/flan-t5-base-samsum",
+            "name": "philschmid/bart-large-cnn-samsum",
             "class": T5ForConditionalGeneration,
             "processor": T5TokenizerFast,
         }
