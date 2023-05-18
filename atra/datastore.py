@@ -10,7 +10,8 @@ from atra.utils import timeit
 db_backend = os.getenv("DBBACKEND", "sqlite:///database.db")
 
 if db_backend.startswith("sqlite"):
-    os.remove(db_backend.replace("sqlite:///", ""))
+    if os.path.isfile(db_backend.replace("sqlite:///", "")):
+        os.remove(db_backend.replace("sqlite:///", ""))
 
 class QueueData(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
