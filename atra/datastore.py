@@ -4,11 +4,13 @@ from typing import Optional, Union
 
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 
-from atra.statics import INPROGRESS, TODO, TASK_MAPPING
+from atra.statics import TODO, TASK_MAPPING
 from atra.utils import timeit
 
 db_backend = os.getenv("DBBACKEND", "sqlite:///database.db")
 
+if db_backend.startswith("sqlite"):
+    os.remove(db_backend.replace("sqlite:///", ""))
 
 class QueueData(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -21,7 +23,7 @@ class QueueData(SQLModel, table=True):
 engine = create_engine(db_backend, pool_recycle=3600, pool_pre_ping=True)
 SQLModel.metadata.create_all(engine)
 
-
+@timeit
 def add_to_queue(audio_batch, hashes, times_list):
     # Create a session to the database
     with Session(engine) as session:
@@ -39,9 +41,10 @@ def add_to_queue(audio_batch, hashes, times_list):
                     TASK_MAPPING[task][0] in time_dict
                     and TASK_MAPPING[task][1] in time_dict
                 ):
-                    first_stamp = time_dict[TASK_MAPPING[task][0]]
-                    second_stamp = time_dict[TASK_MAPPING[task][1]]
-                    timesstamps = f"{first_stamp},{second_stamp},{task}"
+                    timesstamps = ""
+                    for task_key in TASK_MAPPING[task]:
+                        timesstamps += f"{time_dict[task_key]},"
+                    timesstamps += f"{task}"
 
             if timesstamps is not None:
                 # Create a new entry
@@ -70,7 +73,8 @@ def get_transkript_batch(hs: str) -> list:
         _type_: The transkripts from the database in a QueueData object in a list
     """
     with Session(engine) as session:
-        statement = select(QueueData).where(QueueData.hash.in_(hs.split(","))) # type: ignore
+        statement = select(QueueData).where(
+            QueueData.hash.in_(hs.split(","))) # type: ignore
         transkript = session.exec(statement).all()
 
     return transkript

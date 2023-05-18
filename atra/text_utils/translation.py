@@ -12,7 +12,8 @@ def translate(text, src, dest) -> str:
     model, tokenizer = get_model_and_processor("universal", "translation")
     tokenizer.src_lang = src # type: ignore
     input_features = tokenizer(text, return_tensors="pt").input_ids
-    generated_tokens = inference_translate(model, input_features, tokenizer.get_lang_id(dest)) # type: ignore
+    generated_tokens = inference_translate(model, 
+                        input_features, tokenizer.get_lang_id(dest)) # type: ignore
     result = tokenizer.batch_decode(generated_tokens, skip_special_tokens=True)
     return result[0]
 

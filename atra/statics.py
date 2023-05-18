@@ -150,7 +150,7 @@ TO_ASR = "***TO ASR***"
 CACHE_SIZE = 128
 
 TASK_MAPPING = {
-    "asr": ["start", "end"],
+    "asr": ["start", "end", "language"],
     "translation": ["source", "target"],
     "summarization": ["long_text", "short_text"],
 }

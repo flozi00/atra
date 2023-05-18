@@ -28,6 +28,7 @@ def build_asr_ui():
     2. Details in JSON format
     """
     # UI for getting audio
+    input_lang = gr.Dropdown(langs, value=langs[0], label="Input Language")
     with gr.Row():
         with gr.TabItem("Microphone"):
             microphone_file = gr.Audio(
@@ -54,13 +55,13 @@ def build_asr_ui():
 
     audio_file.change(
         fn=add_to_vad_queue,
-        inputs=[audio_file],
+        inputs=[audio_file, input_lang],
         outputs=[task_id],
         api_name="transcription",
     )
     microphone_file.change(
         fn=add_to_vad_queue,
-        inputs=[microphone_file],
+        inputs=[microphone_file, input_lang],
         outputs=[task_id],
     )
 
@@ -87,11 +88,11 @@ def build_translator_ui():
     """
     with gr.Row():
         with gr.Column():
-            input_lang = gr.Dropdown(langs, value=langs[0])
+            input_lang = gr.Dropdown(langs, value=langs[0], label="Input Language")
             input_text = gr.Textbox(label="Input Text")
 
         with gr.Column():
-            output_lang = gr.Dropdown(langs, value=langs[0])
+            output_lang = gr.Dropdown(langs, value=langs[0], label="Output Language")
             output_text = gr.Text(label="Output Text")
 
     send = gr.Button(label="Translate")
@@ -106,7 +107,8 @@ def build_translator_ui():
 def build_summarization_ui():
     with gr.Row():
         with gr.Column():
-            input_lang = gr.Dropdown(sum_langs, value=sum_langs[0])
+            input_lang = gr.Dropdown(sum_langs, value=sum_langs[0], 
+                                     label="Input Language")
             input_text = gr.Textbox(label="Input Text")
 
         output_text = gr.Text(label="Output Text")

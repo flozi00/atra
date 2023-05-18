@@ -33,7 +33,8 @@ def get_model(model_class, model_id) -> bool:
         model_id (str): The Huggingface model id to load
 
     Returns:
-        PretrainedModel, bool: The loaded model and a boolean indicating if the model was loaded from cache
+        PretrainedModel, bool: The loaded model and
+          a boolean indicating if the model was loaded from cache
     """
     global MODELS_CACHE
     cached = MODELS_CACHE.get(model_id, None)
@@ -78,7 +79,6 @@ def get_peft_model(peft_model_id, model_class) -> bool:
             cache_dir="./model_cache",
         )
         model = model.merge_and_unload() # type: ignore
-        model = model.eval()
         MODELS_CACHE[peft_model_id] = {"model": model, "on_gpu": False}
         return False
     else:
@@ -114,20 +114,22 @@ def get_model_and_processor(lang: str, task: str) -> tuple[PreTrainedModel, PreT
     processor_class = MODEL_MAPPING[task][base_model_lang].get(
         "processor", AutoProcessor
     )
-    processor = get_processor(processor_class, model_id)
 
     if cached is False:
         # if Unlimiformer is available for the model type,
         # convert the model to a Unlimiformer model
         if MODELS_CACHE[id_to_use]["model"].config.model_type in ["bart", "led", "t5"]:
             MODELS_CACHE[id_to_use]["model"] = Unlimiformer.convert_model(MODELS_CACHE[id_to_use]["model"])
-            print("Unlimiformer model created")
         else:
             # convert the model to a BetterTransformer model
             try:
                 MODELS_CACHE[id_to_use]["model"] = BetterTransformer.transform(MODELS_CACHE[id_to_use]["model"]) # type: ignore
             except Exception as e:
                 print("Bettertransformer exception: ", e)
+        
+        MODELS_CACHE[id_to_use]["model"] = torch.compile(MODELS_CACHE[id_to_use]["model"], mode="max-autotune", backend="onnxrt")
+        processor = get_processor(processor_class, model_id)
+        MODELS_CACHE[id_to_use]["processor"] = processor
 
     if torch.cuda.is_available():
         free_gpu()
@@ -135,4 +137,4 @@ def get_model_and_processor(lang: str, task: str) -> tuple[PreTrainedModel, PreT
             MODELS_CACHE[id_to_use]["model"] = MODELS_CACHE[id_to_use]["model"].cuda()
             MODELS_CACHE[id_to_use]["on_gpu"] = True
 
-    return MODELS_CACHE[id_to_use]["model"], processor # type: ignore
+    return MODELS_CACHE[id_to_use]["model"], MODELS_CACHE[id_to_use]["processor"] # type: ignore
