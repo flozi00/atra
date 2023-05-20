@@ -2,6 +2,7 @@ import os
 import threading
 
 from atra.gradio_utils import build_gradio
+from atra.text_utils.question_answering import answer_question
 from atra.text_utils.summarization import summarize
 from atra.text_utils.translation import translate
 
@@ -34,6 +35,11 @@ class BackgroundTasks(threading.Thread):
                     input_lang = task_metas[0]
                     target_lang = task_metas[1]
                     result = summarize(input_text, input_lang)
+                elif task_metas[-1] == "question-answering":
+                    input_text = bytes_data.decode("utf-8")
+                    question = task_metas[0]
+                    input_lang = task_metas[1]
+                    result = answer_question(input_text, question, input_lang)
                 elif task_metas[-1] == "asr":
                     array = np.frombuffer(bytes_data, dtype=np.float32)
                     lang = task_metas[2]

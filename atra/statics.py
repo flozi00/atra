@@ -32,10 +32,27 @@ MODEL_MAPPING = {
     },
     "summarization": {
         "english": {
-            "name": "philschmid/bart-large-cnn-samsum",
+            "name": "google/flan-t5-large",
+            "class": AutoModelForSeq2SeqLM,
+            "processor": AutoTokenizer,
+        },
+        "german": {
+            "name": "google/flan-t5-large",
             "class": AutoModelForSeq2SeqLM,
             "processor": AutoTokenizer,
         }
+    },
+    "question-answering": {
+        "english": {
+            "name": "google/flan-t5-large",
+            "class": AutoModelForSeq2SeqLM,
+            "processor": AutoTokenizer,
+        },
+        "german": {
+            "name": "google/flan-t5-large",
+            "class": AutoModelForSeq2SeqLM,
+            "processor": AutoTokenizer,
+        },
     },
 }
 
@@ -153,4 +170,5 @@ TASK_MAPPING = {
     "asr": ["start", "end", "language"],
     "translation": ["source", "target"],
     "summarization": ["long_text", "short_text"],
+    "question-answering": ["question", "lang"],
 }

@@ -4,6 +4,7 @@ from atra.gradio_utils.ui import (
     build_asr_ui,
     build_summarization_ui,
     build_translator_ui,
+    build_question_answering_ui
 )
 
 
@@ -21,5 +22,7 @@ def build_gradio():
                 build_translator_ui()
             with gr.Tab("Summarization"):
                 build_summarization_ui()
+            with gr.Tab("Question Answering"):
+                build_question_answering_ui()
 
     return ui

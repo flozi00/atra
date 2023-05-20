@@ -45,6 +45,25 @@ def add_to_summarization_queue(input_text: str, input_lang: str):
 
     return transcript
 
+def add_to_question_answering_queue(input_text: str, question: str, input_lang: str):
+    input_text_bytes = input_text.encode(encoding="UTF-8")
+    hs = hashlib.sha256(input_text_bytes).hexdigest()
+    hs = f"{hs}.txt"
+
+    add_to_queue(
+        audio_batch=[input_text_bytes],
+        hashes=[hs],
+        times_list=[{"question": question.replace(",",""), "lang": input_lang}],
+    )
+
+    transcript, chunks = get_transcription(hs)
+    while "***" in transcript:
+        transcript, chunks = get_transcription(hs)
+
+    delete_by_hash(hs)
+
+    return transcript
+
 
 def add_to_vad_queue(audio: str, lang: str):
     hs = ""

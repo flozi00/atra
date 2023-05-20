@@ -1,6 +1,7 @@
 import gradio as gr
 
 from atra.gradio_utils.queues import (
+    add_to_question_answering_queue,
     add_to_summarization_queue,
     add_to_translation_queue,
     add_to_vad_queue,
@@ -10,6 +11,7 @@ from atra.statics import LANG_MAPPING, MODEL_MAPPING
 
 langs = sorted(list(LANG_MAPPING.keys()))
 sum_langs = sorted(list(MODEL_MAPPING["summarization"].keys()))
+question_answering_langs = sorted(list(MODEL_MAPPING["question-answering"].keys()))
 
 GLOBAL_CSS = """
 #hidden_stuff {display: none} 
@@ -111,12 +113,32 @@ def build_summarization_ui():
                                      label="Input Language")
             input_text = gr.Textbox(label="Input Text")
 
-        output_text = gr.Text(label="Output Text")
+        output_text = gr.Text(label="Summarization")
 
     send = gr.Button(label="Translate")
 
     send.click(
         add_to_summarization_queue,
         inputs=[input_text, input_lang],
+        outputs=[output_text],
+    )
+
+
+def build_question_answering_ui():
+    with gr.Row():
+        with gr.Column():
+            input_lang = gr.Dropdown(question_answering_langs, value=question_answering_langs[0], 
+                                     label="Input Language")
+            with gr.Row():
+                input_text = gr.Textbox(label="Input Text")
+                question = gr.Textbox(label="Question")
+
+        output_text = gr.Text(label="Answer")
+
+    send = gr.Button(label="Translate")
+
+    send.click(
+        add_to_question_answering_queue,
+        inputs=[input_text, question, input_lang],
         outputs=[output_text],
     )
