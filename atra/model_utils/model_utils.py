@@ -25,6 +25,9 @@ def free_gpu():
                     MODELS_CACHE[model]["on_gpu"] = False
                     print("Model {} moved to CPU".format(model))
 
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+
 def get_model(model_class, model_id) -> bool:
     """This function loads a model from cache or from the Huggingface model hub
 
@@ -87,9 +90,6 @@ def get_peft_model(peft_model_id, model_class) -> bool:
 @timeit
 def get_model_and_processor(lang: str, task: str) -> tuple[PreTrainedModel, PreTrainedTokenizer]:
     global MODELS_CACHE
-
-    if torch.cuda.is_available():
-        torch.cuda.empty_cache()
 
     # get all the model information from the mapping
     # for the requested task, config and lang

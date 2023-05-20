@@ -32,24 +32,24 @@ MODEL_MAPPING = {
     },
     "summarization": {
         "english": {
-            "name": "google/flan-t5-large",
+            "name": "google/flan-t5-xl",
             "class": AutoModelForSeq2SeqLM,
             "processor": AutoTokenizer,
         },
         "german": {
-            "name": "google/flan-t5-large",
+            "name": "google/flan-t5-xl",
             "class": AutoModelForSeq2SeqLM,
             "processor": AutoTokenizer,
         }
     },
     "question-answering": {
         "english": {
-            "name": "google/flan-t5-large",
+            "name": "google/flan-t5-xl",
             "class": AutoModelForSeq2SeqLM,
             "processor": AutoTokenizer,
         },
         "german": {
-            "name": "google/flan-t5-large",
+            "name": "google/flan-t5-xl",
             "class": AutoModelForSeq2SeqLM,
             "processor": AutoTokenizer,
         },
