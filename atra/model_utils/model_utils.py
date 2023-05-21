@@ -5,7 +5,6 @@ from transformers import PreTrainedTokenizer, PreTrainedModel, AutoProcessor
 
 from atra.statics import MODEL_MAPPING
 from atra.utils import timeit
-from atra.model_utils.unlimiformer import Unlimiformer
 import GPUtil
 
 MODELS_CACHE = {}
@@ -27,6 +26,7 @@ def free_gpu():
 
     if torch.cuda.is_available():
         torch.cuda.empty_cache()
+
 
 def get_model(model_class, model_id) -> bool:
     """This function loads a model from cache or from the Huggingface model hub
@@ -81,14 +81,17 @@ def get_peft_model(peft_model_id, model_class) -> bool:
             peft_model_id,
             cache_dir="./model_cache",
         )
-        model = model.merge_and_unload() # type: ignore
+        model = model.merge_and_unload()  # type: ignore
         MODELS_CACHE[peft_model_id] = {"model": model, "on_gpu": False}
         return False
     else:
         return True
 
+
 @timeit
-def get_model_and_processor(lang: str, task: str) -> tuple[PreTrainedModel, PreTrainedTokenizer]:
+def get_model_and_processor(
+    lang: str, task: str
+) -> tuple[PreTrainedModel, PreTrainedTokenizer]:
     global MODELS_CACHE
 
     # get all the model information from the mapping
@@ -116,18 +119,15 @@ def get_model_and_processor(lang: str, task: str) -> tuple[PreTrainedModel, PreT
     )
 
     if cached is False:
-        # if Unlimiformer is available for the model type,
-        # convert the model to a Unlimiformer model
-        if MODELS_CACHE[id_to_use]["model"].config.model_type in ["bart", "led", "t5"]:
-            MODELS_CACHE[id_to_use]["model"] = Unlimiformer.convert_model(MODELS_CACHE[id_to_use]["model"])
-        else:
-            # convert the model to a BetterTransformer model
-            try:
-                MODELS_CACHE[id_to_use]["model"] = BetterTransformer.transform(MODELS_CACHE[id_to_use]["model"]) # type: ignore
-            except Exception as e:
-                print("Bettertransformer exception: ", e)
-        
-        MODELS_CACHE[id_to_use]["model"] = torch.compile(MODELS_CACHE[id_to_use]["model"], mode="max-autotune", backend="onnxrt")
+        # convert the model to a BetterTransformer model
+        try:
+            MODELS_CACHE[id_to_use]["model"] = BetterTransformer.transform(MODELS_CACHE[id_to_use]["model"])  # type: ignore
+        except Exception as e:
+            print("Bettertransformer exception: ", e)
+
+        MODELS_CACHE[id_to_use]["model"] = torch.compile(
+            MODELS_CACHE[id_to_use]["model"], mode="max-autotune", backend="onnxrt"
+        )
         processor = get_processor(processor_class, model_id)
         MODELS_CACHE[id_to_use]["processor"] = processor
 
@@ -137,4 +137,4 @@ def get_model_and_processor(lang: str, task: str) -> tuple[PreTrainedModel, PreT
             MODELS_CACHE[id_to_use]["model"] = MODELS_CACHE[id_to_use]["model"].cuda()
             MODELS_CACHE[id_to_use]["on_gpu"] = True
 
-    return MODELS_CACHE[id_to_use]["model"], MODELS_CACHE[id_to_use]["processor"] # type: ignore
+    return MODELS_CACHE[id_to_use]["model"], MODELS_CACHE[id_to_use]["processor"]  # type: ignore

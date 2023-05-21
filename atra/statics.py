@@ -40,7 +40,7 @@ MODEL_MAPPING = {
             "name": "google/flan-t5-xl",
             "class": AutoModelForSeq2SeqLM,
             "processor": AutoTokenizer,
-        }
+        },
     },
     "question-answering": {
         "english": {

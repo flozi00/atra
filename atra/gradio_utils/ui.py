@@ -1,13 +1,10 @@
 import gradio as gr
+from atra.audio_utils.asr import speech_recognition
 
-from atra.gradio_utils.queues import (
-    add_to_question_answering_queue,
-    add_to_summarization_queue,
-    add_to_translation_queue,
-    add_to_vad_queue,
-)
-from atra.gradio_utils.utils import get_transcription, wait_for_transcription
 from atra.statics import LANG_MAPPING, MODEL_MAPPING
+from atra.text_utils.question_answering import answer_question
+from atra.text_utils.summarization import summarize
+from atra.text_utils.translation import translate
 
 langs = sorted(list(LANG_MAPPING.keys()))
 sum_langs = sorted(list(MODEL_MAPPING["summarization"].keys()))
@@ -42,42 +39,17 @@ def build_asr_ui():
     with gr.Row():
         with gr.TabItem("Transcription"):
             transcription_finished = gr.Textbox(max_lines=10)
-        with gr.TabItem("details"):
-            chunks_finished = gr.JSON()
-
-    # hidden UI stuff
-    with gr.Row(elem_id="hidden_stuff"):
-        task_id = gr.Textbox(label="Task ID", max_lines=3)
-        with gr.TabItem("Transcription State"):
-            with gr.Row():
-                with gr.TabItem("Transcription"):
-                    transcription = gr.Textbox(max_lines=10)
-                with gr.TabItem("details"):
-                    chunks = gr.JSON()
 
     audio_file.change(
-        fn=add_to_vad_queue,
+        fn=speech_recognition,
         inputs=[audio_file, input_lang],
-        outputs=[task_id],
+        outputs=[transcription_finished],
         api_name="transcription",
     )
     microphone_file.change(
-        fn=add_to_vad_queue,
+        fn=speech_recognition,
         inputs=[microphone_file, input_lang],
-        outputs=[task_id],
-    )
-
-    task_id.change(
-        fn=get_transcription,
-        inputs=task_id,
-        outputs=[transcription, chunks],
-        api_name="get_transcription",
-    )
-
-    task_id.change(
-        fn=wait_for_transcription,
-        inputs=task_id,
-        outputs=[transcription_finished, chunks_finished],
+        outputs=[transcription_finished],
     )
 
 
@@ -100,7 +72,7 @@ def build_translator_ui():
     send = gr.Button(label="Translate")
 
     send.click(
-        add_to_translation_queue,
+        translate,
         inputs=[input_text, input_lang, output_lang],
         outputs=[output_text],
     )
@@ -109,8 +81,9 @@ def build_translator_ui():
 def build_summarization_ui():
     with gr.Row():
         with gr.Column():
-            input_lang = gr.Dropdown(sum_langs, value=sum_langs[0], 
-                                     label="Input Language")
+            input_lang = gr.Dropdown(
+                sum_langs, value=sum_langs[0], label="Input Language"
+            )
             input_text = gr.Textbox(label="Input Text")
 
         output_text = gr.Text(label="Summarization")
@@ -118,7 +91,7 @@ def build_summarization_ui():
     send = gr.Button(label="Translate")
 
     send.click(
-        add_to_summarization_queue,
+        summarize,
         inputs=[input_text, input_lang],
         outputs=[output_text],
     )
@@ -127,8 +100,11 @@ def build_summarization_ui():
 def build_question_answering_ui():
     with gr.Row():
         with gr.Column():
-            input_lang = gr.Dropdown(question_answering_langs, value=question_answering_langs[0], 
-                                     label="Input Language")
+            input_lang = gr.Dropdown(
+                question_answering_langs,
+                value=question_answering_langs[0],
+                label="Input Language",
+            )
             with gr.Row():
                 input_text = gr.Textbox(label="Input Text")
                 question = gr.Textbox(label="Question")
@@ -138,7 +114,7 @@ def build_question_answering_ui():
     send = gr.Button(label="Translate")
 
     send.click(
-        add_to_question_answering_queue,
+        answer_question,
         inputs=[input_text, question, input_lang],
         outputs=[output_text],
     )

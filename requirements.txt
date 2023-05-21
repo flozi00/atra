@@ -8,14 +8,10 @@ torch>=1.13.0
 torchaudio
 transformers>=4.29.1
 peft
-sqlmodel
-pymysql
 soundfile
 accelerate
 librosa 
 pydub
 text2num
-datasets
-tqdm
 pyloudnorm
 gputil
