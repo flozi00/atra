@@ -1,13 +1,18 @@
 import torch
 from atra.model_utils.model_utils import get_model_and_processor
 from atra.utils import timeit
+import gradio as gr
 
 
-def summarize(text, input_lang) -> str:
+def summarize(text, input_lang, progress=gr.Progress()) -> str:
     text = f"""summarize: {text}"""
-    model, tokenizer = get_model_and_processor(input_lang, "summarization")
+    model, tokenizer = get_model_and_processor(
+        input_lang, "summarization", progress=progress
+    )
     inputs = tokenizer(text, return_tensors="pt", max_length=128_000, truncation=True)
+    progress.__call__(0.7, "Summarizing Text")
     generated_tokens = inference_sum(model, inputs)
+    progress.__call__(0.9, "Converting to Text")
     result = tokenizer.batch_decode(generated_tokens, skip_special_tokens=True)[0]
     return result
 

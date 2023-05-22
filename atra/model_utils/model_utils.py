@@ -7,6 +7,7 @@ from atra.model_utils.unlimiformer import Unlimiformer
 from atra.statics import MODEL_MAPPING
 from atra.utils import timeit
 import GPUtil
+import gradio as gr
 
 MODELS_CACHE = {}
 
@@ -92,12 +93,13 @@ def get_peft_model(peft_model_id, model_class) -> bool:
 
 @timeit
 def get_model_and_processor(
-    lang: str, task: str
+    lang: str, task: str, progress=gr.Progress()
 ) -> tuple[PreTrainedModel, PreTrainedTokenizer]:
     global MODELS_CACHE
 
     # get all the model information from the mapping
     # for the requested task, config and lang
+    progress.__call__(0.25, "Loading Model Information")
     model_id = MODEL_MAPPING[task].get(lang, {}).get("name", None)
     adapter_id = MODEL_MAPPING[task].get(lang, {}).get("adapter_id", None)
     if model_id is None:
@@ -107,6 +109,7 @@ def get_model_and_processor(
         base_model_lang = lang
     model_class = MODEL_MAPPING[task][base_model_lang].get("class", None)
 
+    progress.__call__(0.3, "Loading Model tensors")
     # load the model
     if adapter_id is not None:
         cached = get_peft_model(adapter_id, model_class)
@@ -120,6 +123,7 @@ def get_model_and_processor(
         "processor", AutoProcessor
     )
 
+    progress.__call__(0.5, "Optimizing Model")
     if cached is False:
         if MODELS_CACHE[id_to_use]["model"].config.model_type == "t5":
             print("Converting T5 model to Unlimiformer")
@@ -138,6 +142,7 @@ def get_model_and_processor(
         processor = get_processor(processor_class, model_id)
         MODELS_CACHE[id_to_use]["processor"] = processor
 
+    progress.__call__(0.6, "Moving Model to GPU")
     if torch.cuda.is_available():
         free_gpu()
         if MODELS_CACHE[id_to_use]["on_gpu"] is False:
