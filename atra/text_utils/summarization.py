@@ -6,22 +6,20 @@ from atra.utils import timeit
 def summarize(text, input_lang) -> str:
     text = f"""summarize: {text}"""
     model, tokenizer = get_model_and_processor(input_lang, "summarization")
-    input_features = tokenizer(
-        text, return_tensors="pt", max_length=1024, truncation=True
-    ).input_ids
-    generated_tokens = inference_sum(model, input_features)
+    inputs = tokenizer(text, return_tensors="pt", max_length=128_000, truncation=True)
+    generated_tokens = inference_sum(model, inputs)
     result = tokenizer.batch_decode(generated_tokens, skip_special_tokens=True)[0]
     return result
 
 
 @timeit
-def inference_sum(model, input_features):
+def inference_sum(model, inputs):
     if torch.cuda.is_available():
-        input_features = input_features.cuda()
+        inputs.to("cuda")
 
     with torch.inference_mode():
         generated_tokens = model.generate(
-            inputs=input_features,
+            **inputs,
             max_new_tokens=1024,
             do_sample=False,
             num_beams=5,

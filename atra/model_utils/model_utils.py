@@ -2,6 +2,7 @@ import peft
 import torch
 from optimum.bettertransformer import BetterTransformer
 from transformers import PreTrainedTokenizer, PreTrainedModel, AutoProcessor
+from atra.model_utils.unlimiformer import Unlimiformer
 
 from atra.statics import MODEL_MAPPING
 from atra.utils import timeit
@@ -20,7 +21,7 @@ def free_gpu():
             models_list = list(MODELS_CACHE.keys())
             for model in models_list:
                 if MODELS_CACHE[model]["on_gpu"] is True:
-                    MODELS_CACHE[model]["model"] = MODELS_CACHE[model]["model"].cpu()
+                    MODELS_CACHE[model]["model"].to("cpu")
                     MODELS_CACHE[model]["on_gpu"] = False
                     print("Model {} moved to CPU".format(model))
 
@@ -52,6 +53,7 @@ def get_model(model_class, model_id) -> bool:
         return True
 
 
+@timeit
 def get_processor(processor_class, model_id):
     processor = processor_class.from_pretrained(model_id)
     return processor
@@ -119,22 +121,28 @@ def get_model_and_processor(
     )
 
     if cached is False:
-        # convert the model to a BetterTransformer model
-        try:
-            MODELS_CACHE[id_to_use]["model"] = BetterTransformer.transform(MODELS_CACHE[id_to_use]["model"])  # type: ignore
-        except Exception as e:
-            print("Bettertransformer exception: ", e)
-
-        MODELS_CACHE[id_to_use]["model"] = torch.compile(
-            MODELS_CACHE[id_to_use]["model"], mode="max-autotune", backend="onnxrt"
-        )
+        if MODELS_CACHE[id_to_use]["model"].config.model_type == "t5":
+            print("Converting T5 model to Unlimiformer")
+            MODELS_CACHE[id_to_use]["model"] = Unlimiformer.convert_model(
+                MODELS_CACHE[id_to_use]["model"]
+            )
+            MODELS_CACHE[id_to_use]["model"].eval()
+        else:
+            try:
+                MODELS_CACHE[id_to_use]["model"] = BetterTransformer.transform(MODELS_CACHE[id_to_use]["model"])  # type: ignore
+            except Exception as e:
+                print("Bettertransformer exception: ", e)
+            MODELS_CACHE[id_to_use]["model"] = torch.compile(
+                MODELS_CACHE[id_to_use]["model"], mode="max-autotune", backend="onnxrt"
+            )
         processor = get_processor(processor_class, model_id)
         MODELS_CACHE[id_to_use]["processor"] = processor
 
     if torch.cuda.is_available():
         free_gpu()
         if MODELS_CACHE[id_to_use]["on_gpu"] is False:
-            MODELS_CACHE[id_to_use]["model"] = MODELS_CACHE[id_to_use]["model"].cuda()
+            print("Moving model {} to GPU".format(id_to_use))
+            MODELS_CACHE[id_to_use]["model"].to("cuda")
             MODELS_CACHE[id_to_use]["on_gpu"] = True
 
     return MODELS_CACHE[id_to_use]["model"], MODELS_CACHE[id_to_use]["processor"]  # type: ignore

@@ -10,10 +10,11 @@ def translate(text, src, dest) -> str:
     src = LANG_MAPPING[src]
     dest = LANG_MAPPING[dest]
     model, tokenizer = get_model_and_processor("universal", "translation")
-    tokenizer.src_lang = src # type: ignore
+    tokenizer.src_lang = src  # type: ignore
     input_features = tokenizer(text, return_tensors="pt").input_ids
-    generated_tokens = inference_translate(model, 
-                        input_features, tokenizer.get_lang_id(dest)) # type: ignore
+    generated_tokens = inference_translate(
+        model, input_features, tokenizer.get_lang_id(dest)
+    )  # type: ignore
     result = tokenizer.batch_decode(generated_tokens, skip_special_tokens=True)
     return result[0]
 
@@ -21,10 +22,10 @@ def translate(text, src, dest) -> str:
 @timeit
 def inference_translate(model, input_features, forced_bos_id):
     if torch.cuda.is_available():
-        input_features = input_features.cuda()
+        input_features.to("cuda")
     with torch.inference_mode():
         generated_tokens = model.generate(
-            inputs=input_features, forced_bos_token_id=forced_bos_id # type: ignore
+            inputs=input_features, forced_bos_token_id=forced_bos_id  # type: ignore
         )
 
     return generated_tokens
