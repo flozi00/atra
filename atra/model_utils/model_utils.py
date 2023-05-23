@@ -1,3 +1,4 @@
+from pyexpat import model
 import GPUtil
 import gradio as gr
 from librosa import ex
@@ -13,7 +14,7 @@ from atra.utils import timeit
 MODELS_CACHE = {}
 
 
-def free_gpu() -> None:
+def free_gpu(except_model) -> None:
     global MODELS_CACHE
     gpus = GPUtil.getGPUs()
     for gpu_num in range(len(gpus)):
@@ -22,7 +23,7 @@ def free_gpu() -> None:
         if gpu.memoryUtil * 100 > 60:
             models_list = list(MODELS_CACHE.keys())
             for model in models_list:
-                if MODELS_CACHE[model]["on_gpu"] is True:
+                if MODELS_CACHE[model]["on_gpu"] is True and model != except_model:
                     MODELS_CACHE[model]["model"].to("cpu")
                     MODELS_CACHE[model]["on_gpu"] = False
                     print("Model {} moved to CPU".format(model))
@@ -45,9 +46,18 @@ def get_model(model_id, model_class, processor_class) -> bool:
 
         processor = processor_class.from_pretrained(model_id)
         
+        conf = AutoConfig.from_pretrained(
+            pretrained_model_name_or_path=base_model_name,
+            cache_dir="./model_cache",
+        )
+
+        if conf.model_type == "wav2vec2":
+            conf.update({"vocab_size": len(processor.tokenizer),})
+        
         model = model_class.from_pretrained(
             base_model_name,
             cache_dir="./model_cache",
+            config=conf,
         )
         try:
             model = peft.PeftModel.from_pretrained(
@@ -113,7 +123,7 @@ def get_model_and_processor(
 
     progress.__call__(progress=0.6, desc="Moving Model to GPU")
     if torch.cuda.is_available():
-        free_gpu()
+        free_gpu(except_model=model_id)
         if MODELS_CACHE[model_id]["on_gpu"] is False:
             print("Moving model {} to GPU".format(model_id))
             MODELS_CACHE[model_id]["model"].to("cuda")

@@ -1,5 +1,4 @@
 from transformers import (
-    WhisperProcessor,
     WhisperForConditionalGeneration,
     M2M100ForConditionalGeneration,
     M2M100Tokenizer,
@@ -14,19 +13,19 @@ MODEL_MAPPING = {
         "universal": {
             "name": "openai/whisper-small",
             "class": WhisperForConditionalGeneration,
-            "processor": WhisperProcessor,
+            "processor": AutoProcessor,
         },
     },
     "asr": {
         "german": {
-            "name": "flozi00/whisper-large-german-lora-cv13",
+            "name": "flozi00/whisper-large-german-lora-cv13", # "flozi00/wav2vec2-xls-r-2b-german-cv13",
             "class": WhisperForConditionalGeneration,
-            "processor": WhisperProcessor,
+            "processor": AutoProcessor,
         },
         "universal": {
             "name": "openai/whisper-large-v2",
             "class": WhisperForConditionalGeneration,
-            "processor": WhisperProcessor,
+            "processor": AutoProcessor,
         },
     },
     "translation": {
