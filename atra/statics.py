@@ -5,6 +5,8 @@ from transformers import (
     M2M100Tokenizer,
     AutoModelForSeq2SeqLM,
     AutoTokenizer,
+    AutoModelForCTC,
+    AutoProcessor,
 )
 
 MODEL_MAPPING = {
@@ -16,7 +18,11 @@ MODEL_MAPPING = {
         },
     },
     "asr": {
-        "german": {"adapter_id": "flozi00/whisper-large-german-lora-cv13"},
+        "german": {
+            "name": "flozi00/whisper-large-german-lora-cv13",
+            "class": WhisperForConditionalGeneration,
+            "processor": WhisperProcessor,
+        },
         "universal": {
             "name": "openai/whisper-large-v2",
             "class": WhisperForConditionalGeneration,
@@ -159,12 +165,6 @@ LANGUAGE_CODES = {
 }
 
 LANG_MAPPING = {v: k for k, v in LANGUAGE_CODES.items()}
-
-TODO = "***TODO***"
-INPROGRESS = "***PROGRESS***"
-TO_ASR = "***TO ASR***"
-
-CACHE_SIZE = 128
 
 TASK_MAPPING = {
     "asr": ["start", "end", "language"],

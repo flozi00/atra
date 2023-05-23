@@ -31,15 +31,18 @@ def speech_recognition(data, language, progress=gr.Progress()) -> str:
     progress.__call__(0.2, "Loading Model")
     model, processor = get_model_and_processor(language, "asr", progress=progress)
 
-    model.config.forced_decoder_ids = processor.get_decoder_prompt_ids(  # type: ignore
-        task="transcribe"
-    )
+    try:
+        model.config.forced_decoder_ids = processor.get_decoder_prompt_ids(
+            task="transcribe"
+        )
+    except Exception:
+        pass
 
     progress.__call__(0.7, "Initializing Pipeline")
     pipe = AutomaticSpeechRecognitionPipeline(
         model=model,
-        tokenizer=processor.tokenizer,  # type: ignore
-        feature_extractor=processor.feature_extractor,  # type: ignore
+        tokenizer=processor.tokenizer,  
+        feature_extractor=processor.feature_extractor,  
         device=0 if torch.cuda.is_available() else -1,
     )
 

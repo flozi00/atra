@@ -4,7 +4,7 @@ from atra.gradio_utils.ui import (
     build_asr_ui,
     build_summarization_ui,
     build_translator_ui,
-    build_question_answering_ui
+    build_question_answering_ui,
 )
 
 

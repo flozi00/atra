@@ -15,7 +15,6 @@ from transformers import (
 
 from typing import TypeVar, Generic
 
-from atra.model_utils.index_building import Datastore, DatastoreBatch
 
 logger = logging.getLogger("attention_knn")
 logger.setLevel(20)
@@ -446,12 +445,6 @@ class Unlimiformer(Generic[ModelType]):
 
     def reset_memory(self, input_ids, attention_mask):
         if self.use_datastore:
-            self.datastore = DatastoreBatch(
-                dim=self.model.config.hidden_size,
-                batch_size=input_ids.shape[0],
-                flat_index=self.flat_index,
-                gpu_index=self.gpu_index,
-            )
             self.embeddings = []
             torch.cuda.empty_cache()
         self.prompt_input_ids = input_ids
