@@ -4,7 +4,7 @@ onnx
 onnxruntime>=1.12.1
 sacremoses
 sentencepiece
-torch>=1.13.0
+torch>=2.0.0
 torchaudio
 transformers>=4.29.1
 peft
@@ -16,3 +16,4 @@ text2num
 pyloudnorm
 gputil
 faiss-cpu
+tokenizers>=0.13.3

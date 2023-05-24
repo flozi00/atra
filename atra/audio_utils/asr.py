@@ -10,26 +10,26 @@ from transformers.pipelines import AutomaticSpeechRecognitionPipeline
 import gradio as gr
 import warnings
 
-warnings.filterwarnings("ignore")
+warnings.filterwarnings(action="ignore")
 
 
 def speech_recognition(data, language, progress=gr.Progress()) -> str:
     if data is None:
         return ""
-    progress.__call__(0.0, "Loading Data")
+    progress.__call__(progress=0.0, desc="Loading Data")
     if isinstance(data, str):
-        with open(data, "rb") as f:
+        with open(file=data, mode="rb") as f:
             payload = f.read()
 
-        data = ffmpeg_read(payload, sampling_rate=16000)
+        data = ffmpeg_read(bpayload=payload, sampling_rate=16000)
 
-    progress.__call__(0.1, "Normalizing Audio")
-    meter = pyln.Meter(16000)  # create BS.1770 meter
-    loudness = meter.integrated_loudness(data)
-    data = pyln.normalize.loudness(data, loudness, 0.0)
+    progress.__call__(progress=0.1, desc="Normalizing Audio")
+    meter = pyln.Meter(rate=16000)  # create BS.1770 meter
+    loudness = meter.integrated_loudness(data=data)
+    data = pyln.normalize.loudness(data=data, input_loudness=loudness, target_loudness=0.0)
 
-    progress.__call__(0.2, "Loading Model")
-    model, processor = get_model_and_processor(language, "asr", progress=progress)
+    progress.__call__(progress=0.2, desc="Loading Model")
+    model, processor = get_model_and_processor(lang=language, task="asr", progress=progress)
 
     try:
         model.config.forced_decoder_ids = processor.get_decoder_prompt_ids(
@@ -38,7 +38,7 @@ def speech_recognition(data, language, progress=gr.Progress()) -> str:
     except Exception:
         pass
 
-    progress.__call__(0.7, "Initializing Pipeline")
+    progress.__call__(progress=0.7, desc="Initializing Pipeline")
     pipe = AutomaticSpeechRecognitionPipeline(
         model=model,
         tokenizer=processor.tokenizer,  
@@ -46,12 +46,12 @@ def speech_recognition(data, language, progress=gr.Progress()) -> str:
         device=0 if torch.cuda.is_available() else -1,
     )
 
-    progress.__call__(0.8, "Transcribing Audio")
-    transcription = inference_asr(pipe, data)
+    progress.__call__(progress=0.8, desc="Transcribing Audio")
+    transcription = inference_asr(pipe=pipe, data=data)
 
-    progress.__call__(0.9, "Converting to Text")
+    progress.__call__(progress=0.9, desc="Converting to Text")
     try:
-        transcription = alpha2digit(transcription, lang=LANG_MAPPING[language])
+        transcription = alpha2digit(text=transcription, lang=LANG_MAPPING[language])
     except Exception:
         pass
 

@@ -12,7 +12,7 @@ from atra.utils import timeit
 MODELS_CACHE = {}
 
 
-def free_gpu(except_model) -> None:
+def free_gpu(except_model: str) -> None:
     global MODELS_CACHE
     gpus = GPUtil.getGPUs()
     for gpu_num in range(len(gpus)):
@@ -29,7 +29,7 @@ def free_gpu(except_model) -> None:
     if torch.cuda.is_available():
         torch.cuda.empty_cache()
 
-def get_model(model_id, model_class, processor_class) -> bool:
+def get_model(model_id: str, model_class: PreTrainedModel, processor_class: PreTrainedTokenizer) -> bool:
     global MODELS_CACHE
     cached = MODELS_CACHE.get(model_id, None)
     base_model_name = model_id
@@ -42,7 +42,7 @@ def get_model(model_id, model_class, processor_class) -> bool:
         except Exception as e:
             print("Error in loading peft config", e)
 
-        processor = processor_class.from_pretrained(model_id)
+        processor = processor_class.from_pretrained(pretrained_model_name_or_path=model_id)
         
         conf = AutoConfig.from_pretrained(
             pretrained_model_name_or_path=base_model_name,
@@ -53,7 +53,7 @@ def get_model(model_id, model_class, processor_class) -> bool:
             conf.update({"vocab_size": len(processor.tokenizer),})
         
         model = model_class.from_pretrained(
-            base_model_name,
+            pretrained_model_name_or_path=base_model_name,
             cache_dir="./model_cache",
             config=conf,
         )

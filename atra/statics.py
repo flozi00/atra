@@ -3,6 +3,7 @@ from transformers import (
     M2M100ForConditionalGeneration,
     M2M100Tokenizer,
     AutoModelForSeq2SeqLM,
+    AutoModelForCausalLM,
     AutoTokenizer,
     AutoModelForCTC,
     AutoProcessor,
@@ -56,6 +57,13 @@ MODEL_MAPPING = {
         "german": {
             "name": "google/flan-t5-xl",
             "class": AutoModelForSeq2SeqLM,
+            "processor": AutoTokenizer,
+        },
+    },
+    "chat": {
+        "universal": {
+            "name": "OpenAssistant/pythia-12b-sft-v8-7k-steps",
+            "class": AutoModelForCausalLM,
             "processor": AutoTokenizer,
         },
     },
