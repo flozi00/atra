@@ -6,10 +6,7 @@ sacremoses
 sentencepiece
 torch>=2.0.0
 torchaudio
-transformers>=4.29.1
-peft
 soundfile
-accelerate
 librosa 
 pydub
 text2num
@@ -17,3 +14,7 @@ pyloudnorm
 gputil
 faiss-cpu
 tokenizers>=0.13.3
+https://github.com/huggingface/transformers/archive/refs/heads/main.zip
+https://github.com/huggingface/peft/archive/refs/heads/main.zip
+https://github.com/huggingface/accelerate/archive/refs/heads/main.zip
+bitsandbytes==0.39.0

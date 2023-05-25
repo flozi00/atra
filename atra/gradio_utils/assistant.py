@@ -2,7 +2,12 @@ import gradio as gr
 
 from atra.text_utils.chat import bot, user
 
+
 def build_chatbot_ui():
+    gr.Markdown("""## Open Assistant Chatbot
+    This is a chatbot that can help you with your daily tasks. It is trained on a large amount of data and can answer a wide variety of questions. It is also able to learn from your conversations and improve over time.
+    At the moment it is not possible to use external plugins and tools with this chatbot, but we are working on it.
+    To use AI tools please select to tools tab above.""")
     chatbot = gr.Chatbot().style(height=500)
     with gr.Row():
         with gr.Column():

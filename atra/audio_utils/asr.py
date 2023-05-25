@@ -26,10 +26,14 @@ def speech_recognition(data, language, progress=gr.Progress()) -> str:
     progress.__call__(progress=0.1, desc="Normalizing Audio")
     meter = pyln.Meter(rate=16000)  # create BS.1770 meter
     loudness = meter.integrated_loudness(data=data)
-    data = pyln.normalize.loudness(data=data, input_loudness=loudness, target_loudness=0.0)
+    data = pyln.normalize.loudness(
+        data=data, input_loudness=loudness, target_loudness=0.0
+    )
 
     progress.__call__(progress=0.2, desc="Loading Model")
-    model, processor = get_model_and_processor(lang=language, task="asr", progress=progress)
+    model, processor = get_model_and_processor(
+        lang=language, task="asr", progress=progress
+    )
 
     try:
         model.config.forced_decoder_ids = processor.get_decoder_prompt_ids(
@@ -41,8 +45,8 @@ def speech_recognition(data, language, progress=gr.Progress()) -> str:
     progress.__call__(progress=0.7, desc="Initializing Pipeline")
     pipe = AutomaticSpeechRecognitionPipeline(
         model=model,
-        tokenizer=processor.tokenizer,  
-        feature_extractor=processor.feature_extractor,  
+        tokenizer=processor.tokenizer,
+        feature_extractor=processor.feature_extractor,
         device=0 if torch.cuda.is_available() else -1,
     )
 

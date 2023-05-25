@@ -14,22 +14,22 @@ MODELS_CACHE = {}
 
 def free_gpu(except_model: str) -> None:
     global MODELS_CACHE
-    gpus = GPUtil.getGPUs()
-    for gpu_num in range(len(gpus)):
-        gpu: GPUtil.GPU = gpus[gpu_num]
-
-        if gpu.memoryUtil * 100 > 60:
-            models_list = list(MODELS_CACHE.keys())
-            for model in models_list:
-                if MODELS_CACHE[model]["on_gpu"] is True and model != except_model:
-                    MODELS_CACHE[model]["model"].to("cpu")
-                    MODELS_CACHE[model]["on_gpu"] = False
-                    print("Model {} moved to CPU".format(model))
+    FREE_GPU_MEM = int(torch.cuda.mem_get_info()[0] / 1024**3)  # in GB
+    if FREE_GPU_MEM <= 8:
+        models_list = list(MODELS_CACHE.keys())
+        for model in models_list:
+            if MODELS_CACHE[model]["on_gpu"] is True and model != except_model:
+                MODELS_CACHE[model]["model"].to("cpu")
+                MODELS_CACHE[model]["on_gpu"] = False
+                print("Model {} moved to CPU".format(model))
 
     if torch.cuda.is_available():
         torch.cuda.empty_cache()
 
-def get_model(model_id: str, model_class: PreTrainedModel, processor_class: PreTrainedTokenizer) -> bool:
+
+def get_model(
+    model_id: str, model_class: PreTrainedModel, processor_class: PreTrainedTokenizer
+) -> bool:
     global MODELS_CACHE
     cached = MODELS_CACHE.get(model_id, None)
     base_model_name = model_id
@@ -42,20 +42,27 @@ def get_model(model_id: str, model_class: PreTrainedModel, processor_class: PreT
         except Exception as e:
             print("Error in loading peft config", e)
 
-        processor = processor_class.from_pretrained(pretrained_model_name_or_path=model_id)
-        
+        processor = processor_class.from_pretrained(
+            pretrained_model_name_or_path=model_id
+        )
+
         conf = AutoConfig.from_pretrained(
             pretrained_model_name_or_path=base_model_name,
             cache_dir="./model_cache",
         )
 
         if conf.model_type == "wav2vec2":
-            conf.update({"vocab_size": len(processor.tokenizer),})
-        
+            conf.update(
+                {
+                    "vocab_size": len(processor.tokenizer),
+                }
+            )
+
         model = model_class.from_pretrained(
             pretrained_model_name_or_path=base_model_name,
             cache_dir="./model_cache",
             config=conf,
+            low_cpu_mem_usage=True,
         )
         try:
             model = peft.PeftModel.from_pretrained(
@@ -63,10 +70,14 @@ def get_model(model_id: str, model_class: PreTrainedModel, processor_class: PreT
                 model_id=model_id,
                 cache_dir="./model_cache",
             )
-            model = model.merge_and_unload()  
+            model = model.merge_and_unload()
         except Exception as e:
             print("Error in loading peft model", e)
-        MODELS_CACHE[model_id] = {"model": model, "processor":processor ,"on_gpu": False}
+        MODELS_CACHE[model_id] = {
+            "model": model,
+            "processor": processor,
+            "on_gpu": False,
+        }
         return False
     else:
         return True
@@ -89,13 +100,13 @@ def get_model_and_processor(
     model_class = MODEL_MAPPING[task][lang].get("class", None)
 
     # get processor
-    processor_class = MODEL_MAPPING[task][lang].get(
-        "processor", AutoProcessor
-    )
+    processor_class = MODEL_MAPPING[task][lang].get("processor", AutoProcessor)
 
     progress.__call__(progress=0.3, desc="Loading Model tensors")
     # load the model
-    cached = get_model(model_class=model_class, model_id=model_id, processor_class=processor_class)
+    cached = get_model(
+        model_class=model_class, model_id=model_id, processor_class=processor_class
+    )
 
     progress.__call__(progress=0.5, desc="Optimizing Model")
     if cached is False:
@@ -107,7 +118,9 @@ def get_model_and_processor(
             MODELS_CACHE[model_id]["model"].eval()
         else:
             try:
-                MODELS_CACHE[model_id]["model"] = BetterTransformer.transform(model=MODELS_CACHE[model_id]["model"])  
+                MODELS_CACHE[model_id]["model"] = BetterTransformer.transform(
+                    model=MODELS_CACHE[model_id]["model"]
+                )
             except Exception as e:
                 print("Bettertransformer exception: ", e)
             try:
@@ -127,4 +140,4 @@ def get_model_and_processor(
             MODELS_CACHE[model_id]["model"].to("cuda")
             MODELS_CACHE[model_id]["on_gpu"] = True
 
-    return MODELS_CACHE[model_id]["model"], MODELS_CACHE[model_id]["processor"]  
+    return MODELS_CACHE[model_id]["model"], MODELS_CACHE[model_id]["processor"]
