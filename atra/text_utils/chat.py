@@ -15,18 +15,10 @@ start_message = """
 
 quant_conf = BitsAndBytesConfig(load_in_4bit=True, 
                                 bnb_4bit_use_double_quant=True, 
-                                bnb_4bit_quant_type="fp4")
+                                bnb_4bit_quant_type="fp4",
+                                bnb_4bit_compute_dtype=torch.float16)
 
-model = AutoModelForCausalLM.from_pretrained(
-    pretrained_model_name_or_path=MODEL_MAPPING["chat"]["universal"]["name"],
-    cache_dir="./model_cache",
-    torch_dtype=torch.float16,
-    quantization_config=quant_conf,
-    #offload_folder="./model_cache",
-)
-tokenizer = AutoTokenizer.from_pretrained(
-    pretrained_model_name_or_path=MODEL_MAPPING["chat"]["universal"]["name"], padding_side='left'
-)
+model, tokenizer = None, None
 
 
 def convert_history_to_text(history):
@@ -60,6 +52,18 @@ def user(message, history):
 
 
 def bot(history):
+    global model, tokenizer
+    if model is None:
+        model = AutoModelForCausalLM.from_pretrained(
+            pretrained_model_name_or_path=MODEL_MAPPING["chat"]["universal"]["name"],
+            cache_dir="./model_cache",
+            torch_dtype=torch.float16,
+            quantization_config=quant_conf,
+            #offload_folder="./model_cache",
+        )
+        tokenizer = AutoTokenizer.from_pretrained(
+            pretrained_model_name_or_path=MODEL_MAPPING["chat"]["universal"]["name"], padding_side='left'
+        )
     # Construct the input message string for the model by concatenating the current 
     # system message and conversation history
     messages = convert_history_to_text(history)
