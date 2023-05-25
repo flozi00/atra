@@ -11,8 +11,6 @@ librosa
 pydub
 text2num
 pyloudnorm
-gputil
-faiss-cpu
 tokenizers>=0.13.3
 https://github.com/huggingface/transformers/archive/refs/heads/main.zip
 https://github.com/huggingface/peft/archive/refs/heads/main.zip

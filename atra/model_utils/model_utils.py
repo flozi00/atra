@@ -1,4 +1,3 @@
-import GPUtil
 import gradio as gr
 import peft
 import torch
