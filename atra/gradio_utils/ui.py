@@ -27,7 +27,7 @@ def build_asr_ui():
     2. Details in JSON format
     """
     # UI for getting audio
-    input_lang = gr.Dropdown(langs, value=langs[0], label="Input Language")
+    input_lang = gr.Dropdown(langs, value="german", label="Input Language")
     with gr.Row():
         with gr.TabItem("Microphone"):
             microphone_file = gr.Audio(
@@ -82,13 +82,13 @@ def build_summarization_ui():
     with gr.Row():
         with gr.Column():
             input_lang = gr.Dropdown(
-                sum_langs, value=sum_langs[0], label="Input Language"
+                sum_langs, value="german", label="Input Language"
             )
             input_text = gr.Textbox(label="Input Text")
 
         output_text = gr.Text(label="Summarization")
 
-    send = gr.Button(label="Translate")
+    send = gr.Button(label="Summarize")
 
     send.click(
         summarize,
@@ -102,7 +102,7 @@ def build_question_answering_ui():
         with gr.Column():
             input_lang = gr.Dropdown(
                 question_answering_langs,
-                value=question_answering_langs[0],
+                value="german",
                 label="Input Language",
             )
             with gr.Row():
@@ -111,7 +111,7 @@ def build_question_answering_ui():
 
         output_text = gr.Text(label="Answer")
 
-    send = gr.Button(label="Translate")
+    send = gr.Button(label="Answer")
 
     send.click(
         answer_question,
