@@ -1,8 +1,6 @@
 import logging
-import numpy as np
 import torch
 from torch import nn
-from enum import Enum, auto
 from transformers import (
     BartModel,
     BartForConditionalGeneration,
@@ -31,7 +29,7 @@ class Unlimiformer(Generic[ModelType]):
         unlimiformer_head_num=None,
         normalize=False,
         exclude_attention=False,
-        model_encoder_max_len=None,
+        model_encoder_max_len=2048,
         chunk_overlap=0,
         verbose=False,
         save_heatmap=False,

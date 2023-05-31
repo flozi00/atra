@@ -81,9 +81,7 @@ def build_translator_ui():
 def build_summarization_ui():
     with gr.Row():
         with gr.Column():
-            input_lang = gr.Dropdown(
-                sum_langs, value="german", label="Input Language"
-            )
+            input_lang = gr.Dropdown(sum_langs, value="german", label="Input Language")
             input_text = gr.Textbox(label="Input Text")
 
         output_text = gr.Text(label="Summarization")

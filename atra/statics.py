@@ -4,8 +4,8 @@ from transformers import (
     M2M100Tokenizer,
     AutoModelForSeq2SeqLM,
     AutoModelForCausalLM,
+    AutoModel,
     AutoTokenizer,
-    AutoModelForCTC,
     AutoProcessor,
 )
 
@@ -67,6 +67,14 @@ MODEL_MAPPING = {
             "processor": AutoTokenizer,
         },
     },
+    "embedding": {
+        "universal": {
+            "name": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+            "class": AutoModel,
+            "processor": AutoTokenizer,
+        },
+    },
+    
 }
 
 LANGUAGE_CODES = {
@@ -178,4 +186,15 @@ TASK_MAPPING = {
     "translation": ["source", "target"],
     "summarization": ["long_text", "short_text"],
     "question-answering": ["question", "lang"],
+}
+
+PROMPTS = {
+    "question-answering": {
+        "german": """Frage: {question}
+    Beantworte die gegebene Frage detailiert mit dem folgenden Kontext:
+    {text}""",
+        "english": """Question: {question}
+    Answer the given Question detailed with the following Context:
+    {text}""",
+    }
 }

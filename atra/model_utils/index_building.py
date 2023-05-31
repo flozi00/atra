@@ -4,7 +4,6 @@ import time
 import logging
 
 import torch
-import numpy as np
 
 code_size = 64
 

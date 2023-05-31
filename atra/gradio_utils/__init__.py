@@ -17,8 +17,10 @@ def build_gradio():
 
     with ui:
         with gr.Row():
-            gr.Markdown('## This project is sponsored by ')
-            gr.Markdown('[ ![PrimeLine](https://www.primeline-solutions.com/skin/frontend/default/theme566/images/primeline-solutions-logo.png) ](https://www.primeline-solutions.com/de/server/nach-einsatzzweck/gpu-rendering-hpc/)')
+            gr.Markdown("## This project is sponsored by ")
+            gr.Markdown(
+                "[ ![PrimeLine](https://www.primeline-solutions.com/skin/frontend/default/theme566/images/primeline-solutions-logo.png) ](https://www.primeline-solutions.com/de/server/nach-einsatzzweck/gpu-rendering-hpc/)"
+            )
         with gr.Tabs():
             with gr.Tab("Chat"):
                 build_chatbot_ui()
