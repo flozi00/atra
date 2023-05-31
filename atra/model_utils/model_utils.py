@@ -47,7 +47,6 @@ def get_model(
 
         conf = AutoConfig.from_pretrained(
             pretrained_model_name_or_path=base_model_name,
-            cache_dir="./model_cache",
         )
 
         if conf.model_type == "wav2vec2":
@@ -59,7 +58,6 @@ def get_model(
 
         model = model_class.from_pretrained(
             pretrained_model_name_or_path=base_model_name,
-            cache_dir="./model_cache",
             config=conf,
             low_cpu_mem_usage=True,
         )
@@ -67,7 +65,6 @@ def get_model(
             model = peft.PeftModel.from_pretrained(
                 model=model,
                 model_id=model_id,
-                cache_dir="./model_cache",
             )
             model = model.merge_and_unload()
         except Exception as e:

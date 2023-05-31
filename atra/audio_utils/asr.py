@@ -39,8 +39,8 @@ def speech_recognition(data, language, progress=gr.Progress()) -> str:
         model.config.forced_decoder_ids = processor.get_decoder_prompt_ids(
             task="transcribe"
         )
-    except Exception:
-        pass
+    except Exception as e:
+        print("Error in setting forced decoder ids", e)
 
     progress.__call__(progress=0.7, desc="Initializing Pipeline")
     pipe = AutomaticSpeechRecognitionPipeline(

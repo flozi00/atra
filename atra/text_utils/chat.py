@@ -63,7 +63,6 @@ def bot(history):
     if model is None:
         model = AutoModelForCausalLM.from_pretrained(
             pretrained_model_name_or_path=MODEL_MAPPING["chat"]["universal"]["name"],
-            cache_dir="./model_cache",
             torch_dtype=torch.float16,
             quantization_config=quant_conf,
             #offload_folder="./model_cache",
