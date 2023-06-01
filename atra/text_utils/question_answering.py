@@ -4,6 +4,7 @@ from atra.utils import timeit
 import gradio as gr
 from atra.statics import PROMPTS
 
+
 def answer_question(text, question, input_lang, progress=gr.Progress()) -> str:
     progress.__call__(0.2, "Filtering Text")
     text = PROMPTS["question-answering"][input_lang].format(
@@ -23,8 +24,7 @@ def answer_question(text, question, input_lang, progress=gr.Progress()) -> str:
 
 @timeit
 def inference_qa(model, inputs):
-    if torch.cuda.is_available():
-        inputs.to("cuda")
+    inputs.to(model.device)
 
     with torch.inference_mode():
         generated_tokens = model.generate(

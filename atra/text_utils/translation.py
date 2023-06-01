@@ -8,8 +8,10 @@ import gradio as gr
 def translate(text, src, dest, progress=gr.Progress()) -> str:
     if src == dest:
         return text
-    src = LANG_MAPPING[src]
-    dest = LANG_MAPPING[dest]
+    if len(src) > 2:
+        src = LANG_MAPPING[src]
+    if len(dest) > 2:
+        dest = LANG_MAPPING[dest]
     model, tokenizer = get_model_and_processor(
         "universal", "translation", progress=progress
     )
@@ -27,8 +29,7 @@ def translate(text, src, dest, progress=gr.Progress()) -> str:
 
 @timeit
 def inference_translate(model, input_features, forced_bos_id):
-    if torch.cuda.is_available():
-        input_features.to("cuda")
+    input_features.to(model.device)
     with torch.inference_mode():
         generated_tokens = model.generate(
             **input_features, forced_bos_token_id=forced_bos_id

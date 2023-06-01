@@ -19,8 +19,7 @@ def summarize(text, input_lang, progress=gr.Progress()) -> str:
 
 @timeit
 def inference_sum(model, inputs):
-    if torch.cuda.is_available():
-        inputs.to("cuda")
+    inputs.to(model.device)
 
     with torch.inference_mode():
         generated_tokens = model.generate(

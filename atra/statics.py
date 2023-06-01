@@ -74,7 +74,6 @@ MODEL_MAPPING = {
             "processor": AutoTokenizer,
         },
     },
-    
 }
 
 LANGUAGE_CODES = {

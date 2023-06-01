@@ -120,20 +120,23 @@ def get_model_and_processor(
             except Exception as e:
                 print("Bettertransformer exception: ", e)
             try:
-                MODELS_CACHE[model_id]["model"] = torch.compile(
-                    model=MODELS_CACHE[model_id]["model"],
-                    mode="max-autotune",
-                    backend="onnxrt",
-                )
+                if task not in ["embedding"]:
+                    MODELS_CACHE[model_id]["model"] = torch.compile(
+                        model=MODELS_CACHE[model_id]["model"],
+                        mode="max-autotune",
+                        backend="onnxrt",
+                    )
             except Exception as e:
                 print("Torch compile exception: ", e)
 
     progress.__call__(progress=0.6, desc="Moving Model to GPU")
     if torch.cuda.is_available():
         free_gpu(except_model=model_id)
-        if MODELS_CACHE[model_id]["on_gpu"] is False:
-            print("Moving model {} to GPU".format(model_id))
-            MODELS_CACHE[model_id]["model"].to("cuda")
-            MODELS_CACHE[model_id]["on_gpu"] = True
+        FREE_GPU_MEM = int(torch.cuda.mem_get_info()[0] / 1024**3)  # in GB
+        if FREE_GPU_MEM >= 8:
+            if MODELS_CACHE[model_id]["on_gpu"] is False:
+                print("Moving model {} to GPU".format(model_id))
+                MODELS_CACHE[model_id]["model"].to("cuda")
+                MODELS_CACHE[model_id]["on_gpu"] = True
 
     return MODELS_CACHE[model_id]["model"], MODELS_CACHE[model_id]["processor"]
