@@ -19,3 +19,4 @@ bitsandbytes==0.39.0
 rapidfuzz>=3.0.0
 qdrant-client
 langdetect
+wikipedia
