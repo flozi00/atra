@@ -97,7 +97,7 @@ class SkillStorage:
 
         self.search_index.recreate_collection(
             collection_name="atra_skills",
-            vectors_config=VectorParams(size=384, distance=Distance.COSINE),
+            vectors_config=VectorParams(size=768, distance=Distance.COSINE),
         )
 
     def add_skill(self, skill: BaseSkill):

@@ -2,22 +2,16 @@ from atra.model_utils.model_utils import get_model_and_processor
 import torch
 
 
-def mean_pooling(model_output, attention_mask):
-    token_embeddings = model_output[
-        0
-    ]  # First element of model_output contains all token embeddings
-    input_mask_expanded = (
-        attention_mask.unsqueeze(-1).expand(token_embeddings.size()).float()
-    )
-    return torch.sum(token_embeddings * input_mask_expanded, 1) / torch.clamp(
-        input_mask_expanded.sum(1), min=1e-9
-    )
+def average_pool(last_hidden_states: torch.Tensor,
+                 attention_mask: torch.Tensor) -> torch.Tensor:
+    last_hidden = last_hidden_states.masked_fill(~attention_mask[..., None].bool(), 0.0)
+    return last_hidden.sum(dim=1) / attention_mask.sum(dim=1)[..., None]
 
 
 def generate_embedding(sentences: list):
     model, tokenizer = get_model_and_processor("universal", "embedding")
     encoded_input = tokenizer(
-        sentences, padding=True, truncation=True, return_tensors="pt"
+        sentences, padding=True, truncation=True, return_tensors="pt", max_length=512
     )
     encoded_input = encoded_input.to(model.device)
     # Compute token embeddings
@@ -25,6 +19,7 @@ def generate_embedding(sentences: list):
         model_output = model(**encoded_input)
 
     # Perform pooling. In this case, max pooling.
-    sentence_embeddings = mean_pooling(model_output, encoded_input["attention_mask"])
+    sentence_embeddings = average_pool(model_output.last_hidden_state, encoded_input['attention_mask'])
+
 
     return sentence_embeddings

@@ -69,7 +69,7 @@ MODEL_MAPPING = {
     },
     "embedding": {
         "universal": {
-            "name": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+            "name": "intfloat/multilingual-e5-base",
             "class": AutoModel,
             "processor": AutoTokenizer,
         },
