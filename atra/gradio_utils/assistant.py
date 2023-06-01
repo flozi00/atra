@@ -1,6 +1,6 @@
 import gradio as gr
 
-from atra.text_utils.chat import bot, user
+from atra.text_utils.chat import bot, user, ranker, missing_skill
 
 
 def build_chatbot_ui():
@@ -9,7 +9,6 @@ def build_chatbot_ui():
     This is a chatbot that can help you with your daily tasks.<br>
     It is trained on a large amount of data and can answer a wide variety of questions.<br>
     It is also able to learn from your conversations and improve over time.<br>
-    At the moment it is not possible to use external plugins and tools with this chatbot, but we are working on it.<br>
     To use AI tools please select to tools tab above.<br>
     You can only use the chatbot in English at the moment."""
     )
@@ -26,6 +25,9 @@ def build_chatbot_ui():
                 submit = gr.Button("Submit")
                 stop = gr.Button("Stop")
                 clear = gr.Button("Clear")
+            with gr.Row():
+                like = gr.Button("Like")
+                dislike = gr.Button("Dislike")
 
     submit_event = msg.submit(
         fn=user,
@@ -61,3 +63,6 @@ def build_chatbot_ui():
         queue=False,
     )
     clear.click(lambda: None, None, chatbot, queue=False)
+
+    like.click(fn=ranker, inputs=[chatbot])
+    dislike.click(fn=missing_skill, inputs=[chatbot])

@@ -10,8 +10,9 @@ from atra.statics import MODEL_MAPPING
 from atra.skills.base import SkillStorage
 from atra.skills.wiki_sums import skill as wiki_skill
 
+
 skills = SkillStorage()
-skills.add_skill(wiki_skill)
+skills.add_skill(skill=wiki_skill)
 
 start_message = """
 - You are a helpful assistant chatbot called Open Assistant.
@@ -67,13 +68,13 @@ def user(message, history):
 
 
 def bot(history):
+    global model, tokenizer
     # check if skill can answer
-    answer = skills.answer(history[-1][0])
+    answer = skills.answer(prompt=history[-1][0])
     if answer is not False:
         history[-1][1] = answer
         yield history
     else:
-        global model, tokenizer
         if model is None:
             model = AutoModelForCausalLM.from_pretrained(
                 pretrained_model_name_or_path=MODEL_MAPPING["chat"]["universal"]["name"],
@@ -87,7 +88,7 @@ def bot(history):
             )
         # Construct the input message string for the model by concatenating the current
         # system message and conversation history
-        messages = convert_history_to_text(history)
+        messages = convert_history_to_text(history=history)
 
         # Tokenize the messages string
         input_ids = tokenizer(
@@ -95,7 +96,7 @@ def bot(history):
         )
         input_ids = input_ids.to(model.device)
         streamer = TextIteratorStreamer(
-            tokenizer, timeout=60.0, skip_prompt=True, skip_special_tokens=True
+            tokenizer=tokenizer, timeout=60.0, skip_prompt=True, skip_special_tokens=True
         )
         generate_kwargs = dict(
             **input_ids,
@@ -123,3 +124,14 @@ def bot(history):
             partial_text += new_text
             history[-1][1] = partial_text
             yield history
+
+def ranker(history):
+    skill_name, score = skills.choose_skill(prompt=history[-1][0])
+    skill_name = skill_name.name
+    if skill_name is not False and score < 0.9:
+        with open("skills.csv", "a+") as f:
+            f.write(f'{history[-1][0].replace(",","")},{skill_name}\n')
+
+def missing_skill(history):
+    with open("missing.csv", "a+") as f:
+        f.write(f'{history[-1][0]}\n')

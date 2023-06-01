@@ -5,6 +5,7 @@ from qdrant_client.models import Distance, VectorParams, PointStruct
 from atra.text_utils.embedding import generate_embedding
 import langdetect
 from atra.text_utils.translation import translate
+import os
 
 class BaseSkill:
     def __init__(
@@ -90,7 +91,8 @@ class BaseSkill:
 class SkillStorage:
     def __init__(self):
         self.skills = []
-        self.search_index = QdrantClient(":memory:")
+        self.stored_vectors = os.path.isdir("./vectors")
+        self.search_index = QdrantClient(path="./vectors")
         self.id_to_use = 1
 
         self.search_index.recreate_collection(
@@ -100,20 +102,21 @@ class SkillStorage:
 
     def add_skill(self, skill: BaseSkill):
         self.skills.append(skill)
-        for example in skill.examples:
-            embeddings = generate_embedding(example)
-            for embedding in embeddings:
-                self.search_index.upsert(
-                    collection_name="atra_skills",
-                    points=[
-                        PointStruct(
-                            id=self.id_to_use,
-                            vector=embedding.tolist(),
-                            payload={"name": skill.name},
-                        )
-                    ],
-                )
-                self.id_to_use += 1
+        if self.stored_vectors is False:
+            for example in skill.examples:
+                embeddings = generate_embedding(example)
+                for embedding in embeddings:
+                    self.search_index.upsert(
+                        collection_name="atra_skills",
+                        points=[
+                            PointStruct(
+                                id=self.id_to_use,
+                                vector=embedding.tolist(),
+                                payload={"name": skill.name},
+                            )
+                        ],
+                    )
+                    self.id_to_use += 1
 
     def remove_skill(self, skill: BaseSkill):
         for i, s in enumerate(self.skills):

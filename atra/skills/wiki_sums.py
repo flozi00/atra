@@ -3,10 +3,10 @@ import wikipedia
 import re
 
 
-def search_wikipedia(query):
+def search_wikipedia(query) -> str:
     topic = wikipedia.search(query)[0]
     summary = wikipedia.summary(topic, sentences=5)
-    summary = re.sub("[\(\[].*?[\)\]]", "", summary)
+    summary = re.sub(pattern="[\(\[].*?[\)\]]", repl="", string=summary)
 
     return summary
 

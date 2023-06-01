@@ -27,7 +27,7 @@ def build_asr_ui():
     2. Details in JSON format
     """
     # UI for getting audio
-    input_lang = gr.Dropdown(langs, value="german", label="Input Language")
+    input_lang = gr.Dropdown(choices=langs, value="german", label="Input Language")
     with gr.Row():
         with gr.TabItem("Microphone"):
             microphone_file = gr.Audio(
@@ -62,11 +62,11 @@ def build_translator_ui():
     """
     with gr.Row():
         with gr.Column():
-            input_lang = gr.Dropdown(langs, value=langs[0], label="Input Language")
+            input_lang = gr.Dropdown(choices=langs, value=langs[0], label="Input Language")
             input_text = gr.Textbox(label="Input Text")
 
         with gr.Column():
-            output_lang = gr.Dropdown(langs, value=langs[0], label="Output Language")
+            output_lang = gr.Dropdown(choices=langs, value=langs[0], label="Output Language")
             output_text = gr.Text(label="Output Text")
 
     send = gr.Button(label="Translate")
@@ -81,7 +81,7 @@ def build_translator_ui():
 def build_summarization_ui():
     with gr.Row():
         with gr.Column():
-            input_lang = gr.Dropdown(sum_langs, value="german", label="Input Language")
+            input_lang = gr.Dropdown(choices=sum_langs, value="german", label="Input Language")
             input_text = gr.Textbox(label="Input Text")
 
         output_text = gr.Text(label="Summarization")
@@ -99,7 +99,7 @@ def build_question_answering_ui():
     with gr.Row():
         with gr.Column():
             input_lang = gr.Dropdown(
-                question_answering_langs,
+                choices=question_answering_langs,
                 value="german",
                 label="Input Language",
             )
