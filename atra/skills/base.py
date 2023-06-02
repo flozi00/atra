@@ -5,7 +5,6 @@ from qdrant_client.models import Distance, VectorParams, PointStruct
 from atra.text_utils.embedding import generate_embedding
 import langdetect
 from atra.text_utils.translation import translate
-import os
 
 class BaseSkill:
     def __init__(
@@ -81,6 +80,7 @@ class BaseSkill:
         lang = langdetect.detect(prompt)
         entities = self.extract_entities(prompt)
         entities["lang"] = lang
+        entities["prompt"] = prompt
         answer = self.module(**entities)
         lang_answer = langdetect.detect(answer)
         if lang_answer != lang:

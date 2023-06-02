@@ -3,9 +3,7 @@ import peft
 import torch
 from optimum.bettertransformer import BetterTransformer
 from transformers import AutoProcessor, PreTrainedModel, PreTrainedTokenizer, AutoConfig
-
-from atra.model_utils.unlimiformer import Unlimiformer
-from atra.statics import MODEL_MAPPING
+from atra.statics import MODEL_MAPPING, LANGUAGE_CODES, PROMPTS
 from atra.utils import timeit
 
 MODELS_CACHE = {}
@@ -85,6 +83,9 @@ def get_model_and_processor(
 ) -> tuple[PreTrainedModel, PreTrainedTokenizer]:
     global MODELS_CACHE
 
+    if len(lang) == 2:
+        lang = LANGUAGE_CODES[lang]
+
     # get all the model information from the mapping
     # for the requested task, config and lang
     progress.__call__(progress=0.25, desc="Loading Model Information")
@@ -106,28 +107,21 @@ def get_model_and_processor(
 
     progress.__call__(progress=0.5, desc="Optimizing Model")
     if cached is False:
-        if MODELS_CACHE[model_id]["model"].config.model_type == "t5":
-            print("Converting T5 model to Unlimiformer")
-            MODELS_CACHE[model_id]["model"] = Unlimiformer.convert_model(
+        try:
+            MODELS_CACHE[model_id]["model"] = BetterTransformer.transform(
                 model=MODELS_CACHE[model_id]["model"]
             )
-            MODELS_CACHE[model_id]["model"].eval()
-        else:
-            try:
-                MODELS_CACHE[model_id]["model"] = BetterTransformer.transform(
-                    model=MODELS_CACHE[model_id]["model"]
+        except Exception as e:
+            print("Bettertransformer exception: ", e)
+        try:
+            if task not in ["embedding"]:
+                MODELS_CACHE[model_id]["model"] = torch.compile(
+                    model=MODELS_CACHE[model_id]["model"],
+                    mode="max-autotune",
+                    backend="onnxrt",
                 )
-            except Exception as e:
-                print("Bettertransformer exception: ", e)
-            try:
-                if task not in ["embedding"]:
-                    MODELS_CACHE[model_id]["model"] = torch.compile(
-                        model=MODELS_CACHE[model_id]["model"],
-                        mode="max-autotune",
-                        backend="onnxrt",
-                    )
-            except Exception as e:
-                print("Torch compile exception: ", e)
+        except Exception as e:
+            print("Torch compile exception: ", e)
 
     progress.__call__(progress=0.6, desc="Moving Model to GPU")
     if torch.cuda.is_available():
@@ -140,3 +134,12 @@ def get_model_and_processor(
                 MODELS_CACHE[model_id]["on_gpu"] = True
 
     return MODELS_CACHE[model_id]["model"], MODELS_CACHE[model_id]["processor"]
+
+
+def get_prompt(task: str, lang: str) -> str:
+    if len(lang) == 2:
+        lang = LANGUAGE_CODES[lang]
+
+    prompt = PROMPTS[task][lang]
+
+    return prompt

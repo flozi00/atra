@@ -1,14 +1,19 @@
 from atra.skills.base import BaseSkill
-import wikipedia
-import re
+from atra.web_utils.pw import get_first_searx_result
+from atra.text_utils.question_answering import answer_question
 
+def search_wikipedia(query: str, lang: str, prompt: str) -> str:
+    wiki_page, pw_context, pw_browser = get_first_searx_result(query, f"{lang}.wikipedia.org")
+    text = wiki_page.inner_text("body")
+    text = text.split("\n")
+    text = [line for line in text if len(line) > 32 and (len(line) / line.count(" ")) < 10]
+    text = "\n".join(text)
 
-def search_wikipedia(query: str, lang: str) -> str:
-    wikipedia.set_lang(prefix=lang)
-    topic = wikipedia.search(query)[0]
-    summary = wikipedia.summary(topic)
-    summary = re.sub(pattern="[\(\[].*?[\)\]]", repl="", string=summary)
+    wiki_page.close()
+    pw_context.close()
+    pw_browser.close()
 
+    summary = answer_question(text=text, question=prompt, input_lang=lang)
     return summary
 
 

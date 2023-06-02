@@ -9,7 +9,7 @@ def summarize(text, input_lang, progress=gr.Progress()) -> str:
     model, tokenizer = get_model_and_processor(
         input_lang, "summarization", progress=progress
     )
-    inputs = tokenizer(text, return_tensors="pt", max_length=128_000, truncation=True)
+    inputs = tokenizer(text, return_tensors="pt", max_length=1024, truncation=True)
     progress.__call__(0.7, "Summarizing Text")
     generated_tokens = inference_sum(model, inputs)
     progress.__call__(0.9, "Converting to Text")

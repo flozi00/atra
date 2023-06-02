@@ -190,7 +190,7 @@ TASK_MAPPING = {
 PROMPTS = {
     "question-answering": {
         "german": """Frage: {question}
-    Beantworte die gegebene Frage detailiert mit dem folgenden Kontext:
+    Beantworte die gegebene Aufgabe detailiert mit dem folgenden Kontext:
     {text}""",
         "english": """Question: {question}
     Answer the given Question detailed with the following Context:
