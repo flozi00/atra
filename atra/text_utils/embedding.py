@@ -8,8 +8,8 @@ def average_pool(last_hidden_states: torch.Tensor,
     return last_hidden.sum(dim=1) / attention_mask.sum(dim=1)[..., None]
 
 
-def generate_embedding(sentences: list):
-    model, tokenizer = get_model_and_processor("universal", "embedding")
+def generate_embedding(sentences: list) -> torch.Tensor:
+    model, tokenizer = get_model_and_processor(lang="universal", task="embedding")
     encoded_input = tokenizer(
         sentences, padding=True, truncation=True, return_tensors="pt", max_length=512
     )
@@ -19,7 +19,7 @@ def generate_embedding(sentences: list):
         model_output = model(**encoded_input)
 
     # Perform pooling. In this case, max pooling.
-    sentence_embeddings = average_pool(model_output.last_hidden_state, encoded_input['attention_mask'])
+    sentence_embeddings = average_pool(last_hidden_states=model_output.last_hidden_state, attention_mask=encoded_input['attention_mask'])
 
 
     return sentence_embeddings

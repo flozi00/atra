@@ -3,9 +3,10 @@ import wikipedia
 import re
 
 
-def search_wikipedia(query) -> str:
+def search_wikipedia(query: str, lang: str) -> str:
+    wikipedia.set_lang(prefix=lang)
     topic = wikipedia.search(query)[0]
-    summary = wikipedia.summary(topic, sentences=5)
+    summary = wikipedia.summary(topic)
     summary = re.sub(pattern="[\(\[].*?[\)\]]", repl="", string=summary)
 
     return summary
@@ -19,10 +20,11 @@ skill = BaseSkill(
     },
     examples=[
         "Erzähl mir etwas über Angela Merkel",
-        "Tell me something about Donald Trump",
-        "Wer ist Elon Musk?",
-        "Erzähl mir etwas über die Bundesrepublik Deutschland",
-        "wer ist donald trump"
+        "Gib mir eine Zusammenfassung über Donald Trump",
+        "Was ist ein Coronavirus",
+        "Suche bei Wikipedia nach dem Coronavirus",
+        "Gib mir die Wikipedia-Zusammenfassung über die CDU",
+        "Wer ist Angela Merkel",
     ],
     module=search_wikipedia,
 )
