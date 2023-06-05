@@ -26,6 +26,7 @@ def build_chatbot_ui():
                 stop = gr.Button("Stop")
                 clear = gr.Button("Clear")
             with gr.Row():
+                ethernet = gr.Checkbox(label="Ethernet access")
                 like = gr.Button("Like")
                 dislike = gr.Button("Dislike")
 
@@ -38,6 +39,7 @@ def build_chatbot_ui():
         fn=bot,
         inputs=[
             chatbot,
+            ethernet,
         ],
         outputs=chatbot,
         queue=True,
@@ -51,6 +53,7 @@ def build_chatbot_ui():
         fn=bot,
         inputs=[
             chatbot,
+            ethernet,
         ],
         outputs=chatbot,
         queue=True,

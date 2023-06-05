@@ -62,7 +62,7 @@ MODEL_MAPPING = {
     },
     "chat": {
         "universal": {
-            "name": "OpenAssistant/pythia-12b-sft-v8-7k-steps",
+            "name": "OpenAssistant/falcon-7b-sft-mix-2000",
             "class": AutoModelForCausalLM,
             "processor": AutoTokenizer,
         },
@@ -189,11 +189,11 @@ TASK_MAPPING = {
 
 PROMPTS = {
     "question-answering": {
-        "german": """Frage: {question}
-    Beantworte die gegebene Aufgabe detailiert mit dem folgenden Kontext:
-    {text}""",
-        "english": """Question: {question}
-    Answer the given Question detailed with the following Context:
-    {text}""",
+        "german": """Kontext: {text}
+Aufgabe: {question}
+Beantworte die gegebene Aufgabe und benutze dafür den folgenden Kontext.""",
+        "english": """Context: {text}
+Task: {question}
+Solve the task using only the given context.""",
     }
 }

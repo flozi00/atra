@@ -6,6 +6,7 @@ from atra.text_utils.embedding import generate_embedding
 import langdetect
 from atra.text_utils.translation import translate
 
+
 class BaseSkill:
     def __init__(
         self,
@@ -82,10 +83,7 @@ class BaseSkill:
         entities["lang"] = lang
         entities["prompt"] = prompt
         answer = self.module(**entities)
-        lang_answer = langdetect.detect(answer)
-        if lang_answer != lang:
-            answer = translate(answer, lang_answer, lang)
-        
+
         return answer
 
 
@@ -117,7 +115,7 @@ class SkillStorage:
                 )
                 self.id_to_use += 1
 
-    def choose_skill(self, prompt: str) -> BaseSkill:
+    def choose_skill(self, prompt: str) -> tuple[BaseSkill, float]:
         embeddings = generate_embedding(prompt)
         search_result = self.search_index.search(
             collection_name="atra_skills",
@@ -135,5 +133,6 @@ class SkillStorage:
         skill, score = self.choose_skill(prompt)
         if score < 0.5:
             return False
-        
-        return skill.answer(prompt) + f"\n\nThis skill ({skill.name}) was chosen with a score of {score:.2f}."
+        answer_returned = skill.answer(prompt)
+
+        return answer_returned
