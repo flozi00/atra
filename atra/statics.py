@@ -8,6 +8,7 @@ from transformers import (
     AutoTokenizer,
     AutoProcessor,
 )
+import os
 
 MODEL_MAPPING = {
     "speech_lang_detection": {
@@ -197,3 +198,5 @@ Task: {question}
 Solve the task using only the given context.""",
     }
 }
+
+SEARCH_BACKENDS = os.getenv("SEARCH_BACKENDS", "searx.be").split(",")

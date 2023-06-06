@@ -1,4 +1,4 @@
-from transformers import AutoTokenizer, TextGenerationPipeline
+from transformers import AutoTokenizer
 from auto_gptq import AutoGPTQForCausalLM, BaseQuantizeConfig
 
 BITS = 4
