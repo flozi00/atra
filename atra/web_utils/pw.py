@@ -1,3 +1,4 @@
+import time
 from playwright.sync_api import (
     sync_playwright,
     Page,
@@ -15,14 +16,23 @@ def get_first_searx_result(
 ) -> tuple[Page, BrowserContext, Browser, Playwright]:
     search_backend = random.choice(SEARCH_BACKENDS)
     playwright = sync_playwright().start()
-    browser = playwright.chromium.launch(headless=True)
+    browser = playwright.firefox.launch(headless=True)
     context = browser.new_context()
     page = context.new_page()
     page.goto(f"https://{search_backend}")
-    page.locator("#q").fill(query + ("" if site is None else f" site:{site}"))
-    page.locator(
-        "#search_form > div.input-group.col-md-8.col-md-offset-2 > span.input-group-btn > button:nth-child(1)"
-    ).click()
-    page.locator("#result-1 > a").click()
+    search_box = page.locator("#q")
+    search_box.fill(query + ("" if site is None else f" site:{site}"))
+    search_box.press("Enter")
+    page.wait_for_url(f"https://{search_backend}/search*")
+    try:
+        results = page.locator("#urls")
+        first_link = results.locator("a").all()[0]
+        first_link.click()
+    except Exception as e:
+        print(e)
+        page.close()
+        context.close()
+        browser.close()
+        playwright.stop()
 
     return page, context, browser, playwright

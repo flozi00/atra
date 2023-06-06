@@ -16,7 +16,7 @@ def search_wikipedia(lang: str, prompt: str) -> str:
         and (len(line) / line.count(" ")) < 10
         and ("." in line or "?" in line or "!" in line)
     ]
-    text = "\n".join(text[2:5])
+    text = "\n".join(text[:10])
 
     wiki_page.close()
     pw_context.close()

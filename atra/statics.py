@@ -199,4 +199,4 @@ Solve the task using only the given context.""",
     }
 }
 
-SEARCH_BACKENDS = os.getenv("SEARCH_BACKENDS", "searx.be").split(",")
+SEARCH_BACKENDS = os.getenv("SEARCH_BACKENDS", "gruble.de,searx.fmac.xyz,search.sapti.me").split(",")
