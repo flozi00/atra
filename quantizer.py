@@ -2,8 +2,8 @@ from transformers import AutoTokenizer
 from auto_gptq import AutoGPTQForCausalLM, BaseQuantizeConfig
 
 BITS = 4
-pretrained_model_dir = "OpenAssistant/falcon-7b-sft-mix-2000"
-quantized_model_dir = f"falcon-7b-sft-mix-2000-{BITS}-bits"
+pretrained_model_dir = "OpenAssistant/falcon-40b-sft-mix-1226"
+quantized_model_dir = f"falcon-40b-openassistant-{BITS}-bits"
 
 tokenizer = AutoTokenizer.from_pretrained(pretrained_model_dir, use_fast=True)
 examples = [

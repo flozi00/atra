@@ -13,7 +13,8 @@ def search_wikipedia(lang: str, prompt: str) -> str:
         line
         for line in text
         if len(line) > 32
-        and (len(line) / line.count(" ")) < 10
+        and line.count(" ") > 0
+        and (len(line) / (line.count(" ") if line.count(" ") > 0 else 1)) < 10
         and ("." in line or "?" in line or "!" in line)
     ]
     text = "\n".join(text[:10])
