@@ -6,11 +6,8 @@ from atra.text_utils.chat import bot, user, ranker, missing_skill
 def build_chatbot_ui():
     gr.Markdown(
         """## Open Assistant Chatbot
-    This is a chatbot that can help you with your daily tasks.<br>
-    It is trained on a large amount of data and can answer a wide variety of questions.<br>
-    It is also able to learn from your conversations and improve over time.<br>
-    To use AI tools please select to tools tab above.<br>
-    You can only use the chatbot in English at the moment."""
+    This is an open assistant chatbot. It is designed to be a general purpose chatbot that can be used for any task.<br>
+    To use AI for non textual tasks like speech recognition please select to tools tab above.<br>"""
     )
     chatbot = gr.Chatbot().style(height=500)
     with gr.Row():
