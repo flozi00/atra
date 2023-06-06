@@ -192,10 +192,11 @@ PROMPTS = {
     "question-answering": {
         "german": """Kontext: {text}
 Aufgabe: {question}
-Beantworte die gegebene Aufgabe und benutze dafür den folgenden Kontext.""",
+Beantworte die gegebene Aufgabe und benutze dafür den Kontext.
+Antworte möglichst kurz und präzise.""",
         "english": """Context: {text}
 Task: {question}
-Solve the task using only the given context.""",
+Solve the task using only the context.""",
     }
 }
 

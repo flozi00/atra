@@ -9,10 +9,10 @@ def average_pool(
     return last_hidden.sum(dim=1) / attention_mask.sum(dim=1)[..., None]
 
 
-def generate_embedding(sentences: list) -> torch.Tensor:
+def generate_embedding(sentences: str, mode: str) -> torch.Tensor:
     model, tokenizer = get_model_and_processor(lang="universal", task="embedding")
     encoded_input = tokenizer(
-        sentences, padding=True, truncation=True, return_tensors="pt", max_length=512
+        mode + ": " + sentences, padding=True, truncation=True, return_tensors="pt", max_length=512
     )
     encoded_input = encoded_input.to(model.device)
     # Compute token embeddings

@@ -27,13 +27,13 @@ def do_generation(input):
             use_safetensors=True,
             torch_dtype=torch.bfloat16,
             trust_remote_code=True,
-            max_memory = {0: f"{FREE_GPU_MEM}GiB"},
+            max_memory = {0: f"{FREE_GPU_MEM}GiB", "cpu": "32GiB"},
         )
 
 
     # Tokenize the messages string
     input_ids = tokenizer(
-        input + "<|endoftext|>", return_tensors="pt", max_length=1024, truncation=True
+        input + "<|endoftext|>", return_tensors="pt", max_length=2048, truncation=True
     )
     input_ids.pop("token_type_ids", None)
     input_ids = input_ids.to(model.device)

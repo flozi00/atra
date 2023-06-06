@@ -101,7 +101,7 @@ class SkillStorage:
     def add_skill(self, skill: BaseSkill):
         self.skills.append(skill)
         for example in skill.examples:
-            embeddings = generate_embedding(example)
+            embeddings = generate_embedding(example, "passage")
             for embedding in embeddings:
                 self.search_index.upsert(
                     collection_name="atra_skills",
@@ -116,7 +116,7 @@ class SkillStorage:
                 self.id_to_use += 1
 
     def choose_skill(self, prompt: str) -> tuple[BaseSkill, float]:
-        embeddings = generate_embedding(prompt)
+        embeddings = generate_embedding(prompt, "passage")
         search_result = self.search_index.search(
             collection_name="atra_skills",
             query_vector=embeddings[0].tolist(),

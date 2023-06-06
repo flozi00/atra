@@ -22,29 +22,11 @@ def build_chatbot_ui():
             ).style(container=False)
         with gr.Column():
             with gr.Row():
-                submit = gr.Button("Submit")
+                ethernet = gr.Checkbox(label="Ethernet access")
                 stop = gr.Button("Stop")
                 clear = gr.Button("Clear")
-            with gr.Row():
-                ethernet = gr.Checkbox(label="Ethernet access")
-                like = gr.Button("Like")
-                dislike = gr.Button("Dislike")
 
     submit_event = msg.submit(
-        fn=user,
-        inputs=[msg, chatbot],
-        outputs=[msg, chatbot],
-        queue=False,
-    ).then(
-        fn=bot,
-        inputs=[
-            chatbot,
-            ethernet,
-        ],
-        outputs=chatbot,
-        queue=True,
-    )
-    submit_click_event = submit.click(
         fn=user,
         inputs=[msg, chatbot],
         outputs=[msg, chatbot],
@@ -62,10 +44,7 @@ def build_chatbot_ui():
         fn=None,
         inputs=None,
         outputs=None,
-        cancels=[submit_event, submit_click_event],
+        cancels=[submit_event],
         queue=False,
     )
     clear.click(lambda: None, None, chatbot, queue=False)
-
-    like.click(fn=ranker, inputs=[chatbot])
-    dislike.click(fn=missing_skill, inputs=[chatbot])

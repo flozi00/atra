@@ -21,11 +21,15 @@ quantize_config = BaseQuantizeConfig(
     desc_act=True,  # set to False can significantly speed up inference but the perplexity may slightly bad 
 )
 
-# load un-quantized model, by default, the model will always be loaded into CPU memory
-model = AutoGPTQForCausalLM.from_pretrained(pretrained_model_dir, quantize_config, trust_remote_code=True)
+try:
+    model = AutoGPTQForCausalLM.from_quantized(quantized_model_dir, trust_remote_code=True, use_safetensors=True)
+except Exception as e:
+    print(e)
+    # load un-quantized model, by default, the model will always be loaded into CPU memory
+    model = AutoGPTQForCausalLM.from_pretrained(pretrained_model_dir, quantize_config, trust_remote_code=True)
 
-# quantize model, the examples should be list of dict whose keys can only be "input_ids" and "attention_mask"
-model.quantize(examples, batch_size=4)
+    # quantize model, the examples should be list of dict whose keys can only be "input_ids" and "attention_mask"
+    model.quantize(examples, batch_size=4)
 
 # save quantized model using safetensors
 model.save_quantized(quantized_model_dir, use_safetensors=True)

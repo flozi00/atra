@@ -1,7 +1,7 @@
 from atra.skills.base import BaseSkill
 from atra.web_utils.pw import get_first_searx_result
 from atra.text_utils.question_answering import answer_question
-
+import re
 
 def search_wikipedia(lang: str, prompt: str) -> str:
     wiki_page, pw_context, pw_browser, pw_ = get_first_searx_result(
@@ -16,9 +16,15 @@ def search_wikipedia(lang: str, prompt: str) -> str:
         and line.count(" ") > 0
         and (len(line) / (line.count(" ") if line.count(" ") > 0 else 1)) < 10
         and ("." in line or "?" in line or "!" in line)
+        and "↑" not in line
     ]
-    text = "\n".join(text[:10])
+    text = "\n".join(text)
 
+    # regex to remove all citations, e.g. [1], [2], [3], ...
+    # remove (citation needed) and [citation needed]
+    text = re.sub(r"\([^()]*\)", "", text)
+    text = re.sub(r"\[[^\]]*\]", "", text)
+    
     wiki_page.close()
     pw_context.close()
     pw_browser.close()
@@ -36,11 +42,9 @@ skill = BaseSkill(
         #"query": "extract the search-query from the given prompt, answer only the keyword / topic"
     },
     examples=[
-        "Erzähl mir etwas über Angela Merkel",
         "Gib mir eine Zusammenfassung über Donald Trump",
         "Was ist ein Coronavirus",
         "Suche bei Wikipedia nach dem Coronavirus",
-        "Gib mir die Wikipedia-Zusammenfassung über die CDU",
         "Wer ist Angela Merkel",
     ],
     module=search_wikipedia,
