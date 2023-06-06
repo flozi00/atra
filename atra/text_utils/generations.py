@@ -4,7 +4,8 @@ from transformers import (
 )
 from threading import Thread
 
-from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
+from transformers import AutoTokenizer
+from auto_gptq import AutoGPTQForCausalLM
 from atra.statics import MODEL_MAPPING
 
 model = None
@@ -18,17 +19,13 @@ def do_generation(input):
                 "name"
             ],
         )
-        quantization_config = BitsAndBytesConfig(
-            load_in_8bit=True,
-        )
         FREE_GPU_MEM = int(torch.cuda.mem_get_info()[0] / 1024**3)-4  # in GB
-        model = AutoModelForCausalLM.from_pretrained(
-            pretrained_model_name_or_path=MODEL_MAPPING["chat"]["universal"]["name"],
+        model = AutoGPTQForCausalLM.from_quantized(
+            model_name_or_path=MODEL_MAPPING["chat"]["universal"]["name"],
             device_map="auto",
             low_cpu_mem_usage=True,
-            use_safetensors=False,
-            torch_dtype=torch.float16,
-            quantization_config=quantization_config,
+            use_safetensors=True,
+            torch_dtype=torch.bfloat16,
             trust_remote_code=True,
             max_memory = {0: f"{FREE_GPU_MEM}GiB"},
         )

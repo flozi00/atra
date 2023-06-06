@@ -62,7 +62,7 @@ MODEL_MAPPING = {
     },
     "chat": {
         "universal": {
-            "name": "OpenAssistant/falcon-7b-sft-mix-2000",
+            "name": "flozi00/falcon-7b-sft-mix-2000-4-bits",
             "class": AutoModelForCausalLM,
             "processor": AutoTokenizer,
         },
