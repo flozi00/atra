@@ -3,8 +3,6 @@ import requests
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams, PointStruct
 from atra.text_utils.embedding import generate_embedding
-import langdetect
-from atra.text_utils.translation import translate
 
 
 class BaseSkill:
@@ -78,9 +76,7 @@ class BaseSkill:
         return extracted_entities
 
     def answer(self, prompt) -> str:
-        lang = langdetect.detect(prompt)
         entities = self.extract_entities(prompt)
-        entities["lang"] = lang
         entities["prompt"] = prompt
         answer = self.module(**entities)
 
@@ -100,20 +96,19 @@ class SkillStorage:
 
     def add_skill(self, skill: BaseSkill):
         self.skills.append(skill)
-        for example in skill.examples:
-            embeddings = generate_embedding(example, "passage")
-            for embedding in embeddings:
-                self.search_index.upsert(
-                    collection_name="atra_skills",
-                    points=[
-                        PointStruct(
-                            id=self.id_to_use,
-                            vector=embedding.tolist(),
-                            payload={"name": skill.name},
-                        )
-                    ],
-                )
-                self.id_to_use += 1
+        embeddings = generate_embedding(skill.examples, "passage")
+        for embedding in embeddings:
+            self.search_index.upsert(
+                collection_name="atra_skills",
+                points=[
+                    PointStruct(
+                        id=self.id_to_use,
+                        vector=embedding.tolist(),
+                        payload={"name": skill.name},
+                    )
+                ],
+            )
+            self.id_to_use += 1
 
     def choose_skill(self, prompt: str) -> tuple[BaseSkill, float]:
         embeddings = generate_embedding(prompt, "passage")

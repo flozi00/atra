@@ -3,9 +3,9 @@ from atra.web_utils.pw import get_first_searx_result
 from atra.text_utils.question_answering import answer_question
 import re
 
-def search_wikipedia(lang: str, prompt: str) -> str:
+def search_wikipedia(prompt: str) -> str:
     wiki_page, pw_context, pw_browser, pw_ = get_first_searx_result(
-        prompt, f"{lang}.wikipedia.org"
+        prompt
     )
     text = wiki_page.inner_text("body")
     text = text.split("\n")
@@ -17,6 +17,10 @@ def search_wikipedia(lang: str, prompt: str) -> str:
         and (len(line) / (line.count(" ") if line.count(" ") > 0 else 1)) < 10
         and ("." in line or "?" in line or "!" in line)
         and "↑" not in line
+        and "^" not in line
+        and "↓" not in line
+        and "→" not in line
+        and "←" not in line
     ]
     text = "\n".join(text)
 
@@ -24,13 +28,13 @@ def search_wikipedia(lang: str, prompt: str) -> str:
     # remove (citation needed) and [citation needed]
     text = re.sub(r"\([^()]*\)", "", text)
     text = re.sub(r"\[[^\]]*\]", "", text)
-    
+    source = wiki_page.url
     wiki_page.close()
     pw_context.close()
     pw_browser.close()
     pw_.stop()
 
-    summary = answer_question(text=text, question=prompt, input_lang=lang)
+    summary = answer_question(text=text, question=prompt, source=source)
     
     return summary
 

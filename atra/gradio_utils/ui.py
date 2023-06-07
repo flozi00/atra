@@ -2,8 +2,6 @@ import gradio as gr
 from atra.audio_utils.asr import speech_recognition
 
 from atra.statics import LANG_MAPPING, MODEL_MAPPING
-from atra.text_utils.question_answering import answer_question
-from atra.text_utils.summarization import summarize
 from atra.text_utils.translation import translate
 
 langs = sorted(list(LANG_MAPPING.keys()))
@@ -78,47 +76,5 @@ def build_translator_ui():
     send.click(
         translate,
         inputs=[input_text, input_lang, output_lang],
-        outputs=[output_text],
-    )
-
-
-def build_summarization_ui():
-    with gr.Row():
-        with gr.Column():
-            input_lang = gr.Dropdown(
-                choices=sum_langs, value="german", label="Input Language"
-            )
-            input_text = gr.Textbox(label="Input Text")
-
-        output_text = gr.Text(label="Summarization")
-
-    send = gr.Button(label="Summarize")
-
-    send.click(
-        summarize,
-        inputs=[input_text, input_lang],
-        outputs=[output_text],
-    )
-
-
-def build_question_answering_ui():
-    with gr.Row():
-        with gr.Column():
-            input_lang = gr.Dropdown(
-                choices=question_answering_langs,
-                value="german",
-                label="Input Language",
-            )
-            with gr.Row():
-                input_text = gr.Textbox(label="Input Text")
-                question = gr.Textbox(label="Question")
-
-        output_text = gr.Text(label="Answer")
-
-    send = gr.Button(label="Answer")
-
-    send.click(
-        answer_question,
-        inputs=[input_text, question, input_lang],
         outputs=[output_text],
     )

@@ -5,15 +5,20 @@ import gradio as gr
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams, PointStruct
 
-def answer_question(text, question, input_lang, progress=gr.Progress()) -> str:
+def answer_question(text, question, source: str = None, progress=gr.Progress()) -> str:
     progress.__call__(0.2, "Filtering Text")
     text = sort_context(text, question)
-    text = get_prompt(task="question-answering", lang=input_lang).format(
+    text = get_prompt(task="question-answering").format(
         text=text, question=question
     )
     progress.__call__(0.8, "Answering Question")
     generated_tokens = do_generation(text)
-    return generated_tokens
+
+    for tok in generated_tokens:
+        yield tok
+    
+    if source is not None:
+        yield tok + "\n\n" + "Source: " + source
 
 def sort_context(context, prompt):
     search_index = QdrantClient(":memory:")
@@ -27,15 +32,15 @@ def sort_context(context, prompt):
     context = context.split("\n")
     steps = 1
     context_slices = ["\n".join(context[i : i+steps]) for i in range(0, len(context), steps)]
+    embeddings = generate_embedding(context_slices, "passage")
 
     for example in range(len(context_slices)):
-        embeddings = generate_embedding(context_slices[example], "passage")[0]
         search_index.upsert(
             collection_name="qa_contexts",
             points=[
                 PointStruct(
                     id=id_to_use,
-                    vector=embeddings.tolist(),
+                    vector=embeddings[example].tolist(),
                     payload={"text": context_slices[example]},
                 )
             ],
@@ -47,10 +52,10 @@ def sort_context(context, prompt):
         collection_name="qa_contexts",
         query_vector=embeddings[0].tolist(),
         filter=None,
-        top=5,
+        top=1,
     )
     new_context = ""
-    for i in range((len(search_result) if len(search_result) < 5 else 5)):
+    for i in range((len(search_result) if len(search_result) < 2 else 1)):
         new_context += search_result[i].payload["text"] + "\n\n"
 
     return new_context

@@ -11,8 +11,14 @@ def average_pool(
 
 def generate_embedding(sentences: str, mode: str) -> torch.Tensor:
     model, tokenizer = get_model_and_processor(lang="universal", task="embedding")
+    if isinstance(sentences, list):
+        for x in range(len(sentences)):
+            sentences[x] = mode + ": " + sentences[x]
+    else:
+        sentences = mode + ": " + sentences
+    
     encoded_input = tokenizer(
-        mode + ": " + sentences, padding=True, truncation=True, return_tensors="pt", max_length=512
+        sentences, padding=True, truncation=True, return_tensors="pt", max_length=512
     )
     encoded_input = encoded_input.to(model.device)
     # Compute token embeddings

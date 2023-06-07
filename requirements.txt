@@ -15,8 +15,6 @@ tokenizers>=0.13.3
 https://github.com/huggingface/transformers/archive/refs/heads/main.zip
 https://github.com/huggingface/peft/archive/refs/heads/main.zip
 https://github.com/huggingface/accelerate/archive/refs/heads/main.zip
-rapidfuzz>=3.0.0
 qdrant-client
-langdetect
 playwright
 auto-gptq>=0.2.0

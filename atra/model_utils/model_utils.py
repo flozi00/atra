@@ -136,10 +136,7 @@ def get_model_and_processor(
     return MODELS_CACHE[model_id]["model"], MODELS_CACHE[model_id]["processor"]
 
 
-def get_prompt(task: str, lang: str) -> str:
-    if len(lang) == 2:
-        lang = LANGUAGE_CODES[lang]
-
-    prompt = PROMPTS[task][lang]
+def get_prompt(task: str) -> str:
+    prompt = PROMPTS[task]
 
     return prompt

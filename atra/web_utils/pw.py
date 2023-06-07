@@ -28,6 +28,7 @@ def get_first_searx_result(
         results = page.locator("#urls")
         first_link = results.locator("a").all()[0]
         first_link.click()
+        print("Picked the following url as information source",page.url, search_backend)
     except Exception as e:
         print(e)
         page.close()

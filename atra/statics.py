@@ -63,7 +63,7 @@ MODEL_MAPPING = {
     },
     "chat": {
         "universal": {
-            "name": "flozi00/falcon-7b-sft-mix-2000-4-bits",
+            "name": "flozi00/pythia-12b-sft-v8-4-bits-autogptq",
             "class": AutoModelForCausalLM,
             "processor": AutoTokenizer,
         },
@@ -188,20 +188,15 @@ TASK_MAPPING = {
     "question-answering": ["question", "lang"],
 }
 
-PROMPTS = {
-    "question-answering": {
-        "german": """Kontext: {text}
-Aufgabe: {question}
-Beantworte die gegebene Aufgabe und benutze dafür den Kontext.
-Antworte möglichst kurz und präzise.""",
-        "english": """Context: {text}
-Task: {question}
-Solve the task using only the context.""",
-    }
-}
-
 SEARCH_BACKENDS = os.getenv("SEARCH_BACKENDS", "gruble.de,searx.fmac.xyz,search.sapti.me").split(",")
 
 HUMAN_PREFIX = "<|prompter|>"
 ASSISTANT_PREFIX = "<|assistant|>"
 END_OF_TEXT_TOKEN = "<|endoftext|>"
+
+PROMPTS = {
+    "question-answering": """Context: {text}
+Task: {question}
+Answer the given task using the context.
+The answer should be as short and precise as possible."""
+}

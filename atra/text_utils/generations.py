@@ -28,6 +28,8 @@ def do_generation(input):
             torch_dtype=torch.float16,
             trust_remote_code=True,
             max_memory = {0: f"{FREE_GPU_MEM}GiB", "cpu": "32GiB"},
+            inject_fused_attention=False,
+            inject_fused_mlp=False,
         )
 
 
@@ -45,12 +47,12 @@ def do_generation(input):
     )
     generate_kwargs = dict(
         **input_ids,
-        max_new_tokens=1024,
+        max_new_tokens=256,
         streamer=streamer,
         do_sample=False,
         num_beams=1,
         temperature=0.1,
-        no_repeat_ngram_size=5,
+        no_repeat_ngram_size=3,
         use_cache = True,
     )
 
