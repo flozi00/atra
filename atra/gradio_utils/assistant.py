@@ -1,6 +1,6 @@
 import gradio as gr
 
-from atra.text_utils.chat import bot, user, ranker, missing_skill
+from atra.text_utils.chat import bot, user
 
 
 def build_chatbot_ui():

@@ -6,7 +6,7 @@ from threading import Thread
 
 from transformers import AutoTokenizer
 from auto_gptq import AutoGPTQForCausalLM
-from atra.statics import MODEL_MAPPING
+from atra.statics import END_OF_TEXT_TOKEN, MODEL_MAPPING
 
 model = None
 tokenizer = None
@@ -25,7 +25,7 @@ def do_generation(input):
             device_map="auto",
             low_cpu_mem_usage=True,
             use_safetensors=True,
-            torch_dtype=torch.bfloat16,
+            torch_dtype=torch.float16,
             trust_remote_code=True,
             max_memory = {0: f"{FREE_GPU_MEM}GiB", "cpu": "32GiB"},
         )
@@ -33,7 +33,7 @@ def do_generation(input):
 
     # Tokenize the messages string
     input_ids = tokenizer(
-        input + "<|endoftext|>", return_tensors="pt", max_length=2048, truncation=True
+        input + END_OF_TEXT_TOKEN, return_tensors="pt", max_length=2048, truncation=True
     )
     input_ids.pop("token_type_ids", None)
     input_ids = input_ids.to(model.device)
@@ -49,12 +49,9 @@ def do_generation(input):
         streamer=streamer,
         do_sample=False,
         num_beams=1,
-        temperature=0.0,
-        top_k=50,
-        top_p=50,
-        repetition_penalty=1.0,
-        length_penalty=1.0,
+        temperature=0.1,
         no_repeat_ngram_size=5,
+        use_cache = True,
     )
 
     def generate_and_signal_complete():

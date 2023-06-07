@@ -201,3 +201,7 @@ Solve the task using only the context.""",
 }
 
 SEARCH_BACKENDS = os.getenv("SEARCH_BACKENDS", "gruble.de,searx.fmac.xyz,search.sapti.me").split(",")
+
+HUMAN_PREFIX = "<|prompter|>"
+ASSISTANT_PREFIX = "<|assistant|>"
+END_OF_TEXT_TOKEN = "<|endoftext|>"
