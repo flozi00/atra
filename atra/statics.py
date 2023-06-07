@@ -197,6 +197,6 @@ END_OF_TEXT_TOKEN = "<|endoftext|>"
 PROMPTS = {
     "question-answering": """Context: {text}
 Task: {question}
-Answer the given task using the context.
+Answer the given task using the context. Pay attention to good grammar and spelling.
 The answer should be as short and precise as possible."""
 }
