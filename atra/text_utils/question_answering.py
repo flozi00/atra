@@ -52,10 +52,10 @@ def sort_context(context, prompt):
         collection_name="qa_contexts",
         query_vector=embeddings[0].tolist(),
         filter=None,
-        top=1,
+        top=3,
     )
     new_context = ""
-    for i in range((len(search_result) if len(search_result) < 2 else 1)):
+    for i in range((len(search_result) if len(search_result) < 3 else 3)):
         new_context += search_result[i].payload["text"] + "\n\n"
 
     return new_context
