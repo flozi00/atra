@@ -24,6 +24,7 @@ def get_first_searx_result(
     search_box.fill(query + ("" if site is None else f" site:{site}"))
     search_box.press("Enter")
     page.wait_for_url(f"https://{search_backend}/search*")
+    search_text = page.inner_text("body")
     try:
         results = page.locator("#urls")
         first_link = results.locator("a").all()[0]
@@ -36,4 +37,4 @@ def get_first_searx_result(
         browser.close()
         playwright.stop()
 
-    return page, context, browser, playwright
+    return page, context, browser, playwright, search_text

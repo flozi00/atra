@@ -4,10 +4,10 @@ from atra.text_utils.question_answering import answer_question
 import re
 
 def search_wikipedia(prompt: str) -> str:
-    wiki_page, pw_context, pw_browser, pw_ = get_first_searx_result(
+    wiki_page, pw_context, pw_browser, pw_, search_engine_text = get_first_searx_result(
         prompt
     )
-    text = wiki_page.inner_text("body")
+    text = wiki_page.inner_text("body") + "\n" + search_engine_text
     text = text.split("\n")
     text = [
         line

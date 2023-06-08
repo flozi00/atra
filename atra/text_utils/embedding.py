@@ -1,6 +1,6 @@
 from atra.model_utils.model_utils import get_model_and_processor
 import torch
-
+import copy
 
 def average_pool(
     last_hidden_states: torch.Tensor, attention_mask: torch.Tensor
@@ -11,14 +11,15 @@ def average_pool(
 
 def generate_embedding(sentences: str, mode: str) -> torch.Tensor:
     model, tokenizer = get_model_and_processor(lang="universal", task="embedding")
-    if isinstance(sentences, list):
+    copied_sentences = copy.deepcopy(sentences)
+    if isinstance(copied_sentences, list):
         for x in range(len(sentences)):
-            sentences[x] = mode + ": " + sentences[x]
+            copied_sentences[x] = mode + ": " + sentences[x]
     else:
-        sentences = mode + ": " + sentences
+        copied_sentences = mode + ": " + copied_sentences
     
     encoded_input = tokenizer(
-        sentences, padding=True, truncation=True, return_tensors="pt", max_length=512
+        copied_sentences, padding=True, truncation=True, return_tensors="pt", max_length=512
     )
     encoded_input = encoded_input.to(model.device)
     # Compute token embeddings
