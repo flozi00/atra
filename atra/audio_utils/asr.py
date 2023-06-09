@@ -2,7 +2,7 @@ import torch
 from text_to_num.transforms import alpha2digit
 
 from atra.model_utils.model_utils import get_model_and_processor
-from atra.statics import LANG_MAPPING
+from atra.statics import WHISPER_LANG_MAPPING
 from atra.utils import timeit
 import pyloudnorm as pyln
 from transformers.pipelines.audio_utils import ffmpeg_read
@@ -55,7 +55,7 @@ def speech_recognition(data, language, progress=gr.Progress()) -> str:
 
     progress.__call__(progress=0.9, desc="Converting to Text")
     try:
-        transcription = alpha2digit(text=transcription, lang=LANG_MAPPING[language])
+        transcription = alpha2digit(text=transcription, lang=WHISPER_LANG_MAPPING[language])
     except Exception:
         pass
 

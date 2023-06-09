@@ -1,38 +1,29 @@
-import torch
 from atra.model_utils.model_utils import get_model_and_processor
-from atra.statics import LANG_MAPPING
+from atra.statics import FLORES_LANG_MAPPING
 from atra.utils import timeit
 import gradio as gr
-
+from transformers import pipeline
 
 def translate(text, src, dest, progress=gr.Progress()) -> str:
     if src == dest:
         return text
-    if len(src) > 2:
-        src = LANG_MAPPING[src]
-    if len(dest) > 2:
-        dest = LANG_MAPPING[dest]
+
+    src = FLORES_LANG_MAPPING[src]
+    dest = FLORES_LANG_MAPPING[dest]
+
     model, tokenizer = get_model_and_processor(
         "universal", "translation", progress=progress
     )
-    tokenizer.src_lang = src
-    progress.__call__(0.7, "Tokenizing Text")
-    input_features = tokenizer(text, return_tensors="pt")
     progress.__call__(0.8, "Translating Text")
     generated_tokens = inference_translate(
-        model, input_features, tokenizer.get_lang_id(dest)
+        model, tokenizer, src, dest, text
     )
     progress.__call__(0.9, "Converting to Text")
-    result = tokenizer.batch_decode(generated_tokens, skip_special_tokens=True)
-    return result[0]
+    return generated_tokens
 
 
 @timeit
-def inference_translate(model, input_features, forced_bos_id):
-    input_features.to(model.device)
-    with torch.inference_mode():
-        generated_tokens = model.generate(
-            **input_features, forced_bos_token_id=forced_bos_id
-        )
+def inference_translate(model, tokenizer, source, target, text):
+    translator = pipeline('translation', model=model, tokenizer=tokenizer, src_lang=source, tgt_lang=target, device=model.device)
 
-    return generated_tokens
+    return translator(text)[0]['translation_text']

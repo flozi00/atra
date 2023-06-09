@@ -11,3 +11,4 @@ datasets/*
 temp_*
 *.csv
 huggingface
+*gptq/*

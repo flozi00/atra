@@ -3,7 +3,7 @@ import peft
 import torch
 from optimum.bettertransformer import BetterTransformer
 from transformers import AutoProcessor, PreTrainedModel, PreTrainedTokenizer, AutoConfig
-from atra.statics import MODEL_MAPPING, LANGUAGE_CODES, PROMPTS
+from atra.statics import MODEL_MAPPING, PROMPTS
 from atra.utils import timeit
 
 MODELS_CACHE = {}
@@ -83,9 +83,6 @@ def get_model_and_processor(
 ) -> tuple[PreTrainedModel, PreTrainedTokenizer]:
     global MODELS_CACHE
 
-    if len(lang) == 2:
-        lang = LANGUAGE_CODES[lang]
-
     # get all the model information from the mapping
     # for the requested task, config and lang
     progress.__call__(progress=0.25, desc="Loading Model Information")
@@ -114,7 +111,7 @@ def get_model_and_processor(
         except Exception as e:
             print("Bettertransformer exception: ", e)
         try:
-            if task not in ["embedding"]:
+            if task not in ["embedding", "language-detection"]:
                 MODELS_CACHE[model_id]["model"] = torch.compile(
                     model=MODELS_CACHE[model_id]["model"],
                     mode="max-autotune",

@@ -1,12 +1,11 @@
 import gradio as gr
 from atra.audio_utils.asr import speech_recognition
 
-from atra.statics import LANG_MAPPING, MODEL_MAPPING
+from atra.statics import WHISPER_LANG_MAPPING, FLORES_LANG_MAPPING
 from atra.text_utils.translation import translate
 
-langs = sorted(list(LANG_MAPPING.keys()))
-sum_langs = sorted(list(MODEL_MAPPING["summarization"].keys()))
-question_answering_langs = sorted(list(MODEL_MAPPING["question-answering"].keys()))
+asr_langs = sorted(list(WHISPER_LANG_MAPPING.keys()))
+translation_langs = sorted(list(FLORES_LANG_MAPPING.keys()))
 
 GLOBAL_CSS = """
 #hidden_stuff {display: none} 
@@ -25,7 +24,7 @@ def build_asr_ui():
     2. Details in JSON format
     """
     # UI for getting audio
-    input_lang = gr.Dropdown(choices=langs, value="german", label="Input Language")
+    input_lang = gr.Dropdown(choices=asr_langs, value="german", label="Input Language")
     with gr.Row():
         with gr.TabItem("Microphone"):
             microphone_file = gr.Audio(
@@ -61,19 +60,17 @@ def build_translator_ui():
     with gr.Row():
         with gr.Column():
             input_lang = gr.Dropdown(
-                choices=langs, value=langs[0], label="Input Language"
+                choices=translation_langs, value=translation_langs[0], label="Input Language"
             )
             input_text = gr.Textbox(label="Input Text")
 
         with gr.Column():
             output_lang = gr.Dropdown(
-                choices=langs, value=langs[0], label="Output Language"
+                choices=translation_langs, value=translation_langs[0], label="Output Language"
             )
             output_text = gr.Text(label="Output Text")
 
-    send = gr.Button(label="Translate")
-
-    send.click(
+    input_text.submit(
         translate,
         inputs=[input_text, input_lang, output_lang],
         outputs=[output_text],

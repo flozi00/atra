@@ -30,7 +30,7 @@ def sort_context(context, prompt):
     )
 
     context = context.split("\n")
-    steps = 1
+    steps = 2
     context_slices = ["\n".join(context[i : i+steps]) for i in range(0, len(context), steps)]
     embeddings = generate_embedding(context_slices, "passage")
 
@@ -52,10 +52,12 @@ def sort_context(context, prompt):
         collection_name="qa_contexts",
         query_vector=embeddings[0].tolist(),
         filter=None,
-        top=5,
+        top=2,
     )
     new_context = ""
     for i in range((len(search_result))):
+        if len(new_context) > 2048:
+            break
         new_context += search_result[i].payload["text"] + "\n\n"
 
     return new_context

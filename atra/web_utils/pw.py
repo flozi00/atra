@@ -8,12 +8,19 @@ from playwright.sync_api import (
 from atra.statics import SEARCH_BACKENDS
 import random
 from atra.utils import timeit
+BACKEND_ID = 0
 
 @timeit
-def get_first_searx_result(
-    query: str, site: str = None
+def get_search_result(
+    query: str, site: str = None, id: int = 0
 ) -> tuple[Page, BrowserContext, Browser, Playwright]:
-    search_backend = random.choice(SEARCH_BACKENDS)
+    global BACKEND_ID
+    search_backend = SEARCH_BACKENDS[BACKEND_ID]
+    if BACKEND_ID == len(SEARCH_BACKENDS) - 1:
+        BACKEND_ID = 0
+    else:
+        BACKEND_ID += 1
+        
     playwright = sync_playwright().start()
     browser = playwright.firefox.launch(headless=True)
     context = browser.new_context()
@@ -29,7 +36,7 @@ def get_first_searx_result(
         search_text = ""
     try:
         results = page.locator("#urls")
-        first_link = results.locator("a").all()[0]
+        first_link = results.locator("a").all()[id]
         first_link.click()
     except Exception as e:
         print(e)

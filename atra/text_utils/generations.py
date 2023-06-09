@@ -28,11 +28,12 @@ def do_generation(input, constraints: list[list[str]] = None, max_len = 128):
             torch_dtype=torch.float16,
             trust_remote_code=True,
             max_memory = {0: f"{FREE_GPU_MEM}GiB", "cpu": "32GiB"},
-            inject_fused_attention=True,
-            inject_fused_mlp=True,
+            inject_fused_attention=False,
+            inject_fused_mlp=False,
+            use_triton=False,
         )
         model.eval()
-        model = torch.compile(model)
+        model = torch.compile(model, mode="max-autotune")
 
     if constraints is not None:
         constraints = [tokenizer(x).input_ids for x in constraints]
