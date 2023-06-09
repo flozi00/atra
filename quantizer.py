@@ -2,8 +2,8 @@ from transformers import AutoTokenizer
 from auto_gptq import AutoGPTQForCausalLM, BaseQuantizeConfig
 
 BITS = 4
-pretrained_model_dir = "OpenAssistant/pythia-12b-sft-v8-7k-steps"
-quantized_model_dir = f"pythia-12b-sft-v8-{BITS}-bits-autogptq"
+pretrained_model_dir = "TheBloke/OpenAssistant-SFT-7-Llama-30B-HF"
+quantized_model_dir = f"OpenAssistant-SFT-7-Llama-30B-{BITS}-bits-autogptq"
 
 tokenizer = AutoTokenizer.from_pretrained(pretrained_model_dir, use_fast=True)
 examples = [
@@ -29,7 +29,7 @@ except Exception as e:
     model = AutoGPTQForCausalLM.from_pretrained(pretrained_model_dir, quantize_config, trust_remote_code=True)
 
     # quantize model, the examples should be list of dict whose keys can only be "input_ids" and "attention_mask"
-    model.quantize(examples, batch_size=4)
+    model.quantize(examples, batch_size=4, use_cuda_fp16=False, cache_examples_on_gpu=False)
 
 # save quantized model using safetensors
 model.save_quantized(quantized_model_dir, use_safetensors=True)

@@ -1,4 +1,3 @@
-import time
 from playwright.sync_api import (
     sync_playwright,
     Page,
@@ -24,12 +23,14 @@ def get_first_searx_result(
     search_box.fill(query + ("" if site is None else f" site:{site}"))
     search_box.press("Enter")
     page.wait_for_url(f"https://{search_backend}/search*")
-    search_text = page.inner_text("body")
+    try:
+        search_text = page.inner_text("#answers", timeout=2000)
+    except Exception as e:
+        search_text = ""
     try:
         results = page.locator("#urls")
         first_link = results.locator("a").all()[0]
         first_link.click()
-        print("Picked the following url as information source",page.url, search_backend)
     except Exception as e:
         print(e)
         page.close()

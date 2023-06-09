@@ -1,7 +1,7 @@
 from atra.skills.base import SkillStorage
-from atra.skills.wiki_sums import skill as wiki_skill
+from atra.skills.internet_search import skill as wiki_skill
 from atra.text_utils.generations import do_generation
-from atra.statics import HUMAN_PREFIX, ASSISTANT_PREFIX, END_OF_TEXT_TOKEN
+from atra.statics import HUMAN_PREFIX, ASSISTANT_PREFIX, END_OF_TEXT_TOKEN, PROMPTS
 
 skills = SkillStorage()
 skills.add_skill(skill=wiki_skill)
@@ -47,15 +47,15 @@ def user(message, history):
 
 
 def bot(history, ethernet: bool = False):
-    # check if skill can answer
+    text_history = convert_history_to_text(history)
+    newest_prompt = history[-1][0]
     if ethernet:
-        answer = skills.answer(prompt=history[-1][0])
+        answer = skills.answer(prompt=newest_prompt)
     else:
         answer = False
     if answer is False:
-        answer = do_generation(convert_history_to_text(history))
+        answer = do_generation(text_history, max_len=1024)
 
-    # Initialize an empty string to store the generated text
     for new_text in answer:
         history[-1][1] = new_text
         yield history

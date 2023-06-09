@@ -4,7 +4,6 @@ from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams, PointStruct
 from atra.text_utils.embedding import generate_embedding
 
-
 class BaseSkill:
     def __init__(
         self,

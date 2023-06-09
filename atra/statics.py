@@ -196,7 +196,9 @@ END_OF_TEXT_TOKEN = "<|endoftext|>"
 
 PROMPTS = {
     "question-answering": """Context: {text}
-Task: {question}
-Answer the given task using the context. Pay attention to good grammar and spelling.
-The answer should be as short and precise as possible."""
+Aufgabe: {question}
+Beantworten Sie die gestellte Aufgabe mit Hilfe des Kontextes kurz und präzise.""",
+    "question-generation": """Based on the context, formulate a query for the following question: {question}""",
+    "classify-reformulation": """Context: {history}\n\nAntworte Yes wenn die Frage mit mehr Details aus dem Kontext neu formuliert werden muss, ansonsten antworte No: {question}""",
+    "classify-retrieval": """Answer with "Yes" or "No" ! Classify if it makes sense to retrieve more context for the following question: {question}""",
 }

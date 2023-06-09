@@ -3,11 +3,11 @@ from atra.web_utils.pw import get_first_searx_result
 from atra.text_utils.question_answering import answer_question
 import re
 
-def search_wikipedia(prompt: str) -> str:
+def search_in_web(prompt: str) -> str:
     wiki_page, pw_context, pw_browser, pw_, search_engine_text = get_first_searx_result(
         prompt
     )
-    text = wiki_page.inner_text("body") + "\n" + search_engine_text
+    text = wiki_page.inner_text("body")
     text = text.split("\n")
     text = [
         line
@@ -34,14 +34,17 @@ def search_wikipedia(prompt: str) -> str:
     pw_browser.close()
     pw_.stop()
 
+    if len(search_engine_text) > 10:
+        return search_engine_text
+
     summary = answer_question(text=text, question=prompt, source=source)
     
     return summary
 
 
 skill = BaseSkill(
-    name="Wikipedia Summaries",
-    description="This skill uses Wikipedia to generate short summaries about a given topic.",
+    name="Internet Search",
+    description="This skill uses Search engines to generate short summaries about a given topic.",
     entities={
         #"query": "extract the search-query from the given prompt, answer only the keyword / topic"
     },
@@ -51,5 +54,5 @@ skill = BaseSkill(
         "Suche bei Wikipedia nach dem Coronavirus",
         "Wer ist Angela Merkel",
     ],
-    module=search_wikipedia,
+    module=search_in_web,
 )

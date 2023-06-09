@@ -11,7 +11,7 @@ from atra.statics import END_OF_TEXT_TOKEN, MODEL_MAPPING
 model = None
 tokenizer = None
 
-def do_generation(input):
+def do_generation(input, constraints: list[list[str]] = None, max_len = 128):
     global model, tokenizer
     if model is None:
         tokenizer = AutoTokenizer.from_pretrained(
@@ -32,6 +32,8 @@ def do_generation(input):
             inject_fused_mlp=False,
         )
 
+    if constraints is not None:
+        constraints = [tokenizer(x).input_ids for x in constraints]
 
     # Tokenize the messages string
     input_ids = tokenizer(
@@ -47,23 +49,29 @@ def do_generation(input):
     )
     generate_kwargs = dict(
         **input_ids,
-        max_new_tokens=256,
-        streamer=streamer,
+        max_new_tokens=max_len,
+        min_new_tokens = 1,
         do_sample=False,
         num_beams=1,
-        temperature=0.1,
+        temperature=0.01,
         no_repeat_ngram_size=3,
         use_cache = True,
     )
+    if constraints is not None:
+        generate_kwargs["force_words_ids"] = constraints
+        generate_kwargs["num_beams"] = 3
+        return tokenizer.batch_decode(model.generate(**generate_kwargs))[0]
+    else:
+        generate_kwargs["streamer"] = streamer
 
-    def generate_and_signal_complete():
-        model.generate(**generate_kwargs, pad_token_id=tokenizer.eos_token_id)
+        def generate_and_signal_complete():
+            model.generate(**generate_kwargs) # pad_token_id=tokenizer.eos_token_id
 
-    t1 = Thread(target=generate_and_signal_complete)
-    t1.start()
+        t1 = Thread(target=generate_and_signal_complete)
+        t1.start()
 
-    # Initialize an empty string to store the generated text
-    partial_text = ""
-    for new_text in streamer:
-        partial_text += new_text
-        yield partial_text
+        # Initialize an empty string to store the generated text
+        partial_text = ""
+        for new_text in streamer:
+            partial_text += new_text
+            yield partial_text
