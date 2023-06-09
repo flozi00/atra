@@ -1,7 +1,7 @@
 from atra.skills.base import SkillStorage
 from atra.skills.internet_search import skill as wiki_skill
 from atra.text_utils.generations import do_generation
-from atra.statics import HUMAN_PREFIX, ASSISTANT_PREFIX, END_OF_TEXT_TOKEN, PROMPTS
+from atra.statics import HUMAN_PREFIX, ASSISTANT_PREFIX, END_OF_TEXT_TOKEN
 
 skills = SkillStorage()
 skills.add_skill(skill=wiki_skill)

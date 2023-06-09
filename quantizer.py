@@ -1,7 +1,7 @@
 from transformers import AutoTokenizer
 from auto_gptq import AutoGPTQForCausalLM, BaseQuantizeConfig
 
-BITS = 4
+BITS = 8
 pretrained_model_dir = "TheBloke/OpenAssistant-SFT-7-Llama-30B-HF"
 quantized_model_dir = f"OpenAssistant-SFT-7-Llama-30B-{BITS}-bits-autogptq"
 
@@ -18,7 +18,7 @@ examples = [
 quantize_config = BaseQuantizeConfig(
     bits=BITS,
     group_size=128,  # it is recommended to set the value to 128
-    desc_act=True,  # set to False can significantly speed up inference but the perplexity may slightly bad 
+    desc_act=False,  # set to False can significantly speed up inference but the perplexity may slightly bad 
 )
 
 try:

@@ -63,7 +63,7 @@ MODEL_MAPPING = {
     },
     "chat": {
         "universal": {
-            "name": "flozi00/pythia-12b-sft-v8-4-bits-autogptq",
+            "name": "flozi00/OpenAssistant-SFT-7-Llama-30B-4-bits-autogptq",
             "class": AutoModelForCausalLM,
             "processor": AutoTokenizer,
         },
