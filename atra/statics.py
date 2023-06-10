@@ -76,6 +76,6 @@ END_OF_TEXT_TOKEN = "<|endoftext|>"
 
 PROMPTS = {
     "question-answering": """Context: {text}
-Task: Answer the following task based on the facts given in the context. Give reasons for your answer.
+Task: Answer the following task based on the facts given in the context.
 Question: {question}""",
 }
