@@ -18,13 +18,6 @@ FLORES_LANGUAGE_CODES
 FLORES_LANG_MAPPING
 
 MODEL_MAPPING = {
-    "speech_lang_detection": {
-        "universal": {
-            "name": "openai/whisper-small",
-            "class": WhisperForConditionalGeneration,
-            "processor": AutoProcessor,
-        },
-    },
     "language-detection": {
         "universal": {
             "name": "juliensimon/xlm-v-base-language-id",
@@ -51,33 +44,9 @@ MODEL_MAPPING = {
             "processor": AutoTokenizer,
         }
     },
-    "summarization": {
-        "english": {
-            "name": "google/flan-t5-xl",
-            "class": AutoModelForSeq2SeqLM,
-            "processor": AutoTokenizer,
-        },
-        "german": {
-            "name": "google/flan-t5-xl",
-            "class": AutoModelForSeq2SeqLM,
-            "processor": AutoTokenizer,
-        },
-    },
-    "question-answering": {
-        "english": {
-            "name": "google/flan-t5-xl",
-            "class": AutoModelForSeq2SeqLM,
-            "processor": AutoTokenizer,
-        },
-        "german": {
-            "name": "google/flan-t5-xl",
-            "class": AutoModelForSeq2SeqLM,
-            "processor": AutoTokenizer,
-        },
-    },
     "chat": {
         "universal": {
-            "name": "flozi00/falcon-7b-sft-mix-2000-4-bits-autogptq",
+            "name": "flozi00/OpenAssistant-SFT-7-Llama-30B-4-bits-autogptq",
             "class": AutoModelForCausalLM,
             "processor": AutoTokenizer,
         },
@@ -107,6 +76,6 @@ END_OF_TEXT_TOKEN = "<|endoftext|>"
 
 PROMPTS = {
     "question-answering": """Context: {text}
-Task: Answer the following task based on the facts given in the context.
+Task: Answer the following task based on the facts given in the context. Give reasons for your answer.
 Question: {question}""",
 }

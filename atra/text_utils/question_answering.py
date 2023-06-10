@@ -12,7 +12,7 @@ def answer_question(text, question, source: str = None, progress=gr.Progress()) 
         text=text, question=question
     )
     progress.__call__(0.8, "Answering Question")
-    generated_tokens = do_generation(text, max_len=256)
+    generated_tokens = do_generation(text, max_len=512)
 
     for tok in generated_tokens:
         yield tok

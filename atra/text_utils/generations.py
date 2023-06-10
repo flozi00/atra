@@ -11,7 +11,7 @@ from atra.statics import END_OF_TEXT_TOKEN, MODEL_MAPPING
 model = None
 tokenizer = None
 
-def do_generation(input, constraints: list[list[str]] = None, max_len = 128):
+def do_generation(input, constraints: list[list[str]] = None, max_len = 512):
     global model, tokenizer
     if model is None:
         tokenizer = AutoTokenizer.from_pretrained(
