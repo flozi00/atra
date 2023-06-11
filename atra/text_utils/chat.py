@@ -1,7 +1,10 @@
+import re
 from atra.skills.base import SkillStorage
 from atra.skills.internet_search import skill as wiki_skill
 from atra.text_utils.generations import do_generation
 from atra.statics import HUMAN_PREFIX, ASSISTANT_PREFIX, END_OF_TEXT_TOKEN
+from atra.text_utils.language_detection import classify_language
+from atra.text_utils.translation import translate
 
 skills = SkillStorage()
 skills.add_skill(skill=wiki_skill)
@@ -22,8 +25,8 @@ def convert_history_to_text(history):
         [
             f"{END_OF_TEXT_TOKEN}".join(
                 [
-                    f"{HUMAN_PREFIX}{item[0]}",
-                    f"{ASSISTANT_PREFIX}{item[1]}",
+                    translate(text=f"{HUMAN_PREFIX}{item[0]}", dest="English"),
+                    translate(text=f"{ASSISTANT_PREFIX}{item[1]}", dest="English"),
                 ]
             )
             for item in history[:-1]
@@ -33,13 +36,13 @@ def convert_history_to_text(history):
         [
             f"{END_OF_TEXT_TOKEN}".join(
                 [
-                    f"{HUMAN_PREFIX}{history[-1][0]}",
-                    f"{ASSISTANT_PREFIX}{history[-1][1]}",
+                    translate(text=f"{HUMAN_PREFIX}{history[-1][0]}", dest="English"),
+                    translate(text=f"{ASSISTANT_PREFIX}{history[-1][1]}", dest="English"),
                 ]
             )
         ]
     )
-    return text
+    return text[-2048:]
 
 def user(message, history):
     # Append the user's message to the conversation history
@@ -49,8 +52,10 @@ def user(message, history):
 def bot(history, ethernet: bool = False):
     text_history = convert_history_to_text(history)
     newest_prompt = history[-1][0]
+    src_lang = classify_language(newest_prompt)
+
     if ethernet:
-        answer = skills.answer(prompt=newest_prompt)
+        answer = skills.answer(prompt=text_history)
     else:
         answer = False
     if answer is False:
@@ -59,3 +64,9 @@ def bot(history, ethernet: bool = False):
     for new_text in answer:
         history[-1][1] = new_text
         yield history
+    
+    results, sources = history[-1][1].split("Source:", maxsplit=1)
+    results = re.sub(r'http\S+', '', results)
+    translated = translate(text=results, src="English", dest=src_lang)
+    history[-1][1] = translated + sources
+    yield history

@@ -76,7 +76,7 @@ class BaseSkill:
 
     def answer(self, prompt) -> str:
         entities = self.extract_entities(prompt)
-        entities["prompt"] = prompt
+        entities["history"] = prompt
         answer = self.module(**entities)
 
         return answer

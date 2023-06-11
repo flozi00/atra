@@ -1,3 +1,4 @@
+import re
 import torch
 from transformers import (
     TextIteratorStreamer,
@@ -6,6 +7,7 @@ from threading import Thread
 
 from transformers import AutoTokenizer
 from auto_gptq import AutoGPTQForCausalLM
+from atra.model_utils.model_utils import free_gpu
 from atra.statics import END_OF_TEXT_TOKEN, MODEL_MAPPING
 
 model = None
@@ -14,6 +16,7 @@ tokenizer = None
 def do_generation(input, constraints: list[list[str]] = None, max_len = 512):
     global model, tokenizer
     if model is None:
+        free_gpu(except_model="chat", force=True)
         tokenizer = AutoTokenizer.from_pretrained(
             pretrained_model_name_or_path=MODEL_MAPPING["chat"]["universal"][
                 "name"
@@ -53,7 +56,7 @@ def do_generation(input, constraints: list[list[str]] = None, max_len = 512):
     generate_kwargs = dict(
         **input_ids,
         max_new_tokens=max_len,
-        min_new_tokens = 12,
+        min_new_tokens = int(max_len/32),
         do_sample=False,
         num_beams=1,
         temperature=0.01,
@@ -77,4 +80,5 @@ def do_generation(input, constraints: list[list[str]] = None, max_len = 512):
         partial_text = ""
         for new_text in streamer:
             partial_text += new_text
+            partial_text = re.sub(r"<.*?\|.*?\|.*?>", "", partial_text)
             yield partial_text

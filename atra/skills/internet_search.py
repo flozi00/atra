@@ -2,18 +2,17 @@ from atra.skills.base import BaseSkill
 from atra.web_utils.pw import get_search_result
 from atra.text_utils.question_answering import answer_question
 import re
-from atra.text_utils.language_detection import classify_language
-from atra.text_utils.translation import translate
 
-def search_in_web(prompt: str) -> str:
+def search_in_web(history: str, query: str) -> str:
     context = ""
     source = ""
-    source_lang = classify_language(prompt)
-    prompt = translate(prompt, source_lang, "English")
+    print("searching in web", query)
     for x in range(0,1):
         wiki_page, pw_context, pw_browser, pw_, search_engine_text = get_search_result(
-            prompt, id=x
+            query, id=x
         )
+        if wiki_page.url in source:
+            continue
         text = wiki_page.inner_text("body") + "\n\n" + search_engine_text
         text = text.split("\n")
         text = [
@@ -42,13 +41,12 @@ def search_in_web(prompt: str) -> str:
         pw_browser.close()
         pw_.stop()
 
-    summary = answer_question(text=context, question=prompt, source=source)
+    summary = answer_question(text=context, question=query, source=source)
 
     for sum in summary:
         yield sum
 
     result, sources = sum.split("Source:")
-    sum = translate(result, "English", source_lang)
     
     yield sum + "\n\n" + "Source:" + sources
 
@@ -57,7 +55,7 @@ skill = BaseSkill(
     name="Internet Search",
     description="This skill uses Search engines to generate short summaries about a given topic.",
     entities={
-        #"query": "extract the search-query from the given prompt, answer only the keyword / topic"
+        "query": "Formulate a search query from the last message by attending to the chat history.",
     },
     examples=[
         "Gib mir eine Zusammenfassung über Donald Trump",

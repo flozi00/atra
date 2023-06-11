@@ -9,16 +9,15 @@ from atra.utils import timeit
 MODELS_CACHE = {}
 
 
-def free_gpu(except_model: str) -> None:
+def free_gpu(except_model: str, force: bool = False) -> None:
     global MODELS_CACHE
     FREE_GPU_MEM = int(torch.cuda.mem_get_info()[0] / 1024**3)  # in GB
-    if FREE_GPU_MEM <= 8:
+    if FREE_GPU_MEM <= 8 or force is True:
         models_list = list(MODELS_CACHE.keys())
         for model in models_list:
             if MODELS_CACHE[model]["on_gpu"] is True and model != except_model:
                 MODELS_CACHE[model]["model"].to("cpu")
                 MODELS_CACHE[model]["on_gpu"] = False
-                print("Model {} moved to CPU".format(model))
 
     if torch.cuda.is_available():
         torch.cuda.empty_cache()
@@ -126,7 +125,6 @@ def get_model_and_processor(
         FREE_GPU_MEM = int(torch.cuda.mem_get_info()[0] / 1024**3)  # in GB
         if FREE_GPU_MEM >= 8:
             if MODELS_CACHE[model_id]["on_gpu"] is False:
-                print("Moving model {} to GPU".format(model_id))
                 MODELS_CACHE[model_id]["model"].to("cuda")
                 MODELS_CACHE[model_id]["on_gpu"] = True
 
