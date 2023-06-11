@@ -8,13 +8,13 @@ from functools import cache
 
 @cache
 def translate(text, src: str = None, dest: str = None, progress=gr.Progress()) -> str:
-    if src == dest:
-        return text
-    
     if src is None:
         src = classify_language(text)
     if dest is None:
         dest = "English"
+    
+    if src == dest:
+        return text
 
     src = FLORES_LANG_MAPPING[src]
     dest = FLORES_LANG_MAPPING[dest]

@@ -46,9 +46,9 @@ def search_in_web(history: str, query: str) -> str:
     for sum in summary:
         yield sum
 
-    result, sources = sum.split("Source:")
+    result, sources = sum.split("Source:", maxsplit=1)
     
-    yield sum + "\n\n" + "Source:" + sources
+    yield result + "\n\n" + "Source:" + sources
 
 
 skill = BaseSkill(
