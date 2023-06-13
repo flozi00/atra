@@ -1,13 +1,10 @@
 import re
 import torch
-from transformers import (
-    TextIteratorStreamer,
-)
 from threading import Thread
 
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformers import AutoTokenizer, AutoModelForCausalLM, StoppingCriteriaList, TextIteratorStreamer, StoppingCriteria, PreTrainedTokenizer
 from atra.model_utils.model_utils import free_gpu
-from atra.statics import END_OF_TEXT_TOKEN, MODEL_MAPPING
+from atra.statics import END_OF_TEXT_TOKEN, MODEL_MAPPING, ASSISTANT_PREFIX, HUMAN_PREFIX
 
 model = None
 tokenizer = None
@@ -28,7 +25,7 @@ def do_generation(input, constraints: list[list[str]] = None, max_len = 512):
             low_cpu_mem_usage=True,
             torch_dtype=torch.float16,
             trust_remote_code=True,
-            max_memory = {0: f"{FREE_GPU_MEM}GiB", "cpu": "32GiB"},
+            max_memory = {0: f"{FREE_GPU_MEM}GiB", "cpu": "64GiB"},
         )
         model.eval()
         model = torch.compile(model, mode="max-autotune", backend="onnxrt")
@@ -48,6 +45,17 @@ def do_generation(input, constraints: list[list[str]] = None, max_len = 512):
         skip_prompt=True,
         skip_special_tokens=True,
     )
+    class StopOnTokens(StoppingCriteria):
+        def __init__(self, stopwords, tokenizer: PreTrainedTokenizer ) -> None:
+            super().__init__()
+            self.stopword_ids = [tokenizer.encode(text=word, add_special_tokens=False, padding=False)[0] for word in stopwords]
+
+        def __call__(self, input_ids: torch.LongTensor, scores: torch.FloatTensor, **kwargs) -> bool:
+            for stop_id in self.stopword_ids:
+                if input_ids[0][-1] == stop_id:
+                    return True
+            return False
+
     generate_kwargs = dict(
         **input_ids,
         max_new_tokens=max_len,
@@ -57,6 +65,7 @@ def do_generation(input, constraints: list[list[str]] = None, max_len = 512):
         temperature=0.01,
         no_repeat_ngram_size=3,
         use_cache = True,
+        stopping_criteria=StoppingCriteriaList([StopOnTokens(stopwords=[END_OF_TEXT_TOKEN, HUMAN_PREFIX, ASSISTANT_PREFIX], tokenizer=tokenizer)]),
     )
     if constraints is not None:
         generate_kwargs["force_words_ids"] = constraints
