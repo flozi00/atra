@@ -8,8 +8,8 @@ def search_in_web(history: str, newest_prompt: str) -> str:
     context = ""
     source = ""
     query = newest_prompt
-    print("searching in web", query)
     for x in range(0,1):
+        yield "Searching in Web for the query: " + query
         wiki_page, pw_context, pw_browser, pw_, search_engine_text = get_search_result(
             query, id=x
         )
@@ -43,6 +43,7 @@ def search_in_web(history: str, newest_prompt: str) -> str:
         pw_browser.close()
         pw_.stop()
 
+    yield "Generating Answer ..."
     summary = answer_question(text=context, question=query, source=source)
 
     if summary is False:

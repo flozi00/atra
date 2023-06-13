@@ -7,6 +7,7 @@ from qdrant_client.models import Distance, VectorParams, PointStruct
 
 def answer_question(text, question, source: str = None, progress=gr.Progress()) -> str:
     progress.__call__(0.2, "Filtering Text")
+    yield "Extracting relevant information..."
     text = sort_context(text, question)
     text = get_prompt(task="question-answering").format(
         text=text, question=question
