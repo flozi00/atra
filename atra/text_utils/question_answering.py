@@ -56,7 +56,7 @@ def sort_context(context, prompt):
         collection_name="qa_contexts",
         query_vector=embeddings[0].tolist(),
         filter=None,
-        top=2,
+        top=5,
     )
     new_context = ""
     for i in range((len(search_result))):
