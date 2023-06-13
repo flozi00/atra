@@ -48,9 +48,14 @@ def search_in_web(history: str, newest_prompt: str) -> str:
     for sum in summary:
         yield sum
 
-    result, sources = sum.split("Source:", maxsplit=1)
+    if "Source:" not in sum:
+        result = sum
+        sources = ""
+    else:
+        result, sources = sum.split("Source:", maxsplit=1)
+        sources = "Source:" + sources
     
-    yield result + "\n\n" + "Source:" + sources
+    yield result + "\n\n" + sources
 
 
 skill = BaseSkill(
