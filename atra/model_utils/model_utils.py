@@ -86,18 +86,14 @@ def get_model_and_processor(
     # for the requested task, config and lang
     progress.__call__(progress=0.25, desc="Loading Model Information")
     model_id = MODEL_MAPPING[task].get(lang, {}).get("name", None)
-    
-    if task == "translation":
-        model_id = "Helsinki-NLP/opus-mt-" + lang
-
     if model_id is None:
         lang = "universal"
         model_id = MODEL_MAPPING[task][lang]["name"]
 
-    model_class = MODEL_MAPPING[task][lang if task != "translation" else "universal"].get("class", None)
+    model_class = MODEL_MAPPING[task][lang].get("class", None)
 
     # get processor
-    processor_class = MODEL_MAPPING[task][lang if task != "translation" else "universal"].get("processor", AutoProcessor)
+    processor_class = MODEL_MAPPING[task][lang].get("processor", AutoProcessor)
 
     progress.__call__(progress=0.3, desc="Loading Model tensors")
     # load the model

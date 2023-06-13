@@ -5,7 +5,7 @@ from atra.statics import WHISPER_LANG_MAPPING, FLORES_LANG_MAPPING
 from atra.text_utils.translation import translate
 
 asr_langs = sorted(list(WHISPER_LANG_MAPPING.keys()))
-translation_langs = sorted(list(WHISPER_LANG_MAPPING.keys()))
+translation_langs = sorted(list(FLORES_LANG_MAPPING.keys()))
 
 GLOBAL_CSS = """
 #hidden_stuff {display: none} 

@@ -39,7 +39,7 @@ MODEL_MAPPING = {
     },
     "translation": {
         "universal": {
-            "name": "facebook/nllb-200-distilled-1.3B",
+            "name": "facebook/nllb-200-3.3B",
             "class": AutoModelForSeq2SeqLM,
             "processor": AutoTokenizer,
         }

@@ -57,7 +57,7 @@ def bot(history, ethernet: bool = False):
     if skills is None:
         add_skills()
     text_history, newest_prompt = convert_history_to_text(history)
-    src_lang = classify_language(history[-1][0]).lower()
+    src_lang = classify_language(history[-1][0])
 
     if ethernet:
         answer = skills.answer(prompt=text_history, newest_prompt=newest_prompt)
