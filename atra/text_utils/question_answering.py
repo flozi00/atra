@@ -12,7 +12,7 @@ def answer_question(text, question, source: str = None, progress=gr.Progress()) 
     text = get_prompt(task="question-answering").format(
         text=text, question=question
     )
-    if len(text) < 512:
+    if len(text) < 256:
         text = question
         source = None
     progress.__call__(0.8, "Answering Question")
@@ -34,7 +34,7 @@ def sort_context(context, prompt):
     )
 
     context = context.split("\n")
-    steps = 2
+    steps = 4
     context_slices = ["\n".join(context[i : i+steps]) for i in range(0, len(context), steps)]
     embeddings = generate_embedding(context_slices, "passage")
 
