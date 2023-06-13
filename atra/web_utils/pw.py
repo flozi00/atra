@@ -6,7 +6,6 @@ from playwright.sync_api import (
     Playwright,
 )
 from atra.statics import SEARCH_BACKENDS
-import random
 from atra.utils import timeit
 BACKEND_ID = 0
 
@@ -32,7 +31,7 @@ def get_search_result(
     page.wait_for_url(f"https://{search_backend}/search*")
     try:
         search_text = page.inner_text("#answers", timeout=2000)
-    except Exception as e:
+    except Exception:
         search_text = ""
     try:
         results = page.locator("#urls")

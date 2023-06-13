@@ -1,4 +1,3 @@
-import re
 from atra.skills.base import SkillStorage
 from atra.skills.internet_search import skill as wiki_skill
 from atra.text_utils.generations import do_generation
@@ -24,7 +23,7 @@ model, tokenizer = None, None
 def convert_history_to_text(history):
     text = start_message + "".join(
         [
-            f"".join(
+            "".join(
                 [
                     HUMAN_PREFIX + f"{item[0]}" + END_OF_TEXT_TOKEN,
                     ASSISTANT_PREFIX + f"{item[1]}" + END_OF_TEXT_TOKEN,
@@ -35,7 +34,7 @@ def convert_history_to_text(history):
     )
     text += "".join(
         [
-            f"".join(
+            "".join(
                 [
                     HUMAN_PREFIX + f"{history[-1][0]}" + END_OF_TEXT_TOKEN,
                     ASSISTANT_PREFIX,

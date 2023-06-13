@@ -1,5 +1,4 @@
 from atra.skills.base import BaseSkill
-from atra.statics import END_OF_TEXT_TOKEN
 from atra.web_utils.pw import get_search_result
 from atra.text_utils.question_answering import answer_question
 import re
@@ -53,7 +52,6 @@ def search_in_web(history: str, newest_prompt: str) -> str:
         sources = ""
     else:
         result, sources = sum.split("Source:", maxsplit=1)
-        sources = "Source:" + sources
     
     yield result + "\n\n" + sources
 
