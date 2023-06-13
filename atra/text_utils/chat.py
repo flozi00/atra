@@ -23,10 +23,10 @@ model, tokenizer = None, None
 def convert_history_to_text(history):
     text = start_message + "".join(
         [
-            f"{END_OF_TEXT_TOKEN}".join(
+            f"".join(
                 [
-                    translate(text=f"{HUMAN_PREFIX}{item[0]}", dest="English"),
-                    translate(text=f"{ASSISTANT_PREFIX}{item[1]}", dest="English"),
+                    HUMAN_PREFIX + translate(text=f"{item[0]}", dest="English") + END_OF_TEXT_TOKEN,
+                    ASSISTANT_PREFIX + translate(text=f"{item[1]}", dest="English") + END_OF_TEXT_TOKEN,
                 ]
             )
             for item in history[:-1]
@@ -34,10 +34,10 @@ def convert_history_to_text(history):
     )
     text += "".join(
         [
-            f"{END_OF_TEXT_TOKEN}".join(
+            f"".join(
                 [
-                    translate(text=f"{HUMAN_PREFIX}{history[-1][0]}", dest="English"),
-                    translate(text=f"{ASSISTANT_PREFIX}{history[-1][1]}", dest="English"),
+                    HUMAN_PREFIX + translate(text=f"{history[-1][0]}", dest="English") + END_OF_TEXT_TOKEN,
+                    ASSISTANT_PREFIX,
                 ]
             )
         ]
@@ -65,7 +65,11 @@ def bot(history, ethernet: bool = False):
         history[-1][1] = new_text
         yield history
     
-    results, sources = history[-1][1].split("Source:", maxsplit=1)
+    if "Source:" in history[-1][1]:
+        results, sources = history[-1][1].split("Source:", maxsplit=1)
+    else:
+        results = history[-1][1]
+        sources = ""
     results = re.sub(r'http\S+', '', results)
     translated = translate(text=results, src="English", dest=src_lang)
     history[-1][1] = translated + sources

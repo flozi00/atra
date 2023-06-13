@@ -43,6 +43,9 @@ def search_in_web(history: str, query: str) -> str:
 
     summary = answer_question(text=context, question=query, source=source)
 
+    if summary is False:
+        return False
+
     for sum in summary:
         yield sum
 
