@@ -7,7 +7,7 @@ from atra.statics import MODEL_MAPPING, PROMPTS
 from atra.utils import timeit
 
 MODELS_CACHE = {}
-
+TASK_BLACKLIST = ["embedding", "language-detection"]
 
 def free_gpu(except_model: str, force: bool = False) -> None:
     global MODELS_CACHE
@@ -110,7 +110,7 @@ def get_model_and_processor(
         except Exception as e:
             print("Bettertransformer exception: ", e)
         try:
-            if task not in ["embedding", "language-detection"]:
+            if task not in TASK_BLACKLIST:
                 MODELS_CACHE[model_id]["model"] = torch.compile(
                     model=MODELS_CACHE[model_id]["model"],
                     mode="max-autotune",
@@ -120,7 +120,7 @@ def get_model_and_processor(
             print("Torch compile exception: ", e)
 
     progress.__call__(progress=0.6, desc="Moving Model to GPU")
-    if torch.cuda.is_available():
+    if torch.cuda.is_available() and task not in TASK_BLACKLIST:
         free_gpu(except_model=model_id)
         FREE_GPU_MEM = int(torch.cuda.mem_get_info()[0] / 1024**3)  # in GB
         if FREE_GPU_MEM >= 8:

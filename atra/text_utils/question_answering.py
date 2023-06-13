@@ -13,7 +13,8 @@ def answer_question(text, question, source: str = None, progress=gr.Progress()) 
         text=text, question=question
     )
     if len(text) < 128:
-        return False
+        text = question
+        source = None
     progress.__call__(0.8, "Answering Question")
     generated_tokens = do_generation(text, max_len=512)
 
@@ -59,7 +60,7 @@ def sort_context(context, prompt):
     )
     new_context = ""
     for i in range((len(search_result))):
-        if len(new_context) > 2048 or search_result[i].score < 0.7:
+        if len(new_context) > 2048 or search_result[i].score < 0.5:
             break
         new_context += search_result[i].payload["text"] + "\n\n"
 

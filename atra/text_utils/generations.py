@@ -43,7 +43,7 @@ def do_generation(input, constraints: list[list[str]] = None, max_len = 512):
 
     # Tokenize the messages string
     input_ids = tokenizer(
-        input + END_OF_TEXT_TOKEN, return_tensors="pt", max_length=2048, truncation=True
+        input + END_OF_TEXT_TOKEN, return_tensors="pt", max_length=1024, truncation=True
     )
     input_ids.pop("token_type_ids", None)
     input_ids = input_ids.to(model.device)

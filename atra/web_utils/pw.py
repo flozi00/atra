@@ -38,11 +38,15 @@ def get_search_result(
         results = page.locator("#urls")
         first_link = results.locator("a").all()[id]
         first_link.click()
+        text = page.inner_text("body")
+        url = page.url
     except Exception as e:
+        text = ""
+        url = ""
         print(e)
-        page.close()
-        context.close()
-        browser.close()
-        playwright.stop()
+    page.close()
+    context.close()
+    browser.close()
+    playwright.stop()
 
-    return page, context, browser, playwright, search_text
+    return text, search_text, url

@@ -10,12 +10,12 @@ def search_in_web(history: str, newest_prompt: str) -> str:
     query = newest_prompt
     for x in range(0,1):
         yield "Searching in Web for the query: " + query
-        wiki_page, pw_context, pw_browser, pw_, search_engine_text = get_search_result(
+        text, search_engine_text, url = get_search_result(
             query, id=x
         )
-        if wiki_page.url in source:
+        if url in source:
             continue
-        text = wiki_page.inner_text("body") + "\n\n" + search_engine_text
+        text += "\n\n" + search_engine_text
         text = text.split("\n")
         text = [
             line
@@ -37,11 +37,7 @@ def search_in_web(history: str, newest_prompt: str) -> str:
         text = re.sub(r"\([^()]*\)", "", text)
         text = re.sub(r"\[[^\]]*\]", "", text)
         context += text + "\n"
-        source += wiki_page.url + "\n"
-        wiki_page.close()
-        pw_context.close()
-        pw_browser.close()
-        pw_.stop()
+        source += url + "\n"
 
     yield "Generating Answer ..."
     summary = answer_question(text=context, question=query, source=source)
