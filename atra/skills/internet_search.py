@@ -16,14 +16,14 @@ def search_in_web(history: str, newest_prompt: str) -> str:
         if url in source:
             continue
         text += "\n\n" + search_engine_text
-        text = text.split("\n")
+        text = re.split(r'[.!?\r\n|\r|\n]', text)
+
         text = [
             line
             for line in text
             if len(line) > 32
             and line.count(" ") > 0
             and (len(line) / (line.count(" ") if line.count(" ") > 0 else 1)) < 10
-            and ("." in line or "?" in line or "!" in line)
             and "↑" not in line
             and "^" not in line
             and "↓" not in line

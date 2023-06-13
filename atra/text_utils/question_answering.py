@@ -12,7 +12,7 @@ def answer_question(text, question, source: str = None, progress=gr.Progress()) 
     text = get_prompt(task="question-answering").format(
         text=text, question=question
     )
-    if len(text) < 128:
+    if len(text) < 512:
         text = question
         source = None
     progress.__call__(0.8, "Answering Question")
@@ -60,7 +60,7 @@ def sort_context(context, prompt):
     )
     new_context = ""
     for i in range((len(search_result))):
-        if len(new_context) > 2048 or search_result[i].score < 0.5:
+        if len(new_context) > 2048 or search_result[i].score < 0.8:
             break
         new_context += search_result[i].payload["text"] + "\n\n"
 
