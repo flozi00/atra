@@ -33,6 +33,6 @@ def translate(text, src: str = None, dest: str = None, progress=gr.Progress()) -
 
 @timeit
 def inference_translate(model, tokenizer, source, target, text):
-    translator = pipeline('translation', model=model, tokenizer=tokenizer, src_lang=source, tgt_lang=target, device=model.device)
+    translator = pipeline('translation', model=model, tokenizer=tokenizer, src_lang=source, tgt_lang=target, device=model.device, min_new_tokens=int(len(text)/3.5), max_new_tokens=int(len(text)/2))
 
     return translator(text)[0]['translation_text']

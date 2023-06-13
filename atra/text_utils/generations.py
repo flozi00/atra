@@ -56,11 +56,10 @@ def do_generation(input, constraints: list[list[str]] = None, max_len = 512):
     generate_kwargs = dict(
         **input_ids,
         max_new_tokens=max_len,
-        min_new_tokens = int(max_len/32),
+        min_new_tokens = int(max_len/8),
         do_sample=False,
         num_beams=1,
         temperature=0.01,
-        no_repeat_ngram_size=3,
         use_cache = True,
     )
     if constraints is not None:
