@@ -1,11 +1,13 @@
 from atra.skills.base import BaseSkill
+from atra.statics import END_OF_TEXT_TOKEN
 from atra.web_utils.pw import get_search_result
 from atra.text_utils.question_answering import answer_question
 import re
 
-def search_in_web(history: str, query: str) -> str:
+def search_in_web(history: str, newest_prompt: str) -> str:
     context = ""
     source = ""
+    query = newest_prompt
     print("searching in web", query)
     for x in range(0,1):
         wiki_page, pw_context, pw_browser, pw_, search_engine_text = get_search_result(
@@ -58,7 +60,7 @@ skill = BaseSkill(
     name="Internet Search",
     description="This skill uses Search engines to generate short summaries about a given topic.",
     entities={
-        "query": "Formulate a search query from the last message by attending to the chat history.",
+        #"query": "Formulate a search query from the last message by attending to the chat history.",
     },
     examples=[
         "Gib mir eine Zusammenfassung über Donald Trump",

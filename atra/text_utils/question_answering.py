@@ -58,7 +58,7 @@ def sort_context(context, prompt):
     )
     new_context = ""
     for i in range((len(search_result))):
-        if len(new_context) > 2048 or search_result[i].score < 0.6:
+        if len(new_context) > 2048 or search_result[i].score < 0.7:
             break
         new_context += search_result[i].payload["text"] + "\n\n"
 

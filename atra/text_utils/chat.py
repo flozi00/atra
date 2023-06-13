@@ -42,7 +42,7 @@ def convert_history_to_text(history):
             )
         ]
     )
-    return text[-2048:]
+    return text[-2048:], translate(text=f"{history[-1][0]}", dest="English")
 
 def user(message, history):
     # Append the user's message to the conversation history
@@ -50,12 +50,11 @@ def user(message, history):
 
 
 def bot(history, ethernet: bool = False):
-    text_history = convert_history_to_text(history)
-    newest_prompt = history[-1][0]
-    src_lang = classify_language(newest_prompt)
+    text_history, newest_prompt = convert_history_to_text(history)
+    src_lang = classify_language(history[-1][0])
 
     if ethernet:
-        answer = skills.answer(prompt=text_history)
+        answer = skills.answer(prompt=text_history, newest_prompt=newest_prompt)
     else:
         answer = False
     if answer is False:

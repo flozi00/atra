@@ -75,9 +75,10 @@ class BaseSkill:
 
         return extracted_entities
 
-    def answer(self, prompt) -> str:
+    def answer(self, prompt, newest_prompt) -> str:
         entities = self.extract_entities(prompt)
         entities["history"] = prompt
+        entities["newest_prompt"] = newest_prompt
         answer = self.module(**entities)
 
         return answer
@@ -124,10 +125,10 @@ class SkillStorage:
             if skill.name == search_result[0].payload["name"]
         ][0], search_result[0].score
 
-    def answer(self, prompt: str) -> str:
+    def answer(self, prompt: str, newest_prompt: str) -> str:
         skill, score = self.choose_skill(prompt)
         if score < 0.5:
             return False
-        answer_returned = skill.answer(prompt)
+        answer_returned = skill.answer(prompt, newest_prompt)
 
         return answer_returned
