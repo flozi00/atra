@@ -1,5 +1,5 @@
 from atra.model_utils.model_utils import get_model_and_processor
-from atra.statics import FLORES_LANG_MAPPING
+from atra.statics import WHISPER_LANG_MAPPING
 from atra.text_utils.language_detection import classify_language
 from atra.utils import timeit
 import gradio as gr
@@ -9,18 +9,21 @@ from functools import cache
 @cache
 def translate(text, src: str = None, dest: str = None, progress=gr.Progress()) -> str:
     if src is None:
-        src = classify_language(text)
+        src = classify_language(text).lower()
     if dest is None:
-        dest = "English"
+        dest = "english"
+    
+    dest = dest.lower()
+    src = src.lower()
     
     if src == dest:
         return text
 
-    src = FLORES_LANG_MAPPING[src]
-    dest = FLORES_LANG_MAPPING[dest]
+    src = WHISPER_LANG_MAPPING[src]
+    dest = WHISPER_LANG_MAPPING[dest]
 
     model, tokenizer = get_model_and_processor(
-        "universal", "translation", progress=progress
+        f"{src}-{dest}", "translation", progress=progress
     )
     progress.__call__(0.8, "Translating Text")
     generated_tokens = inference_translate(

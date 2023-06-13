@@ -3,7 +3,7 @@ from atra.utils import timeit
 from atra.model_utils.model_utils import get_model_and_processor
 
 @timeit
-def classify_language(text):
+def classify_language(text) -> str:
     model, tokenizer = get_model_and_processor(
         "universal", "language-detection",
     )
