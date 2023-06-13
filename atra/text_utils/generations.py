@@ -5,8 +5,7 @@ from transformers import (
 )
 from threading import Thread
 
-from transformers import AutoTokenizer
-from auto_gptq import AutoGPTQForCausalLM
+from transformers import AutoTokenizer, AutoModelForCausalLM
 from atra.model_utils.model_utils import free_gpu
 from atra.statics import END_OF_TEXT_TOKEN, MODEL_MAPPING
 
@@ -16,27 +15,23 @@ tokenizer = None
 def do_generation(input, constraints: list[list[str]] = None, max_len = 512):
     global model, tokenizer
     if model is None:
-        free_gpu(except_model="chat", force=True)
+        free_gpu(except_model="chat")
         tokenizer = AutoTokenizer.from_pretrained(
             pretrained_model_name_or_path=MODEL_MAPPING["chat"]["universal"][
                 "name"
             ],
         )
-        FREE_GPU_MEM = int(torch.cuda.mem_get_info()[0] / 1024**3)-4  # in GB
-        model = AutoGPTQForCausalLM.from_quantized(
-            model_name_or_path=MODEL_MAPPING["chat"]["universal"]["name"],
+        FREE_GPU_MEM = int(torch.cuda.mem_get_info()[0] / 1024**3)-3  # in GB
+        model = AutoModelForCausalLM.from_pretrained(
+            MODEL_MAPPING["chat"]["universal"]["name"],
             device_map="auto",
             low_cpu_mem_usage=True,
-            use_safetensors=True,
             torch_dtype=torch.float16,
             trust_remote_code=True,
             max_memory = {0: f"{FREE_GPU_MEM}GiB", "cpu": "32GiB"},
-            inject_fused_attention=False,
-            inject_fused_mlp=False,
-            use_triton=False,
         )
         model.eval()
-        model = torch.compile(model, mode="max-autotune")
+        model = torch.compile(model, mode="max-autotune", backend="onnxrt")
 
     if constraints is not None:
         constraints = [tokenizer(x).input_ids for x in constraints]
@@ -56,7 +51,7 @@ def do_generation(input, constraints: list[list[str]] = None, max_len = 512):
     generate_kwargs = dict(
         **input_ids,
         max_new_tokens=max_len,
-        min_new_tokens = int(max_len/16),
+        min_new_tokens = int(max_len/4),
         do_sample=False,
         num_beams=1,
         temperature=0.01,

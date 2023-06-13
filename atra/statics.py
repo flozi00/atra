@@ -46,7 +46,7 @@ MODEL_MAPPING = {
     },
     "chat": {
         "universal": {
-            "name": "flozi00/OpenAssistant-SFT-7-Llama-30B-4-bits-autogptq",
+            "name": "OpenAssistant/falcon-7b-sft-mix-2000",
             "class": AutoModelForCausalLM,
             "processor": AutoTokenizer,
         },
