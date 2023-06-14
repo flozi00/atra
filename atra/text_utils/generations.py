@@ -10,7 +10,6 @@ from transformers import (
     StoppingCriteria,
     PreTrainedTokenizer,
     BitsAndBytesConfig,
-    AutoConfig,
 )
 from atra.model_utils.model_utils import free_gpu
 from atra.statics import (
@@ -19,7 +18,6 @@ from atra.statics import (
     ASSISTANT_PREFIX,
     HUMAN_PREFIX,
 )
-from accelerate import infer_auto_device_map, init_empty_weights
 
 model = None
 tokenizer = None
@@ -29,10 +27,14 @@ def do_generation(input, constraints: list[list[str]] = None, max_len=512):
     global model, tokenizer
     if model is None:
         free_gpu(except_model="chat")
+        FREE_GPU_MEM = int(torch.cuda.mem_get_info()[0] / 1024**3) - 3  # in GB
+        if FREE_GPU_MEM > 36:
+            mode = "large"
+        else:
+            mode = "universal"
         tokenizer = AutoTokenizer.from_pretrained(
-            pretrained_model_name_or_path=MODEL_MAPPING["chat"]["universal"]["name"],
+            pretrained_model_name_or_path=MODEL_MAPPING["chat"][mode]["name"],
         )
-        FREE_GPU_MEM = int(torch.cuda.mem_get_info()[0] / 1024**3) - 6  # in GB
         bnb_conf = BitsAndBytesConfig(
             load_in_4bit=True,
             bnb_4bit_use_double_quant=True,
@@ -40,12 +42,12 @@ def do_generation(input, constraints: list[list[str]] = None, max_len=512):
         )
 
         model = AutoModelForCausalLM.from_pretrained(
-            pretrained_model_name_or_path=MODEL_MAPPING["chat"]["universal"]["name"],
+            pretrained_model_name_or_path=MODEL_MAPPING["chat"][mode]["name"],
             device_map="auto",
             low_cpu_mem_usage=True,
             torch_dtype=torch.float16,
             trust_remote_code=True,
-            max_memory={0: f"{FREE_GPU_MEM}GiB", "cpu": "64GiB"},
+            max_memory={0: f"{FREE_GPU_MEM}GB", "cpu": "64GB"},
             quantization_config=bnb_conf,
         )
         model.eval()
@@ -89,7 +91,7 @@ def do_generation(input, constraints: list[list[str]] = None, max_len=512):
         min_new_tokens=int(max_len / 4),
         do_sample=False,
         num_beams=1,
-        temperature=0.01,
+        temperature=1,
         no_repeat_ngram_size=3,
         use_cache=True,
         stopping_criteria=StoppingCriteriaList(
@@ -100,6 +102,8 @@ def do_generation(input, constraints: list[list[str]] = None, max_len=512):
                 )
             ]
         ),
+        eos_token_id = tokenizer.eos_token_id,
+        pad_token_id = tokenizer.eos_token_id
     )
     if constraints is not None:
         generate_kwargs["force_words_ids"] = constraints

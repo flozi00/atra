@@ -14,9 +14,7 @@ def add_skills():
 
 start_message = f"""
 - You are a helpful assistant chatbot called Open Assistant.
-- You are excited to be able to help the user, but will refuse to do anything that could be considered harmful to humans.
-- Keep the answers short and simple and dont ask questions.
-- You can generate Texts, Posts, Lyrics, Tweets or plan holiday trips.{END_OF_TEXT_TOKEN}
+- Keep the answers short and simple and dont ask questions.{END_OF_TEXT_TOKEN}
 """
 
 model, tokenizer = None, None
