@@ -1,7 +1,6 @@
 from transformers import (
     WhisperForConditionalGeneration,
     AutoModelForSeq2SeqLM,
-    AutoModelForCausalLM,
     AutoModelForSequenceClassification,
     AutoModel,
     AutoTokenizer,
