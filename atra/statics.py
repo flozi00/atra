@@ -50,11 +50,6 @@ MODEL_MAPPING = {
             "class": AutoModelForCausalLM,
             "processor": AutoTokenizer,
         },
-        "large": {
-            "name": "OpenAssistant/falcon-40b-lora-sft-1.4k",
-            "class": AutoModelForCausalLM,
-            "processor": AutoTokenizer,
-        },
     },
     "embedding": {
         "universal": {

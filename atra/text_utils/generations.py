@@ -28,12 +28,8 @@ def do_generation(input, constraints: list[list[str]] = None, max_len=512):
     if model is None:
         free_gpu(except_model="chat")
         FREE_GPU_MEM = int(torch.cuda.mem_get_info()[0] / 1024**3) - 3  # in GB
-        if FREE_GPU_MEM > 36:
-            mode = "large"
-        else:
-            mode = "universal"
         tokenizer = AutoTokenizer.from_pretrained(
-            pretrained_model_name_or_path=MODEL_MAPPING["chat"][mode]["name"],
+            pretrained_model_name_or_path=MODEL_MAPPING["chat"]["universal"]["name"],
         )
         bnb_conf = BitsAndBytesConfig(
             load_in_4bit=True,
@@ -42,7 +38,7 @@ def do_generation(input, constraints: list[list[str]] = None, max_len=512):
         )
 
         model = AutoModelForCausalLM.from_pretrained(
-            pretrained_model_name_or_path=MODEL_MAPPING["chat"][mode]["name"],
+            pretrained_model_name_or_path=MODEL_MAPPING["chat"]["universal"]["name"],
             device_map="auto",
             low_cpu_mem_usage=True,
             torch_dtype=torch.float16,
