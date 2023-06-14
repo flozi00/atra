@@ -1,4 +1,4 @@
-codes_as_string = '''Acehnese (Arabic script)	ace_Arab
+codes_as_string = """Acehnese (Arabic script)	ace_Arab
 Acehnese (Latin script)	ace_Latn
 Mesopotamian Arabic	acm_Arab
 Ta’izzi-Adeni Arabic	acq_Arab
@@ -201,13 +201,13 @@ Yue Chinese	yue_Hant
 Chinese (Simplified)	zho_Hans
 Chinese (Traditional)	zho_Hant
 Standard Malay	zsm_Latn
-Zulu	zul_Latn'''
+Zulu	zul_Latn"""
 
-codes_as_string = codes_as_string.split('\n')
+codes_as_string = codes_as_string.split("\n")
 
 FLORES_LANG_MAPPING = {}
 for code in codes_as_string:
-    lang, lang_code = code.split('\t')
+    lang, lang_code = code.split("\t")
     FLORES_LANG_MAPPING[lang] = lang_code
 
 FLORES_LANGUAGE_CODES = {v: k for k, v in FLORES_LANG_MAPPING.items()}

@@ -9,6 +9,7 @@ from atra.utils import timeit
 MODELS_CACHE = {}
 TASK_BLACKLIST = ["embedding", "language-detection"]
 
+
 def free_gpu(except_model: str, force: bool = False) -> None:
     global MODELS_CACHE
     FREE_GPU_MEM = int(torch.cuda.mem_get_info()[0] / 1024**3)  # in GB

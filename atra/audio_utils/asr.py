@@ -55,7 +55,9 @@ def speech_recognition(data, language, progress=gr.Progress()) -> str:
 
     progress.__call__(progress=0.9, desc="Converting to Text")
     try:
-        transcription = alpha2digit(text=transcription, lang=WHISPER_LANG_MAPPING[language])
+        transcription = alpha2digit(
+            text=transcription, lang=WHISPER_LANG_MAPPING[language]
+        )
     except Exception:
         pass
 

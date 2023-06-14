@@ -7,7 +7,9 @@ from playwright.sync_api import (
 )
 from atra.statics import SEARCH_BACKENDS
 from atra.utils import timeit
+
 BACKEND_ID = 0
+
 
 @timeit
 def get_search_result(
@@ -19,7 +21,7 @@ def get_search_result(
         BACKEND_ID = 0
     else:
         BACKEND_ID += 1
-        
+
     playwright = sync_playwright().start()
     browser = playwright.firefox.launch(headless=True)
     context = browser.new_context()

@@ -60,13 +60,17 @@ def build_translator_ui():
     with gr.Row():
         with gr.Column():
             input_lang = gr.Dropdown(
-                choices=translation_langs, value=translation_langs[0], label="Input Language"
+                choices=translation_langs,
+                value=translation_langs[0],
+                label="Input Language",
             )
             input_text = gr.Textbox(label="Input Text")
 
         with gr.Column():
             output_lang = gr.Dropdown(
-                choices=translation_langs, value=translation_langs[0], label="Output Language"
+                choices=translation_langs,
+                value=translation_langs[0],
+                label="Output Language",
             )
             output_text = gr.Text(label="Output Text")
 

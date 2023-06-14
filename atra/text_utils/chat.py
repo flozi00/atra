@@ -5,10 +5,12 @@ from atra.statics import HUMAN_PREFIX, ASSISTANT_PREFIX, END_OF_TEXT_TOKEN
 
 skills = None
 
+
 def add_skills():
     global skills
     skills = SkillStorage()
     skills.add_skill(skill=wiki_skill)
+
 
 start_message = f"""
 - You are a helpful assistant chatbot called Open Assistant.
@@ -43,6 +45,7 @@ def convert_history_to_text(history):
         ]
     )
     return text[-2048:], history[-1][0]
+
 
 def user(message, history):
     # Append the user's message to the conversation history

@@ -5,13 +5,12 @@ import gradio as gr
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams, PointStruct
 
+
 def answer_question(text, question, source: str = None, progress=gr.Progress()) -> str:
     progress.__call__(0.2, "Filtering Text")
     yield "Extracting relevant information..."
     text = sort_context(text, question)
-    text = get_prompt(task="question-answering").format(
-        text=text, question=question
-    )
+    text = get_prompt(task="question-answering").format(text=text, question=question)
     if len(text) < 256:
         text = question
         source = None
@@ -20,9 +19,10 @@ def answer_question(text, question, source: str = None, progress=gr.Progress()) 
 
     for tok in generated_tokens:
         yield tok
-    
+
     if source is not None:
         yield tok + "\n\n" + "Source: " + source
+
 
 def sort_context(context, prompt):
     search_index = QdrantClient(":memory:")
@@ -35,7 +35,9 @@ def sort_context(context, prompt):
 
     context = context.split("\n")
     steps = 4
-    context_slices = ["\n".join(context[i : i+steps]) for i in range(0, len(context), steps)]
+    context_slices = [
+        "\n".join(context[i : i + steps]) for i in range(0, len(context), steps)
+    ]
     embeddings = generate_embedding(context_slices, "passage")
 
     for example in range(len(context_slices)):

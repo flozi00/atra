@@ -5,6 +5,7 @@ from qdrant_client.models import Distance, VectorParams, PointStruct
 from atra.text_utils.embedding import generate_embedding
 from atra.statics import HUMAN_PREFIX, END_OF_TEXT_TOKEN
 
+
 class BaseSkill:
     def __init__(
         self,

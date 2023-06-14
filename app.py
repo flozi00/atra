@@ -9,7 +9,7 @@ if __name__ == "__main__":
     auth_name = os.getenv("AUTH_NAME", None)
     auth_password = os.getenv("AUTH_PASSWORD", None)
 
-    ui.queue(concurrency_count=4, api_open= False)
+    ui.queue(concurrency_count=4, api_open=False)
     ui.launch(
         server_name="0.0.0.0",
         server_port=int(os.getenv("PORT", 7860)),
