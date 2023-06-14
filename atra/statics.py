@@ -44,16 +44,9 @@ MODEL_MAPPING = {
             "processor": AutoTokenizer,
         }
     },
-    "chat": {
-        "universal": {
-            "name": "OpenAssistant/falcon-7b-sft-mix-2000",
-            "class": AutoModelForCausalLM,
-            "processor": AutoTokenizer,
-        },
-    },
     "embedding": {
         "universal": {
-            "name": "intfloat/e5-base-v2",
+            "name": "intfloat/multilingual-e5-base",
             "class": AutoModel,
             "processor": AutoTokenizer,
         },

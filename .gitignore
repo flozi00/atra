@@ -12,3 +12,4 @@ temp_*
 *.csv
 huggingface
 *gptq/*
+data/
