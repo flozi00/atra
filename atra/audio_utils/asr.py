@@ -48,6 +48,7 @@ def speech_recognition(data, language, progress=gr.Progress()) -> str:
         tokenizer=processor.tokenizer,
         feature_extractor=processor.feature_extractor,
         device=0 if torch.cuda.is_available() else -1,
+        torch_dtype=torch.float16,
     )
 
     progress.__call__(progress=0.8, desc="Transcribing Audio")

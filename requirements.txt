@@ -18,3 +18,4 @@ accelerate>=0.20.3
 qdrant-client
 playwright
 text-generation
+diffusers

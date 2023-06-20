@@ -6,6 +6,7 @@ from transformers import (
     AutoTokenizer,
     AutoProcessor,
 )
+from diffusers import StableDiffusionPipeline
 import os
 from atra.audio_utils.whisper_langs import WHISPER_LANG_MAPPING, WHISPER_LANGUAGE_CODES
 from atra.text_utils.flores_langs import FLORES_LANG_MAPPING, FLORES_LANGUAGE_CODES
@@ -50,17 +51,18 @@ MODEL_MAPPING = {
             "processor": AutoTokenizer,
         },
     },
+    "diffusion": {
+        "photo-real": {
+            "name": "dreamlike-art/dreamlike-photoreal-2.0",
+            "class": StableDiffusionPipeline,
+            "processor": None,
+        },
+    },
 }
 
-
-TASK_MAPPING = {
-    "asr": ["start", "end", "language"],
-    "translation": ["source", "target"],
-    "summarization": ["long_text", "short_text"],
-    "question-answering": ["question", "lang"],
-}
-
-SEARCH_BACKENDS = os.getenv("SEARCH_BACKENDS", "gruble.de,searx.fmac.xyz,search.sapti.me").split(",")
+SEARCH_BACKENDS = os.getenv(
+    "SEARCH_BACKENDS", "gruble.de,searx.fmac.xyz,search.sapti.me"
+).split(",")
 
 HUMAN_PREFIX = "<|prompter|>"
 ASSISTANT_PREFIX = "<|assistant|>"

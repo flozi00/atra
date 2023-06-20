@@ -1,5 +1,6 @@
 import gradio as gr
 from atra.audio_utils.asr import speech_recognition
+from atra.image_utils.diffusion import generate_images
 
 from atra.statics import WHISPER_LANG_MAPPING, FLORES_LANG_MAPPING
 from atra.text_utils.translation import translate
@@ -79,3 +80,10 @@ def build_translator_ui():
         inputs=[input_text, input_lang, output_lang],
         outputs=[output_text],
     )
+
+def build_diffusion_ui():
+    with gr.Row():
+        prompt = gr.Textbox(label="Prompt")
+        images = gr.Image()
+
+    prompt.submit(generate_images, inputs=prompt, outputs=images)

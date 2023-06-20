@@ -2,7 +2,7 @@ import gradio as gr
 import peft
 import torch
 from optimum.bettertransformer import BetterTransformer
-from transformers import AutoProcessor, PreTrainedModel, PreTrainedTokenizer, AutoConfig
+from transformers import AutoProcessor, PreTrainedModel, PreTrainedTokenizer
 from atra.statics import MODEL_MAPPING, PROMPTS
 from atra.utils import timeit
 
@@ -37,27 +37,19 @@ def get_model(
             )
             base_model_name = peft_config.base_model_name_or_path
         except Exception as e:
-            print("Error in loading peft config", e)
+            pass
 
-        processor = processor_class.from_pretrained(
-            pretrained_model_name_or_path=model_id
-        )
-
-        conf = AutoConfig.from_pretrained(
-            pretrained_model_name_or_path=base_model_name,
-        )
-
-        if conf.model_type == "wav2vec2":
-            conf.update(
-                {
-                    "vocab_size": len(processor.tokenizer),
-                }
+        if processor_class is not None:
+            processor = processor_class.from_pretrained(
+                pretrained_model_name_or_path=model_id
             )
+        else:
+            processor = None
 
         model = model_class.from_pretrained(
             pretrained_model_name_or_path=base_model_name,
-            config=conf,
             low_cpu_mem_usage=True,
+            torch_dtype=torch.float16 if "e5" not in base_model_name else torch.float32,
         )
         try:
             model = peft.PeftModel.from_pretrained(
@@ -66,7 +58,7 @@ def get_model(
             )
             model = model.merge_and_unload()
         except Exception as e:
-            print("Error in loading peft model", e)
+            pass
         MODELS_CACHE[model_id] = {
             "model": model,
             "processor": processor,
@@ -109,7 +101,7 @@ def get_model_and_processor(
                 model=MODELS_CACHE[model_id]["model"]
             )
         except Exception as e:
-            print("Bettertransformer exception: ", e)
+            pass
         try:
             if task not in TASK_BLACKLIST:
                 MODELS_CACHE[model_id]["model"] = torch.compile(
@@ -118,7 +110,10 @@ def get_model_and_processor(
                     backend="onnxrt",
                 )
         except Exception as e:
-            print("Torch compile exception: ", e)
+            try:
+                MODELS_CACHE[model_id]["model"].unet = torch.compile(MODELS_CACHE[model_id]["model"].unet, mode="reduce-overhead", fullgraph=True)
+            except Exception as e:
+                pass
 
     progress.__call__(progress=0.6, desc="Moving Model to GPU")
     if torch.cuda.is_available() and task not in TASK_BLACKLIST:
