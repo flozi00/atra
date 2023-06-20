@@ -12,38 +12,36 @@ def search_in_web(history: str, newest_prompt: str) -> str:
     query = ""
     for s in search_query:
         query = s
-    query = query.split("Result:")[-1].replace("”", "").replace("“", "")
-    for x in range(0, 1):
-        yield "Searching in Web for the query: " + query
-        text, search_engine_text, url = get_search_result(query, id=x)
-        if url in source:
-            continue
-        text += "\n\n" + search_engine_text
-        text = re.split(r"[.!?\r\n|\r|\n]", text)
+    query = query.split(":")[-1].replace("”", "").replace("“", "")
+    yield "Searching in Web for the query: " + query
+    text, search_engine_text, url = get_search_result(query, id=0)
 
-        text = [
-            line
-            for line in text
-            if len(line) > 32
-            and line.count(" ") > 0
-            and (len(line) / (line.count(" ") if line.count(" ") > 0 else 1)) < 10
-            and "↑" not in line
-            and "^" not in line
-            and "↓" not in line
-            and "→" not in line
-            and "←" not in line
-        ]
-        text = "\n".join(text)
+    text += "\n\n" + search_engine_text
+    text = re.split(r"[.!?\r\n|\r|\n]", text)
 
-        # regex to remove all citations, e.g. [1], [2], [3], ...
-        # remove (citation needed) and [citation needed]
-        text = re.sub(r"\([^()]*\)", "", text)
-        text = re.sub(r"\[[^\]]*\]", "", text)
-        context += text + "\n"
-        source += url + "\n"
+    text = [
+        line
+        for line in text
+        if len(line) > 32
+        and line.count(" ") > 0
+        and (len(line) / (line.count(" ") if line.count(" ") > 0 else 1)) < 10
+        and "↑" not in line
+        and "^" not in line
+        and "↓" not in line
+        and "→" not in line
+        and "←" not in line
+    ]
+    text = "\n".join(text)
+
+    # regex to remove all citations, e.g. [1], [2], [3], ...
+    # remove (citation needed) and [citation needed]
+    text = re.sub(r"\([^()]*\)", "", text)
+    text = re.sub(r"\[[^\]]*\]", "", text)
+    context += text + "\n"
+    source += url + "\n"
 
     yield "Generating Answer ..."
-    summary = answer_question(text=context, question=query, source=source)
+    summary = answer_question(text=context, question=newest_prompt, source=source)
 
     if summary is False:
         return False
