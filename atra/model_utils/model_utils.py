@@ -5,6 +5,7 @@ from optimum.bettertransformer import BetterTransformer
 from transformers import AutoProcessor, PreTrainedModel, PreTrainedTokenizer
 from atra.statics import MODEL_MAPPING, PROMPTS
 from atra.utils import timeit
+from diffusers import DPMSolverMultistepScheduler
 
 MODELS_CACHE = {}
 TASK_BLACKLIST = ["embedding", "language-detection"]
@@ -96,6 +97,10 @@ def get_model_and_processor(
 
     progress.__call__(progress=0.5, desc="Optimizing Model")
     if cached is False:
+        if task == "diffusion":
+            MODELS_CACHE[model_id]["model"].scheduler = DPMSolverMultistepScheduler.from_config(MODELS_CACHE[model_id]["model"].scheduler.config)
+            MODELS_CACHE[model_id]["model"].unet = torch.compile(MODELS_CACHE[model_id]["model"].unet, mode="reduce-overhead", fullgraph=True)
+
         try:
             MODELS_CACHE[model_id]["model"] = BetterTransformer.transform(
                 model=MODELS_CACHE[model_id]["model"]
@@ -110,10 +115,7 @@ def get_model_and_processor(
                     backend="onnxrt",
                 )
         except Exception as e:
-            try:
-                MODELS_CACHE[model_id]["model"].unet = torch.compile(MODELS_CACHE[model_id]["model"].unet, mode="reduce-overhead", fullgraph=True)
-            except Exception as e:
-                pass
+            pass
 
     progress.__call__(progress=0.6, desc="Moving Model to GPU")
     if torch.cuda.is_available() and task not in TASK_BLACKLIST:
