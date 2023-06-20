@@ -4,7 +4,7 @@ from atra.gradio_utils.ui import (
     GLOBAL_CSS,
     build_asr_ui,
     build_translator_ui,
-    build_diffusion_ui
+    build_diffusion_ui,
 )
 
 

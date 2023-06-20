@@ -37,7 +37,7 @@ def get_model(
                 pretrained_model_name_or_path=model_id
             )
             base_model_name = peft_config.base_model_name_or_path
-        except Exception as e:
+        except Exception:
             pass
 
         if processor_class is not None:
@@ -58,7 +58,7 @@ def get_model(
                 model_id=model_id,
             )
             model = model.merge_and_unload()
-        except Exception as e:
+        except Exception:
             pass
         MODELS_CACHE[model_id] = {
             "model": model,
@@ -98,14 +98,22 @@ def get_model_and_processor(
     progress.__call__(progress=0.5, desc="Optimizing Model")
     if cached is False:
         if task == "diffusion":
-            MODELS_CACHE[model_id]["model"].scheduler = DPMSolverMultistepScheduler.from_config(MODELS_CACHE[model_id]["model"].scheduler.config)
-            MODELS_CACHE[model_id]["model"].unet = torch.compile(MODELS_CACHE[model_id]["model"].unet, mode="reduce-overhead", fullgraph=True)
+            MODELS_CACHE[model_id][
+                "model"
+            ].scheduler = DPMSolverMultistepScheduler.from_config(
+                MODELS_CACHE[model_id]["model"].scheduler.config
+            )
+            MODELS_CACHE[model_id]["model"].unet = torch.compile(
+                MODELS_CACHE[model_id]["model"].unet,
+                mode="reduce-overhead",
+                fullgraph=True,
+            )
 
         try:
             MODELS_CACHE[model_id]["model"] = BetterTransformer.transform(
                 model=MODELS_CACHE[model_id]["model"]
             )
-        except Exception as e:
+        except Exception:
             pass
         try:
             if task not in TASK_BLACKLIST:
@@ -114,7 +122,7 @@ def get_model_and_processor(
                     mode="max-autotune",
                     backend="onnxrt",
                 )
-        except Exception as e:
+        except Exception:
             pass
 
     progress.__call__(progress=0.6, desc="Moving Model to GPU")

@@ -64,7 +64,8 @@ def test_add_open_assistant():
                             # my message doesn't follow conversation
                             continue
                         if parent_id == conv["message_id"][-len(parent_id) :]:
-                            # my message follows conversation, but fork first, so another follow-on message can do same
+                            # my message follows conversation, but fork first,
+                            # so another follow-on message can do same
                             conversations.append(conv.copy())
                             conv[
                                 "text"

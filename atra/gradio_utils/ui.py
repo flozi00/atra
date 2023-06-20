@@ -81,6 +81,7 @@ def build_translator_ui():
         outputs=[output_text],
     )
 
+
 def build_diffusion_ui():
     with gr.Row():
         with gr.Column():

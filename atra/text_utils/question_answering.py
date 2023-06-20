@@ -16,7 +16,6 @@ def answer_question(text, question, source: str = None, progress=gr.Progress()) 
         source = None
     progress.__call__(0.8, "Answering Question")
     generated_tokens = do_generation(text, max_len=512)
-
     for tok in generated_tokens:
         yield tok
 

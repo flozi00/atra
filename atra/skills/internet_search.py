@@ -1,4 +1,4 @@
-from atra.skills.base import BaseSkill
+from atra.text_utils.generations import do_generation
 from atra.web_utils.pw import get_search_result
 from atra.text_utils.question_answering import answer_question
 import re
@@ -8,6 +8,11 @@ def search_in_web(history: str, newest_prompt: str) -> str:
     context = ""
     source = ""
     query = newest_prompt
+    search_query = do_generation(f"{history} Instruction: Generate a search query to retrieve the missing information for the task given above")
+    query = ""
+    for s in search_query:
+        query = s
+    query = query.split("Result:")[-1].replace("”", "").replace("“", "")
     for x in range(0, 1):
         yield "Searching in Web for the query: " + query
         text, search_engine_text, url = get_search_result(query, id=x)
@@ -53,19 +58,3 @@ def search_in_web(history: str, newest_prompt: str) -> str:
         result, sources = sum.split("Source:", maxsplit=1)
 
     yield result + "\n\n" + sources
-
-
-skill = BaseSkill(
-    name="Internet Search",
-    description="This skill uses Search engines to generate short summaries about a given topic.",
-    entities={
-        # "query": "Formulate a search query from the last message by attending to the chat history.",
-    },
-    examples=[
-        "Gib mir eine Zusammenfassung über Donald Trump",
-        "Was ist ein Coronavirus",
-        "Suche bei Wikipedia nach dem Coronavirus",
-        "Wer ist Angela Merkel",
-    ],
-    module=search_in_web,
-)

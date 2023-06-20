@@ -4,11 +4,6 @@ from atra.text_utils.chat import bot, user
 
 
 def build_chatbot_ui():
-    gr.Markdown(
-        """## Open Assistant Chatbot
-    This is an open assistant chatbot. It is designed to be a general purpose chatbot that can be used for any task.<br>
-    To use AI for non textual tasks like speech recognition please select to tools tab above.<br>"""
-    )
     chatbot = gr.Chatbot().style(height=500)
     with gr.Row():
         with gr.Column():

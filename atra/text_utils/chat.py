@@ -1,20 +1,10 @@
-from atra.skills.base import SkillStorage
-from atra.skills.internet_search import skill as wiki_skill
+from atra.skills.internet_search import search_in_web
 from atra.text_utils.generations import do_generation
 from atra.statics import HUMAN_PREFIX, ASSISTANT_PREFIX, END_OF_TEXT_TOKEN
 
-skills = None
-
-
-def add_skills():
-    global skills
-    skills = SkillStorage()
-    skills.add_skill(skill=wiki_skill)
-
 
 start_message = f"""
-- You are a helpful assistant chatbot called Open Assistant.
-- Keep the answers short and simple and dont ask questions.{END_OF_TEXT_TOKEN}
+- You are a helpful assistant chatbot called PrimeLine Assistant.{END_OF_TEXT_TOKEN}
 """
 
 model, tokenizer = None, None
@@ -51,12 +41,10 @@ def user(message, history):
 
 
 def bot(history, ethernet: bool = False):
-    if skills is None:
-        add_skills()
     text_history, newest_prompt = convert_history_to_text(history)
 
     if ethernet is True:
-        answer = skills.answer(prompt=text_history, newest_prompt=newest_prompt)
+        answer = search_in_web(history=text_history, newest_prompt=newest_prompt)
     else:
         answer = False
     if answer is False:
