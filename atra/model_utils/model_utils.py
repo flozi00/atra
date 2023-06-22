@@ -103,11 +103,6 @@ def get_model_and_processor(
             ].scheduler = DPMSolverMultistepScheduler.from_config(
                 MODELS_CACHE[model_id]["model"].scheduler.config
             )
-            MODELS_CACHE[model_id]["model"].unet = torch.compile(
-                MODELS_CACHE[model_id]["model"].unet,
-                mode="reduce-overhead",
-                fullgraph=True,
-            )
 
         try:
             MODELS_CACHE[model_id]["model"] = BetterTransformer.transform(

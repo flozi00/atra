@@ -57,6 +57,11 @@ MODEL_MAPPING = {
             "class": StableDiffusionPipeline,
             "processor": None,
         },
+        "openjourney": {
+            "name": "prompthero/openjourney",
+            "class": StableDiffusionPipeline,
+            "processor": None,
+        },
     },
 }
 
