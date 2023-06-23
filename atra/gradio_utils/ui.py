@@ -86,7 +86,7 @@ def build_diffusion_ui():
     with gr.Row():
         with gr.Column():
             prompt = gr.Textbox(label="Prompt")
-            num_steps = gr.Slider(minimum=5, maximum=50, value=20)
-        images = gr.Gallery()
+            num_steps = gr.Slider(minimum=5, maximum=50, value=30, label="Steps")
+        images = gr.Image()
 
     prompt.submit(generate_images, inputs=[prompt, num_steps], outputs=images)

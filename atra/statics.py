@@ -62,6 +62,11 @@ MODEL_MAPPING = {
             "class": StableDiffusionPipeline,
             "processor": None,
         },
+        "sd2.1": {
+            "name": "stabilityai/stable-diffusion-2-1",
+            "class": StableDiffusionPipeline,
+            "processor": None,
+        },
     },
 }
 
