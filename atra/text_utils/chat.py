@@ -45,9 +45,14 @@ def bot(history, ethernet: bool = False):
 
     if ethernet is True:
         answer = search_in_web(history=text_history, newest_prompt=newest_prompt)
+        is_answer = next(answer)
+        if is_answer == False:
+            answer = False
     else:
         answer = False
-    if answer is False:
+
+    if answer == False:
+        print("no search done")
         answer = do_generation(text_history, max_len=1024)
 
     for new_text in answer:

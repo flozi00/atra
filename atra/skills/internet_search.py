@@ -8,12 +8,18 @@ def search_in_web(history: str, newest_prompt: str) -> str:
     context = ""
     source = ""
     query = newest_prompt
-    search_query = do_generation(f"{history} Instruction: Generate a search query to retrieve the missing information for the task given above")
+    search_query = do_generation(
+        f"{history} Instruction: Generate a search query to retrieve the missing information for the task given above"
+    )
     query = ""
     for s in search_query:
         query = s
     query = query.split(":")[-1].replace("”", "").replace("“", "")
-    yield "Searching in Web for the query: " + query
+    if len(query) < 5:
+        yield False
+    else:
+        yield "Searching in Web for the query: " + query
+        yield "Searching in Web for the query: " + query
     text, search_engine_text, url = get_search_result(query, id=0)
 
     text += "\n\n" + search_engine_text

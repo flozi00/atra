@@ -14,7 +14,7 @@ def build_chatbot_ui():
             ).style(container=False)
         with gr.Column():
             with gr.Row():
-                ethernet = gr.Checkbox(label="Ethernet access")
+                ethernet = gr.Checkbox(label="Ethernet access", value=True)
                 stop = gr.Button("Stop")
                 clear = gr.Button("Clear")
 
