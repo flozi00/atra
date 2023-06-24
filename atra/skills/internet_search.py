@@ -14,12 +14,12 @@ def search_in_web(history: str, newest_prompt: str) -> str:
     query = ""
     for s in search_query:
         query = s
-    query = query.split(":")[-1].replace("”", "").replace("“", "")
+        query = query.split(":")[-1].replace("”", "").replace("“", "")
+        if len(query.split(" ")) > 8:
+            yield False
+
     if len(query) < 5:
         yield False
-    elif len(query.split(" ")) > 8:
-        yield query
-        yield query
     else:
         yield "Searching in Web for the query: " + query
         yield "Searching in Web for the query: " + query
