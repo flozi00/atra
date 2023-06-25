@@ -19,6 +19,7 @@ def test_add_open_assistant():
     parent_ids = df["parent_id"].values.tolist()
     texts = df["text"].values.tolist()
     roles = df["role"].values.tolist()
+    langs = df["lang"].values.tolist()
 
     for i in range(df.shape[0]):
         # collect all trees
@@ -27,18 +28,22 @@ def test_add_open_assistant():
         parent_id = parent_ids[i]
         text = texts[i]
         role = roles[i]
+        lang = langs[i]
         new_data = (
             ("<|prompter|> " if role == "prompter" else "<|assistant|> ")
             + text
             + "<|endoftext|>"
         )
-        entry = dict(message_id=message_id, parent_id=parent_id, text=new_data)
+        entry = dict(
+            message_id=message_id, parent_id=parent_id, text=new_data, lang=lang
+        )
         if message_tree_id not in rows:
             rows[message_tree_id] = [entry]
         else:
             rows[message_tree_id].append(entry)
 
-    all_rows = []
+    all_rows_text = []
+    all_row_lang = []
 
     for node_id in rows:
         # order responses in tree, based on message/parent relationship
@@ -67,11 +72,7 @@ def test_add_open_assistant():
                             # my message follows conversation, but fork first,
                             # so another follow-on message can do same
                             conversations.append(conv.copy())
-                            conv[
-                                "text"
-                            ] += f"""
-{leaf['text']}
-"""
+                            conv["text"] += f"""{leaf['text']}"""
                             conv["message_id"] += leaf["message_id"]
                             found = True
                             break
@@ -80,27 +81,16 @@ def test_add_open_assistant():
                     del list_msgs[i]
                     break
 
-        # now reduce down to final conversations, find the longest chains of message ids
-        for i, conv in enumerate(conversations):
-            for j, conv2 in enumerate(conversations):
-                if i == j:
-                    continue
-                if conv["message_id"] and conv2["message_id"]:
-                    assert conv["message_id"] != conv2["message_id"]
-                    # delete the shorter conversation, if one contains the other
-                    if conv["message_id"] in conv2["message_id"]:
-                        conv["message_id"] = None
-                    if conv2["message_id"] in conv["message_id"]:
-                        conv2["message_id"] = None
         conversations = [
             c
             for c in conversations
             if c["message_id"] and c["text"].count("<|assistant|>") >= 1
         ]
-        all_rows.extend(c["text"] for c in conversations)
-    all_rows = {"conversations": all_rows}
-    print(len(all_rows["conversations"]))
-    return all_rows
+        all_rows_text.extend(c["text"] for c in conversations)
+        all_row_lang.extend(c["lang"] for c in conversations)
+    all_rows_text = {"conversations": all_rows_text, "lang": all_row_lang}
+    print(len(all_rows_text["conversations"]))
+    return all_rows_text
 
 
 ds = datasets.Dataset.from_dict(test_add_open_assistant())
