@@ -79,7 +79,9 @@ ASSISTANT_PREFIX = "<|assistant|>"
 END_OF_TEXT_TOKEN = "<|endoftext|>"
 
 PROMPTS = {
-    "question-answering": """Context: {text}
+    "question-answering": HUMAN_PREFIX
+    + """Context: {text}
 Task: Answer the following task based on the facts given in the context.
-Question: {question}""",
+Question: {question}"""
+    + END_OF_TEXT_TOKEN,
 }

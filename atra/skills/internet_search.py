@@ -1,3 +1,4 @@
+from atra.statics import HUMAN_PREFIX, END_OF_TEXT_TOKEN
 from atra.text_utils.generations import do_generation
 from atra.web_utils.pw import get_search_result
 from atra.text_utils.question_answering import answer_question
@@ -9,7 +10,8 @@ def search_in_web(history: str, newest_prompt: str) -> str:
     source = ""
     query = newest_prompt
     search_query = do_generation(
-        f"{history} Instruction: Generate a search query to retrieve the missing information for the task given above"
+        f"{history + HUMAN_PREFIX} Instruction: Generate a search query to retrieve the missing information for the task given above, answer only the query {END_OF_TEXT_TOKEN}",
+        max_len=32,
     )
     query = ""
     for s in search_query:
@@ -17,6 +19,7 @@ def search_in_web(history: str, newest_prompt: str) -> str:
         query = query.split(":")[-1].replace("”", "").replace("“", "")
         if len(query.split(" ")) > 8:
             yield False
+            break
 
     if len(query) < 5:
         yield False

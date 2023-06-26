@@ -22,16 +22,7 @@ def convert_history_to_text(history):
             for item in history[:-1]
         ]
     )
-    text += "".join(
-        [
-            "".join(
-                [
-                    HUMAN_PREFIX + f"{history[-1][0]}" + END_OF_TEXT_TOKEN,
-                    ASSISTANT_PREFIX,
-                ]
-            )
-        ]
-    )
+    text += HUMAN_PREFIX + f"{history[-1][0]}" + END_OF_TEXT_TOKEN
     return text[-2048:], history[-1][0]
 
 
@@ -53,7 +44,7 @@ def bot(history, ethernet: bool = False):
 
     if answer == False:
         print("no search done")
-        answer = do_generation(text_history, max_len=1024)
+        answer = do_generation(text_history + ASSISTANT_PREFIX, max_len=1024)
 
     for new_text in answer:
         history[-1][1] = new_text
