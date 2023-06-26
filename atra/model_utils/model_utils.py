@@ -8,7 +8,7 @@ from atra.utils import timeit
 from diffusers import DPMSolverMultistepScheduler
 
 MODELS_CACHE = {}
-TASK_BLACKLIST = ["embedding", "language-detection"]
+TASK_BLACKLIST = ["embedding", "language-detection", "diffusion"]
 
 
 def free_gpu(except_model: str, force: bool = False) -> None:
@@ -50,7 +50,7 @@ def get_model(
         model = model_class.from_pretrained(
             pretrained_model_name_or_path=base_model_name,
             low_cpu_mem_usage=True,
-            torch_dtype=torch.float16 if "e5" not in base_model_name else torch.float32,
+            torch_dtype=torch.float32,
         )
         try:
             model = peft.PeftModel.from_pretrained(
@@ -103,6 +103,8 @@ def get_model_and_processor(
             ].scheduler = DPMSolverMultistepScheduler.from_config(
                 MODELS_CACHE[model_id]["model"].scheduler.config
             )
+            MODELS_CACHE[model_id]["model"].enable_model_cpu_offload()
+            MODELS_CACHE[model_id]["model"].enable_attention_slicing(1)
 
         try:
             MODELS_CACHE[model_id]["model"] = BetterTransformer.transform(
@@ -112,6 +114,9 @@ def get_model_and_processor(
             pass
         try:
             if task not in TASK_BLACKLIST:
+                MODELS_CACHE[model_id]["model"] = MODELS_CACHE[model_id]["model"].to(
+                    torch.float16
+                )
                 MODELS_CACHE[model_id]["model"] = torch.compile(
                     model=MODELS_CACHE[model_id]["model"],
                     mode="max-autotune",
