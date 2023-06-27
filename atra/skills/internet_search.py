@@ -10,7 +10,7 @@ def search_in_web(history: str, newest_prompt: str) -> str:
     source = ""
     query = newest_prompt
     search_query = do_generation(
-        f"{history + HUMAN_PREFIX} Instruction: Generate a search query to retrieve the missing information for the task given above, answer only the query {END_OF_TEXT_TOKEN}",
+        f"{history + HUMAN_PREFIX} Instruction: Generate a search query for the given task, answer only the query:",
         max_len=32,
     )
     query = ""
