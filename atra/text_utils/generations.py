@@ -1,7 +1,8 @@
 import re
 from text_generation import Client
+import os
 
-client = Client("http://127.0.0.1:8080")
+client = Client(os.environ.get("tgi", "http://127.0.0.1:8080"))
 
 
 def do_generation(input, max_len=512):
