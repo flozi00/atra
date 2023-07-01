@@ -27,7 +27,7 @@ MODEL_MAPPING = {
     },
     "asr": {
         "german": {
-            "name": "flozi00/whisper-large-v2-german-cv13",
+            "name": "flozi00/whisper-large-german-lora-cv13",
             "class": WhisperForConditionalGeneration,
             "processor": AutoProcessor,
         },

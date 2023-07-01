@@ -47,19 +47,26 @@ def get_model(
         else:
             processor = None
 
-        model = model_class.from_pretrained(
-            pretrained_model_name_or_path=base_model_name,
-            low_cpu_mem_usage=True,
-            torch_dtype=torch.float32,
-        )
         try:
-            model = peft.PeftModel.from_pretrained(
-                model=model,
-                model_id=model_id,
+            model = model_class.from_pretrained(
+                pretrained_model_name_or_path=model_id,
+                low_cpu_mem_usage=True,
+                torch_dtype=torch.float32,
             )
-            model = model.merge_and_unload()
-        except Exception:
-            pass
+        except:
+            model = model_class.from_pretrained(
+                pretrained_model_name_or_path=base_model_name,
+                low_cpu_mem_usage=True,
+                torch_dtype=torch.float32,
+            )
+            try:
+                model = peft.PeftModel.from_pretrained(
+                    model=model,
+                    model_id=model_id,
+                )
+                model = model.merge_and_unload()
+            except Exception:
+                pass
         MODELS_CACHE[model_id] = {
             "model": model,
             "processor": processor,
