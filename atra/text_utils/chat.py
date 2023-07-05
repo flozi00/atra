@@ -3,15 +3,8 @@ from atra.text_utils.generations import do_generation
 from atra.statics import HUMAN_PREFIX, ASSISTANT_PREFIX, END_OF_TEXT_TOKEN
 
 
-start_message = f"""
-- You are a helpful assistant chatbot called PrimeLine Assistant.{END_OF_TEXT_TOKEN}
-"""
-
-model, tokenizer = None, None
-
-
 def convert_history_to_text(history):
-    text = start_message + "".join(
+    text = "".join(
         [
             "".join(
                 [
