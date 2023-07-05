@@ -2,11 +2,9 @@ import gradio as gr
 from atra.audio_utils.asr import speech_recognition
 from atra.image_utils.diffusion import generate_images
 
-from atra.statics import WHISPER_LANG_MAPPING, FLORES_LANG_MAPPING
-from atra.text_utils.translation import translate
+from atra.statics import WHISPER_LANG_MAPPING
 
 asr_langs = sorted(list(WHISPER_LANG_MAPPING.keys()))
-translation_langs = sorted(list(FLORES_LANG_MAPPING.keys()))
 
 GLOBAL_CSS = """
 #hidden_stuff {display: none} 
@@ -48,37 +46,6 @@ def build_asr_ui():
         fn=speech_recognition,
         inputs=[microphone_file, input_lang],
         outputs=[transcription_finished],
-    )
-
-
-def build_translator_ui():
-    """
-    UI for Translation
-    It has one row with two columns
-    Left side is for input
-    Right side is for output
-    """
-    with gr.Row():
-        with gr.Column():
-            input_lang = gr.Dropdown(
-                choices=translation_langs,
-                value=translation_langs[0],
-                label="Input Language",
-            )
-            input_text = gr.Textbox(label="Input Text")
-
-        with gr.Column():
-            output_lang = gr.Dropdown(
-                choices=translation_langs,
-                value=translation_langs[0],
-                label="Output Language",
-            )
-            output_text = gr.Text(label="Output Text")
-
-    input_text.submit(
-        translate,
-        inputs=[input_text, input_lang, output_lang],
-        outputs=[output_text],
     )
 
 

@@ -8,7 +8,7 @@ from atra.utils import timeit
 from diffusers import DPMSolverMultistepScheduler
 
 MODELS_CACHE = {}
-TASK_BLACKLIST = ["embedding", "language-detection", "diffusion"]
+TASK_BLACKLIST = ["embedding", "diffusion"]
 
 
 def free_gpu(except_model: str, force: bool = False) -> None:

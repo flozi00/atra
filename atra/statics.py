@@ -9,22 +9,11 @@ from transformers import (
 from diffusers import StableDiffusionPipeline
 import os
 from atra.audio_utils.whisper_langs import WHISPER_LANG_MAPPING, WHISPER_LANGUAGE_CODES
-from atra.text_utils.flores_langs import FLORES_LANG_MAPPING, FLORES_LANGUAGE_CODES
 
 WHISPER_LANGUAGE_CODES
 WHISPER_LANG_MAPPING
 
-FLORES_LANGUAGE_CODES
-FLORES_LANG_MAPPING
-
 MODEL_MAPPING = {
-    "language-detection": {
-        "universal": {
-            "name": "juliensimon/xlm-v-base-language-id",
-            "class": AutoModelForSequenceClassification,
-            "processor": AutoTokenizer,
-        },
-    },
     "asr": {
         "german": {
             "name": "flozi00/whisper-large-german-lora-cv13",
@@ -36,13 +25,6 @@ MODEL_MAPPING = {
             "class": WhisperForConditionalGeneration,
             "processor": AutoProcessor,
         },
-    },
-    "translation": {
-        "universal": {
-            "name": "facebook/nllb-200-distilled-1.3B",
-            "class": AutoModelForSeq2SeqLM,
-            "processor": AutoTokenizer,
-        }
     },
     "embedding": {
         "universal": {
