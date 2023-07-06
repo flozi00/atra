@@ -53,7 +53,7 @@ def get_model(
                 low_cpu_mem_usage=True,
                 torch_dtype=torch.float32,
             )
-        except:
+        except Exception:
             model = model_class.from_pretrained(
                 pretrained_model_name_or_path=base_model_name,
                 low_cpu_mem_usage=True,

@@ -1,4 +1,4 @@
-from atra.statics import HUMAN_PREFIX, END_OF_TEXT_TOKEN
+from atra.statics import HUMAN_PREFIX
 from atra.text_utils.generations import do_generation
 from atra.web_utils.pw import get_search_result
 from atra.text_utils.question_answering import answer_question
@@ -10,7 +10,7 @@ def search_in_web(history: str, newest_prompt: str) -> str:
     source = ""
     query = newest_prompt
     search_query = do_generation(
-        f"{history + HUMAN_PREFIX} Instruction: Generate a search query for the given task, answer only the query:",
+        f"{history + HUMAN_PREFIX} Generate a search query for the given task, answer the search query only:",
         max_len=32,
     )
     query = ""
