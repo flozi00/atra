@@ -18,4 +18,5 @@ accelerate>=0.20.3
 qdrant-client
 playwright
 text-generation
-diffusers
+diffusers==0.18.1
+invisible-watermark>=2.0

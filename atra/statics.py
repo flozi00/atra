@@ -4,7 +4,7 @@ from transformers import (
     AutoTokenizer,
     AutoProcessor,
 )
-from diffusers import StableDiffusionPipeline
+from diffusers import StableDiffusionXLPipeline, StableDiffusionXLImg2ImgPipeline
 import os
 from atra.audio_utils.whisper_langs import WHISPER_LANG_MAPPING, WHISPER_LANGUAGE_CODES
 
@@ -29,23 +29,6 @@ MODEL_MAPPING = {
             "name": "intfloat/multilingual-e5-base",
             "class": AutoModel,
             "processor": AutoTokenizer,
-        },
-    },
-    "diffusion": {
-        "photo-real": {
-            "name": "dreamlike-art/dreamlike-photoreal-2.0",
-            "class": StableDiffusionPipeline,
-            "processor": None,
-        },
-        "openjourney": {
-            "name": "prompthero/openjourney",
-            "class": StableDiffusionPipeline,
-            "processor": None,
-        },
-        "sd2.1": {
-            "name": "stabilityai/stable-diffusion-2-1",
-            "class": StableDiffusionPipeline,
-            "processor": None,
         },
     },
 }

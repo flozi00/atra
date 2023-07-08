@@ -1,13 +1,25 @@
-from atra.model_utils.model_utils import get_model_and_processor
+from diffusers import StableDiffusionXLPipeline, StableDiffusionXLImg2ImgPipeline
+import torch
+
+pipe = StableDiffusionXLPipeline.from_pretrained(
+    "stabilityai/stable-diffusion-xl-base-0.9",
+    torch_dtype=torch.float16,
+    variant="fp16",
+    use_safetensors=True,
+)
+pipe.enable_model_cpu_offload()
+
+refiner = StableDiffusionXLImg2ImgPipeline.from_pretrained(
+    "stabilityai/stable-diffusion-xl-refiner-0.9",
+    torch_dtype=torch.float16,
+    use_safetensors=True,
+    variant="fp16",
+)
+refiner.enable_model_cpu_offload()
 
 
-def generate_images(prompt: str, num_inference_steps: int):
-    pipeline, processor = get_model_and_processor(lang="openjourney", task="diffusion")
+def generate_images(prompt: str):
+    image = pipe(prompt=prompt, output_type="latent").images[0]
+    image = refiner(prompt=prompt, image=image[None, :]).images[0]
 
-    image = pipeline(
-        prompt,
-        num_images_per_prompt=1,
-        num_inference_steps=int(num_inference_steps),
-    ).images
-
-    return image[0]
+    return image

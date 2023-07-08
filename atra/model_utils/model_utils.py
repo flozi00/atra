@@ -104,15 +104,6 @@ def get_model_and_processor(
 
     progress.__call__(progress=0.5, desc="Optimizing Model")
     if cached is False:
-        if task == "diffusion":
-            MODELS_CACHE[model_id][
-                "model"
-            ].scheduler = DPMSolverMultistepScheduler.from_config(
-                MODELS_CACHE[model_id]["model"].scheduler.config
-            )
-            MODELS_CACHE[model_id]["model"].enable_model_cpu_offload()
-            MODELS_CACHE[model_id]["model"].enable_attention_slicing(1)
-
         try:
             MODELS_CACHE[model_id]["model"] = BetterTransformer.transform(
                 model=MODELS_CACHE[model_id]["model"]
