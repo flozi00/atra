@@ -30,7 +30,7 @@ def build_chatbot_ui():
             ethernet,
         ],
         outputs=chatbot,
-        queue=True,
+        queue=False,
     )
     stop.click(
         fn=None,
