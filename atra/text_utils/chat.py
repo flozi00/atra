@@ -45,4 +45,4 @@ def bot(history, ethernet: bool = False):
 
     for new_text in answer:
         history[-1][1] = new_text
-    return history
+        yield history
