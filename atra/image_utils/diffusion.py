@@ -2,29 +2,36 @@ from diffusers import StableDiffusionXLPipeline, StableDiffusionXLImg2ImgPipelin
 import torch
 from diffusers import DPMSolverMultistepScheduler
 
-pipe = StableDiffusionXLPipeline.from_pretrained(
-    "stabilityai/stable-diffusion-xl-base-0.9",
-    torch_dtype=torch.float16,
-    variant="fp16",
-    use_safetensors=True,
-)
-pipe.scheduler = DPMSolverMultistepScheduler.from_config(pipe.scheduler.config)
-
-refiner = StableDiffusionXLImg2ImgPipeline.from_pretrained(
-    "stabilityai/stable-diffusion-xl-refiner-0.9",
-    torch_dtype=torch.float16,
-    use_safetensors=True,
-    variant="fp16",
-)
-pipe.to("cuda")
-refiner.to("cuda")
+pipe = None
+refiner = None
 
 
-pipe.unet = torch.compile(pipe.unet, mode="reduce-overhead", fullgraph=True)
-refiner.unet = torch.compile(refiner.unet, mode="reduce-overhead", fullgraph=True)
+def get_pipes():
+    global pipe, refiner
+    pipe = StableDiffusionXLPipeline.from_pretrained(
+        "stabilityai/stable-diffusion-xl-base-0.9",
+        torch_dtype=torch.float16,
+        variant="fp16",
+        use_safetensors=True,
+    )
+    pipe.scheduler = DPMSolverMultistepScheduler.from_config(pipe.scheduler.config)
+
+    refiner = StableDiffusionXLImg2ImgPipeline.from_pretrained(
+        "stabilityai/stable-diffusion-xl-refiner-0.9",
+        torch_dtype=torch.float16,
+        use_safetensors=True,
+        variant="fp16",
+    )
+    pipe.to("cuda")
+    refiner.to("cuda")
+
+    pipe.unet = torch.compile(pipe.unet, mode="reduce-overhead", fullgraph=True)
+    refiner.unet = torch.compile(refiner.unet, mode="reduce-overhead", fullgraph=True)
 
 
 def generate_images(prompt: str, negatives: str = ""):
+    if pipe is None:
+        get_pipes()
     if negatives is None:
         negatives = ""
     image = pipe(
