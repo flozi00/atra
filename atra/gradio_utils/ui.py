@@ -57,3 +57,4 @@ def build_diffusion_ui():
         images = gr.Image()
 
     prompt.submit(generate_images, inputs=[prompt, negatives], outputs=images)
+    negatives.submit(generate_images, inputs=[prompt, negatives], outputs=images)
