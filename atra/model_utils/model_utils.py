@@ -118,7 +118,7 @@ def get_model_and_processor(
                 MODELS_CACHE[model_id]["model"] = torch.compile(
                     model=MODELS_CACHE[model_id]["model"],
                     mode="max-autotune",
-                    backend="inductor",
+                    backend="onnxrt",
                 )
         except Exception:
             pass

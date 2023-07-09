@@ -7,7 +7,6 @@ pipe = StableDiffusionXLPipeline.from_pretrained(
     variant="fp16",
     use_safetensors=True,
 )
-pipe.enable_model_cpu_offload()
 
 refiner = StableDiffusionXLImg2ImgPipeline.from_pretrained(
     "stabilityai/stable-diffusion-xl-refiner-0.9",
@@ -15,7 +14,13 @@ refiner = StableDiffusionXLImg2ImgPipeline.from_pretrained(
     use_safetensors=True,
     variant="fp16",
 )
-refiner.enable_model_cpu_offload()
+
+pipe.unet = torch.compile(
+    pipe.unet, mode="reduce-overhead", backend="onnxrt", fullgraph=True
+)
+refiner.unet = torch.compile(
+    refiner.unet, mode="reduce-overhead", backend="onnxrt", fullgraph=True
+)
 
 
 def generate_images(prompt: str):
