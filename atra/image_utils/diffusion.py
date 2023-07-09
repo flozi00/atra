@@ -18,12 +18,8 @@ pipe.to("cuda")
 refiner.to("cuda")
 
 
-pipe.unet = torch.compile(
-    pipe.unet, mode="reduce-overhead", backend="onnxrt", fullgraph=True
-)
-refiner.unet = torch.compile(
-    refiner.unet, mode="reduce-overhead", backend="onnxrt", fullgraph=True
-)
+pipe.unet = torch.compile(pipe.unet, mode="reduce-overhead", fullgraph=True)
+refiner.unet = torch.compile(refiner.unet, mode="reduce-overhead", fullgraph=True)
 
 
 def generate_images(prompt: str, negatives: str = ""):
