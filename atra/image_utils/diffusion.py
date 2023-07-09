@@ -11,7 +11,7 @@ pipe = StableDiffusionXLPipeline.from_pretrained(
 pipe.scheduler = DPMSolverMultistepScheduler.from_config(pipe.scheduler.config)
 pipe.to("cuda")
 
-# pipe.unet = torch.compile(pipe.unet, mode="reduce-overhead", fullgraph=True)
+pipe.unet = torch.compile(pipe.unet, mode="reduce-overhead", fullgraph=True)
 
 
 def generate_images(prompt: str, negatives: str = ""):
