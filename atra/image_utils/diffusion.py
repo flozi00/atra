@@ -23,8 +23,14 @@ refiner.unet = torch.compile(
 )
 
 
-def generate_images(prompt: str):
-    image = pipe(prompt=prompt, output_type="latent").images[0]
-    image = refiner(prompt=prompt, image=image[None, :]).images[0]
+def generate_images(prompt: str, negatives: str = ""):
+    if negatives is None:
+        negatives = ""
+    image = pipe(prompt=prompt, negative_prompt=negatives, output_type="latent").images[
+        0
+    ]
+    image = refiner(
+        prompt=prompt, negative_prompt=negatives, image=image[None, :]
+    ).images[0]
 
     return image
