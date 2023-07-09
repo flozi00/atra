@@ -14,6 +14,16 @@ refiner = StableDiffusionXLImg2ImgPipeline.from_pretrained(
     use_safetensors=True,
     variant="fp16",
 )
+pipe.to("cuda")
+refiner.to("cuda")
+
+
+pipe.unet = torch.compile(
+    pipe.unet, mode="reduce-overhead", backend="onnxrt", fullgraph=True
+)
+refiner.unet = torch.compile(
+    refiner.unet, mode="reduce-overhead", backend="onnxrt", fullgraph=True
+)
 
 
 def generate_images(prompt: str, negatives: str = ""):
