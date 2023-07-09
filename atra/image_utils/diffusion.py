@@ -9,9 +9,19 @@ pipe = StableDiffusionXLPipeline.from_pretrained(
     use_safetensors=True,
 )
 pipe.scheduler = DPMSolverMultistepScheduler.from_config(pipe.scheduler.config)
+
+refiner = StableDiffusionXLImg2ImgPipeline.from_pretrained(
+    "stabilityai/stable-diffusion-xl-refiner-0.9",
+    torch_dtype=torch.float16,
+    use_safetensors=True,
+    variant="fp16",
+)
 pipe.to("cuda")
+refiner.to("cuda")
+
 
 pipe.unet = torch.compile(pipe.unet, mode="reduce-overhead", fullgraph=True)
+refiner.unet = torch.compile(refiner.unet, mode="reduce-overhead", fullgraph=True)
 
 
 def generate_images(prompt: str, negatives: str = ""):
@@ -20,7 +30,12 @@ def generate_images(prompt: str, negatives: str = ""):
     image = pipe(
         prompt=prompt,
         negative_prompt=negatives,
-        num_images_per_prompt=4,
+        output_type="latent",
+        num_images_per_prompt=1,
         num_inference_steps=30,
-    ).images
-    yield image
+    ).images[0]
+    image = refiner(
+        prompt=prompt, negative_prompt=negatives, image=image[None, :]
+    ).images[0]
+
+    return image

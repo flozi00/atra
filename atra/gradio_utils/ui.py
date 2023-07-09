@@ -54,7 +54,7 @@ def build_diffusion_ui():
         with gr.Column():
             prompt = gr.Textbox(label="Prompt")
             negatives = gr.Textbox(label="Negative Prompt")
-        images = gr.Gallery()
+        images = gr.Image()
 
     prompt.submit(generate_images, inputs=[prompt, negatives], outputs=images)
     negatives.submit(generate_images, inputs=[prompt, negatives], outputs=images)
