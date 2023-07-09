@@ -5,7 +5,6 @@ from optimum.bettertransformer import BetterTransformer
 from transformers import AutoProcessor, PreTrainedModel, PreTrainedTokenizer
 from atra.statics import MODEL_MAPPING, PROMPTS
 from atra.utils import timeit
-from diffusers import DPMSolverMultistepScheduler
 
 MODELS_CACHE = {}
 TASK_BLACKLIST = ["embedding", "diffusion"]

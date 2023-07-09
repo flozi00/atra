@@ -4,7 +4,6 @@ from transformers import (
     AutoTokenizer,
     AutoProcessor,
 )
-from diffusers import StableDiffusionXLPipeline, StableDiffusionXLImg2ImgPipeline
 import os
 from atra.audio_utils.whisper_langs import WHISPER_LANG_MAPPING, WHISPER_LANGUAGE_CODES
 

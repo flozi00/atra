@@ -1,20 +1,15 @@
 import os
-
-from atra.gradio_utils import build_gradio
-
-ui = build_gradio()
-
+from atra.gradio_utils.asr import build_asr_ui
+from atra.gradio_utils.sd import build_diffusion_ui
+from atra.gradio_utils.chat import build_chatbot_ui
+from multiprocessing import Process
 
 if __name__ == "__main__":
-    auth_name = os.getenv("AUTH_NAME", None)
-    auth_password = os.getenv("AUTH_PASSWORD", None)
-
-    ui.queue(concurrency_count=1, api_open=False)
-    ui.launch(
-        server_name="0.0.0.0",
-        server_port=int(os.getenv("PORT", 7860)),
-        auth=(auth_name, auth_password)
-        if auth_name is not None and auth_password is not None
-        else None,
-        show_api=False,
-    )
+    UIs = [build_chatbot_ui, build_diffusion_ui, build_asr_ui]
+    processes = [Process(target=ui) for ui in UIs]
+    # start new processes
+    for child in processes:
+        child.start()
+    # wait for processes to finish
+    for child in processes:
+        child.join()
