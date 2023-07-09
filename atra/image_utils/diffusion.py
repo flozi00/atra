@@ -15,13 +15,6 @@ refiner = StableDiffusionXLImg2ImgPipeline.from_pretrained(
     variant="fp16",
 )
 
-pipe.unet = torch.compile(
-    pipe.unet, mode="reduce-overhead", backend="onnxrt", fullgraph=True
-)
-refiner.unet = torch.compile(
-    refiner.unet, mode="reduce-overhead", backend="onnxrt", fullgraph=True
-)
-
 
 def generate_images(prompt: str, negatives: str = ""):
     if negatives is None:
