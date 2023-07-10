@@ -7,6 +7,7 @@ from playwright.sync_api import (
 )
 from atra.statics import SEARCH_BACKENDS
 from atra.utils import timeit
+import urllib.parse
 
 BACKEND_ID = 0
 
@@ -26,11 +27,10 @@ def get_search_result(
     browser = playwright.firefox.launch(headless=True)
     context = browser.new_context()
     page = context.new_page()
-    page.goto(f"https://{search_backend}")
-    search_box = page.locator("#q")
-    search_box.fill(query + ("" if site is None else f" site:{site}"))
-    search_box.press("Enter")
-    page.wait_for_url(f"https://{search_backend}/search*")
+    params = {"q": query, "categories": "general"}
+    params = urllib.parse.urlencode(params)
+
+    page.goto(f"https://{search_backend}/search?{params}")
     try:
         search_text = page.inner_text("#answers", timeout=2000)
     except Exception:
