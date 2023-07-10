@@ -31,14 +31,6 @@ def get_model(
     cached = MODELS_CACHE.get(model_id, None)
     base_model_name = model_id
     if cached is None:
-        try:
-            peft_config = peft.PeftConfig.from_pretrained(
-                pretrained_model_name_or_path=model_id
-            )
-            base_model_name = peft_config.base_model_name_or_path
-        except Exception:
-            pass
-
         if processor_class is not None:
             processor = processor_class.from_pretrained(
                 pretrained_model_name_or_path=model_id
@@ -58,14 +50,6 @@ def get_model(
                 low_cpu_mem_usage=True,
                 torch_dtype=torch.float32,
             )
-            try:
-                model = peft.PeftModel.from_pretrained(
-                    model=model,
-                    model_id=model_id,
-                )
-                model = model.merge_and_unload()
-            except Exception:
-                pass
         MODELS_CACHE[model_id] = {
             "model": model,
             "processor": processor,

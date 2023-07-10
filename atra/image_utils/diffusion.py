@@ -22,11 +22,9 @@ def get_pipes():
         use_safetensors=True,
         variant="fp16",
     )
-    pipe.to("cuda")
-    refiner.to("cuda")
 
-    pipe.unet = torch.compile(pipe.unet, mode="reduce-overhead", fullgraph=True)
-    refiner.unet = torch.compile(refiner.unet, mode="reduce-overhead", fullgraph=True)
+    pipe.enable_model_cpu_offload()
+    refiner.enable_model_cpu_offload()
 
 
 def generate_images(prompt: str, negatives: str = ""):
