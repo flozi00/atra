@@ -1,9 +1,8 @@
 import gradio as gr
-import peft
 import torch
 from optimum.bettertransformer import BetterTransformer
 from transformers import AutoProcessor, PreTrainedModel, PreTrainedTokenizer
-from atra.statics import MODEL_MAPPING, PROMPTS
+from atra.statics import MODEL_MAPPING
 from atra.utils import timeit
 
 MODELS_CACHE = {}
