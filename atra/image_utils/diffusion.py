@@ -18,7 +18,6 @@ def get_pipes():
         variant="fp16",
         use_safetensors=True,
     )
-    pipe.scheduler = DPMSolverMultistepScheduler.from_config(pipe.scheduler.config)
 
     refiner = DiffusionPipeline.from_pretrained(
         "stabilityai/stable-diffusion-xl-refiner-0.9",
@@ -28,16 +27,13 @@ def get_pipes():
         use_safetensors=True,
         variant="fp16",
     )
-    refiner.scheduler = DPMSolverMultistepScheduler.from_config(
-        refiner.scheduler.config
-    )
 
     pipe.enable_model_cpu_offload()
     refiner.enable_model_cpu_offload()
 
 
 def generate_images(prompt: str, negatives: str = ""):
-    n_steps = 30
+    n_steps = 40
     high_noise_frac = 0.7
 
     if pipe is None:
