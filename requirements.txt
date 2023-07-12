@@ -18,5 +18,5 @@ accelerate>=0.20.3
 qdrant-client
 playwright
 text-generation
-diffusers==0.18.1
+https://github.com/huggingface/diffusers/archive/refs/heads/main.zip
 invisible-watermark>=2.0
