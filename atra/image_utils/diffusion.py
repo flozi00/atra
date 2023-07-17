@@ -27,9 +27,6 @@ def get_pipes():
     )
 
     pipe.scheduler = DPMSolverMultistepScheduler.from_config(pipe.scheduler.config)
-    refiner.scheduler = DPMSolverMultistepScheduler.from_config(
-        refiner.scheduler.config
-    )
 
     pipe.to("cuda")
     refiner.to("cuda")
@@ -39,8 +36,8 @@ def get_pipes():
 
 
 def generate_images(prompt: str, negatives: str = ""):
-    n_steps = 30
-    high_noise_frac = 0.7
+    n_steps = 25
+    high_noise_frac = 0.8
 
     if pipe is None:
         get_pipes()
