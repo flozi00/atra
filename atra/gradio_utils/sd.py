@@ -28,8 +28,7 @@ def use_diffusion_ui(prompt, negatives):
             else:
                 res = job.result()
                 results.append(res)
-
-    return results
+                yield results
 
 
 def build_diffusion_ui():

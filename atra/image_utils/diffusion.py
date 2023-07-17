@@ -56,4 +56,4 @@ def generate_images(prompt: str, negatives: str = ""):
         image=image,
     ).images[0]
 
-    return [image]
+    return image
