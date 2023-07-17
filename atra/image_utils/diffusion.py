@@ -39,7 +39,7 @@ def get_pipes():
 
 
 def generate_images(prompt: str, negatives: str = ""):
-    n_steps = 20
+    n_steps = 30
     high_noise_frac = 0.7
 
     if pipe is None:
