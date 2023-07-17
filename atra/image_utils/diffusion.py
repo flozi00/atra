@@ -3,6 +3,7 @@ from diffusers import (
 )
 import torch
 from diffusers import DPMSolverMultistepScheduler
+from atra.utils import timeit
 
 pipe = None
 refiner = None
@@ -35,6 +36,7 @@ def get_pipes():
     refiner.unet = torch.compile(refiner.unet, mode="reduce-overhead", fullgraph=True)
 
 
+@timeit
 def generate_images(prompt: str, negatives: str = ""):
     n_steps = 25
     high_noise_frac = 0.8
