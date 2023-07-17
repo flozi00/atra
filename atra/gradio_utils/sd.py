@@ -8,6 +8,8 @@ import os
 IMAGE_BACKENDS = os.getenv("SD")
 if IMAGE_BACKENDS is not None:
     IMAGE_BACKENDS = IMAGE_BACKENDS.split(",")
+else:
+    IMAGE_BACKENDS = []
 
 CLIENTS = [Client(src=backend) for backend in IMAGE_BACKENDS]
 
