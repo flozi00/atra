@@ -31,6 +31,9 @@ def get_pipes():
         refiner.scheduler.config
     )
 
+    pipe.to("cuda")
+    refiner.to("cuda")
+
     pipe.unet = torch.compile(pipe.unet, mode="reduce-overhead", fullgraph=True)
     refiner.unet = torch.compile(refiner.unet, mode="reduce-overhead", fullgraph=True)
 
