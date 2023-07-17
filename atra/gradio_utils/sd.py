@@ -4,10 +4,9 @@ from atra.image_utils.diffusion import generate_images
 import gradio as gr
 from gradio_client import Client
 
-client = Client(src="https://chat.atra.ai")
-
 
 def use_diffusion_ui(prompt, negatives):
+    client = Client(src="https://chat.atra.ai")
     job = client.submit(3, api_name="/sd")
     while not job.done():
         time.sleep(0.1)
