@@ -26,7 +26,8 @@ def use_diffusion_ui(prompt, negatives):
             if not job.done():
                 running_job = True
             else:
-                results.append(job.result())
+                res = job.result()
+                results.append(res)
 
     return results
 
@@ -39,7 +40,7 @@ def build_diffusion_ui():
             with gr.Column():
                 prompt = gr.Textbox(label="Prompt")
                 negatives = gr.Textbox(label="Negative Prompt")
-            images = gr.Gallery()
+            images = gr.Image() if len(CLIENTS) == 0 else gr.Gallery()
 
         prompt.submit(
             generate_images if len(CLIENTS) == 0 else use_diffusion_ui,
