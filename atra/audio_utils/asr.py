@@ -1,19 +1,21 @@
 import torch
 from text_to_num.transforms import alpha2digit
 
-from atra.model_utils.model_utils import get_model_and_processor
 from atra.statics import WHISPER_LANG_MAPPING
 from atra.utils import timeit
 import pyloudnorm as pyln
 from transformers.pipelines.audio_utils import ffmpeg_read
-from transformers.pipelines import AutomaticSpeechRecognitionPipeline
+from transformers import pipeline
 import gradio as gr
 import warnings
 
 warnings.filterwarnings(action="ignore")
 
+pipe = None
+
 
 def speech_recognition(data, language, progress=gr.Progress()) -> str:
+    global pipe
     if data is None:
         return ""
     progress.__call__(progress=0.0, desc="Loading Data")
@@ -31,28 +33,18 @@ def speech_recognition(data, language, progress=gr.Progress()) -> str:
     )
 
     progress.__call__(progress=0.2, desc="Loading Model")
-    model, processor = get_model_and_processor(
-        lang=language, task="asr", progress=progress
-    )
-
-    try:
-        model.config.forced_decoder_ids = processor.get_decoder_prompt_ids(
-            task="transcribe"
+    if pipe is None:
+        pipe = pipeline(
+            "automatic-speech-recognition",
+            "flozi00/whisper-large-german-lora-cv13",
+            device=0 if torch.cuda.is_available() else -1,
+            torch_dtype=torch.float16,
         )
-    except Exception as e:
-        print("Error in setting forced decoder ids", e)
-
-    progress.__call__(progress=0.7, desc="Initializing Pipeline")
-    pipe = AutomaticSpeechRecognitionPipeline(
-        model=model,
-        tokenizer=processor.tokenizer,
-        feature_extractor=processor.feature_extractor,
-        device=0 if torch.cuda.is_available() else -1,
-        torch_dtype=torch.float16,
-    )
+        pipe.model.eval()
+        pipe.model = torch.compile(pipe.model, backend="onnxrt", mode="max-autotune")
 
     progress.__call__(progress=0.8, desc="Transcribing Audio")
-    transcription = inference_asr(pipe=pipe, data=data)
+    transcription = inference_asr(pipe=pipe, data=data, language=language)
 
     progress.__call__(progress=0.9, desc="Converting to Text")
     try:
@@ -66,8 +58,14 @@ def speech_recognition(data, language, progress=gr.Progress()) -> str:
 
 
 @timeit
-def inference_asr(pipe, data) -> str:
+def inference_asr(pipe, data, language) -> str:
     generated_ids = pipe(
-        data, chunk_length_s=30, stride_length_s=(10, 0), max_new_tokens=200
+        data,
+        chunk_length_s=30,
+        stride_length_s=(10, 0),
+        generate_kwargs={
+            "task": "transcribe",
+            "language": f"<|{WHISPER_LANG_MAPPING[language]}|>",
+        },
     )
     return generated_ids["text"]
