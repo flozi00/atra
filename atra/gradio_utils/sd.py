@@ -3,15 +3,30 @@ from atra.gradio_utils.ui import GLOBAL_CSS, GET_GLOBAL_HEADER, launch_args
 from atra.image_utils.diffusion import generate_images
 import gradio as gr
 from gradio_client import Client
+import os
+
+IMAGE_BACKENDS = os.getenv("SD")
+if IMAGE_BACKENDS is not None:
+    IMAGE_BACKENDS = IMAGE_BACKENDS.split(",")
+
+CLIENTS = [Client(src=backend) for backend in IMAGE_BACKENDS]
 
 
 def use_diffusion_ui(prompt, negatives):
-    client = Client(src="https://chat.atra.ai")
-    job = client.submit(3, api_name="/sd")
-    while not job.done():
-        time.sleep(0.1)
+    jobs = [client.submit(prompt, negatives, api_name="/sd") for client in CLIENTS]
+    results = []
+    running_job = True
 
-    return job.result()
+    while running_job:
+        results = []
+        running_job = False
+        for job in jobs:
+            if not job.done():
+                running_job = True
+            else:
+                results.append(job.result())
+
+    return results
 
 
 def build_diffusion_ui():
@@ -22,12 +37,19 @@ def build_diffusion_ui():
             with gr.Column():
                 prompt = gr.Textbox(label="Prompt")
                 negatives = gr.Textbox(label="Negative Prompt")
-            images = gr.Image()
+            images = gr.Gallery()
 
         prompt.submit(
-            generate_images, inputs=[prompt, negatives], outputs=images, api_name="sd"
+            generate_images if len(CLIENTS) == 0 else use_diffusion_ui,
+            inputs=[prompt, negatives],
+            outputs=images,
+            api_name="sd",
         )
-        negatives.submit(generate_images, inputs=[prompt, negatives], outputs=images)
+        negatives.submit(
+            generate_images if len(CLIENTS) == 0 else use_diffusion_ui,
+            inputs=[prompt, negatives],
+            outputs=images,
+        )
 
     ui.queue(concurrency_count=1, api_open=False)
     ui.launch(server_port=7861, **launch_args)

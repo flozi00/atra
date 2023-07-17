@@ -2,7 +2,6 @@ from diffusers import (
     DiffusionPipeline,
 )
 import torch
-from diffusers import DPMSolverMultistepScheduler
 from atra.utils import timeit
 
 pipe = None
@@ -27,8 +26,6 @@ def get_pipes():
         variant="fp16",
     )
 
-    pipe.scheduler = DPMSolverMultistepScheduler.from_config(pipe.scheduler.config)
-
     pipe.to("cuda")
     refiner.to("cuda")
 
@@ -38,8 +35,8 @@ def get_pipes():
 
 @timeit
 def generate_images(prompt: str, negatives: str = ""):
-    n_steps = 25
-    high_noise_frac = 0.8
+    n_steps = 50
+    high_noise_frac = 0.7
 
     if pipe is None:
         get_pipes()
@@ -59,4 +56,4 @@ def generate_images(prompt: str, negatives: str = ""):
         image=image,
     ).images[0]
 
-    return image
+    return [image]
