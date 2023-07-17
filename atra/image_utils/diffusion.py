@@ -1,6 +1,4 @@
 from diffusers import (
-    StableDiffusionXLPipeline,
-    StableDiffusionXLImg2ImgPipeline,
     DiffusionPipeline,
 )
 import torch
@@ -28,8 +26,13 @@ def get_pipes():
         variant="fp16",
     )
 
-    pipe.enable_model_cpu_offload()
-    refiner.enable_model_cpu_offload()
+    pipe.scheduler = DPMSolverMultistepScheduler.from_config(pipe.scheduler.config)
+    refiner.scheduler = DPMSolverMultistepScheduler.from_config(
+        refiner.scheduler.config
+    )
+
+    pipe.unet = torch.compile(pipe.unet, mode="reduce-overhead", fullgraph=True)
+    refiner.unet = torch.compile(refiner.unet, mode="reduce-overhead", fullgraph=True)
 
 
 def generate_images(prompt: str, negatives: str = ""):
