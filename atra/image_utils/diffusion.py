@@ -26,16 +26,13 @@ def get_pipes():
         variant="fp16",
     )
 
-    pipe.to("cuda")
-    refiner.to("cuda")
-
-    pipe.unet = torch.compile(pipe.unet, mode="reduce-overhead", fullgraph=True)
-    refiner.unet = torch.compile(refiner.unet, mode="reduce-overhead", fullgraph=True)
+    pipe.enable_model_cpu_offload()
+    refiner.enable_model_cpu_offload()
 
 
 @timeit
 def generate_images(prompt: str, negatives: str = ""):
-    n_steps = 50
+    n_steps = 40
     high_noise_frac = 0.7
 
     if pipe is None:
