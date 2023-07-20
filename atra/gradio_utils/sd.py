@@ -1,4 +1,3 @@
-import time
 from atra.gradio_utils.ui import GLOBAL_CSS, GET_GLOBAL_HEADER, launch_args
 from atra.image_utils.diffusion import generate_images
 import gradio as gr

@@ -3,7 +3,6 @@ from diffusers import (
 )
 import torch
 from atra.utils import timeit
-import tomesd
 
 pipe = None
 refiner = None
@@ -33,8 +32,19 @@ def get_pipes():
     pipe.enable_xformers_memory_efficient_attention()
     refiner.enable_xformers_memory_efficient_attention()
 
-    pipe = tomesd.apply_patch(pipe, ratio=0.3)
-    refiner = tomesd.apply_patch(refiner, ratio=0.3)
+    pipe.unet = torch.compile(
+        pipe.unet, backend="inductor", mode="reduce-overhead", fullgraph=True
+    )
+    pipe.vae = torch.compile(
+        pipe.vae, backend="onnxrt", mode="reduce-overhead", fullgraph=True
+    )
+
+    refiner.unet = torch.compile(
+        refiner.unet, backend="inductor", mode="reduce-overhead", fullgraph=True
+    )
+    refiner.vae = torch.compile(
+        refiner.vae, backend="onnxrt", mode="reduce-overhead", fullgraph=True
+    )
 
     # pipe.enable_model_cpu_offload()
     # refiner.enable_model_cpu_offload()
