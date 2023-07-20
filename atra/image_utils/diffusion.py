@@ -3,6 +3,7 @@ from diffusers import (
 )
 import torch
 from atra.utils import timeit
+import tomesd
 
 pipe = None
 refiner = None
@@ -26,8 +27,17 @@ def get_pipes():
         variant="fp16",
     )
 
-    pipe.enable_model_cpu_offload()
-    refiner.enable_model_cpu_offload()
+    pipe.to("cuda")
+    refiner.to("cuda")
+
+    pipe.enable_xformers_memory_efficient_attention()
+    refiner.enable_xformers_memory_efficient_attention()
+
+    pipe = tomesd.apply_patch(pipe, ratio=0.3)
+    refiner = tomesd.apply_patch(refiner, ratio=0.3)
+
+    # pipe.enable_model_cpu_offload()
+    # refiner.enable_model_cpu_offload()
 
 
 @timeit
