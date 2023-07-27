@@ -4,6 +4,8 @@ from diffusers import (
     DPMSolverSinglestepScheduler,
     EulerDiscreteScheduler,
 )
+from diffusers.models.cross_attention import AttnProcessor2_0
+
 import torch
 from atra.utils import timeit
 
@@ -42,6 +44,9 @@ def get_pipes():
 
     pipe.to("cuda")
     refiner.to("cuda")
+
+    pipe.unet.set_attn_processor(AttnProcessor2_0())
+    refiner.unet.set_attn_processor(AttnProcessor2_0())
 
     pipe.enable_xformers_memory_efficient_attention()
     refiner.enable_xformers_memory_efficient_attention()
