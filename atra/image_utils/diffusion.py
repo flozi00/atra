@@ -1,7 +1,7 @@
 from diffusers import (
     StableDiffusionXLPipeline,
-    StableDiffusionXLImg2ImgPipeline,
     DPMSolverSinglestepScheduler,
+    EulerDiscreteScheduler,
 )
 import torch
 from atra.utils import timeit
@@ -34,25 +34,27 @@ def get_pipes():
 
     pipe.enable_xformers_memory_efficient_attention()
 
-    pipe.scheduler = DPMSolverSinglestepScheduler.from_config(pipe.scheduler.config)
-
 
 @timeit
-def generate_images(prompt: str, negatives: str = ""):
-    n_steps = 15
-    high_noise_frac = 0.8
-
+def generate_images(prompt: str, negatives: str = "", mode: str = "prototyping"):
     if pipe is None:
         get_pipes()
 
     if negatives is None:
         negatives = ""
 
+    if mode == "prototyping":
+        pipe.scheduler = DPMSolverSinglestepScheduler.from_config(pipe.scheduler.config)
+        n_steps = 20
+    else:
+        pipe.scheduler = EulerDiscreteScheduler.from_config(pipe.scheduler.config)
+        n_steps = 50
+
     image = pipe(
         prompt=prompt,
         negative_prompt=negatives,
         num_inference_steps=n_steps,
-        # output_type="latent",
+        output_type="latent",
     ).images[0]
 
     return image

@@ -43,17 +43,22 @@ def build_diffusion_ui():
                     label="Negative Prompt",
                     info="Prompt describing what you dont want to see, useful for refining image",
                 )
+                mode = gr.Dropdown(
+                    choices=["prototyping", "high res"],
+                    label="Mode",
+                    value="prototyping",
+                )
             images = gr.Image() if len(CLIENTS) == 0 else gr.Gallery()
 
         prompt.submit(
             generate_images if len(CLIENTS) == 0 else use_diffusion_ui,
-            inputs=[prompt, negatives],
+            inputs=[prompt, negatives, mode],
             outputs=images,
             api_name="sd",
         )
         negatives.submit(
             generate_images if len(CLIENTS) == 0 else use_diffusion_ui,
-            inputs=[prompt, negatives],
+            inputs=[prompt, negatives, mode],
             outputs=images,
         )
 
@@ -61,32 +66,26 @@ def build_diffusion_ui():
             [
                 [
                     "A photo of A majestic lion jumping from a big stone at night",
-                    "",
                 ],
                 [
                     "Aerial photography of a winding river through autumn forests, with vibrant red and orange foliage",
-                    "",
                 ],
                 [
                     "interior design, open plan, kitchen and living room, modular furniture with cotton textiles, wooden floor, high ceiling, large steel windows viewing a city",
-                    "",
                 ],
                 [
-                    "High nation-geographic symmetrical close-up portrait shoot in green jungle of an expressive lizard, anamorphic lens, ultra-realistic, hyper-detailed, green-core, jungle-core",
-                    "",
+                    "High nation-geographic symmetrical close-up portrait shoot in green jungle of an expressive lizard, anamorphic lens, ultra-realistic, hyper-detailed, green-core, jungle-core"
                 ],
-                ["photo of romantic couple walking on beach while sunset", ""],
-                ["Glowing jellyfish floating through a foggy forest at twilight", ""],
+                ["photo of romantic couple walking on beach while sunset"],
+                ["Glowing jellyfish floating through a foggy forest at twilight"],
                 [
-                    "Skeleton man going on an adventure in the foggy hills of Ireland wearing a cape",
-                    "",
+                    "Skeleton man going on an adventure in the foggy hills of Ireland wearing a cape"
                 ],
                 [
-                    "Elegant lavender garnish cocktail idea, cocktail glass, realistic, sharp focus, 8k high definition",
-                    "",
+                    "Elegant lavender garnish cocktail idea, cocktail glass, realistic, sharp focus, 8k high definition"
                 ],
             ],
-            inputs=[prompt, negatives],
+            inputs=[prompt],
             outputs=images,
             fn=generate_images if len(CLIENTS) == 0 else use_diffusion_ui,
             cache_examples=False,
