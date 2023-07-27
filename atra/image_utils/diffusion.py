@@ -54,7 +54,6 @@ def generate_images(prompt: str, negatives: str = "", mode: str = "prototyping")
         prompt=prompt,
         negative_prompt=negatives,
         num_inference_steps=n_steps,
-        output_type="latent",
     ).images[0]
 
     return image
