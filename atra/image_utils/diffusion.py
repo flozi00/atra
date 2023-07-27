@@ -30,20 +30,9 @@ def get_pipes():
         use_safetensors=True,
     )
 
-    refiner = StableDiffusionXLImg2ImgPipeline.from_pretrained(
-        "stabilityai/stable-diffusion-xl-refiner-1.0",
-        text_encoder_2=pipe.text_encoder_2,
-        vae=pipe.vae,
-        torch_dtype=torch.float16,
-        use_safetensors=True,
-        variant="fp16",
-    )
-
     pipe.to("cuda")
-    refiner.to("cuda")
 
     pipe.enable_xformers_memory_efficient_attention()
-    refiner.enable_xformers_memory_efficient_attention()
 
     pipe.scheduler = DPMSolverSinglestepScheduler.from_config(pipe.scheduler.config)
 
@@ -63,15 +52,7 @@ def generate_images(prompt: str, negatives: str = ""):
         prompt=prompt,
         negative_prompt=negatives,
         num_inference_steps=n_steps,
-        denoising_end=high_noise_frac,
-        output_type="latent",
-    ).images
-    image = refiner(
-        prompt=prompt,
-        negative_prompt=negatives,
-        num_inference_steps=n_steps,
-        denoising_start=high_noise_frac,
-        image=image,
+        # output_type="latent",
     ).images[0]
 
     return image
