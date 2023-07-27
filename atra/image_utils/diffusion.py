@@ -8,6 +8,17 @@ from atra.utils import timeit
 pipe = None
 refiner = None
 
+import diffusers.pipelines.stable_diffusion_xl.watermark
+
+
+def apply_watermark_dummy(self, images: torch.FloatTensor):
+    return images
+
+
+diffusers.pipelines.stable_diffusion_xl.watermark.StableDiffusionXLWatermarker.apply_watermark = (
+    apply_watermark_dummy
+)
+
 
 def get_pipes():
     global pipe, refiner
@@ -32,24 +43,6 @@ def get_pipes():
 
     pipe.enable_xformers_memory_efficient_attention()
     refiner.enable_xformers_memory_efficient_attention()
-
-    try:
-        pipe.unet = torch.compile(
-            pipe.unet, backend="inductor", mode="reduce-overhead", fullgraph=True
-        )
-        pipe.vae = torch.compile(
-            pipe.vae, backend="onnxrt", mode="reduce-overhead", fullgraph=True
-        )
-
-        refiner.unet = torch.compile(
-            refiner.unet, backend="inductor", mode="reduce-overhead", fullgraph=True
-        )
-        refiner.vae = torch.compile(
-            refiner.vae, backend="onnxrt", mode="reduce-overhead", fullgraph=True
-        )
-    except:
-        pipe.enable_model_cpu_offload()
-        refiner.enable_model_cpu_offload()
 
     pipe.scheduler = DPMSolverSinglestepScheduler.from_config(pipe.scheduler.config)
 
