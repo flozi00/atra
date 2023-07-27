@@ -1,5 +1,6 @@
 from diffusers import (
     StableDiffusionXLPipeline,
+    StableDiffusionXLImg2ImgPipeline,
     DPMSolverSinglestepScheduler,
     EulerDiscreteScheduler,
 )
@@ -30,13 +31,26 @@ def get_pipes():
         use_safetensors=True,
     )
 
+    refiner = StableDiffusionXLImg2ImgPipeline.from_pretrained(
+        "stabilityai/stable-diffusion-xl-refiner-1.0",
+        text_encoder_2=pipe.text_encoder_2,
+        vae=pipe.vae,
+        torch_dtype=torch.float16,
+        use_safetensors=True,
+        variant="fp16",
+    )
+
     pipe.to("cuda")
+    refiner.to("cuda")
 
     pipe.enable_xformers_memory_efficient_attention()
+    refiner.enable_xformers_memory_efficient_attention()
 
 
 @timeit
 def generate_images(prompt: str, negatives: str = "", mode: str = "prototyping"):
+    high_noise_frac = 0.7
+
     if pipe is None:
         get_pipes()
 
@@ -45,15 +59,22 @@ def generate_images(prompt: str, negatives: str = "", mode: str = "prototyping")
 
     if mode == "prototyping":
         pipe.scheduler = DPMSolverSinglestepScheduler.from_config(pipe.scheduler.config)
-        n_steps = 20
+        n_steps = 15
     else:
         pipe.scheduler = EulerDiscreteScheduler.from_config(pipe.scheduler.config)
-        n_steps = 50
+        n_steps = 60
 
     image = pipe(
         prompt=prompt,
-        negative_prompt=negatives,
         num_inference_steps=n_steps,
+        denoising_end=high_noise_frac,
+        output_type="latent",
+    ).images
+    image = refiner(
+        prompt=prompt,
+        num_inference_steps=n_steps,
+        denoising_start=high_noise_frac,
+        image=image,
     ).images[0]
 
     return image
