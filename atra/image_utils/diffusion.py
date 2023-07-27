@@ -1,5 +1,6 @@
 from diffusers import (
     DiffusionPipeline,
+    DPMSolverSinglestepScheduler,
 )
 import torch
 from atra.utils import timeit
@@ -11,14 +12,14 @@ refiner = None
 def get_pipes():
     global pipe, refiner
     pipe = DiffusionPipeline.from_pretrained(
-        "stabilityai/stable-diffusion-xl-base-0.9",
+        "stabilityai/stable-diffusion-xl-base-1.0",
         torch_dtype=torch.float16,
         variant="fp16",
         use_safetensors=True,
     )
 
     refiner = DiffusionPipeline.from_pretrained(
-        "stabilityai/stable-diffusion-xl-refiner-0.9",
+        "stabilityai/stable-diffusion-xl-refiner-1.0",
         text_encoder_2=pipe.text_encoder_2,
         vae=pipe.vae,
         torch_dtype=torch.float16,
@@ -32,27 +33,30 @@ def get_pipes():
     pipe.enable_xformers_memory_efficient_attention()
     refiner.enable_xformers_memory_efficient_attention()
 
-    pipe.unet = torch.compile(
-        pipe.unet, backend="inductor", mode="reduce-overhead", fullgraph=True
-    )
-    pipe.vae = torch.compile(
-        pipe.vae, backend="onnxrt", mode="reduce-overhead", fullgraph=True
-    )
+    try:
+        pipe.unet = torch.compile(
+            pipe.unet, backend="inductor", mode="reduce-overhead", fullgraph=True
+        )
+        pipe.vae = torch.compile(
+            pipe.vae, backend="onnxrt", mode="reduce-overhead", fullgraph=True
+        )
 
-    refiner.unet = torch.compile(
-        refiner.unet, backend="inductor", mode="reduce-overhead", fullgraph=True
-    )
-    refiner.vae = torch.compile(
-        refiner.vae, backend="onnxrt", mode="reduce-overhead", fullgraph=True
-    )
+        refiner.unet = torch.compile(
+            refiner.unet, backend="inductor", mode="reduce-overhead", fullgraph=True
+        )
+        refiner.vae = torch.compile(
+            refiner.vae, backend="onnxrt", mode="reduce-overhead", fullgraph=True
+        )
+    except:
+        pipe.enable_model_cpu_offload()
+        refiner.enable_model_cpu_offload()
 
-    # pipe.enable_model_cpu_offload()
-    # refiner.enable_model_cpu_offload()
+    pipe.scheduler = DPMSolverSinglestepScheduler.from_config(pipe.scheduler.config)
 
 
 @timeit
 def generate_images(prompt: str, negatives: str = ""):
-    n_steps = 40
+    n_steps = 15
     high_noise_frac = 0.7
 
     if pipe is None:
