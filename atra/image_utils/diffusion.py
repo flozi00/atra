@@ -7,7 +7,7 @@ from diffusers import (
 from diffusers.models.cross_attention import AttnProcessor2_0
 
 import torch
-from atra.utils import timeit
+from atra.utils import timeit, ttl_cache
 import GPUtil
 import time
 import io
@@ -62,6 +62,7 @@ def get_pipes():
 
 
 @timeit
+@ttl_cache(maxsize=128, ttl=60 * 60 * 6)
 def generate_images(prompt: str, negatives: str = "", mode: str = "prototyping"):
     high_noise_frac = 0.7
 
