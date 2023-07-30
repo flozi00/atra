@@ -8,9 +8,18 @@ from diffusers.models.cross_attention import AttnProcessor2_0
 
 import torch
 from atra.utils import timeit
+import GPUtil
+import time
+import io
+from huggingface_hub import HfApi
+import base64
+
+api = HfApi()
 
 pipe = None
 refiner = None
+
+TEMP_LIMIT = 65
 
 import diffusers.pipelines.stable_diffusion_xl.watermark
 
@@ -69,6 +78,13 @@ def generate_images(prompt: str, negatives: str = "", mode: str = "prototyping")
         pipe.scheduler = EulerDiscreteScheduler.from_config(pipe.scheduler.config)
         n_steps = 60
 
+    gpus = GPUtil.getGPUs()
+    for gpu_num in range(len(gpus)):
+        gpu = gpus[gpu_num]
+        if gpu.temperature >= TEMP_LIMIT:
+            faktor = int(gpu.temperature) - TEMP_LIMIT
+            time.sleep(faktor * 10)  # wait for GPU to cool down
+
     image = pipe(
         prompt=prompt,
         num_inference_steps=n_steps,
@@ -81,5 +97,24 @@ def generate_images(prompt: str, negatives: str = "", mode: str = "prototyping")
         denoising_start=high_noise_frac,
         image=image,
     ).images[0]
+
+    if mode != "prototyping":
+        buf = io.BytesIO()
+        image.save(buf, format="png")
+        byte_im = buf.getvalue()
+
+        timestamp = str(int(time.time()))
+
+        combined = prompt + "-->" + negatives + "-->" + timestamp
+
+        encoded = base64.b64encode(combined.encode("utf-8")).decode("utf-8")
+
+        api.upload_file(
+            path_or_fileobj=byte_im,
+            path_in_repo="images/{}.png".format(encoded),
+            repo_id="flozi00/diffusions",
+            repo_type="dataset",
+            commit_message=prompt,
+        )
 
     return image
