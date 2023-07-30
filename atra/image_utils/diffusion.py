@@ -13,6 +13,7 @@ import time
 import io
 from huggingface_hub import HfApi
 import base64
+import re
 
 api = HfApi()
 
@@ -20,6 +21,19 @@ pipe = None
 refiner = None
 
 TEMP_LIMIT = 65
+
+BAD_PATTERNS = [
+    "nude",
+    "naked",
+    "nacked",
+    "porn",
+    "undressed",
+    "sex",
+    "erotic",
+    "pornographic",
+    "vulgar",
+    "hentai",
+]
 
 import diffusers.pipelines.stable_diffusion_xl.watermark
 
@@ -78,6 +92,13 @@ def generate_images(prompt: str, negatives: str = "", mode: str = "prototyping")
     else:
         pipe.scheduler = EulerDiscreteScheduler.from_config(pipe.scheduler.config)
         n_steps = 60
+
+    pattern = r"\d+"
+    prompt = re.sub(pattern, "", prompt)
+
+    for pattern in BAD_PATTERNS:
+        if pattern in prompt:
+            raise "NSFW prompt not allowed"
 
     gpus = GPUtil.getGPUs()
     for gpu_num in range(len(gpus)):

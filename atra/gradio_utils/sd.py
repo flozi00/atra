@@ -1,33 +1,6 @@
 from atra.gradio_utils.ui import GLOBAL_CSS, GET_GLOBAL_HEADER, launch_args
 from atra.image_utils.diffusion import generate_images
 import gradio as gr
-from gradio_client import Client
-import os
-
-IMAGE_BACKENDS = os.getenv("SD")
-if IMAGE_BACKENDS is not None:
-    IMAGE_BACKENDS = IMAGE_BACKENDS.split(",")
-else:
-    IMAGE_BACKENDS = []
-
-CLIENTS = [Client(src=backend) for backend in IMAGE_BACKENDS]
-
-
-def use_diffusion_ui(prompt, negatives):
-    jobs = [client.submit(prompt, negatives, api_name="/sd") for client in CLIENTS]
-    results = []
-    running_job = True
-
-    while running_job:
-        results = []
-        running_job = False
-        for job in jobs:
-            if not job.done():
-                running_job = True
-            else:
-                res = job.result()
-                results.append(res)
-                yield results
 
 
 def build_diffusion_ui():
@@ -48,16 +21,14 @@ def build_diffusion_ui():
                     label="Mode",
                     value="prototyping",
                 )
-            images = gr.Image() if len(CLIENTS) == 0 else gr.Gallery()
-
+            images = gr.Image()
         prompt.submit(
-            generate_images if len(CLIENTS) == 0 else use_diffusion_ui,
+            generate_images,
             inputs=[prompt, negatives, mode],
             outputs=images,
-            api_name="sd",
         )
         negatives.submit(
-            generate_images if len(CLIENTS) == 0 else use_diffusion_ui,
+            generate_images,
             inputs=[prompt, negatives, mode],
             outputs=images,
         )
@@ -87,7 +58,7 @@ def build_diffusion_ui():
             ],
             inputs=[prompt],
             outputs=images,
-            fn=generate_images if len(CLIENTS) == 0 else use_diffusion_ui,
+            fn=generate_images,
             cache_examples=False,
             run_on_click=False,
         )
