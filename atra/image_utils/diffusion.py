@@ -79,22 +79,27 @@ def get_pipes():
 @timeit
 @ttl_cache(maxsize=128, ttl=60 * 60 * 6)
 def generate_images(prompt: str, negatives: str = "", mode: str = "prototyping"):
+    TIME_LOG = ""
     high_noise_frac = 0.7
 
     negatives += ",".join(BAD_PATTERNS)
 
+    start_time = time.time()
     if pipe is None:
         get_pipes()
+    TIME_LOG += "--- %s seconds model loading---\n" % (time.time() - start_time)
 
     if negatives is None:
         negatives = ""
 
+    start_time = time.time()
     if mode == "prototyping":
         pipe.scheduler = DPMSolverSinglestepScheduler.from_config(pipe.scheduler.config)
         n_steps = 15
     else:
         pipe.scheduler = EulerDiscreteScheduler.from_config(pipe.scheduler.config)
         n_steps = 60
+    TIME_LOG += "--- %s seconds scheduler config---\n" % (time.time() - start_time)
 
     pattern = r"\d+"
     prompt = re.sub(pattern, "", prompt)
@@ -110,20 +115,25 @@ def generate_images(prompt: str, negatives: str = "", mode: str = "prototyping")
             faktor = int(gpu.temperature) - TEMP_LIMIT
             time.sleep(faktor * 10)  # wait for GPU to cool down
 
+    start_time = time.time()
     image = pipe(
         prompt=prompt,
         num_inference_steps=n_steps,
         denoising_end=high_noise_frac,
         output_type="latent",
     ).images
+    TIME_LOG += "--- %s seconds base model inference---\n" % (time.time() - start_time)
+    start_time = time.time()
     image = refiner(
         prompt=prompt,
         num_inference_steps=n_steps,
         denoising_start=high_noise_frac,
         image=image,
     ).images[0]
+    TIME_LOG += "--- %s seconds refiner + rendering---\n" % (time.time() - start_time)
 
     if mode != "prototyping":
+        start_time = time.time()
         buf = io.BytesIO()
         image.save(buf, format="png")
         byte_im = buf.getvalue()
@@ -141,5 +151,6 @@ def generate_images(prompt: str, negatives: str = "", mode: str = "prototyping")
             repo_type="dataset",
             commit_message=prompt,
         )
+        TIME_LOG += "--- %s seconds image upload---\n" % (time.time() - start_time)
 
-    return image
+    return image, TIME_LOG

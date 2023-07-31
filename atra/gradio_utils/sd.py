@@ -21,16 +21,18 @@ def build_diffusion_ui():
                     label="Mode",
                     value="prototyping",
                 )
-            images = gr.Image()
+            with gr.Column():
+                images = gr.Image()
+                LOGS = gr.Textbox(max_lines=6)
         prompt.submit(
             generate_images,
             inputs=[prompt, negatives, mode],
-            outputs=images,
+            outputs=[images, LOGS],
         )
         negatives.submit(
             generate_images,
             inputs=[prompt, negatives, mode],
-            outputs=images,
+            outputs=[images, LOGS],
         )
 
         gr.Examples(
@@ -57,10 +59,6 @@ def build_diffusion_ui():
                 ],
             ],
             inputs=[prompt],
-            outputs=images,
-            fn=generate_images,
-            cache_examples=False,
-            run_on_click=False,
         )
 
     ui.queue(concurrency_count=1, api_open=False)
