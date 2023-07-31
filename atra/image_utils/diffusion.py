@@ -50,15 +50,18 @@ diffusers.pipelines.stable_diffusion_xl.watermark.StableDiffusionXLWatermarker.a
 
 def get_pipes():
     global pipe, refiner
-    #pipe = StableDiffusionXLPipeline.from_pretrained(
+    # pipe = StableDiffusionXLPipeline.from_pretrained(
     #    "stabilityai/stable-diffusion-xl-base-1.0",
     #    torch_dtype=torch.float16,
     #    variant="fp16",
     #    use_safetensors=True,
-    #)
+    # )
 
-    pipe = StableDiffusionXLPipeline.from_single_file("https://huggingface.co/jayparmr/DreamShaper_XL1_0_Alpha2/blob/main/dreamshaperXL10.safetensors", torch_dtype=torch.float16, use_safetensors=True,)
-
+    pipe = StableDiffusionXLPipeline.from_single_file(
+        "https://huggingface.co/jayparmr/DreamShaper_XL1_0_Alpha2/blob/main/dreamshaperXL10.safetensors",
+        torch_dtype=torch.float16,
+        use_safetensors=True,
+    )
 
     refiner = StableDiffusionXLImg2ImgPipeline.from_pretrained(
         "stabilityai/stable-diffusion-xl-refiner-1.0",
@@ -91,7 +94,6 @@ def generate_images(prompt: str, negatives: str = "", mode: str = "prototyping")
             if pattern in prompt:
                 raise "NSFW prompt not allowed"
 
-
     start_time = time.time()
     if pipe is None:
         get_pipes()
@@ -116,24 +118,28 @@ def generate_images(prompt: str, negatives: str = "", mode: str = "prototyping")
             faktor = int(gpu.temperature) - TEMP_LIMIT
             time.sleep(faktor * 10)  # wait for GPU to cool down
 
-    start_time = time.time()
-    image = pipe(
-        prompt=prompt,
-        num_inference_steps=n_steps,
-        denoising_end=high_noise_frac,
-        output_type="latent",
-    ).images
-    TIME_LOG += "--- %s seconds base model inference---\n" % (time.time() - start_time)
-    start_time = time.time()
-    image = refiner(
-        prompt=prompt,
-        num_inference_steps=n_steps,
-        denoising_start=high_noise_frac,
-        image=image,
-    ).images[0]
-    TIME_LOG += "--- %s seconds refiner + rendering---\n" % (time.time() - start_time)
-
     if mode != "prototyping":
+        start_time = time.time()
+        image = pipe(
+            prompt=prompt,
+            num_inference_steps=n_steps,
+            denoising_end=high_noise_frac,
+            output_type="latent",
+        ).images
+        TIME_LOG += "--- %s seconds base model inference---\n" % (
+            time.time() - start_time
+        )
+        start_time = time.time()
+        image = refiner(
+            prompt=prompt,
+            num_inference_steps=n_steps,
+            denoising_start=high_noise_frac,
+            image=image,
+        ).images[0]
+        TIME_LOG += "--- %s seconds refiner + rendering---\n" % (
+            time.time() - start_time
+        )
+
         start_time = time.time()
         buf = io.BytesIO()
         image.save(buf, format="png")
@@ -153,5 +159,14 @@ def generate_images(prompt: str, negatives: str = "", mode: str = "prototyping")
             commit_message=prompt,
         )
         TIME_LOG += "--- %s seconds image upload---\n" % (time.time() - start_time)
+    else:
+        start_time = time.time()
+        image = pipe(
+            prompt=prompt,
+            num_inference_steps=n_steps,
+        ).images[0]
+        TIME_LOG += "--- %s seconds base model inference---\n" % (
+            time.time() - start_time
+        )
 
     return image, TIME_LOG
