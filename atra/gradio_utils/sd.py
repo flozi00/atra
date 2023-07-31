@@ -1,7 +1,43 @@
 from atra.gradio_utils.ui import GLOBAL_CSS, GET_GLOBAL_HEADER, launch_args
-from atra.image_utils.diffusion import generate_images
+from atra.image_utils.diffusion import generate_images as local_generator
 import gradio as gr
 
+from gradio_client import Client
+import os
+
+IMAGE_BACKENDS = os.getenv("SD")
+if IMAGE_BACKENDS is not None:
+    IMAGE_BACKENDS = IMAGE_BACKENDS.split(",")
+else:
+    IMAGE_BACKENDS = []
+
+CLIENTS = [Client(src=backend) for backend in IMAGE_BACKENDS]
+
+def use_diffusion_ui(prompt, negatives, mode):
+    jobs = [client.submit(prompt, negatives, mode, fn_index=0) for client in CLIENTS]
+    results = []
+    for c in CLIENTS:
+        results.append(None)
+        results.append(None)
+    running_job = True
+
+    while running_job:
+        running_job = False
+        for job_index in range(len(jobs)):
+            job = jobs[job_index]
+            if not job.done():
+                running_job = True
+            else:
+                img, log = job.result()
+                results[job_index*2] = img
+                results[job_index*2+1] = log
+                
+                yield results
+
+if len(CLIENTS) == 0:
+    generate_images = local_generator
+else:
+    generate_images = use_diffusion_ui
 
 def build_diffusion_ui():
     ui = gr.Blocks(css=GLOBAL_CSS)
@@ -21,18 +57,29 @@ def build_diffusion_ui():
                     label="Mode",
                     value="prototyping",
                 )
-            with gr.Column():
-                images = gr.Image()
-                LOGS = gr.Textbox(max_lines=6)
+            
+            if len(CLIENTS) == 0:
+                _boxes = []
+                with gr.Column():
+                    _boxes.append(gr.Image())
+                    _boxes.append(gr.Textbox(max_lines=6))
+            else:
+                _boxes = []
+                for c in CLIENTS:
+                    with gr.Column():
+                        _boxes.append(gr.Image())
+                        _boxes.append(gr.Textbox(max_lines=6))
+
+
         prompt.submit(
             generate_images,
             inputs=[prompt, negatives, mode],
-            outputs=[images, LOGS],
+            outputs=_boxes,
         )
         negatives.submit(
             generate_images,
             inputs=[prompt, negatives, mode],
-            outputs=[images, LOGS],
+            outputs=_boxes,
         )
 
         gr.Examples(
