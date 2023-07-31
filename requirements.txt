@@ -21,3 +21,4 @@ text-generation
 https://github.com/huggingface/diffusers/archive/refs/heads/main.zip
 invisible-watermark>=2.0
 xformers
+omegaconf
