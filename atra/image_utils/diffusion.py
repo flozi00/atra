@@ -33,6 +33,7 @@ BAD_PATTERNS = [
     "pornographic",
     "vulgar",
     "hentai",
+    "nackt",
 ]
 
 import diffusers.pipelines.stable_diffusion_xl.watermark
@@ -79,6 +80,8 @@ def get_pipes():
 @ttl_cache(maxsize=128, ttl=60 * 60 * 6)
 def generate_images(prompt: str, negatives: str = "", mode: str = "prototyping"):
     high_noise_frac = 0.7
+
+    negatives += ",".join(BAD_PATTERNS)
 
     if pipe is None:
         get_pipes()
