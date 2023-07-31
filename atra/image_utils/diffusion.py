@@ -50,12 +50,15 @@ diffusers.pipelines.stable_diffusion_xl.watermark.StableDiffusionXLWatermarker.a
 
 def get_pipes():
     global pipe, refiner
-    pipe = StableDiffusionXLPipeline.from_pretrained(
-        "stabilityai/stable-diffusion-xl-base-1.0",
-        torch_dtype=torch.float16,
-        variant="fp16",
-        use_safetensors=True,
-    )
+    #pipe = StableDiffusionXLPipeline.from_pretrained(
+    #    "stabilityai/stable-diffusion-xl-base-1.0",
+    #    torch_dtype=torch.float16,
+    #    variant="fp16",
+    #    use_safetensors=True,
+    #)
+
+    pipe = StableDiffusionXLPipeline.from_single_file("https://huggingface.co/jayparmr/DreamShaper_XL1_0_Alpha2/blob/main/dreamshaperXL10.safetensors", torch_dtype=torch.float16, use_safetensors=True,)
+
 
     refiner = StableDiffusionXLImg2ImgPipeline.from_pretrained(
         "stabilityai/stable-diffusion-xl-refiner-1.0",
@@ -82,7 +85,12 @@ def generate_images(prompt: str, negatives: str = "", mode: str = "prototyping")
     TIME_LOG = ""
     high_noise_frac = 0.7
 
-    negatives += ",".join(BAD_PATTERNS)
+    if mode != "prototyping":
+        negatives += ",".join(BAD_PATTERNS)
+        for pattern in BAD_PATTERNS:
+            if pattern in prompt:
+                raise "NSFW prompt not allowed"
+
 
     start_time = time.time()
     if pipe is None:
@@ -100,13 +108,6 @@ def generate_images(prompt: str, negatives: str = "", mode: str = "prototyping")
         pipe.scheduler = EulerDiscreteScheduler.from_config(pipe.scheduler.config)
         n_steps = 60
     TIME_LOG += "--- %s seconds scheduler config---\n" % (time.time() - start_time)
-
-    pattern = r"\d+"
-    prompt = re.sub(pattern, "", prompt)
-
-    for pattern in BAD_PATTERNS:
-        if pattern in prompt:
-            raise "NSFW prompt not allowed"
 
     gpus = GPUtil.getGPUs()
     for gpu_num in range(len(gpus)):
