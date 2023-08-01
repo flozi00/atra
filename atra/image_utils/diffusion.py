@@ -55,7 +55,6 @@ refiner = StableDiffusionXLImg2ImgPipeline.from_pretrained(
     use_safetensors=True,
     variant="fp16",
 )
-refiner.enable_model_cpu_offload()
 refiner.unet.set_attn_processor(AttnProcessor2_0())
 refiner.enable_xformers_memory_efficient_attention()
 
