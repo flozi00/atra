@@ -92,7 +92,7 @@ API_URL = "https://api-inference.huggingface.co/models/facebook/bart-large-mnli"
 def query(payload):
     payload = {
         "inputs": payload,
-        "parameters": {"candidate_labels": ["interior design", "exterior design", "general image"]},
+        "parameters": {"candidate_labels": ["interior design", "exterior design", "general image", "portrait"]},
     }
     response = requests.post(API_URL, json=payload)
     return response.json()["labels"][0]
@@ -154,6 +154,7 @@ def generate_images(prompt: str, negatives: str = "", mode: str = "prototyping")
         num_inference_steps=n_steps,
     ).images[0]
     TIME_LOG["base-inference"] = time.time() - start_time
+    TIME_LOG["watt-seconds"] = TIME_LOG["base-inference"] * POWER
     
     if mode != "prototyping":
         start_time = time.time()
@@ -163,5 +164,11 @@ def generate_images(prompt: str, negatives: str = "", mode: str = "prototyping")
             image=image,
         ).images[0]
         TIME_LOG["refiner-inference"] = time.time() - start_time
+        TIME_LOG["watt-seconds"] += TIME_LOG["refiner-inference"] * POWER
+
+    TIME_LOG["watt-hours"] = TIME_LOG["watt-seconds"]/3600
+
+    TIME_LOG["energy-costs-euro"] = TIME_LOG["watt-hours"]/1000*0.4
+    TIME_LOG["energy-costs-cent"] = TIME_LOG["energy-costs-euro"]*100
 
     return image, TIME_LOG
