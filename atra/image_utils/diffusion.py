@@ -140,6 +140,7 @@ def generate_images(prompt: str, negatives: str = "", mode: str = "prototyping")
     start_time = time.time()
     model_art = query(prompt)
     TIME_LOG["choosing expert"] = time.time() - start_time
+    TIME_LOG["expert used"] = model_art
 
     if model_art == "interior design":
         pipe_to_use = interior_pipe
