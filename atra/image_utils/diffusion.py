@@ -100,7 +100,7 @@ def get_pipes(expert):
             if MAPPINGS[pipe_name].get("pipe", None) == None:
                 MAPPINGS[pipe_name]["pipe"] = MAPPINGS[pipe_name][
                     "class"
-                ].from_single_file(MAPPINGS[pipe_name]["path"])
+                ].from_single_file(MAPPINGS[pipe_name]["path"], torch_dtype=torch.float16)
                 MAPPINGS[pipe_name]["pipe"].enable_model_cpu_offload()
                 MAPPINGS[pipe_name]["pipe"].unet.set_attn_processor(AttnProcessor2_0())
                 MAPPINGS[pipe_name]["pipe"].enable_xformers_memory_efficient_attention()
