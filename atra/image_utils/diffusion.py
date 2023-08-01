@@ -57,6 +57,7 @@ refiner = StableDiffusionXLImg2ImgPipeline.from_pretrained(
 )
 refiner.unet.set_attn_processor(AttnProcessor2_0())
 refiner.enable_xformers_memory_efficient_attention()
+refiner = refiner.to("cuda")
 
 MAPPINGS = {
     "general": {
