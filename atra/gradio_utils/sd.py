@@ -62,13 +62,13 @@ def build_diffusion_ui():
                 _boxes = []
                 with gr.Column():
                     _boxes.append(gr.Image())
-                    _boxes.append(gr.Textbox(max_lines=6))
+                    _boxes.append(gr.JSON())
             else:
                 _boxes = []
                 for c in CLIENTS:
                     with gr.Column():
                         _boxes.append(gr.Image())
-                        _boxes.append(gr.Textbox(max_lines=6))
+                        _boxes.append(gr.JSON())
 
 
         prompt.submit(
