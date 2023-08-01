@@ -85,17 +85,12 @@ def get_pipes():
     exterior_pipe.enable_xformers_memory_efficient_attention()
 
 
-import requests
+from transformers import pipeline
 
-API_URL = "https://api-inference.huggingface.co/models/facebook/bart-large-mnli"
-
+pipe = pipeline("zero-shot-classification", model="facebook/bart-large-mnli")
 def query(payload):
-    payload = {
-        "inputs": payload,
-        "parameters": {"candidate_labels": ["interior design", "exterior design", "general image", "portrait"]},
-    }
-    response = requests.post(API_URL, json=payload)
-    return response.json()["labels"][0]
+    response = pipe(payload, candidate_labels= ["interior design", "exterior design", "general image", "portrait"])
+    return response["labels"][0]
 
 
 @timeit
@@ -104,7 +99,6 @@ def generate_images(prompt: str, negatives: str = "", mode: str = "prototyping")
     TIME_LOG = {"gpu-power": POWER}
 
     if mode != "prototyping":
-        negatives += ",".join(BAD_PATTERNS)
         for pattern in BAD_PATTERNS:
             if pattern in prompt:
                 raise "NSFW prompt not allowed"
@@ -141,6 +135,7 @@ def generate_images(prompt: str, negatives: str = "", mode: str = "prototyping")
     model_art = query(prompt)
     TIME_LOG["choosing expert"] = time.time() - start_time
     TIME_LOG["expert used"] = model_art
+    TIME_LOG["watt-seconds"] = TIME_LOG["choosing expert"] * POWER
 
     if model_art == "interior design":
         pipe_to_use = interior_pipe
@@ -152,15 +147,17 @@ def generate_images(prompt: str, negatives: str = "", mode: str = "prototyping")
     start_time = time.time()
     image = pipe_to_use(
         prompt=prompt,
+        negative_prompt = negatives,
         num_inference_steps=n_steps,
     ).images[0]
     TIME_LOG["base-inference"] = time.time() - start_time
-    TIME_LOG["watt-seconds"] = TIME_LOG["base-inference"] * POWER
+    TIME_LOG["watt-seconds"] += TIME_LOG["base-inference"] * POWER
     
     if mode != "prototyping":
         start_time = time.time()
         image = refiner(
             prompt=prompt,
+            negative_prompt = negatives,
             num_inference_steps=int(n_steps/3),
             image=image,
         ).images[0]
