@@ -8,6 +8,7 @@ from transformers.pipelines.audio_utils import ffmpeg_read
 from transformers import pipeline
 import gradio as gr
 import warnings
+from optimum.bettertransformer import BetterTransformer
 
 warnings.filterwarnings(action="ignore")
 
@@ -41,6 +42,7 @@ def speech_recognition(data, language, progress=gr.Progress()) -> str:
             torch_dtype=torch.float16,
         )
         pipe.model.eval()
+        pipe.model = BetterTransformer.transform(pipe.model)
         pipe.model = torch.compile(pipe.model, backend="onnxrt", mode="max-autotune")
 
     progress.__call__(progress=0.8, desc="Transcribing Audio")
