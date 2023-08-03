@@ -3,7 +3,8 @@ from diffusers import (
     StableDiffusionXLImg2ImgPipeline,
     DPMSolverSinglestepScheduler,
     EulerDiscreteScheduler,
-    StableDiffusionPipeline,
+    AutoencoderTiny,
+    EulerAncestralDiscreteScheduler
 )
 from diffusers.models.attention_processor import AttnProcessor2_0
 
@@ -49,16 +50,6 @@ from transformers import pipeline
 
 pipe = pipeline("zero-shot-classification", model="facebook/bart-large-mnli")
 
-refiner = StableDiffusionXLImg2ImgPipeline.from_pretrained(
-    "stabilityai/stable-diffusion-xl-refiner-1.0",
-    torch_dtype=torch.float16,
-    use_safetensors=True,
-    variant="fp16",
-)
-refiner.unet.set_attn_processor(AttnProcessor2_0())
-refiner.enable_xformers_memory_efficient_attention()
-refiner = refiner.to("cuda")
-
 MAPPINGS = {
     "general": {
         "class": StableDiffusionXLPipeline,
@@ -102,8 +93,10 @@ def get_pipes(expert):
                     "class"
                 ].from_single_file(MAPPINGS[pipe_name]["path"], torch_dtype=torch.float16)
                 MAPPINGS[pipe_name]["pipe"].enable_model_cpu_offload()
-                MAPPINGS[pipe_name]["pipe"].unet.set_attn_processor(AttnProcessor2_0())
                 MAPPINGS[pipe_name]["pipe"].enable_xformers_memory_efficient_attention()
+                MAPPINGS[pipe_name]["pipe"].unet.set_attn_processor(AttnProcessor2_0())
+
+                MAPPINGS[pipe_name]["pipe"].vae = torch.compile(MAPPINGS[pipe_name]["pipe"].vae, mode="reduce-overhead", fullgraph=True)
 
             return MAPPINGS[pipe_name]["pipe"]
 
@@ -117,7 +110,7 @@ def query(payload):
 
 
 @timeit
-@ttl_cache(maxsize=128, ttl=60 * 60 * 6)
+@ttl_cache(maxsize=1024, ttl=60 * 60 * 24)
 def generate_images(prompt: str, negatives: str = "", mode: str = "prototyping"):
     TIME_LOG = {"gpu-power": POWER}
 
@@ -153,31 +146,21 @@ def generate_images(prompt: str, negatives: str = "", mode: str = "prototyping")
         )
         n_steps = 15
     else:
-        pipe_to_use.scheduler = EulerDiscreteScheduler.from_config(
+        pipe_to_use.scheduler = EulerAncestralDiscreteScheduler.from_config(
             pipe_to_use.scheduler.config
         )
-        n_steps = 60
+        n_steps = 40
     TIME_LOG["scheduler-loading"] = time.time() - start_time
 
     start_time = time.time()
-    image = pipe_to_use(
-        prompt=prompt,
-        negative_prompt=negatives,
-        num_inference_steps=n_steps,
-    ).images[0]
-    TIME_LOG["base-inference"] = time.time() - start_time
-    TIME_LOG["watt-seconds"] += TIME_LOG["base-inference"] * POWER
-
-    if mode != "prototyping":
-        start_time = time.time()
-        image = refiner(
+    with torch.inference_mode():
+        image = pipe_to_use(
             prompt=prompt,
             negative_prompt=negatives,
-            num_inference_steps=int(n_steps / 3),
-            image=image,
+            num_inference_steps=n_steps,
         ).images[0]
-        TIME_LOG["refiner-inference"] = time.time() - start_time
-        TIME_LOG["watt-seconds"] += TIME_LOG["refiner-inference"] * POWER
+    TIME_LOG["base-inference"] = time.time() - start_time
+    TIME_LOG["watt-seconds"] += TIME_LOG["base-inference"] * POWER
 
     TIME_LOG["watt-hours"] = TIME_LOG["watt-seconds"] / 3600
 
