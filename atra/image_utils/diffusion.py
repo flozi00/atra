@@ -82,6 +82,8 @@ MERGED_CATEGORIES = []
 for pipe_name in list(MAPPINGS.keys()):
     MERGED_CATEGORIES.extend(MAPPINGS[pipe_name]["categories"])
 
+tiny_vae = AutoencoderTiny.from_pretrained("madebyollin/taesdxl", torch_dtype=torch.float16)
+
 
 def get_pipes(expert):
     global MAPPINGS
@@ -92,6 +94,7 @@ def get_pipes(expert):
                 MAPPINGS[pipe_name]["pipe"] = MAPPINGS[pipe_name][
                     "class"
                 ].from_single_file(MAPPINGS[pipe_name]["path"], torch_dtype=torch.float16)
+                MAPPINGS[pipe_name]["pipe"].vae = tiny_vae
                 MAPPINGS[pipe_name]["pipe"].enable_model_cpu_offload()
                 MAPPINGS[pipe_name]["pipe"].enable_xformers_memory_efficient_attention()
                 MAPPINGS[pipe_name]["pipe"].unet.set_attn_processor(AttnProcessor2_0())
@@ -118,13 +121,6 @@ def generate_images(prompt: str, negatives: str = "", mode: str = "prototyping")
         for pattern in BAD_PATTERNS:
             if pattern in prompt:
                 raise "NSFW prompt not allowed"
-
-    gpus = GPUtil.getGPUs()
-    for gpu_num in range(len(gpus)):
-        gpu = gpus[gpu_num]
-        if gpu.temperature >= TEMP_LIMIT:
-            faktor = int(gpu.temperature) - TEMP_LIMIT
-            time.sleep(faktor * 10)  # wait for GPU to cool down
 
     start_time = time.time()
     model_art = query(prompt)

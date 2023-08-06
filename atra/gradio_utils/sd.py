@@ -108,5 +108,5 @@ def build_diffusion_ui():
             inputs=[prompt],
         )
 
-    ui.queue(concurrency_count=1, api_open=False)
+    #ui.queue(concurrency_count=1, api_open=False)
     ui.launch(server_port=7861, **launch_args)
