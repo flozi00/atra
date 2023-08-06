@@ -1,8 +1,7 @@
+import pathlib
 from diffusers import (
     StableDiffusionXLPipeline,
-    StableDiffusionXLImg2ImgPipeline,
     DPMSolverSinglestepScheduler,
-    EulerDiscreteScheduler,
     AutoencoderTiny,
     EulerAncestralDiscreteScheduler
 )
@@ -10,7 +9,6 @@ from diffusers.models.attention_processor import AttnProcessor2_0
 
 import torch
 from atra.utils import timeit, ttl_cache
-import GPUtil
 import time
 import subprocess
 import json
@@ -95,11 +93,11 @@ def get_pipes(expert):
                     "class"
                 ].from_single_file(MAPPINGS[pipe_name]["path"], torch_dtype=torch.float16)
                 MAPPINGS[pipe_name]["pipe"].vae = tiny_vae
-                MAPPINGS[pipe_name]["pipe"].enable_model_cpu_offload()
-                MAPPINGS[pipe_name]["pipe"].enable_xformers_memory_efficient_attention()
+                #MAPPINGS[pipe_name]["pipe"].enable_model_cpu_offload()
                 MAPPINGS[pipe_name]["pipe"].unet.set_attn_processor(AttnProcessor2_0())
 
                 MAPPINGS[pipe_name]["pipe"].vae = torch.compile(MAPPINGS[pipe_name]["pipe"].vae, mode="reduce-overhead", fullgraph=True)
+                MAPPINGS[pipe_name]["pipe"] = MAPPINGS[pipe_name]["pipe"].to("cuda")
 
             return MAPPINGS[pipe_name]["pipe"]
 
@@ -163,4 +161,6 @@ def generate_images(prompt: str, negatives: str = "", mode: str = "prototyping")
     TIME_LOG["energy-costs-euro"] = TIME_LOG["watt-hours"] / 1000 * 0.4
     TIME_LOG["energy-costs-cent"] = TIME_LOG["energy-costs-euro"] * 100
 
+    image.save("output_image.jpg", "JPEG")
+    image = pathlib.Path("output_image.jpg")
     return image, TIME_LOG
