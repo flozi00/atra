@@ -6,9 +6,9 @@ from diffusers import (
     EulerAncestralDiscreteScheduler
 )
 from diffusers.models.attention_processor import AttnProcessor2_0
-
+import gradio as gr
 import torch
-from atra.utils import timeit, ttl_cache
+from atra.utils import timeit
 import time
 import subprocess
 import json
@@ -60,7 +60,8 @@ def generate_images(prompt: str, negatives: str = ""):
 
     for pattern in BAD_PATTERNS:
         if pattern in prompt:
-            raise "NSFW prompt not allowed"
+            raise gr.Error("NSFW prompt not allowed")
+            #raise "NSFW prompt not allowed"
 
     if negatives is None:
         negatives = ""
