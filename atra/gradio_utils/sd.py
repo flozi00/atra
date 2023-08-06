@@ -13,8 +13,8 @@ else:
 
 CLIENTS = [Client(src=backend) for backend in IMAGE_BACKENDS]
 
-def use_diffusion_ui(prompt, negatives, mode):
-    jobs = [client.submit(prompt, negatives, mode, fn_index=0) for client in CLIENTS]
+def use_diffusion_ui(prompt, negatives):
+    jobs = [client.submit(prompt, negatives, fn_index=0) for client in CLIENTS]
     results = []
     for c in CLIENTS:
         results.append(None)
@@ -52,11 +52,6 @@ def build_diffusion_ui():
                     label="Negative Prompt",
                     info="Prompt describing what you dont want to see, useful for refining image",
                 )
-                mode = gr.Dropdown(
-                    choices=["prototyping", "high res"],
-                    label="Mode",
-                    value="prototyping",
-                )
             
             if len(CLIENTS) == 0:
                 _boxes = []
@@ -73,12 +68,12 @@ def build_diffusion_ui():
 
         prompt.submit(
             generate_images,
-            inputs=[prompt, negatives, mode],
+            inputs=[prompt, negatives],
             outputs=_boxes,
         )
         negatives.submit(
             generate_images,
-            inputs=[prompt, negatives, mode],
+            inputs=[prompt, negatives],
             outputs=_boxes,
         )
 

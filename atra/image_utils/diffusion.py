@@ -44,117 +44,36 @@ subprocess = subprocess.Popen("gpustat -P --json", shell=True, stdout=subprocess
 subprocess_return = subprocess.stdout.read()
 POWER = json.loads(subprocess_return)["gpus"][0]["enforced.power.limit"]
 
-from transformers import pipeline
+diffusion_pipe = StableDiffusionXLPipeline.from_single_file("https://huggingface.co/jayparmr/DreamShaper_XL1_0_Alpha2/blob/main/dreamshaperXL10.safetensors", torch_dtype=torch.float16)
+diffusion_pipe.vae = AutoencoderTiny.from_pretrained("madebyollin/taesdxl", torch_dtype=torch.float16)
+diffusion_pipe.unet.set_attn_processor(AttnProcessor2_0())
 
-pipe = pipeline("zero-shot-classification", model="facebook/bart-large-mnli")
-
-MAPPINGS = {
-    "general": {
-        "class": StableDiffusionXLPipeline,
-        "path": "https://huggingface.co/jayparmr/DreamShaper_XL1_0_Alpha2/blob/main/dreamshaperXL10.safetensors",
-        "categories": ["general image"],
-    },
-    "mbbxl": {
-        "class": StableDiffusionXLPipeline,
-        "path": "https://huggingface.co/flozi00/diffusion-moe/blob/main/mbbxlUltimate_v10RC.safetensors",
-        "categories": [
-            "comic",
-            "fantasy",
-            "unreal",
-            "mickey mouse",
-            "superman",
-            "marvel universum",
-            "painting",
-            "drawing",
-        ],
-    },
-    "xl6": {
-        "class": StableDiffusionXLPipeline,
-        "path": "https://huggingface.co/flozi00/diffusion-moe/blob/main/xl6HEPHAISTOSSD10XLSFW_v10.safetensors",
-        "categories": ["portrait", "animal", "human"],
-    },
-}
-
-MERGED_CATEGORIES = []
-
-for pipe_name in list(MAPPINGS.keys()):
-    MERGED_CATEGORIES.extend(MAPPINGS[pipe_name]["categories"])
-
-tiny_vae = AutoencoderTiny.from_pretrained("madebyollin/taesdxl", torch_dtype=torch.float16)
-
-
-def get_pipes(expert):
-    global MAPPINGS
-
-    for pipe_name in list(MAPPINGS.keys()):
-        if expert in MAPPINGS[pipe_name]["categories"]:
-            if MAPPINGS[pipe_name].get("pipe", None) == None:
-                MAPPINGS[pipe_name]["pipe"] = MAPPINGS[pipe_name][
-                    "class"
-                ].from_single_file(MAPPINGS[pipe_name]["path"], torch_dtype=torch.float16)
-                MAPPINGS[pipe_name]["pipe"].vae = tiny_vae
-                #MAPPINGS[pipe_name]["pipe"].enable_model_cpu_offload()
-                MAPPINGS[pipe_name]["pipe"].unet.set_attn_processor(AttnProcessor2_0())
-
-                MAPPINGS[pipe_name]["pipe"].vae = torch.compile(MAPPINGS[pipe_name]["pipe"].vae, mode="reduce-overhead", fullgraph=True)
-                MAPPINGS[pipe_name]["pipe"] = MAPPINGS[pipe_name]["pipe"].to("cuda")
-
-            return MAPPINGS[pipe_name]["pipe"]
-
-
-def query(payload):
-    response = pipe(
-        payload,
-        candidate_labels=MERGED_CATEGORIES,
+diffusion_pipe.vae = torch.compile(diffusion_pipe.vae, mode="reduce-overhead", fullgraph=True)
+diffusion_pipe = diffusion_pipe.to("cuda")
+diffusion_pipe.scheduler = EulerAncestralDiscreteScheduler.from_config(
+        diffusion_pipe.scheduler.config
     )
-    return response["labels"][0]
-
 
 @timeit
-@ttl_cache(maxsize=1024, ttl=60 * 60 * 24)
-def generate_images(prompt: str, negatives: str = "", mode: str = "prototyping"):
+def generate_images(prompt: str, negatives: str = ""):
     TIME_LOG = {"gpu-power": POWER}
 
-    if mode != "prototyping":
-        for pattern in BAD_PATTERNS:
-            if pattern in prompt:
-                raise "NSFW prompt not allowed"
-
-    start_time = time.time()
-    model_art = query(prompt)
-    TIME_LOG["choosing expert"] = time.time() - start_time
-    TIME_LOG["expert used"] = model_art
-    TIME_LOG["watt-seconds"] = TIME_LOG["choosing expert"] * POWER
-
-    start_time = time.time()
-    pipe_to_use = get_pipes(model_art)
-    TIME_LOG["model-loading"] = time.time() - start_time
+    for pattern in BAD_PATTERNS:
+        if pattern in prompt:
+            raise "NSFW prompt not allowed"
 
     if negatives is None:
         negatives = ""
 
     start_time = time.time()
-    if mode == "prototyping":
-        pipe_to_use.scheduler = DPMSolverSinglestepScheduler.from_config(
-            pipe_to_use.scheduler.config
-        )
-        n_steps = 15
-    else:
-        pipe_to_use.scheduler = EulerAncestralDiscreteScheduler.from_config(
-            pipe_to_use.scheduler.config
-        )
-        n_steps = 40
-    TIME_LOG["scheduler-loading"] = time.time() - start_time
-
-    start_time = time.time()
     with torch.inference_mode():
-        image = pipe_to_use(
+        image = diffusion_pipe(
             prompt=prompt,
             negative_prompt=negatives,
-            num_inference_steps=n_steps,
+            num_inference_steps=60,
         ).images[0]
     TIME_LOG["base-inference"] = time.time() - start_time
-    TIME_LOG["watt-seconds"] += TIME_LOG["base-inference"] * POWER
+    TIME_LOG["watt-seconds"] = TIME_LOG["base-inference"] * POWER
 
     TIME_LOG["watt-hours"] = TIME_LOG["watt-seconds"] / 3600
 
