@@ -45,7 +45,7 @@ subprocess_return = subprocess.stdout.read()
 POWER = json.loads(subprocess_return)["gpus"][0]["enforced.power.limit"]
 
 diffusion_pipe = StableDiffusionXLPipeline.from_single_file("https://huggingface.co/jayparmr/DreamShaper_XL1_0_Alpha2/blob/main/dreamshaperXL10.safetensors", torch_dtype=torch.float16)
-diffusion_pipe.vae = AutoencoderTiny.from_pretrained("madebyollin/taesdxl", torch_dtype=torch.float16)
+#diffusion_pipe.vae = AutoencoderTiny.from_pretrained("madebyollin/taesdxl", torch_dtype=torch.float16)
 diffusion_pipe.unet.set_attn_processor(AttnProcessor2_0())
 
 diffusion_pipe.vae = torch.compile(diffusion_pipe.vae, mode="reduce-overhead", fullgraph=True)
