@@ -11,17 +11,28 @@ system_message = "Im Folgenden finden Sie eine Reihe von Dialogen zwischen versc
 
 SEARCH_PROMPT = """Formuliere Suchanfragen anhand der vorrausgehenden Konvesation:
 Was ist Chatgpt ? --> Was ist Chatgpt
+
 Ich habe Hunger --> Was sind schnelle Rezepte
+
 Wer ist der aktuelle Bundespräsident --> Wer ist der aktuelle Bundespräsident
+
 Sichere Programmierung --> Wie programmiere ich sicher
+
 Ich suche einen guten Artikel über .net Autorisierung --> .net Autorisierung
+
 Wer ist Jeff Bezos --> Wer ist jeff Bezos
+
 Ich suche einen Artikel über Wallbox --> Wallbox
+
 Wann iMac 2023 --> Wann ist das iMac 2023 Releasedatum
+
 Überwachungskamera --> Was ist eine gute Überwachungskamera
+
 wann kommt gta 6 raus --> Wann ist der GTA 6 Release
-wer ist angela merkel ?, und wie alt ist sie --> wie alt ist angela merkel
-wer ist donald trump , muss er ins gefängnis ? --> muss donald trump ins gefängnis
+
+Wer ist Angela Merkel
+Wann wurde sie geboren --> Wann wurde Angela Merkel geboren
+
 <|question|> -->"""
 
 CLASSIFY_SEARCHABLE = """Klassifiziere ob die Frage im Internet gesucht werden kann oder lokal beantwortet wird:
@@ -57,7 +68,7 @@ def get_webpage_content_playwright(query):
 def get_user_messages(history):
     users = ""
     for h in history:
-        users += "," + h[0]
+        users += "\n" + h[0]
     
     return users
 
