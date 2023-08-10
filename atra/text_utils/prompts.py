@@ -42,6 +42,7 @@ LOCALS_SEARCH_CONVERSATION = [
     [["Was ist Chatgpt"], "Search"],
     [["Ich habe Hunger"], "Lokal"],
     [["Wer ist der aktuelle Bundespräsident"], "Search"],
+    [["Plane einen 3tägigen Ausflug nach Mallorca", "Erstelle eine Liste mit dem tagesablauf für jeden Tag"], "Lokal"],
 ]
 
 for c in LOCALS_SEARCH_CONVERSATION:

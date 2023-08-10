@@ -50,7 +50,7 @@ def predict(message, chatbot):
     text = ""
     if searchable is True:
         search_query = client.generate(SEARCH_PROMPT.replace("<|question|>", user_messages), stop_sequences=["\n"]).generated_text.strip()
-        text += "```Search query: " + search_query + "```\n\n"
+        text += "```\nSearch query: " + search_query + "\n```\n\n"
         options = get_webpage_content_playwright(search_query)
         text += client.generate(options + "\nQuestion: " + search_query + "\n\nAnswer in german plain text:", max_new_tokens=128, temperature=0.1).generated_text
         yield text.replace("<|", "")
