@@ -3,50 +3,9 @@ from atra.gradio_utils.ui import GLOBAL_CSS, GET_GLOBAL_HEADER, launch_args
 from playwright.sync_api import sync_playwright
 from text_generation import Client
 import urllib.parse
-import json
+from atra.text_utils.prompts import ASSISTANT_TOKEN, END_TOKEN, SYSTEM_PROMPT, SEARCH_PROMPT, CLASSIFY_SEARCHABLE, USER_TOKEN
 
 client = Client("http://127.0.0.1:8080")
-
-system_message = "Im Folgenden finden Sie eine Reihe von Dialogen zwischen verschiedenen Personen und einem deutschen KI-Assistenten namens Egino. Die KI versucht, hilfsbereit, höflich, ehrlich, kultiviert, gefühlsbetont und bescheiden, aber kenntnisreich zu sein. Der Assistent ist gerne bereit, bei fast allem zu helfen, und tut sein Bestes, um genau zu verstehen, was benötigt wird. Er bemüht sich auch, keine falschen oder irreführenden Informationen zu geben, und er macht Vorbehalte, wenn er sich der richtigen Antwort nicht ganz sicher ist. Dennoch ist der Assistent praktisch und tut wirklich sein Bestes, ohne sich von der Vorsicht zu sehr einschränken zu lassen. Die Antworten werden vollständig formuliert und so detailliert wie möglich sein."
-
-SEARCH_PROMPT = """Formuliere Suchanfragen anhand der vorrausgehenden Konvesation:
-Was ist Chatgpt ? --> Was ist Chatgpt
-
-Ich habe Hunger --> Was sind schnelle Rezepte
-
-Wer ist der aktuelle Bundespräsident --> Wer ist der aktuelle Bundespräsident
-
-Sichere Programmierung --> Wie programmiere ich sicher
-
-Ich suche einen guten Artikel über .net Autorisierung --> .net Autorisierung
-
-Wer ist Jeff Bezos --> Wer ist jeff Bezos
-
-Ich suche einen Artikel über Wallbox --> Wallbox
-
-Wann iMac 2023 --> Wann ist das iMac 2023 Releasedatum
-
-Überwachungskamera --> Was ist eine gute Überwachungskamera
-
-wann kommt gta 6 raus --> Wann ist der GTA 6 Release
-
-Wer ist Angela Merkel
-Wann wurde sie geboren --> Wann wurde Angela Merkel geboren
-
-<|question|> -->"""
-
-CLASSIFY_SEARCHABLE = """Klassifiziere ob die Frage im Internet gesucht werden kann oder lokal beantwortet wird:
-Wer bist du ? --> Lokal
-Ich habe Hunger --> Lokal
-Wann iMac 2023 --> Search
-Was kannst du --> Lokal
-Was ist der Sinn des Lebens --> Search
-Wer bist du --> Lokal
-Ich suche einen Artikel über Wallbox --> Search
-Wer ist Angela Merkel --> Search
-Und auf Deutsch ? --> Lokal
-Plane einen 3tägigen Trip nach Hawaii --> Lokal
-<|question|> -->"""
 
 def get_webpage_content_playwright(query):
     url = "https://searx.be/search?categories=general&language=de&q=" + urllib.parse.quote(query)
@@ -65,35 +24,41 @@ def get_webpage_content_playwright(query):
 
     return filtered
 
-def get_user_messages(history):
+def get_user_messages(history, message):
     users = ""
     for h in history:
-        users += "\n" + h[0]
+        users += USER_TOKEN + h[0] + END_TOKEN
+    
+    users += USER_TOKEN + message + END_TOKEN
     
     return users
 
+def generate_history_as_string(history, message):
+    messages = SYSTEM_PROMPT + "\n\n" + "\n".join(["\n".join([USER_TOKEN+item[0]+END_TOKEN, ASSISTANT_TOKEN+item[1]+END_TOKEN])
+                          for item in history])
+    
+    messages += USER_TOKEN + message + END_TOKEN + ASSISTANT_TOKEN 
+
+    return messages
+
 def predict(message, chatbot):    
-    input_prompt = f"<|prompter|>{system_message}<|endoftext|>"
-    for interaction in chatbot:
-        input_prompt = "<|prompter|>" + input_prompt + str(interaction[0]) + "<|assistant|>" + str(interaction[1]) + "<|endoftext|>"
-
-    input_prompt = input_prompt + "<|prompter|>" + str(message) + "<|endoftext|><|assistant|>"
-
-    searchable_answer = client.generate(CLASSIFY_SEARCHABLE.replace("<|question|>", message), temperature=0.1).generated_text
+    input_prompt = generate_history_as_string(chatbot, message)
+    user_messages = get_user_messages(chatbot, message)
+    searchable_answer = client.generate(CLASSIFY_SEARCHABLE.replace("<|question|>", user_messages), temperature=0.1, stop_sequences=["\n"], max_new_tokens=3).generated_text
     searchable = "Search" in searchable_answer
 
     text = ""
     if searchable is True:
-        search_query = client.generate(SEARCH_PROMPT.replace("<|question|>", message), stop_sequences=["\n"]).generated_text + "\n"
-        text += "Search query: " + search_query
+        search_query = client.generate(SEARCH_PROMPT.replace("<|question|>", user_messages), stop_sequences=["\n"]).generated_text.strip()
+        text += "```Search query: " + search_query + "```\n\n"
         options = get_webpage_content_playwright(search_query)
         text += client.generate(options + "\nQuestion: " + search_query + "\n\nAnswer in german plain text:", max_new_tokens=128, temperature=0.1).generated_text
-        yield text
+        yield text.replace("<|", "")
     else:
-        for response in client.generate_stream(input_prompt, max_new_tokens=256, temperature=0.6, stop_sequences=["endoftext","<|"]):
+        for response in client.generate_stream(input_prompt, max_new_tokens=256, temperature=0.6, stop_sequences=["<|"]):
             if not response.token.special:
                 text += response.token.text
-                yield text
+                yield text.replace("<|", "")
 
     
 def build_chat_ui():
