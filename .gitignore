@@ -13,3 +13,4 @@ temp_*
 huggingface
 *gptq/*
 data/
+*.jpg

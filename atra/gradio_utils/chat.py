@@ -4,8 +4,32 @@ from playwright.sync_api import sync_playwright
 from text_generation import Client
 import urllib.parse
 from atra.text_utils.prompts import ASSISTANT_TOKEN, END_TOKEN, SYSTEM_PROMPT, SEARCH_PROMPT, CLASSIFY_SEARCHABLE, USER_TOKEN
+from sentence_transformers import SentenceTransformer, util
+import torch
+
+embedder = SentenceTransformer('intfloat/multilingual-e5-large')
 
 client = Client("http://127.0.0.1:8080")
+
+def re_ranking(query, options):
+    corpus = ["passage: " + o for o in options]
+    query = "query: " + query
+
+    filtered_corpus = []
+
+    corpus_embeddings = embedder.encode(corpus, convert_to_tensor=True)
+    query_embedding = embedder.encode(query, convert_to_tensor=True)
+
+    cos_scores = util.cos_sim(query_embedding, corpus_embeddings)[0]
+    top_results = torch.topk(cos_scores, k=20)
+
+    for score, idx in zip(top_results[0], top_results[1]):
+        if score > 0.7:
+            filtered_corpus.append(corpus[idx])
+
+    return "\n".join(filtered_corpus)
+
+
 
 def get_webpage_content_playwright(query):
     url = "https://searx.be/search?categories=general&language=de&q=" + urllib.parse.quote(query)
@@ -21,6 +45,8 @@ def get_webpage_content_playwright(query):
     for co in content:
         if len(co.split(" ")) > 5:
             filtered += co + "\n" 
+    
+    filtered = re_ranking(query, filtered.split("\n"))
 
     return filtered
 
