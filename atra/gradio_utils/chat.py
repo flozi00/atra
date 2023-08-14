@@ -3,7 +3,7 @@ from atra.gradio_utils.ui import GLOBAL_CSS, GET_GLOBAL_HEADER, launch_args
 from playwright.sync_api import sync_playwright
 from text_generation import Client
 import urllib.parse
-from atra.text_utils.prompts import ASSISTANT_TOKEN, END_TOKEN, SYSTEM_PROMPT, SEARCH_PROMPT, CLASSIFY_SEARCHABLE, USER_TOKEN
+from atra.text_utils.prompts import ASSISTANT_TOKEN, END_TOKEN, SYSTEM_PROMPT, SEARCH_PROMPT, CLASSIFY_SEARCHABLE, USER_TOKEN, QUERY_PROMPT
 from sentence_transformers import SentenceTransformer, util
 import torch
 
@@ -75,10 +75,11 @@ def predict(message, chatbot):
 
     text = ""
     if searchable is True:
-        search_query = client.generate(SEARCH_PROMPT.replace("<|question|>", user_messages), stop_sequences=["\n"]).generated_text.strip()
+        search_query = client.generate(QUERY_PROMPT.replace("<|question|>", user_messages), stop_sequences=["\n"]).generated_text.strip()
+        search_uestion = client.generate(SEARCH_PROMPT.replace("<|question|>", user_messages), stop_sequences=["\n"]).generated_text.strip()
         text += "```\nSearch query: " + search_query + "\n```\n\n"
         options = get_webpage_content_playwright(search_query)
-        text += client.generate(options + "\nQuestion: " + search_query + "\n\nAnswer in german plain text:", max_new_tokens=128, temperature=0.1).generated_text
+        text += client.generate(options + "\nQuestion: " + search_uestion + "\n\nAnswer in german plain text:", max_new_tokens=128, temperature=0.1).generated_text
         yield text.replace("<|", "")
     else:
         for response in client.generate_stream(input_prompt, max_new_tokens=256, temperature=0.6, stop_sequences=["<|"]):

@@ -4,7 +4,7 @@ ASSISTANT_TOKEN = "<|assistant|>"
 USER_TOKEN = "<|prompter|>"
 END_TOKEN = "<|endoftext|>"
 
-SEARCH_PROMPT = "Formuliere Suchanfragen anhand der vorrausgehenden Konvesation:\n"
+SEARCH_PROMPT = "Formuliere Fragen anhand der vorrausgehenden Konvesation:\n"
 SEARCH_CONVERSATION = [
     [["Was ist Chatgpt"], "Was ist Chatgpt"],
     [["Ich habe Hunger"], "Was sind schnelle Rezepte"],
@@ -28,6 +28,32 @@ for c in SEARCH_CONVERSATION:
         inputs += USER_TOKEN + ins + END_TOKEN
     SEARCH_PROMPT += "\n" + inputs + " --> " + c[1]
 SEARCH_PROMPT += "\n<|question|> -->"
+
+
+QUERY_PROMPT = "Formuliere Suchmaschinen Queries anhand der vorrausgehenden Konvesation:\n"
+QUERY_CONVERSATION = [
+    [["Was ist Chatgpt"], "Chatgpt Definition"],
+    [["Ich habe Hunger"], "Einfache Rezepte"],
+    [["Wer ist der aktuelle Bundespräsident"], "Aktueller Bundespräsident"],
+    [["Sichere Programmierung"], "Sichere Programmierung"],
+    [["Ich suche einen guten Artikel über .net Autorisierung"], ".net Autorisierung"],
+    [["Wer ist Jeff Bezos"], "jeff Bezos"],
+    [["Ich suche einen Artikel über Wallbox"], "Wallbox"],
+    [["Wann iMac 2023"], "Wann ist das iMac 2023 Releasedatum"],
+    [["Überwachungskamera"], "gute Überwachungskamera"],
+    [["wann kommt gta 6 raus"], "GTA 6 Release"],
+    [["Wer ist Angela Merkel", "Wann wurde sie geboren"], "Geburtsdatum Angela Merkel"],
+    [["Wie ist das Wetter in Berlin", "und in München"], "Wetter in München"],
+    [["Wie ist das Wetter in Berlin", "und in München", "und in Hamburg"], "Wetter in Hamburg"],
+    [["Was war die erste Partei von Angela Merkel ? ", "Seit wann ist sie Bundeskanzlerin ?"], "Seit wann ist Angela Merkel Bundeskanzlerin"],
+]
+
+for c in QUERY_CONVERSATION:
+    inputs = ""
+    for ins in c[0]:
+        inputs += USER_TOKEN + ins + END_TOKEN
+    QUERY_PROMPT += "\n" + inputs + " --> " + c[1]
+QUERY_PROMPT += "\n<|question|> -->"
 
 
 CLASSIFY_SEARCHABLE = "Klassifiziere ob die Frage im Internet gesucht werden kann oder lokal beantwortet wird:\n"
