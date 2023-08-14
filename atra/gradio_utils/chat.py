@@ -93,5 +93,5 @@ def build_chat_ui():
         GET_GLOBAL_HEADER()
         gr.ChatInterface(predict)  
 
-    demo.queue()
+    demo.queue(concurrency_count=4)
     demo.launch(server_port=7860, **launch_args)
