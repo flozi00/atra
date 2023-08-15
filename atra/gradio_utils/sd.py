@@ -13,6 +13,7 @@ else:
 
 CLIENTS = [Client(src=backend) for backend in IMAGE_BACKENDS]
 
+
 def use_diffusion_ui(prompt, negatives):
     jobs = [client.submit(prompt, negatives, fn_index=0) for client in CLIENTS]
     results = []
@@ -29,15 +30,17 @@ def use_diffusion_ui(prompt, negatives):
                 running_job = True
             else:
                 img, log = job.result()
-                results[job_index*2] = img
-                results[job_index*2+1] = log
-                
+                results[job_index * 2] = img
+                results[job_index * 2 + 1] = log
+
                 yield results
+
 
 if len(CLIENTS) == 0:
     generate_images = local_generator
 else:
     generate_images = use_diffusion_ui
+
 
 def build_diffusion_ui():
     ui = gr.Blocks(css=GLOBAL_CSS)
@@ -52,7 +55,7 @@ def build_diffusion_ui():
                     label="Negative Prompt",
                     info="Prompt describing what you dont want to see, useful for refining image",
                 )
-            
+
             if len(CLIENTS) == 0:
                 _boxes = []
                 with gr.Column():
@@ -64,7 +67,6 @@ def build_diffusion_ui():
                     with gr.Column():
                         _boxes.append(gr.Image())
                         _boxes.append(gr.JSON())
-
 
         prompt.submit(
             generate_images,

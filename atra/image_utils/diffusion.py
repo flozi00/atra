@@ -2,12 +2,9 @@ import pathlib
 from diffusers import (
     StableDiffusionXLPipeline,
     StableDiffusionXLImg2ImgPipeline,
-    DPMSolverSinglestepScheduler,
-    AutoencoderTiny,
-    EulerAncestralDiscreteScheduler
+    EulerAncestralDiscreteScheduler,
 )
 from diffusers.models.attention_processor import AttnProcessor2_0
-import gradio as gr
 import torch
 from atra.utils import timeit
 import time
@@ -46,14 +43,19 @@ subprocess = subprocess.Popen("gpustat -P --json", shell=True, stdout=subprocess
 subprocess_return = subprocess.stdout.read()
 POWER = json.loads(subprocess_return)["gpus"][0]["enforced.power.limit"]
 
-diffusion_pipe = StableDiffusionXLPipeline.from_single_file("https://huggingface.co/jayparmr/DreamShaper_XL1_0_Alpha2/blob/main/dreamshaperXL10.safetensors", torch_dtype=torch.float16)
-#diffusion_pipe.vae = AutoencoderTiny.from_pretrained("madebyollin/taesdxl", torch_dtype=torch.float16)
+diffusion_pipe = StableDiffusionXLPipeline.from_single_file(
+    "https://huggingface.co/jayparmr/DreamShaper_XL1_0_Alpha2/blob/main/dreamshaperXL10.safetensors",
+    torch_dtype=torch.float16,
+)
+# diffusion_pipe.vae = AutoencoderTiny.from_pretrained("madebyollin/taesdxl", torch_dtype=torch.float16)
 diffusion_pipe.unet.set_attn_processor(AttnProcessor2_0())
-diffusion_pipe.vae = torch.compile(diffusion_pipe.vae, mode="reduce-overhead", fullgraph=True)
+diffusion_pipe.vae = torch.compile(
+    diffusion_pipe.vae, mode="reduce-overhead", fullgraph=True
+)
 diffusion_pipe = diffusion_pipe.to("cuda")
 diffusion_pipe.scheduler = EulerAncestralDiscreteScheduler.from_config(
-        diffusion_pipe.scheduler.config
-    )
+    diffusion_pipe.scheduler.config
+)
 
 refiner = StableDiffusionXLImg2ImgPipeline.from_pretrained(
     "stabilityai/stable-diffusion-xl-refiner-1.0",
@@ -67,7 +69,7 @@ refiner.scheduler = EulerAncestralDiscreteScheduler.from_config(
     refiner.scheduler.config
 )
 refiner.unet.set_attn_processor(AttnProcessor2_0())
-#refiner.vae = torch.compile(refiner.vae, mode="reduce-overhead", fullgraph=True)
+# refiner.vae = torch.compile(refiner.vae, mode="reduce-overhead", fullgraph=True)
 refiner.to("cuda")
 
 
@@ -75,10 +77,10 @@ refiner.to("cuda")
 def generate_images(prompt: str, negatives: str = ""):
     TIME_LOG = {"gpu-power": POWER}
 
-    #for pattern in BAD_PATTERNS:
+    # for pattern in BAD_PATTERNS:
     #    if pattern in prompt:
     #        raise gr.Error("NSFW prompt not allowed")
-            #raise "NSFW prompt not allowed"
+    # raise "NSFW prompt not allowed"
 
     if negatives is None:
         negatives = ""
@@ -98,7 +100,6 @@ def generate_images(prompt: str, negatives: str = ""):
             denoising_start=high_noise_frac,
             image=image,
         ).images[0]
-
 
     TIME_LOG["base-inference"] = time.time() - start_time
     TIME_LOG["watt-seconds"] = TIME_LOG["base-inference"] * POWER

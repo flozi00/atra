@@ -16,10 +16,25 @@ SEARCH_CONVERSATION = [
     [["Wann iMac 2023"], "Wann ist das iMac 2023 Releasedatum"],
     [["Überwachungskamera"], "Was ist eine gute Überwachungskamera"],
     [["wann kommt gta 6 raus"], "Wann ist der GTA 6 Release"],
-    [["Wer ist Angela Merkel", "Wann wurde sie geboren"], "Wann wurde Angela Merkel geboren"],
-    [["Wie ist das Wetter in Berlin", "und in München"], "Wie ist das Wetter in München"],
-    [["Wie ist das Wetter in Berlin", "und in München", "und in Hamburg"], "Wie ist das Wetter in Hamburg"],
-    [["Was war die erste Partei von Angela Merkel ? ", "Seit wann ist sie Bundeskanzlerin ?"], "Seit wann ist Angela Merkel Bundeskanzlerin"],
+    [
+        ["Wer ist Angela Merkel", "Wann wurde sie geboren"],
+        "Wann wurde Angela Merkel geboren",
+    ],
+    [
+        ["Wie ist das Wetter in Berlin", "und in München"],
+        "Wie ist das Wetter in München",
+    ],
+    [
+        ["Wie ist das Wetter in Berlin", "und in München", "und in Hamburg"],
+        "Wie ist das Wetter in Hamburg",
+    ],
+    [
+        [
+            "Was war die erste Partei von Angela Merkel ? ",
+            "Seit wann ist sie Bundeskanzlerin ?",
+        ],
+        "Seit wann ist Angela Merkel Bundeskanzlerin",
+    ],
 ]
 
 for c in SEARCH_CONVERSATION:
@@ -30,7 +45,9 @@ for c in SEARCH_CONVERSATION:
 SEARCH_PROMPT += "\n<|question|> -->"
 
 
-QUERY_PROMPT = "Formuliere Suchmaschinen Queries anhand der vorrausgehenden Konvesation:\n"
+QUERY_PROMPT = (
+    "Formuliere Suchmaschinen Queries anhand der vorrausgehenden Konvesation:\n"
+)
 QUERY_CONVERSATION = [
     [["Was ist Chatgpt"], "Chatgpt Definition"],
     [["Ich habe Hunger"], "Einfache Rezepte"],
@@ -44,8 +61,17 @@ QUERY_CONVERSATION = [
     [["wann kommt gta 6 raus"], "GTA 6 Release"],
     [["Wer ist Angela Merkel", "Wann wurde sie geboren"], "Geburtsdatum Angela Merkel"],
     [["Wie ist das Wetter in Berlin", "und in München"], "Wetter in München"],
-    [["Wie ist das Wetter in Berlin", "und in München", "und in Hamburg"], "Wetter in Hamburg"],
-    [["Was war die erste Partei von Angela Merkel ? ", "Seit wann ist sie Bundeskanzlerin ?"], "Seit wann ist Angela Merkel Bundeskanzlerin"],
+    [
+        ["Wie ist das Wetter in Berlin", "und in München", "und in Hamburg"],
+        "Wetter in Hamburg",
+    ],
+    [
+        [
+            "Was war die erste Partei von Angela Merkel ? ",
+            "Seit wann ist sie Bundeskanzlerin ?",
+        ],
+        "Seit wann ist Angela Merkel Bundeskanzlerin",
+    ],
 ]
 
 for c in QUERY_CONVERSATION:
@@ -64,11 +90,23 @@ LOCALS_SEARCH_CONVERSATION = [
     [["Plane einen 3tägigen Trip nach Hawaii"], "Lokal"],
     [["Wie ist das Wetter in Berlin", "und in München"], "Search"],
     [["Wie ist das Wetter in Berlin", "und in München", "und in Hamburg"], "Search"],
-    [["Was war die erste Partei von Angela Merkel ? ", "Seit wann ist sie Bundeskanzlerin ?"], "Search"],
+    [
+        [
+            "Was war die erste Partei von Angela Merkel ? ",
+            "Seit wann ist sie Bundeskanzlerin ?",
+        ],
+        "Search",
+    ],
     [["Was ist Chatgpt"], "Search"],
     [["Ich habe Hunger"], "Lokal"],
     [["Wer ist der aktuelle Bundespräsident"], "Search"],
-    [["Plane einen 3tägigen Ausflug nach Mallorca", "Erstelle eine Liste mit dem tagesablauf für jeden Tag"], "Lokal"],
+    [
+        [
+            "Plane einen 3tägigen Ausflug nach Mallorca",
+            "Erstelle eine Liste mit dem tagesablauf für jeden Tag",
+        ],
+        "Lokal",
+    ],
 ]
 
 for c in LOCALS_SEARCH_CONVERSATION:
