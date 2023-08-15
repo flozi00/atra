@@ -75,7 +75,7 @@ refiner.to("cuda")
 
 @timeit
 def generate_images(prompt: str, negatives: str = ""):
-    TIME_LOG = {"gpu-power": POWER}
+    TIME_LOG = {"GPU Power insert in W": POWER}
 
     # for pattern in BAD_PATTERNS:
     #    if pattern in prompt:
@@ -101,13 +101,8 @@ def generate_images(prompt: str, negatives: str = ""):
             image=image,
         ).images[0]
 
-    TIME_LOG["base-inference"] = time.time() - start_time
-    TIME_LOG["watt-seconds"] = TIME_LOG["base-inference"] * POWER
-
-    TIME_LOG["watt-hours"] = TIME_LOG["watt-seconds"] / 3600
-
-    TIME_LOG["energy-costs-euro"] = TIME_LOG["watt-hours"] / 1000 * 0.4
-    TIME_LOG["energy-costs-cent"] = TIME_LOG["energy-costs-euro"] * 100
+    TIME_LOG["Comsumed Watt hours"] = (time.time() - start_time) * POWER / 3600
+    TIME_LOG["Energy costs in cent"] = TIME_LOG["Comsumed Watt hours"] * 40 / 1000
 
     image.save("output_image.jpg", "JPEG")
     image = pathlib.Path("output_image.jpg")

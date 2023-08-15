@@ -8,7 +8,7 @@ GLOBAL_CSS = """
 
 def GET_GLOBAL_HEADER():
     return gr.Markdown(
-        "## This project is sponsored by [ ![PrimeLine](https://www.primeline-solutions.com/skin/frontend/default/theme566/images/primeline-solutions-logo.png) ](https://www.primeline-solutions.com/de/server/nach-einsatzzweck/gpu-rendering-hpc/)"
+        "[ ![PrimeLine](https://www.primeline-solutions.com/skin/frontend/default/theme566/images/primeline-solutions-logo.png) ](https://www.primeline-solutions.com/de/server/nach-einsatzzweck/gpu-rendering-hpc/)"
     )
 
 
