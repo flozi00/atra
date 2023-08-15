@@ -38,12 +38,11 @@ def speech_recognition(data, language, progress=gr.Progress()) -> str:
         pipe = pipeline(
             "automatic-speech-recognition",
             "flozi00/whisper-large-german-lora-cv13",
-            device=0 if torch.cuda.is_available() else -1,
-            torch_dtype=torch.float16,
+            device=-1,
         )
         pipe.model.eval()
         pipe.model = BetterTransformer.transform(pipe.model)
-        pipe.model = torch.compile(pipe.model, backend="onnxrt", mode="max-autotune")
+        pipe.model = torch.compile(pipe.model, backend="onnxrt", mode="reduce-overhead")
 
     progress.__call__(progress=0.8, desc="Transcribing Audio")
     transcription = inference_asr(pipe=pipe, data=data, language=language)
