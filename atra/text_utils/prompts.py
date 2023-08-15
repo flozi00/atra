@@ -55,6 +55,14 @@ QUERY_CONVERSATION = [
     [["Sichere Programmierung"], "Sichere Programmierung"],
     [["Ich suche einen guten Artikel über .net Autorisierung"], ".net Autorisierung"],
     [["Wer ist Jeff Bezos"], "jeff Bezos"],
+    [
+        [
+            "Wer ist Elon Musk",
+            "Wieviele Kinder hat er",
+            "Wer ist seine aktuelle Freundin",
+        ],
+        "Elon Musk aktuelle Freundin",
+    ],
     [["Ich suche einen Artikel über Wallbox"], "Wallbox"],
     [["Wann iMac 2023"], "Wann ist das iMac 2023 Releasedatum"],
     [["Überwachungskamera"], "gute Überwachungskamera"],
@@ -71,6 +79,15 @@ QUERY_CONVERSATION = [
             "Seit wann ist sie Bundeskanzlerin ?",
         ],
         "Seit wann ist Angela Merkel Bundeskanzlerin",
+    ],
+    [
+        [
+            "Hi, wie geht es dir",
+            "Was kannst du denn alles ?",
+            "Schreibe einen Text über Primeline Solutions und warum man dort seine Server kaufen sollte",
+            "Wie teuer ist denn eine H100",
+        ],
+        "Preis H100",
     ],
 ]
 

@@ -101,6 +101,9 @@ def build_diffusion_ui():
                 [
                     "Elegant lavender garnish cocktail idea, cocktail glass, realistic, sharp focus, 8k high definition"
                 ],
+                [
+                    "General Artificial Intelligence in data center, futuristic concept art, 3d rendering"
+                ],
             ],
             inputs=[prompt],
         )

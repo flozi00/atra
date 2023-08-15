@@ -79,7 +79,7 @@ def get_webpage_content_playwright(query):
 
 def get_user_messages(history, message):
     users = ""
-    for h in history:
+    for h in history[-10:]:
         users += USER_TOKEN + h[0] + END_TOKEN
 
     users += USER_TOKEN + message + END_TOKEN
