@@ -104,6 +104,9 @@ def generate_images(prompt: str, negatives: str = ""):
     TIME_LOG["Comsumed Watt hours"] = (time.time() - start_time) * POWER / 3600
     TIME_LOG["Energy costs in cent"] = TIME_LOG["Comsumed Watt hours"] * 40 / 1000
 
+    MD = json.dumps(TIME_LOG, indent=4)
+    MD = "```json\n" + MD + "\n```"
+
     image.save("output_image.jpg", "JPEG")
     image = pathlib.Path("output_image.jpg")
-    return image, TIME_LOG
+    return image, MD

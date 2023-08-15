@@ -1,5 +1,4 @@
 from atra.gradio_utils.ui import GLOBAL_CSS, GET_GLOBAL_HEADER, launch_args
-from atra.image_utils.diffusion import generate_images as local_generator
 import gradio as gr
 
 from gradio_client import Client
@@ -10,6 +9,8 @@ if IMAGE_BACKENDS is not None:
     IMAGE_BACKENDS = IMAGE_BACKENDS.split(",")
 else:
     IMAGE_BACKENDS = []
+    from atra.image_utils.diffusion import generate_images as local_generator
+
 
 CLIENTS = [Client(src=backend) for backend in IMAGE_BACKENDS]
 
@@ -45,9 +46,14 @@ else:
 def build_diffusion_ui():
     ui = gr.Blocks(css=GLOBAL_CSS)
     with ui:
-        GET_GLOBAL_HEADER()
+        with gr.Row():
+            GET_GLOBAL_HEADER()
+            if len(CLIENTS) > 0:
+                gr.Markdown("# GPU Vergleich")
         with gr.Row():
             with gr.Column():
+                if len(CLIENTS) > 0:
+                    gr.Markdown("### Prompt")
                 prompt = gr.Textbox(
                     label="Prompt", info="Prompt of what you want to see"
                 )
@@ -60,13 +66,14 @@ def build_diffusion_ui():
                 _boxes = []
                 with gr.Column():
                     _boxes.append(gr.Image())
-                    _boxes.append(gr.JSON())
+                    _boxes.append(gr.Markdown())
             else:
                 _boxes = []
-                for c in CLIENTS:
+                for c in range(len(CLIENTS)):
                     with gr.Column():
+                        gr.Markdown("GPU " + str(c))
                         _boxes.append(gr.Image())
-                        _boxes.append(gr.JSON())
+                        _boxes.append(gr.Markdown())
 
         prompt.submit(
             generate_images,
