@@ -3,6 +3,7 @@ from diffusers import (
     StableDiffusionXLPipeline,
     StableDiffusionXLImg2ImgPipeline,
     EulerAncestralDiscreteScheduler,
+    AutoencoderTiny,
 )
 from diffusers.models.attention_processor import AttnProcessor2_0
 import torch
@@ -47,15 +48,6 @@ diffusion_pipe = StableDiffusionXLPipeline.from_single_file(
     "https://huggingface.co/jayparmr/DreamShaper_XL1_0_Alpha2/blob/main/dreamshaperXL10.safetensors",
     torch_dtype=torch.float16,
 )
-# diffusion_pipe.vae = AutoencoderTiny.from_pretrained("madebyollin/taesdxl", torch_dtype=torch.float16)
-diffusion_pipe.unet.set_attn_processor(AttnProcessor2_0())
-diffusion_pipe.vae = torch.compile(
-    diffusion_pipe.vae, mode="reduce-overhead", fullgraph=True
-)
-diffusion_pipe = diffusion_pipe.to("cuda")
-diffusion_pipe.scheduler = EulerAncestralDiscreteScheduler.from_config(
-    diffusion_pipe.scheduler.config
-)
 
 refiner = StableDiffusionXLImg2ImgPipeline.from_pretrained(
     "stabilityai/stable-diffusion-xl-refiner-1.0",
@@ -65,11 +57,24 @@ refiner = StableDiffusionXLImg2ImgPipeline.from_pretrained(
     use_safetensors=True,
     variant="fp16",
 )
+#refiner.vae = AutoencoderTiny.from_pretrained("madebyollin/taesdxl", torch_dtype=torch.float16)
+
+# set attention processor
+refiner.unet.set_attn_processor(AttnProcessor2_0())
+diffusion_pipe.unet.set_attn_processor(AttnProcessor2_0())
+
+refiner.vae = torch.compile(refiner.vae, mode="reduce-overhead", fullgraph=True)
+
+# change scheduler
+diffusion_pipe.scheduler = EulerAncestralDiscreteScheduler.from_config(
+    diffusion_pipe.scheduler.config
+)
 refiner.scheduler = EulerAncestralDiscreteScheduler.from_config(
     refiner.scheduler.config
 )
-refiner.unet.set_attn_processor(AttnProcessor2_0())
-# refiner.vae = torch.compile(refiner.vae, mode="reduce-overhead", fullgraph=True)
+
+# set to GPU
+diffusion_pipe = diffusion_pipe.to("cuda")
 refiner.to("cuda")
 
 

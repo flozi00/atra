@@ -79,12 +79,12 @@ def get_webpage_content_playwright(query):
 
 def get_user_messages(history, message):
     users = ""
-    for h in history[-10:]:
+    for h in history:
         users += USER_TOKEN + h[0] + END_TOKEN
 
     users += USER_TOKEN + message + END_TOKEN
 
-    return users
+    return users[-2048*3:]
 
 
 def generate_history_as_string(history, message):
