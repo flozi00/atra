@@ -1,7 +1,6 @@
 import gradio as gr
 from atra.gradio_utils.ui import GET_GLOBAL_HEADER, launch_args
 from playwright.sync_api import sync_playwright
-from text_generation import Client
 import urllib.parse
 from atra.text_utils.prompts import (
     ASSISTANT_TOKEN,
@@ -14,10 +13,11 @@ from atra.text_utils.prompts import (
 )
 from sentence_transformers import SentenceTransformer, util
 import torch
+from huggingface_hub import InferenceClient
 
 embedder = SentenceTransformer("intfloat/multilingual-e5-large")
 
-client = Client("http://127.0.0.1:8080")
+client = InferenceClient(model="http://127.0.0.1:8080")
 
 
 def re_ranking(query, options):
@@ -128,40 +128,39 @@ def predict(message, chatbot):
     """
     input_prompt = generate_history_as_string(chatbot, message)
     user_messages = get_user_messages(chatbot, message)
-    searchable_answer = client.generate(
+    searchable_answer = client.text_generation(prompt=
         CLASSIFY_SEARCHABLE.replace("<|question|>", user_messages),
         temperature=0.1,
         stop_sequences=["\n"],
         max_new_tokens=3,
-    ).generated_text
+    )
     searchable = "Search" in searchable_answer
 
     text = ""
     if searchable is True:
-        search_query = client.generate(
+        search_query = client.text_generation(prompt=
             QUERY_PROMPT.replace("<|question|>", user_messages), stop_sequences=["\n"]
-        ).generated_text.strip()
-        search_uestion = client.generate(
+        ).strip()
+        search_uestion = client.text_generation(prompt=
             SEARCH_PROMPT.replace("<|question|>", user_messages), stop_sequences=["\n"]
-        ).generated_text.strip()
+        ).strip()
         text += "```\nSearch query: " + search_query + "\n```\n\n"
         options = get_webpage_content_playwright(search_query)
-        text += client.generate(
+        text += client.text_generation(prompt=
             options
             + "\nQuestion: "
             + search_uestion
             + "\n\nAnswer in german plain text:",
             max_new_tokens=128,
             temperature=0.1,
-        ).generated_text
+        )
         yield text.replace("<|", "")
     else:
-        for response in client.generate_stream(
-            input_prompt, max_new_tokens=256, temperature=0.6, stop_sequences=["<|"]
+        for token in client.text_generation(prompt=
+            input_prompt, max_new_tokens=256, temperature=0.6, stop_sequences=["<|"], stream=True
         ):
-            if not response.token.special:
-                text += response.token.text
-                yield text.replace("<|", "")
+            text += token
+            yield text.replace("<|", "")
 
 
 def build_chat_ui():
