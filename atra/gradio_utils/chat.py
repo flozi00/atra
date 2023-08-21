@@ -36,7 +36,7 @@ def re_ranking(query, options):
     query_embedding = embedder.encode(query, convert_to_tensor=True)
 
     cos_scores = util.cos_sim(query_embedding, corpus_embeddings)[0]
-    top_results = torch.topk(cos_scores, k=20)
+    top_results = torch.topk(cos_scores, k=20 if len(corpus) > 20 else len(corpus))
 
     for score, idx in zip(top_results[0], top_results[1]):
         if score > 0.7:
