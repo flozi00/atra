@@ -14,11 +14,11 @@ from atra.text_utils.prompts import (
 from sentence_transformers import SentenceTransformer, util
 import torch
 from huggingface_hub import InferenceClient
+import os
 
-embedder = SentenceTransformer("intfloat/multilingual-e5-large")
+embedder = SentenceTransformer("intfloat/multilingual-e5-large", device="cpu")
 
-client = InferenceClient(model="http://127.0.0.1:8080")
-
+client = InferenceClient(model=os.environ.get("LLM", "http://127.0.0.1:8080"))
 
 def re_ranking(query, options):
     """
