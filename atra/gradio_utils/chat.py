@@ -15,6 +15,17 @@ from sentence_transformers import SentenceTransformer, util
 import torch
 from huggingface_hub import InferenceClient
 import os
+import os
+import argilla as rg
+
+try:
+    rg.init(
+        api_url=os.environ.get("ARGILLA_API_URL"),
+        api_key=os.environ.get("ARGILLA_API_KEY"),
+        workspace="argilla",
+    )
+except Exception as e:
+    print(e)
 
 embedder = SentenceTransformer("intfloat/multilingual-e5-large", device="cpu")
 
@@ -151,10 +162,12 @@ def predict(message, chatbot):
     searchable_answer = client.text_generation(
         prompt=CLASSIFY_SEARCHABLE.replace("<|question|>", user_messages),
         temperature=0.1,
-        stop_sequences=["\n"],
+        stop_sequences=["\n", END_TOKEN],
         max_new_tokens=3,
     )
     searchable = "Search" in searchable_answer
+    search_query_record = rg.Text2TextRecord(text=user_messages, prediction=[searchable_answer],)
+    rg.log(search_query_record, "plugin_record")
 
     text = ""
     if searchable is True:
@@ -162,25 +175,33 @@ def predict(message, chatbot):
             prompt=QUERY_PROMPT.replace("<|question|>", user_messages),
             stop_sequences=["\n", END_TOKEN],
         ).strip()
-        search_uestion = client.text_generation(
+        search_query_record = rg.Text2TextRecord(text=user_messages, prediction=[search_query],)
+        rg.log(search_query_record, "search_query_record")
+
+        search_question = client.text_generation(
             prompt=SEARCH_PROMPT.replace("<|question|>", user_messages),
             stop_sequences=["\n", END_TOKEN],
         ).strip()
+        search_question_record = rg.Text2TextRecord(text=user_messages, prediction=[search_question],)
+        rg.log(search_question_record, "search_question_record")
+
         text += "```\nSearch query: " + search_query + "\n```\n\n"
         options = get_webpage_content_playwright(search_query)
-        text += client.text_generation(
-            prompt=USER_TOKEN
-            + options
-            + "\nQuestion: "
-            + search_uestion
-            + "\n\nAnswer in german plain text:"
-            + END_TOKEN
-            + ASSISTANT_TOKEN,
+
+        QA_Prompt = USER_TOKEN + options + "\nQuestion: " + "\n\n" + search_question + "\n\nAnswer in german plain text:" + END_TOKEN + ASSISTANT_TOKEN
+        answer = client.text_generation(
+            prompt=QA_Prompt,
             max_new_tokens=512,
             temperature=0.1,
             stop_sequences=["<|", END_TOKEN],
         )
+        text += answer
         yield text.replace("<|", "")
+        record = rg.Text2TextRecord(
+            text=QA_Prompt,
+            prediction=[answer],
+        )
+        rg.log(record, "qa_record")
     else:
         for token in client.text_generation(
             prompt=input_prompt,
@@ -191,6 +212,12 @@ def predict(message, chatbot):
         ):
             text += token
             yield text.replace("<|", "")
+        
+        record = rg.Text2TextRecord(
+            text=input_prompt,
+            prediction=[text],
+        )
+        rg.log(record, "chat_record")
 
 
 def build_chat_ui():
