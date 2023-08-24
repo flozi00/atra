@@ -147,11 +147,12 @@ def predict(message, chatbot):
         text += "```\nSearch query: " + search_query + "\n```\n\n"
         options = get_webpage_content_playwright(search_query)
         text += client.text_generation(prompt=
+            USER_TOKEN + 
             options
             + "\nQuestion: "
             + search_uestion
-            + "\n\nAnswer in german plain text:",
-            max_new_tokens=128,
+            + "\n\nAnswer in german plain text:" + END_TOKEN + ASSISTANT_TOKEN,
+            max_new_tokens=512,
             temperature=0.1,
         )
         yield text.replace("<|", "")
