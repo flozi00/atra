@@ -124,7 +124,12 @@ LOCALS_SEARCH_CONVERSATION = [
         ],
         "Lokal",
     ],
-    [["Classify if in that conversation jokes are made or not. Answer with Joke or No Joke"], "Lokal"],
+    [
+        [
+            "Classify if in that conversation jokes are made or not. Answer with Joke or No Joke"
+        ],
+        "Lokal",
+    ],
 ]
 
 for c in LOCALS_SEARCH_CONVERSATION:

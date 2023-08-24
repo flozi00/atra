@@ -20,12 +20,17 @@ embedder = SentenceTransformer("intfloat/multilingual-e5-large", device="cpu")
 
 client = InferenceClient(model=os.environ.get("LLM", "http://127.0.0.1:8080"))
 
-def re_ranking(query, options):
+
+def re_ranking(query: str, options: list):
     """
-    1. Embeds the query and the corpus using the embedding model
-    2. Calculates the cosine similarity between the query embedding and all corpus embeddings
-    3. Filters the corpus based on the cosine similarity
-    4. Returns the filtered corpus
+    Re-ranks a list of options based on their similarity to a given query.
+
+    Args:
+        query (str): The query to compare the options against.
+        options (list): A list of strings representing the options to be ranked.
+
+    Returns:
+        str: A string containing the top-ranked options that have a cosine similarity score greater than 0.7.
     """
     corpus = ["passage: " + o for o in options]
     query = "query: " + query
@@ -47,13 +52,14 @@ def re_ranking(query, options):
 
 def get_webpage_content_playwright(query):
     """
-    1. It starts a chromium browser
-    2. It goes to the URL with the query
-    3. It gets the content of the body
-    4. It splits the content at every new line
-    5. It filters out all lines with less than 5 words
-    6. It re-ranks the filtered lines
-    7. It returns the re-ranked lines
+    Uses Playwright to launch a Chromium browser and navigate to a search engine URL with the given query.
+    Returns the filtered and re-ranked text content of the webpage.
+
+    Args:
+    - query (str): The search query to be used in the URL.
+
+    Returns:
+    - filtered (str): The filtered and re-ranked text content of the webpage.
     """
     url = (
         "https://searx.be/search?categories=general&language=de&q="
@@ -78,21 +84,35 @@ def get_webpage_content_playwright(query):
 
 
 def get_user_messages(history, message):
+    """
+    Returns a string containing all the user messages in the chat history, including the current message.
+
+    Args:
+    - history (list): A list of tuples containing the user and their message.
+    - message (str): The current message sent by the user.
+
+    Returns:
+    - A string containing all the user messages in the chat history, including the current message.
+    """
     users = ""
     for h in history:
         users += USER_TOKEN + h[0] + END_TOKEN
 
     users += USER_TOKEN + message + END_TOKEN
 
-    return users[-2048*3:]
+    return users[-2048 * 3 :]
 
 
 def generate_history_as_string(history, message):
     """
-    1. Creates a string containing the history and the current input message.
-    2. Creates a list containing the user and assistant messages.
-    3. Creates a string containing the history and the current input message.
-    4. Returns the string.
+    Generates a string representation of the chat history and the current message.
+
+    Args:
+        history (list): A list of tuples containing the user and assistant messages.
+        message (str): The current message to be added to the chat history.
+
+    Returns:
+        str: A string representation of the chat history and the current message.
     """
     messages = (
         SYSTEM_PROMPT
@@ -128,8 +148,8 @@ def predict(message, chatbot):
     """
     input_prompt = generate_history_as_string(chatbot, message)
     user_messages = get_user_messages(chatbot, message)
-    searchable_answer = client.text_generation(prompt=
-        CLASSIFY_SEARCHABLE.replace("<|question|>", user_messages),
+    searchable_answer = client.text_generation(
+        prompt=CLASSIFY_SEARCHABLE.replace("<|question|>", user_messages),
         temperature=0.1,
         stop_sequences=["\n"],
         max_new_tokens=3,
@@ -138,28 +158,36 @@ def predict(message, chatbot):
 
     text = ""
     if searchable is True:
-        search_query = client.text_generation(prompt=
-            QUERY_PROMPT.replace("<|question|>", user_messages), stop_sequences=["\n", END_TOKEN]
+        search_query = client.text_generation(
+            prompt=QUERY_PROMPT.replace("<|question|>", user_messages),
+            stop_sequences=["\n", END_TOKEN],
         ).strip()
-        search_uestion = client.text_generation(prompt=
-            SEARCH_PROMPT.replace("<|question|>", user_messages), stop_sequences=["\n", END_TOKEN]
+        search_uestion = client.text_generation(
+            prompt=SEARCH_PROMPT.replace("<|question|>", user_messages),
+            stop_sequences=["\n", END_TOKEN],
         ).strip()
         text += "```\nSearch query: " + search_query + "\n```\n\n"
         options = get_webpage_content_playwright(search_query)
-        text += client.text_generation(prompt=
-            USER_TOKEN + 
-            options
+        text += client.text_generation(
+            prompt=USER_TOKEN
+            + options
             + "\nQuestion: "
             + search_uestion
-            + "\n\nAnswer in german plain text:" + END_TOKEN + ASSISTANT_TOKEN,
+            + "\n\nAnswer in german plain text:"
+            + END_TOKEN
+            + ASSISTANT_TOKEN,
             max_new_tokens=512,
             temperature=0.1,
             stop_sequences=["<|", END_TOKEN],
         )
         yield text.replace("<|", "")
     else:
-        for token in client.text_generation(prompt=
-            input_prompt, max_new_tokens=512, temperature=0.6, stop_sequences=["<|", END_TOKEN], stream=True
+        for token in client.text_generation(
+            prompt=input_prompt,
+            max_new_tokens=512,
+            temperature=0.6,
+            stop_sequences=["<|", END_TOKEN],
+            stream=True,
         ):
             text += token
             yield text.replace("<|", "")

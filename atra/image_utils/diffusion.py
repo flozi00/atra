@@ -3,7 +3,6 @@ from diffusers import (
     StableDiffusionXLPipeline,
     StableDiffusionXLImg2ImgPipeline,
     EulerAncestralDiscreteScheduler,
-    AutoencoderTiny,
 )
 from diffusers.models.attention_processor import AttnProcessor2_0
 import torch
@@ -57,7 +56,7 @@ refiner = StableDiffusionXLImg2ImgPipeline.from_pretrained(
     use_safetensors=True,
     variant="fp16",
 )
-#refiner.vae = AutoencoderTiny.from_pretrained("madebyollin/taesdxl", torch_dtype=torch.float16)
+# refiner.vae = AutoencoderTiny.from_pretrained("madebyollin/taesdxl", torch_dtype=torch.float16)
 
 # set attention processor
 refiner.unet.set_attn_processor(AttnProcessor2_0())
