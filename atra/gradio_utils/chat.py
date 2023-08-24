@@ -139,10 +139,10 @@ def predict(message, chatbot):
     text = ""
     if searchable is True:
         search_query = client.text_generation(prompt=
-            QUERY_PROMPT.replace("<|question|>", user_messages), stop_sequences=["\n"]
+            QUERY_PROMPT.replace("<|question|>", user_messages), stop_sequences=["\n", END_TOKEN]
         ).strip()
         search_uestion = client.text_generation(prompt=
-            SEARCH_PROMPT.replace("<|question|>", user_messages), stop_sequences=["\n"]
+            SEARCH_PROMPT.replace("<|question|>", user_messages), stop_sequences=["\n", END_TOKEN]
         ).strip()
         text += "```\nSearch query: " + search_query + "\n```\n\n"
         options = get_webpage_content_playwright(search_query)
@@ -154,11 +154,12 @@ def predict(message, chatbot):
             + "\n\nAnswer in german plain text:" + END_TOKEN + ASSISTANT_TOKEN,
             max_new_tokens=512,
             temperature=0.1,
+            stop_sequences=["<|", END_TOKEN],
         )
         yield text.replace("<|", "")
     else:
         for token in client.text_generation(prompt=
-            input_prompt, max_new_tokens=256, temperature=0.6, stop_sequences=["<|"], stream=True
+            input_prompt, max_new_tokens=512, temperature=0.6, stop_sequences=["<|", END_TOKEN], stream=True
         ):
             text += token
             yield text.replace("<|", "")
