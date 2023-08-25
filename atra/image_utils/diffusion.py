@@ -21,8 +21,8 @@ diffusers.pipelines.stable_diffusion_xl.watermark.StableDiffusionXLWatermarker.a
     apply_watermark_dummy
 )
 
-high_noise_frac = 0.8
-INFER_STEPS = 60
+high_noise_frac = 0.7
+INFER_STEPS = 40
 
 BAD_PATTERNS = [
     "nude",
