@@ -38,10 +38,12 @@ BAD_PATTERNS = [
     "nackt",
 ]
 
+GPU_ID = 0
+
 
 subprocess = subprocess.Popen("gpustat -P --json", shell=True, stdout=subprocess.PIPE)
 subprocess_return = subprocess.stdout.read()
-POWER = json.loads(subprocess_return)["gpus"][0]["enforced.power.limit"]
+POWER = json.loads(subprocess_return)["gpus"][GPU_ID]["enforced.power.limit"]
 
 diffusion_pipe = StableDiffusionXLPipeline.from_single_file(
     "https://huggingface.co/jayparmr/DreamShaper_XL1_0_Alpha2/blob/main/dreamshaperXL10.safetensors",
@@ -73,8 +75,8 @@ refiner.scheduler = EulerAncestralDiscreteScheduler.from_config(
 )
 
 # set to GPU
-diffusion_pipe = diffusion_pipe.to("cuda:0")
-refiner.to("cuda:0")
+diffusion_pipe = diffusion_pipe.to(f"cuda:{GPU_ID}")
+refiner.to(f"cuda:{GPU_ID}")
 
 
 @timeit
