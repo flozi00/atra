@@ -73,8 +73,8 @@ refiner.scheduler = EulerAncestralDiscreteScheduler.from_config(
 )
 
 # set to GPU
-diffusion_pipe = diffusion_pipe.to("cuda")
-refiner.to("cuda")
+diffusion_pipe = diffusion_pipe.to("cuda:0")
+refiner.to("cuda:0")
 
 
 @timeit
