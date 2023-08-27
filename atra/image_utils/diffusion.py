@@ -3,7 +3,6 @@ from diffusers import (
     StableDiffusionXLPipeline,
     StableDiffusionXLImg2ImgPipeline,
     EulerAncestralDiscreteScheduler,
-    AutoencoderTiny,
 )
 from diffusers.models.attention_processor import AttnProcessor2_0
 import torch
@@ -22,8 +21,8 @@ diffusers.pipelines.stable_diffusion_xl.watermark.StableDiffusionXLWatermarker.a
     apply_watermark_dummy
 )
 
-high_noise_frac = 0.8
-INFER_STEPS = 60
+high_noise_frac = 0.7
+INFER_STEPS = 40
 
 BAD_PATTERNS = [
     "nude",
@@ -39,10 +38,12 @@ BAD_PATTERNS = [
     "nackt",
 ]
 
+GPU_ID = 0
+
 
 subprocess = subprocess.Popen("gpustat -P --json", shell=True, stdout=subprocess.PIPE)
 subprocess_return = subprocess.stdout.read()
-POWER = json.loads(subprocess_return)["gpus"][0]["enforced.power.limit"]
+POWER = json.loads(subprocess_return)["gpus"][GPU_ID]["enforced.power.limit"]
 
 diffusion_pipe = StableDiffusionXLPipeline.from_single_file(
     "https://huggingface.co/jayparmr/DreamShaper_XL1_0_Alpha2/blob/main/dreamshaperXL10.safetensors",
@@ -57,7 +58,7 @@ refiner = StableDiffusionXLImg2ImgPipeline.from_pretrained(
     use_safetensors=True,
     variant="fp16",
 )
-#refiner.vae = AutoencoderTiny.from_pretrained("madebyollin/taesdxl", torch_dtype=torch.float16)
+# refiner.vae = AutoencoderTiny.from_pretrained("madebyollin/taesdxl", torch_dtype=torch.float16)
 
 # set attention processor
 refiner.unet.set_attn_processor(AttnProcessor2_0())
@@ -74,8 +75,8 @@ refiner.scheduler = EulerAncestralDiscreteScheduler.from_config(
 )
 
 # set to GPU
-diffusion_pipe = diffusion_pipe.to("cuda")
-refiner.to("cuda")
+diffusion_pipe = diffusion_pipe.to(f"cuda:{GPU_ID}")
+refiner.to(f"cuda:{GPU_ID}")
 
 
 @timeit

@@ -1,8 +1,13 @@
-SYSTEM_PROMPT = "Im Folgenden finden Sie eine Reihe von Dialogen zwischen verschiedenen Personen und einem deutschen KI-Assistenten namens Egino. Die KI versucht, hilfsbereit, höflich, ehrlich, kultiviert, gefühlsbetont und bescheiden, aber kenntnisreich zu sein. Der Assistent ist gerne bereit, bei fast allem zu helfen, und tut sein Bestes, um genau zu verstehen, was benötigt wird. Er bemüht sich auch, keine falschen oder irreführenden Informationen zu geben, und er macht Vorbehalte, wenn er sich der richtigen Antwort nicht ganz sicher ist. Dennoch ist der Assistent praktisch und tut wirklich sein Bestes, ohne sich von der Vorsicht zu sehr einschränken zu lassen. Die Antworten werden vollständig formuliert und so detailliert wie möglich sein."
+ASSISTANT_TOKEN = "### ASSISTANT: "
+USER_TOKEN = "### USER: "
+END_TOKEN = "</s>"
 
-ASSISTANT_TOKEN = "<|assistant|>"
-USER_TOKEN = "<|prompter|>"
-END_TOKEN = "<|endoftext|>"
+SYSTEM_PROMPT = f"""Im Folgenden finden Sie eine Reihe von Dialogen zwischen verschiedenen Personen und einem deutschen KI-Assistenten namens Egino. 
+Die KI versucht, hilfsbereit, höflich, ehrlich, kultiviert, gefühlsbetont und bescheiden, aber kenntnisreich zu sein. 
+Der Assistent ist gerne bereit, bei fast allem zu helfen, und tut sein Bestes, um genau zu verstehen, was benötigt wird. 
+Er bemüht sich auch, keine falschen oder irreführenden Informationen zu geben, und er macht Vorbehalte, wenn er sich der richtigen Antwort nicht ganz sicher ist. 
+Dennoch ist der Assistent praktisch und tut wirklich sein Bestes, ohne sich von der Vorsicht zu sehr einschränken zu lassen. 
+Die Antworten werden vollständig formuliert und so detailliert wie möglich sein.{END_TOKEN}"""
 
 SEARCH_PROMPT = "Formuliere Fragen anhand der vorrausgehenden Konvesation:\n"
 SEARCH_CONVERSATION = [
@@ -124,7 +129,12 @@ LOCALS_SEARCH_CONVERSATION = [
         ],
         "Lokal",
     ],
-    [["Classify if in that conversation jokes are made or not. Answer with Joke or No Joke"], "Lokal"],
+    [
+        [
+            "Classify if in that conversation jokes are made or not. Answer with Joke or No Joke"
+        ],
+        "Lokal",
+    ],
 ]
 
 for c in LOCALS_SEARCH_CONVERSATION:

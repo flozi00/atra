@@ -116,4 +116,9 @@ def build_diffusion_ui():
         )
 
     ui.queue(concurrency_count=1, api_open=False)
-    ui.launch(server_port=7861, **launch_args)
+    for port in range(7861, 7870):
+        try:
+            ui.launch(server_port=port, **launch_args)
+            break
+        except Exception as e:
+            print(e)
