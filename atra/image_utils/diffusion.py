@@ -8,7 +8,6 @@ from diffusers.models.attention_processor import AttnProcessor2_0
 import torch
 from atra.utils import timeit
 import time
-import subprocess
 import json
 import diffusers.pipelines.stable_diffusion_xl.watermark
 
@@ -39,11 +38,12 @@ BAD_PATTERNS = [
 ]
 
 GPU_ID = 0
-
-
-subprocess = subprocess.Popen("gpustat -P --json", shell=True, stdout=subprocess.PIPE)
-subprocess_return = subprocess.stdout.read()
-POWER = json.loads(subprocess_return)["gpus"][GPU_ID]["enforced.power.limit"]
+POWER = 450
+GPU_NAME = torch.cuda.get_device_name(GPU_ID)
+if "H100" in GPU_NAME:
+    POWER = 310
+elif "A6000" in GPU_NAME:
+    POWER = 300
 
 diffusion_pipe = StableDiffusionXLPipeline.from_single_file(
     "https://huggingface.co/jayparmr/DreamShaper_XL1_0_Alpha2/blob/main/dreamshaperXL10.safetensors",
@@ -107,8 +107,11 @@ def generate_images(prompt: str, negatives: str = ""):
             image=image,
         ).images[0]
 
-    TIME_LOG["Comsumed Watt hours"] = (time.time() - start_time) * POWER / 3600
+    consumed_time = time.time() - start_time
+    TIME_LOG["Time in seconds"] = consumed_time
+    TIME_LOG["Comsumed Watt hours"] = consumed_time * POWER / 3600
     TIME_LOG["Energy costs in cent"] = TIME_LOG["Comsumed Watt hours"] * 40 / 1000
+    TIME_LOG["Device Name"] = GPU_NAME
 
     MD = json.dumps(TIME_LOG, indent=4)
     MD = "```json\n" + MD + "\n```"
