@@ -5,8 +5,15 @@ import torch
 from playwright.sync_api import sync_playwright
 import urllib.parse
 from enum import Enum
-
-from atra.text_utils.prompts import ASSISTANT_TOKEN, CLASSIFY_SEARCHABLE, END_TOKEN, QUERY_PROMPT, SEARCH_PROMPT, USER_TOKEN
+from tqdm.auto import tqdm
+from atra.text_utils.prompts import (
+    ASSISTANT_TOKEN,
+    CLASSIFY_SEARCHABLE,
+    END_TOKEN,
+    QUERY_PROMPT,
+    SEARCH_PROMPT,
+    USER_TOKEN,
+)
 
 import os
 import argilla as rg
@@ -20,9 +27,11 @@ try:
 except Exception as e:
     print(e)
 
+
 class Plugins(Enum):
     LOKAL = "lokal"
     SEARCH = "search"
+
 
 class Agent:
     def __init__(self, llm: InferenceClient, embedder: SentenceTransformer):
@@ -48,10 +57,13 @@ class Agent:
 
         for plugin in Plugins:
             if plugin.value.lower() in searchable_answer.lower():
-                search_query_record = rg.Text2TextRecord(text=history, prediction=[searchable_answer],)
+                search_query_record = rg.Text2TextRecord(
+                    text=history,
+                    prediction=[searchable_answer],
+                )
                 rg.log(search_query_record, "plugin_record")
                 return plugin
-            
+
     def generate_search_query(self, history: str) -> str:
         """
         Generates a search query based on the given history using the LLM.
@@ -66,17 +78,16 @@ class Agent:
             prompt=QUERY_PROMPT.replace("<|question|>", history),
             stop_sequences=["\n", END_TOKEN],
         ).strip()
-        search_query_record = rg.Text2TextRecord(text=history, prediction=[search_query],)
-        rg.log(search_query_record, "search_query_record")
+
         return search_query
-    
+
     def generate_search_question(self, history: str) -> str:
         """
         Generates a search question based on the given history using the LLM.
-        
+
         Args:
             history (str): The history to use as context for generating the search question.
-            
+
         Returns:
             str: The generated search question.
         """
@@ -84,23 +95,30 @@ class Agent:
             prompt=SEARCH_PROMPT.replace("<|question|>", history),
             stop_sequences=["\n", END_TOKEN],
         ).strip()
-        search_question_record = rg.Text2TextRecord(text=history, prediction=[search_question],)
-        rg.log(search_question_record, "search_question_record")
+        
         return search_question
-    
+
     def do_qa(self, question: str, context: str) -> Iterable[str]:
         """
         Generates an answer to a question based on the given context using the LLM.
-        
+
         Args:
             question (str): The question to be answered.
             context (str): The context to use for answering the question.
-            
+
         Returns:
             str: The generated answer.
         """
         text = ""
-        QA_Prompt = USER_TOKEN + context + "\nQuestion: " + "\n\n" + question + "\n\nAnswer in german plain text:" + END_TOKEN + ASSISTANT_TOKEN
+        QA_Prompt = (
+            USER_TOKEN
+            + context
+            + "\n\nQuestion: "
+            + question
+            + "\n\nAnswer in german plain text:"
+            + END_TOKEN
+            + ASSISTANT_TOKEN
+        )
         answer = self.llm.text_generation(
             prompt=QA_Prompt,
             max_new_tokens=512,
@@ -112,7 +130,7 @@ class Agent:
         for token in answer:
             text += token
             yield text
-        
+
         record = rg.Text2TextRecord(
             text=QA_Prompt,
             prediction=[text],
@@ -148,7 +166,7 @@ class Agent:
                 filtered_corpus.append(corpus[idx])
 
         return "\n".join(filtered_corpus)
-    
+
     def get_webpage_content_playwright(self, query: str) -> str:
         """
         Uses Playwright to launch a Chromium browser and navigate to a search engine URL with the given query.
@@ -169,6 +187,14 @@ class Agent:
             page = browser.new_page()
             page.goto(url)
             content = page.locator("body").inner_text()
+            links = page.locator("body").get_by_role('link').all()
+            links = [link.get_attribute('href') for link in links if "https://" in link.get_attribute('href')][:5]
+            for link in tqdm(links):
+                try:
+                    page.goto(link, timeout=5000)
+                    content += page.locator("body").inner_text()
+                except:
+                    break
             browser.close()
 
         content = content.split("\n")
@@ -180,7 +206,7 @@ class Agent:
         filtered = self.re_ranking(query, filtered.split("\n"))
 
         return filtered
-    
+
     def custom_generation(self, query) -> Iterable[str]:
         text = ""
         result = self.llm.text_generation(

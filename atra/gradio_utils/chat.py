@@ -13,11 +13,12 @@ from sentence_transformers import SentenceTransformer
 from huggingface_hub import InferenceClient
 import os
 
-embedder = SentenceTransformer("intfloat/multilingual-e5-large", device="cpu")
+embedder = SentenceTransformer("intfloat/multilingual-e5-large")
 
 client = InferenceClient(model=os.environ.get("LLM", "http://127.0.0.1:8080"))
 
 agent = Agent(client, embedder)
+
 
 def get_user_messages(history, message):
     """
@@ -71,17 +72,25 @@ def generate_history_as_string(history, message):
     return messages
 
 
-def predict(message, chatbot):
+def predict(message, chatbot, url):
+    yield "Reading History"
     input_prompt = generate_history_as_string(chatbot, message)
     user_messages = get_user_messages(chatbot, message)
-    
+
+    yield "Classifying Plugin"
     plugin = agent.classify_plugin(user_messages)
 
     if plugin == Plugins.SEARCH:
+        yield "Generating Search Query"
         search_query = agent.generate_search_query(user_messages)
+        if len(url) > 6:
+            search_query += " site:" + url
         search_question = agent.generate_search_question(user_messages)
+        
+        yield "Searching"
         options = agent.get_webpage_content_playwright(search_query)
 
+        yield "Answering"
         answer = agent.do_qa(search_question, options)
         for text in answer:
             yield text
@@ -94,7 +103,7 @@ def predict(message, chatbot):
 def build_chat_ui():
     with gr.Blocks() as demo:
         GET_GLOBAL_HEADER()
-        gr.ChatInterface(predict)
+        gr.ChatInterface(predict, additional_inputs=[gr.Textbox(lines=1, label="Domain")])
 
     demo.queue(concurrency_count=4)
     demo.launch(server_port=7860, **launch_args)
