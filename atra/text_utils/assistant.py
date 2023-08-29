@@ -188,6 +188,7 @@ class Agent:
             if len(co.split(" ")) > 5:
                 filtered += co + "\n"
 
+        yield "Counting passages: " + str(len(filtered.split("\n")))
         filtered = self.re_ranking(query, filtered.split("\n"))
 
         yield filtered
