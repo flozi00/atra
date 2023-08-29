@@ -54,13 +54,10 @@ class Agent:
             stop_sequences=["\n", END_TOKEN],
             max_new_tokens=3,
         )
-
+        
         for plugin in Plugins:
             if plugin.value.lower() in searchable_answer.lower():
-                search_query_record = rg.Text2TextRecord(
-                    text=history,
-                    prediction=[searchable_answer],
-                )
+                search_query_record = rg.TextClassificationRecord(text=history)
                 rg.log(search_query_record, "plugin_record")
                 return plugin
 
@@ -198,7 +195,7 @@ class Agent:
         result = self.llm.text_generation(
             prompt=query,
             max_new_tokens=512,
-            temperature=0.6,
+            temperature=0.3,
             stop_sequences=["<|", END_TOKEN],
             stream=True,
         )
@@ -206,11 +203,5 @@ class Agent:
             text += token
 
             yield text
-
-        record = rg.Text2TextRecord(
-            text=query,
-            prediction=[text],
-        )
-        rg.log(record, "chat_record")
 
         yield text
