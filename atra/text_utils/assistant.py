@@ -64,23 +64,6 @@ class Agent:
                 rg.log(search_query_record, "plugin_record")
                 return plugin
 
-    def generate_search_query(self, history: str) -> str:
-        """
-        Generates a search query based on the given history using the LLM.
-
-        Args:
-            history (str): The history to use as context for generating the search query.
-
-        Returns:
-            str: The generated search query.
-        """
-        search_query = self.llm.text_generation(
-            prompt=QUERY_PROMPT.replace("<|question|>", history),
-            stop_sequences=["\n", END_TOKEN],
-        ).strip()
-
-        return search_query
-
     def generate_search_question(self, history: str) -> str:
         """
         Generates a search question based on the given history using the LLM.
@@ -179,7 +162,7 @@ class Agent:
         - filtered (str): The filtered and re-ranked text content of the webpage.
         """
         url = (
-            "https://searx.be/search?categories=general&language=de&q="
+            "https://duckduckgo.com/?t=h_&ia=web&q="
             + urllib.parse.quote(query)
         )
         with sync_playwright() as p:
@@ -191,6 +174,7 @@ class Agent:
             links = [link.get_attribute('href') for link in links if "https://" in link.get_attribute('href')][:5]
             for link in tqdm(links):
                 try:
+                    yield f"Reading {link}"
                     page.goto(link, timeout=5000)
                     content += page.locator("body").inner_text()
                 except Exception as e:
@@ -206,7 +190,7 @@ class Agent:
 
         filtered = self.re_ranking(query, filtered.split("\n"))
 
-        return filtered
+        yield filtered
 
     def custom_generation(self, query) -> Iterable[str]:
         text = ""

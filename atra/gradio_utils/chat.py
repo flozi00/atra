@@ -82,13 +82,13 @@ def predict(message, chatbot, url):
 
     if plugin == Plugins.SEARCH:
         yield "Generating Search Query"
-        search_query = agent.generate_search_query(user_messages)
-        if len(url) > 6:
-            search_query += " site:" + url
         search_question = agent.generate_search_question(user_messages)
         
         yield "Searching"
-        options = agent.get_webpage_content_playwright(search_query)
+        results = agent.get_webpage_content_playwright("site:" + url + " " + search_question)
+        for opt in results:
+            options = opt
+            yield opt
 
         yield "Answering"
         answer = agent.do_qa(search_question, options)
