@@ -40,6 +40,7 @@ SEARCH_CONVERSATION = [
         ],
         "Seit wann ist Angela Merkel Bundeskanzlerin",
     ],
+    [["Wer ist Stefan bangel"], "Wer ist Stefan Bangel"],
 ]
 
 for c in SEARCH_CONVERSATION:
@@ -120,6 +121,8 @@ LOCALS_SEARCH_CONVERSATION = [
         "Search",
     ],
     [["Was ist Chatgpt"], "Search"],
+    [["Wer ist Stefan"], "Search"],
+    [["Wer ist der geschäftsführer von Primeline"], "Search"],
     [["Ich habe Hunger"], "Lokal"],
     [["Wer ist der aktuelle Bundespräsident"], "Search"],
     [

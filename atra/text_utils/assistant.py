@@ -193,7 +193,8 @@ class Agent:
                 try:
                     page.goto(link, timeout=5000)
                     content += page.locator("body").inner_text()
-                except:
+                except Exception as e:
+                    print(e, link)
                     break
             browser.close()
 
