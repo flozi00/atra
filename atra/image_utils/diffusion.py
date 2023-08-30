@@ -3,6 +3,7 @@ from diffusers import (
     StableDiffusionXLPipeline,
     StableDiffusionXLImg2ImgPipeline,
     EulerAncestralDiscreteScheduler,
+    AutoencoderTiny,
 )
 from diffusers.models.attention_processor import AttnProcessor2_0
 import torch
@@ -44,6 +45,8 @@ if "H100" in GPU_NAME:
     POWER = 310
 elif "A6000" in GPU_NAME:
     POWER = 300
+elif "RTX 6000" in GPU_NAME:
+    POWER = 240
 
 diffusion_pipe = StableDiffusionXLPipeline.from_single_file(
     "https://huggingface.co/jayparmr/DreamShaper_XL1_0_Alpha2/blob/main/dreamshaperXL10.safetensors",
@@ -58,7 +61,9 @@ refiner = StableDiffusionXLImg2ImgPipeline.from_pretrained(
     use_safetensors=True,
     variant="fp16",
 )
-# refiner.vae = AutoencoderTiny.from_pretrained("madebyollin/taesdxl", torch_dtype=torch.float16)
+refiner.vae = AutoencoderTiny.from_pretrained(
+    "madebyollin/taesdxl", torch_dtype=torch.float16
+)
 
 # set attention processor
 refiner.unet.set_attn_processor(AttnProcessor2_0())
