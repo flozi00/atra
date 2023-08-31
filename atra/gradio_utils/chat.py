@@ -11,6 +11,17 @@ from sentence_transformers import SentenceTransformer
 from huggingface_hub import InferenceClient
 import os
 
+import argilla as rg
+
+try:
+    rg.init(
+        api_url=os.environ.get("ARGILLA_API_URL"),
+        api_key=os.environ.get("ARGILLA_API_KEY"),
+        workspace="argilla",
+    )
+except Exception as e:
+    print(e)
+
 embedder = SentenceTransformer("intfloat/multilingual-e5-large")
 
 client = InferenceClient(model=os.environ.get("LLM", "http://127.0.0.1:8080"))
@@ -56,8 +67,8 @@ def generate_history_as_string(history, message):
             [
                 "\n".join(
                     [
-                        USER_TOKEN + item[0] + END_TOKEN,
-                        ASSISTANT_TOKEN + item[1] + END_TOKEN,
+                        USER_TOKEN + item[0].strip() + END_TOKEN,
+                        ASSISTANT_TOKEN + item[1].strip() + END_TOKEN,
                     ]
                 )
                 for item in history
@@ -65,7 +76,7 @@ def generate_history_as_string(history, message):
         )
     )
 
-    messages += USER_TOKEN + message + END_TOKEN + ASSISTANT_TOKEN
+    messages += USER_TOKEN + message.strip() + END_TOKEN + ASSISTANT_TOKEN
 
     return messages
 
@@ -100,11 +111,44 @@ def predict(message, chatbot, url):
         for text in answer:
             yield text
 
+def label_chat(history, label):
+    messages = (
+        SYSTEM_PROMPT
+        + "\n\n"
+        + "\n".join(
+            [
+                "\n".join(
+                    [
+                        USER_TOKEN + item[0].strip() + END_TOKEN,
+                        ASSISTANT_TOKEN + item[1].strip() + END_TOKEN,
+                    ]
+                )
+                for item in history
+            ]
+        )
+    )
+    to_log = rg.TextClassificationRecord(text=messages, prediction=[(label, 1.0)])
+    rg.log(to_log, "chatbot_reward")
+
+def like_chat(history):
+    label_chat(history, "like")
+
+def dislike_chat(history):
+    label_chat(history, "dislike")
+
+
+chatter = gr.Chatbot()
 
 def build_chat_ui():
     with gr.Blocks() as demo:
         GET_GLOBAL_HEADER()
-        gr.ChatInterface(predict, additional_inputs=[gr.Textbox(lines=1, label="Domain")])
+        chat_ui = gr.ChatInterface(predict,chatbot=chatter ,additional_inputs=[gr.Textbox(lines=1, label="Domain")])
+        with gr.Row():
+            top = gr.Button("👍 Top 👍")
+            flop = gr.Button("👎 Flop 👎")
+
+        top.click(like_chat, inputs=chatter)
+        flop.click(dislike_chat, inputs=chatter)
 
     demo.queue(concurrency_count=4)
-    demo.launch(server_port=7860, **launch_args)
+    demo.launch(server_port=7865, **launch_args)

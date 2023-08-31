@@ -52,7 +52,7 @@ class Agent:
             temperature=0.1,
             stop_sequences=["\n", END_TOKEN],
             max_new_tokens=3,
-        )
+        ).strip()
         
         for plugin in Plugins:
             if plugin.value.lower() in searchable_answer.lower():
@@ -102,13 +102,13 @@ class Agent:
             prompt=QA_Prompt,
             max_new_tokens=512,
             temperature=0.1,
-            stop_sequences=["<|", END_TOKEN],
+            stop_sequences=[END_TOKEN, "###"],
             stream=True,
         )
 
         for token in answer:
             text += token
-            yield text
+            yield text.strip()
 
         record = rg.Text2TextRecord(
             text=QA_Prompt,
@@ -116,7 +116,7 @@ class Agent:
         )
         rg.log(record, "qa_record")
 
-        return text
+        return text.strip()
 
     def re_ranking(self, query: str, options: list) -> str:
         """
@@ -194,8 +194,8 @@ class Agent:
         result = self.llm.text_generation(
             prompt=query,
             max_new_tokens=512,
-            temperature=0.3,
-            stop_sequences=["<|", END_TOKEN],
+            temperature=0.1,
+            stop_sequences=[END_TOKEN, "###"],
             stream=True,
         )
         for token in result:
@@ -203,4 +203,4 @@ class Agent:
 
             yield text
 
-        yield text
+        yield text.strip()
