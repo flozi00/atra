@@ -11,7 +11,7 @@ from sentence_transformers import SentenceTransformer
 from huggingface_hub import InferenceClient
 import os
 
-embedder = SentenceTransformer("intfloat/multilingual-e5-large", device="cuda")
+embedder = SentenceTransformer("intfloat/multilingual-e5-large")
 
 client = InferenceClient(model=os.environ.get("LLM", "http://127.0.0.1:8080"))
 
