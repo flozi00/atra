@@ -10,7 +10,6 @@ from atra.text_utils.prompts import (
     ASSISTANT_TOKEN,
     CLASSIFY_SEARCHABLE,
     END_TOKEN,
-    QUERY_PROMPT,
     SEARCH_PROMPT,
     USER_TOKEN,
 )
@@ -93,9 +92,9 @@ class Agent:
         QA_Prompt = (
             USER_TOKEN
             + context
-            + "\n\nQuestion: "
+            + "\n\nFrage: "
             + question
-            + "\n\nAnswer in german plain text:"
+            + "\n\nAntwort:"
             + END_TOKEN
             + ASSISTANT_TOKEN
         )

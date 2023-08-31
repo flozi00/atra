@@ -51,60 +51,6 @@ for c in SEARCH_CONVERSATION:
 SEARCH_PROMPT += "\n<|question|> -->"
 
 
-QUERY_PROMPT = (
-    "Formuliere Suchmaschinen Queries anhand der vorrausgehenden Konvesation:\n"
-)
-QUERY_CONVERSATION = [
-    [["Was ist Chatgpt"], "Chatgpt Definition"],
-    [["Ich habe Hunger"], "Einfache Rezepte"],
-    [["Wer ist der aktuelle Bundespräsident"], "Aktueller Bundespräsident"],
-    [["Sichere Programmierung"], "Sichere Programmierung"],
-    [["Ich suche einen guten Artikel über .net Autorisierung"], ".net Autorisierung"],
-    [["Wer ist Jeff Bezos"], "jeff Bezos"],
-    [
-        [
-            "Wer ist Elon Musk",
-            "Wieviele Kinder hat er",
-            "Wer ist seine aktuelle Freundin",
-        ],
-        "Elon Musk aktuelle Freundin",
-    ],
-    [["Ich suche einen Artikel über Wallbox"], "Wallbox"],
-    [["Wann iMac 2023"], "Wann ist das iMac 2023 Releasedatum"],
-    [["Überwachungskamera"], "gute Überwachungskamera"],
-    [["wann kommt gta 6 raus"], "GTA 6 Release"],
-    [["Wer ist Angela Merkel", "Wann wurde sie geboren"], "Geburtsdatum Angela Merkel"],
-    [["Wie ist das Wetter in Berlin", "und in München"], "Wetter in München"],
-    [
-        ["Wie ist das Wetter in Berlin", "und in München", "und in Hamburg"],
-        "Wetter in Hamburg",
-    ],
-    [
-        [
-            "Was war die erste Partei von Angela Merkel ? ",
-            "Seit wann ist sie Bundeskanzlerin ?",
-        ],
-        "Seit wann ist Angela Merkel Bundeskanzlerin",
-    ],
-    [
-        [
-            "Hi, wie geht es dir",
-            "Was kannst du denn alles ?",
-            "Schreibe einen Text über Primeline Solutions und warum man dort seine Server kaufen sollte",
-            "Wie teuer ist denn eine H100",
-        ],
-        "Preis H100",
-    ],
-]
-
-for c in QUERY_CONVERSATION:
-    inputs = ""
-    for ins in c[0]:
-        inputs += USER_TOKEN + ins + END_TOKEN
-    QUERY_PROMPT += "\n" + inputs + " --> " + c[1]
-QUERY_PROMPT += "\n<|question|> -->"
-
-
 CLASSIFY_SEARCHABLE = "Klassifiziere ob die Frage im Internet gesucht werden kann oder lokal beantwortet wird:\n"
 LOCALS_SEARCH_CONVERSATION = [
     [["Wer bist du ?"], "Lokal"],

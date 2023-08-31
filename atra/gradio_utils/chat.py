@@ -4,16 +4,14 @@ from atra.text_utils.prompts import (
     ASSISTANT_TOKEN,
     END_TOKEN,
     SYSTEM_PROMPT,
-    SEARCH_PROMPT,
     USER_TOKEN,
-    QUERY_PROMPT,
 )
 from atra.text_utils.assistant import Agent, Plugins
 from sentence_transformers import SentenceTransformer
 from huggingface_hub import InferenceClient
 import os
 
-embedder = SentenceTransformer("intfloat/multilingual-e5-large")
+embedder = SentenceTransformer("intfloat/multilingual-e5-large", device="cuda")
 
 client = InferenceClient(model=os.environ.get("LLM", "http://127.0.0.1:8080"))
 
@@ -85,7 +83,10 @@ def predict(message, chatbot, url):
         search_question = agent.generate_search_question(user_messages)
         
         yield "Searching"
-        results = agent.get_webpage_content_playwright("site:" + url + " " + search_question)
+        search_query = search_question
+        if len(url) > 6:
+            search_query += f" site:{url}"
+        results = agent.get_webpage_content_playwright(search_query)
         for opt in results:
             options = opt
             yield opt
