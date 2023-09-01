@@ -52,11 +52,13 @@ SEARCH_PROMPT += "\n<|question|> -->"
 
 
 CLASSIFY_SEARCHABLE = """Klassifiziere welches Plugin für die Beantwortung der Frage genutzt werden sollte.
-Nutze eine der folgenden Kategorien: Lokal, Search\n"""
+Nutze eine der folgenden Kategorien: Lokal, Search, Coding\n"""
 LOCALS_SEARCH_CONVERSATION = [
     [["Wer bist du ?"], "Lokal"],
     [["Was kannst du ?"], "Lokal"],
+    [["Erkläre folgendes Rust Programm"], "Coding"],
     [["Und auf Deutsch ?"], "Lokal"],
+    [["Schreibe ein Bash Skript um alle Cronjobs aufzulisten"], "Coding"],
     [["Plane einen 3tägigen Trip nach Hawaii"], "Lokal"],
     [["Wie ist das Wetter in Berlin", "und in München"], "Search"],
     [["Wie ist das Wetter in Berlin", "und in München", "und in Hamburg"], "Search"],
@@ -68,9 +70,11 @@ LOCALS_SEARCH_CONVERSATION = [
         "Search",
     ],
     [["Was ist Chatgpt"], "Search"],
+    [["Schreibe ein Python Programm welches die höchste Primzahl bis 9999 errechnet"], "Coding"],
     [["Wer ist Stefan"], "Search"],
     [["Wer ist der geschäftsführer von Primeline"], "Search"],
     [["Ich habe Hunger"], "Lokal"],
+    [["Was bedeutet der % Operator in c++"], "Coding"],
     [["Wer ist der aktuelle Bundespräsident"], "Search"],
     [
         [
