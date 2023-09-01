@@ -32,7 +32,7 @@ except Exception as e:
 class Plugins(Enum):
     LOKAL = "lokal"
     SEARCH = "search"
-
+    CODING = "coding"
 
 class Agent:
     def __init__(self, llm: InferenceClient, embedder: SentenceTransformer):
