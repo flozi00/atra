@@ -41,6 +41,7 @@ SEARCH_CONVERSATION = [
         "Seit wann ist Angela Merkel Bundeskanzlerin",
     ],
     [["Wer ist Stefan bangel"], "Wer ist Stefan Bangel"],
+    [["Erkläre mir den Unterschied zwischen der SPD und der CDU"], "Was ist der Unterschied zwischen SPD und CDU"],
 ]
 
 for c in SEARCH_CONVERSATION:
@@ -54,46 +55,48 @@ SEARCH_PROMPT += "\n<|question|> -->"
 CLASSIFY_SEARCHABLE = """Klassifiziere welches Plugin für die Beantwortung der Frage genutzt werden sollte.
 Nutze eine der folgenden Kategorien: Lokal, Search, Coding\n"""
 LOCALS_SEARCH_CONVERSATION = [
-    [["Wer bist du ?"], "Lokal"],
-    [["Was kannst du ?"], "Lokal"],
-    [["Erkläre folgendes Rust Programm"], "Coding"],
-    [["Und auf Deutsch ?"], "Lokal"],
-    [["Schreibe ein Bash Skript um alle Cronjobs aufzulisten"], "Coding"],
-    [["Plane einen 3tägigen Trip nach Hawaii"], "Lokal"],
-    [["Wie ist das Wetter in Berlin", "und in München"], "Search"],
-    [["Wie ist das Wetter in Berlin", "und in München", "und in Hamburg"], "Search"],
+    ["Lokal", ["Wer bist du ?"]],
+    ["Search", ["Erkläre mir den Unterschied zwischen der SPD und der CDU"]],
+    ["Lokal", ["Was kannst du ?"]],
+    ["Coding", ["Erkläre folgendes Rust Programm"]],
+    ["Lokal", ["Und auf Deutsch ?"]],
+    ["Coding", ["Schreibe ein Bash Skript um alle Cronjobs aufzulisten"]],
+    ["Lokal", ["Plane einen 3tägigen Trip nach Hawaii"]],
+    ["Search", ["Wie ist das Wetter in Berlin", "und in München"]],
+    ["Coding", ["Ich brauche eine Funktion welche eine Liste von Strings nach der Anzahl der Vokale sortiert"]],
+    ["Search", ["Wie ist das Wetter in Berlin", "und in München", "und in Hamburg"]],
     [
+        "Search",
         [
             "Was war die erste Partei von Angela Merkel ? ",
             "Seit wann ist sie Bundeskanzlerin ?",
         ],
-        "Search",
     ],
-    [["Was ist Chatgpt"], "Search"],
-    [["Schreibe ein Python Programm welches die höchste Primzahl bis 9999 errechnet"], "Coding"],
-    [["Wer ist Stefan"], "Search"],
-    [["Wer ist der geschäftsführer von Primeline"], "Search"],
-    [["Ich habe Hunger"], "Lokal"],
-    [["Was bedeutet der % Operator in c++"], "Coding"],
-    [["Wer ist der aktuelle Bundespräsident"], "Search"],
+    ["Search", ["Was ist Chatgpt"]],
+    ["Coding", ["Schreibe ein Python Programm welches die höchste Primzahl bis 9999 errechnet"]],
+    ["Search", ["Wer ist Stefan"]],
+    ["Search", ["Wer ist der geschäftsführer von Primeline"]],
+    ["Lokal", ["Ich habe Hunger"]],
+    ["Coding", ["Was bedeutet der % Operator in c++"]],
+    ["Search", ["Wer ist der aktuelle Bundespräsident"]],
     [
+        "Lokal",
         [
             "Plane einen 3tägigen Ausflug nach Mallorca",
             "Erstelle eine Liste mit dem tagesablauf für jeden Tag",
         ],
-        "Lokal",
     ],
     [
+        "Lokal",
         [
             "Classify if in that conversation jokes are made or not. Answer with Joke or No Joke"
         ],
-        "Lokal",
     ],
 ]
 
 for c in LOCALS_SEARCH_CONVERSATION:
     inputs = ""
-    for ins in c[0]:
+    for ins in c[1]:
         inputs += USER_TOKEN + ins + END_TOKEN
-    CLASSIFY_SEARCHABLE += "\n" + inputs + " --> " + c[1]
+    CLASSIFY_SEARCHABLE += "\n" + inputs + " --> " + c[0]
 CLASSIFY_SEARCHABLE += "\n<|question|> -->"
