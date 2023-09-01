@@ -2,7 +2,10 @@ from atra.text_utils.typesense_search import SemanticSearcher
 
 searcher = SemanticSearcher()
 
-searcher.delete_collection()
+try:
+    searcher.delete_collection()
+except:
+    pass
 searcher.create_collection()
 searcher.upsert_documents(["hello world"], ["test"])
 searcher.upsert_documents(["hello flo"], ["test2"])

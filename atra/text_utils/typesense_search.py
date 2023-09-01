@@ -2,7 +2,8 @@ import typesense
 import os
 
 class SemanticSearcher:
-    def __init__(self) -> None:
+    def __init__(self, collection = "articles") -> None:
+        self.collection_name = collection
         self.client = typesense.Client({
             'api_key': os.getenv('TYPESENSE_API_KEY', 'xyz'),
             'nodes': [{
@@ -13,7 +14,7 @@ class SemanticSearcher:
             'connection_timeout_seconds': 2
         })
         self.schema = {
-            "name": "articles",
+            "name": self.collection_name,
             "fields": [
                 {"name": "article", "type": "string"},
                 {"name": "source", "type": "string"},
@@ -37,10 +38,10 @@ class SemanticSearcher:
                     "article": article,
                     "source": source,
                 }
-            self.client.collections["articles"].documents.upsert(document)
+            self.client.collections[self.collection_name].documents.upsert(document)
 
     def delete_collection(self):
-        self.client.collections["articles"].delete()
+        self.client.collections[self.collection_name].delete()
 
     def semantic_search(self, query: str):
         search_params = {
@@ -48,7 +49,7 @@ class SemanticSearcher:
             "query_by": "embedding",
         }
 
-        results = self.client.collections["articles"].documents.search(
+        results = self.client.collections[self.collection_name].documents.search(
             search_params
         )
 

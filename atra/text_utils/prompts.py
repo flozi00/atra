@@ -51,7 +51,8 @@ for c in SEARCH_CONVERSATION:
 SEARCH_PROMPT += "\n<|question|> -->"
 
 
-CLASSIFY_SEARCHABLE = "Klassifiziere ob die Frage im Internet gesucht werden kann oder lokal beantwortet wird:\n"
+CLASSIFY_SEARCHABLE = """Klassifiziere welches Plugin für die Beantwortung der Frage genutzt werden sollte.
+Nutze eine der folgenden Kategorien: Lokal, Search\n"""
 LOCALS_SEARCH_CONVERSATION = [
     [["Wer bist du ?"], "Lokal"],
     [["Was kannst du ?"], "Lokal"],

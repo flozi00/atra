@@ -94,13 +94,16 @@ def predict(message, chatbot, url):
         search_question = agent.generate_search_question(user_messages)
         
         yield "Searching"
-        search_query = search_question
-        if len(url) > 6:
-            search_query += f" site:{url}"
-        results = agent.get_webpage_content_playwright(search_query)
-        for opt in results:
-            options = opt
-            yield opt
+        if os.getenv("TYPESENSE_API_KEY") is None:
+            search_query = search_question
+            if len(url) > 6:
+                search_query += f" site:{url}"
+            results = agent.get_webpage_content_playwright(search_query)
+            for opt in results:
+                options = opt
+                yield opt
+        else:
+            options = agent.get_data_from_typesense(search_question)
 
         yield "Answering"
         answer = agent.do_qa(search_question, options)

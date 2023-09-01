@@ -17,6 +17,8 @@ from atra.text_utils.prompts import (
 import os
 import argilla as rg
 
+from atra.text_utils.typesense_search import SemanticSearcher
+
 try:
     rg.init(
         api_url=os.environ.get("ARGILLA_API_URL"),
@@ -36,6 +38,8 @@ class Agent:
     def __init__(self, llm: InferenceClient, embedder: SentenceTransformer):
         self.embedder = embedder
         self.llm = llm
+        self.searcher = SemanticSearcher()
+
 
     def classify_plugin(self, history: str) -> Plugins:
         """
@@ -145,8 +149,27 @@ class Agent:
                 filtered_corpus.append(corpus[idx])
 
         return "\n".join(filtered_corpus)
+    
 
-    def get_webpage_content_playwright(self, query: str) -> str:
+    def get_data_from_typesense(self, query: str) -> str:
+        """
+        Searches for data in Typesense using the given query and returns an iterable of passages containing the query.
+
+        Args:
+            query (str): The query to search for in Typesense.
+
+        Yields:
+            Iterable[str]: An iterable of passages containing the query.
+        """
+        options = ""
+        result = self.searcher.semantic_search(query)
+        for res in result:
+            for key, value in res.items():
+                options += "passage: " + value + "\n"
+
+        return options
+
+    def get_webpage_content_playwright(self, query: str) -> Iterable[str]:
         """
         Uses Playwright to launch a Chromium browser and navigate to a search engine URL with the given query.
         Returns the filtered and re-ranked text content of the webpage.
