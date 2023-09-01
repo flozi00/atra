@@ -56,7 +56,7 @@ class Agent:
         
         for plugin in Plugins:
             if plugin.value.lower() in searchable_answer.lower():
-                search_query_record = rg.TextClassificationRecord(text=history)
+                search_query_record = rg.TextClassificationRecord(text=history, prediction=[(plugin.value.lower(), 1.0)])
                 rg.log(search_query_record, "plugin_record")
                 return plugin
 
