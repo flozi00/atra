@@ -33,13 +33,14 @@ class Plugins(Enum):
     LOKAL = "lokal"
     SEARCH = "search"
     CODING = "coding"
+    WRITING = "writing"
+
 
 class Agent:
     def __init__(self, llm: InferenceClient, embedder: SentenceTransformer):
         self.embedder = embedder
         self.llm = llm
-        self.searcher = SemanticSearcher()
-
+        self.searcher = SemanticSearcher(embedder=embedder)
 
     def classify_plugin(self, history: str) -> Plugins:
         """
@@ -57,10 +58,12 @@ class Agent:
             stop_sequences=["\n", END_TOKEN],
             max_new_tokens=3,
         ).strip()
-        
+
         for plugin in Plugins:
             if plugin.value.lower() in searchable_answer.lower():
-                search_query_record = rg.TextClassificationRecord(text=history, prediction=[(plugin.value.lower(), 1.0)])
+                search_query_record = rg.TextClassificationRecord(
+                    text=history, prediction=[(plugin.value.lower(), 1.0)]
+                )
                 rg.log(search_query_record, "plugin_record")
                 return plugin
 
@@ -78,7 +81,7 @@ class Agent:
             prompt=SEARCH_PROMPT.replace("<|question|>", history),
             stop_sequences=["\n", END_TOKEN],
         ).strip()
-        
+
         return search_question
 
     def do_qa(self, question: str, context: str) -> Iterable[str]:
@@ -120,7 +123,7 @@ class Agent:
         )
         rg.log(record, "qa_record")
 
-        return text.strip()
+        yield text.strip()
 
     def re_ranking(self, query: str, options: list) -> str:
         """
@@ -149,7 +152,6 @@ class Agent:
                 filtered_corpus.append(corpus[idx])
 
         return "\n".join(filtered_corpus)
-    
 
     def get_data_from_typesense(self, query: str) -> str:
         """
@@ -180,17 +182,18 @@ class Agent:
         Returns:
         - filtered (str): The filtered and re-ranked text content of the webpage.
         """
-        url = (
-            "https://duckduckgo.com/?t=h_&ia=web&q="
-            + urllib.parse.quote(query)
-        )
+        url = "https://duckduckgo.com/?t=h_&ia=web&q=" + urllib.parse.quote(query)
         with sync_playwright() as p:
             browser = p.chromium.launch()
             page = browser.new_page()
             page.goto(url)
             content = page.locator("body").inner_text()
-            links = page.locator("body").get_by_role('link').all()
-            links = [link.get_attribute('href') for link in links if "https://" in link.get_attribute('href')][:5]
+            links = page.locator("body").get_by_role("link").all()
+            links = [
+                link.get_attribute("href")
+                for link in links
+                if "https://" in link.get_attribute("href")
+            ][:5]
             for link in tqdm(links):
                 try:
                     yield f"Reading {link}"

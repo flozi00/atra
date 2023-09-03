@@ -1,18 +1,25 @@
 import typesense
 import os
+from sentence_transformers import SentenceTransformer
+
 
 class SemanticSearcher:
-    def __init__(self, collection = "articles") -> None:
+    def __init__(self, embedder: SentenceTransformer, collection="articles") -> None:
+        self.embedder = embedder
         self.collection_name = collection
-        self.client = typesense.Client({
-            'api_key': os.getenv('TYPESENSE_API_KEY', 'xyz'),
-            'nodes': [{
-                'host': os.getenv('TYPESENSE_HOST') or 'localhost',
-                'port': '8108',
-                'protocol': 'http'
-            }],
-            'connection_timeout_seconds': 2
-        })
+        self.client = typesense.Client(
+            {
+                "api_key": os.getenv("TYPESENSE_API_KEY", "xyz"),
+                "nodes": [
+                    {
+                        "host": os.getenv("TYPESENSE_HOST") or "localhost",
+                        "port": "8108",
+                        "protocol": "http",
+                    }
+                ],
+                "connection_timeout_seconds": 2,
+            }
+        )
         self.schema = {
             "name": self.collection_name,
             "fields": [
@@ -21,10 +28,7 @@ class SemanticSearcher:
                 {
                     "name": "embedding",
                     "type": "float[]",
-                    "embed": {
-                        "from": ["article"],
-                        "model_config": {"model_name": "ts/multilingual-e5-base"},
-                    },
+                    "num_dim": 1024,
                 },
             ],
         }
@@ -33,11 +37,15 @@ class SemanticSearcher:
         self.client.collections.create(self.schema)
 
     def upsert_documents(self, articles: list, sources: list):
-        for article, source in zip(articles, sources):
+        for i in range(len(articles)):
+            articles[i] = "passage: " + articles[i]
+        embeddings = self.embedder.encode(articles)
+        for article, source, embeds in zip(articles, sources, embeddings):
             document = {
-                    "article": article,
-                    "source": source,
-                }
+                "article": article,
+                "source": source,
+                "embedding": embeds.tolist(),
+            }
             self.client.collections[self.collection_name].documents.upsert(document)
 
     def delete_collection(self):
@@ -45,17 +53,23 @@ class SemanticSearcher:
 
     def semantic_search(self, query: str):
         search_params = {
-            "q": query,
-            "query_by": "embedding",
+            "searches": [
+                {
+                    "collection": self.collection_name,
+                    "q": "*",
+                    "vector_query": "embedding:(%s, k:50)"
+                    % self.embedder.encode(["query: " + query])[0].tolist(),
+                }
+            ]
         }
 
-        results = self.client.collections[self.collection_name].documents.search(
-            search_params
+        results = self.client.multi_search.perform(
+            search_params, {}
         )
 
         result = []
-        for r in results["hits"]:
-            result.append({r["document"]["source"]: r["document"]["article"]})
+        for r in results["results"][0]["hits"]:
+            if (r["vector_distance"] < 0.7):
+                result.append({r["document"]["source"]: r["document"]["article"]})
 
         return result
-

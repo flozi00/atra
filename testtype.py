@@ -1,6 +1,9 @@
 from atra.text_utils.typesense_search import SemanticSearcher
+from sentence_transformers import SentenceTransformer
 
-searcher = SemanticSearcher()
+embedder = SentenceTransformer("intfloat/multilingual-e5-large")
+
+searcher = SemanticSearcher(embedder=embedder)
 
 try:
     searcher.delete_collection()

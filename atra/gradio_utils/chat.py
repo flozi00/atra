@@ -92,7 +92,7 @@ def predict(message, chatbot, url):
     if plugin == Plugins.SEARCH:
         yield "Generating Search Query"
         search_question = agent.generate_search_question(user_messages)
-        
+
         yield "Searching"
         if os.getenv("TYPESENSE_API_KEY") is None:
             search_query = search_question
@@ -114,6 +114,7 @@ def predict(message, chatbot, url):
         for text in answer:
             yield text
 
+
 def label_chat(history, label):
     messages = (
         SYSTEM_PROMPT
@@ -133,8 +134,10 @@ def label_chat(history, label):
     to_log = rg.TextClassificationRecord(text=messages, prediction=[(label, 1.0)])
     rg.log(to_log, "chatbot_reward")
 
+
 def like_chat(history):
     label_chat(history, "like")
+
 
 def dislike_chat(history):
     label_chat(history, "dislike")
@@ -142,10 +145,15 @@ def dislike_chat(history):
 
 chatter = gr.Chatbot()
 
+
 def build_chat_ui():
     with gr.Blocks() as demo:
         GET_GLOBAL_HEADER()
-        chat_ui = gr.ChatInterface(predict, chatbot=chatter ,additional_inputs=[gr.Textbox(lines=1, label="Domain")])
+        chat_ui = gr.ChatInterface(
+            predict,
+            chatbot=chatter,
+            additional_inputs=[gr.Textbox(lines=1, label="Domain")],
+        )
         with gr.Row():
             top = gr.Button("👍 Top 👍")
             flop = gr.Button("👎 Flop 👎")

@@ -41,7 +41,10 @@ SEARCH_CONVERSATION = [
         "Seit wann ist Angela Merkel Bundeskanzlerin",
     ],
     [["Wer ist Stefan bangel"], "Wer ist Stefan Bangel"],
-    [["Erkläre mir den Unterschied zwischen der SPD und der CDU"], "Was ist der Unterschied zwischen SPD und CDU"],
+    [
+        ["Erkläre mir den Unterschied zwischen der SPD und der CDU"],
+        "Was ist der Unterschied zwischen SPD und CDU",
+    ],
 ]
 
 for c in SEARCH_CONVERSATION:
@@ -53,18 +56,32 @@ SEARCH_PROMPT += "\n<|question|> -->"
 
 
 CLASSIFY_SEARCHABLE = """Klassifiziere welches Plugin für die Beantwortung der Frage genutzt werden sollte.
-Nutze eine der folgenden Kategorien: Lokal, Search, Coding\n"""
+Nutze eine der folgenden Kategorien: Lokal, Search, Coding, Writing, Math\n"""
 LOCALS_SEARCH_CONVERSATION = [
     ["Lokal", ["Wer bist du ?"]],
+    ["Writing", ["Schreibe einen Text über die Geschichte von Deutschland"]],
     ["Search", ["Erkläre mir den Unterschied zwischen der SPD und der CDU"]],
     ["Lokal", ["Was kannst du ?"]],
     ["Coding", ["Erkläre folgendes Rust Programm"]],
+    [
+        "Writing",
+        [
+            "Schreibe ein Entschuldingungsschreiben für meinen Professor, weil ich die Hausaufgaben nicht gemacht habe"
+        ],
+    ],
     ["Lokal", ["Und auf Deutsch ?"]],
     ["Coding", ["Schreibe ein Bash Skript um alle Cronjobs aufzulisten"]],
     ["Lokal", ["Plane einen 3tägigen Trip nach Hawaii"]],
+    ["Math", ["Was ist 2 + 2"]],
     ["Search", ["Wie ist das Wetter in Berlin", "und in München"]],
-    ["Coding", ["Ich brauche eine Funktion welche eine Liste von Strings nach der Anzahl der Vokale sortiert"]],
+    [
+        "Coding",
+        [
+            "Ich brauche eine Funktion welche eine Liste von Strings nach der Anzahl der Vokale sortiert"
+        ],
+    ],
     ["Search", ["Wie ist das Wetter in Berlin", "und in München", "und in Hamburg"]],
+    ["Writing", ["Ich brauche ein Referat über den Covid Ausbruch in Deutschland"]],
     [
         "Search",
         [
@@ -72,11 +89,20 @@ LOCALS_SEARCH_CONVERSATION = [
             "Seit wann ist sie Bundeskanzlerin ?",
         ],
     ],
+    ["Math", ["Wie Berechne ich die Wurzel aus 4"]],
     ["Search", ["Was ist Chatgpt"]],
-    ["Coding", ["Schreibe ein Python Programm welches die höchste Primzahl bis 9999 errechnet"]],
+    [
+        "Coding",
+        [
+            "Schreibe ein Python Programm welches die höchste Primzahl bis 9999 errechnet"
+        ],
+    ],
     ["Search", ["Wer ist Stefan"]],
+    ["Math", ["Erkläre mir die Ableitung von x^2"]],
     ["Search", ["Wer ist der geschäftsführer von Primeline"]],
     ["Lokal", ["Ich habe Hunger"]],
+    ["Math", ["Was ist die Wurzel aus 4"]],
+    ["Writing", ["Verfasse einen Artikel darüber, dass die Erde eine Scheibe ist"]],
     ["Coding", ["Was bedeutet der % Operator in c++"]],
     ["Search", ["Wer ist der aktuelle Bundespräsident"]],
     [
