@@ -29,7 +29,7 @@ client = InferenceClient(model=os.environ.get("LLM", "http://127.0.0.1:8080"))
 agent = Agent(client, embedder)
 
 
-def get_user_messages(history, message):
+def get_user_messages(history, message) -> str:
     """
     Returns a string containing all the user messages in the chat history, including the current message.
 
@@ -46,10 +46,10 @@ def get_user_messages(history, message):
 
     users += USER_TOKEN + message + END_TOKEN
 
-    return users[-2048 * 3 :]
+    return users[-4096 * 3 :]
 
 
-def generate_history_as_string(history, message):
+def generate_history_as_string(history, message) -> str:
     """
     Generates a string representation of the chat history and the current message.
 
@@ -78,20 +78,19 @@ def generate_history_as_string(history, message):
 
     messages += USER_TOKEN + message.strip() + END_TOKEN + ASSISTANT_TOKEN
 
-    return messages
+    return messages[-4096 * 3 :]
 
 
 def predict(message, chatbot, url):
     yield "Reading History"
     input_prompt = generate_history_as_string(chatbot, message)
-    user_messages = get_user_messages(chatbot, message)
 
     yield "Classifying Plugin"
-    plugin = agent.classify_plugin(user_messages)
+    plugin = agent.classify_plugin(input_prompt.strip(ASSISTANT_TOKEN).strip())
 
     if plugin == Plugins.SEARCH:
         yield "Generating Search Query"
-        search_question = agent.generate_search_question(user_messages)
+        search_question = agent.generate_search_question(input_prompt.strip(ASSISTANT_TOKEN).strip())
 
         yield "Searching"
         if os.getenv("TYPESENSE_API_KEY") is None:

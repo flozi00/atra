@@ -34,6 +34,7 @@ class Plugins(Enum):
     SEARCH = "search"
     CODING = "coding"
     WRITING = "writing"
+    MATH = "math"
 
 
 class Agent:
