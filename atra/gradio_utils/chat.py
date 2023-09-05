@@ -57,8 +57,8 @@ def generate_history_as_string(history, message) -> str:
             [
                 "\n".join(
                     [
-                        USER_TOKEN + item[0].strip() + END_TOKEN,
-                        ASSISTANT_TOKEN + item[1].strip() + END_TOKEN,
+                        USER_TOKEN + item[0].rstrip() + END_TOKEN,
+                        ASSISTANT_TOKEN + item[1].rstrip() + END_TOKEN,
                     ]
                 )
                 for item in history
@@ -66,7 +66,7 @@ def generate_history_as_string(history, message) -> str:
         )
     )
 
-    messages += USER_TOKEN + message.strip() + END_TOKEN + ASSISTANT_TOKEN
+    messages += USER_TOKEN + message.rstrip() + END_TOKEN + ASSISTANT_TOKEN
 
     return messages[-4096 * 3 :]
 
@@ -76,13 +76,13 @@ def predict(message, chatbot, url):
     input_prompt = generate_history_as_string(chatbot, message)
 
     yield "Classifying Plugin"
-    plugin = agent.classify_plugin(input_prompt.strip(ASSISTANT_TOKEN).strip())
+    plugin = agent.classify_plugin(input_prompt.rstrip(ASSISTANT_TOKEN).rstrip())
 
     if plugin == Plugins.SEARCH:
         yield "Generating Search Query"
-        search_question = agent.generate_search_question(input_prompt.strip(ASSISTANT_TOKEN).strip())
+        search_question = agent.generate_search_question(input_prompt.rstrip(ASSISTANT_TOKEN).rstrip().replace(SYSTEM_PROMPT, ""))
 
-        yield "Searching"
+        yield "Searching for " + search_question
         if os.getenv("TYPESENSE_API_KEY") is None:
             search_query = search_question
             if len(url) > 6:
@@ -110,8 +110,8 @@ def label_chat(history, message):
             [
                 "\n".join(
                     [
-                        USER_TOKEN + item[0].strip() + END_TOKEN,
-                        ASSISTANT_TOKEN + item[1].strip() + END_TOKEN,
+                        USER_TOKEN + item[0].rstrip() + END_TOKEN,
+                        ASSISTANT_TOKEN + item[1].rstrip() + END_TOKEN,
                     ]
                 )
                 for item in history

@@ -11,6 +11,9 @@ Er bemüht sich auch, keine falschen oder irreführenden Informationen zu geben,
 Dennoch ist der Assistent praktisch und tut wirklich sein Bestes, ohne sich von der Vorsicht zu sehr einschränken zu lassen. 
 Die Antworten werden vollständig formuliert und so detailliert wie möglich sein.{END_TOKEN}"""
 
+QA_SYSTEM_PROMPT = f"""### SYSTEM: Beantworte die Frage so gut wie möglich. Nutze die gegebenen passagen um die Antwort zu finden.
+Denke dir keine Informationen aus und verweise auf die genutzten passagen, sollte die Antwort anhand der passagen nicht beantwortet werden können teile dies mit.{END_TOKEN}"""
+
 SEARCH_PROMPT = "Formuliere Fragen anhand der vorrausgehenden Konvesation:\n"
 SEARCH_CONVERSATION = [
     [["Was ist Chatgpt"], "Was ist Chatgpt"],
@@ -23,6 +26,7 @@ SEARCH_CONVERSATION = [
     [["Wann iMac 2023"], "Wann ist das iMac 2023 Releasedatum"],
     [["Überwachungskamera"], "Was ist eine gute Überwachungskamera"],
     [["wann kommt gta 6 raus"], "Wann ist der GTA 6 Release"],
+    [["Wer ist der Geschäftsführer von Primeline"], "Wer ist der Geschäftsführer von Primeline"],
     [
         ["Wer ist Angela Merkel", "Wann wurde sie geboren"],
         "Wann wurde Angela Merkel geboren",

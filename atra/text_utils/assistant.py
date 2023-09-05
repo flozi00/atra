@@ -10,6 +10,7 @@ from atra.text_utils.prompts import (
     ASSISTANT_TOKEN,
     CLASSIFY_SEARCHABLE,
     END_TOKEN,
+    QA_SYSTEM_PROMPT,
     SEARCH_PROMPT,
     TOKENS_TO_STRIP,
     USER_TOKEN,
@@ -46,7 +47,7 @@ class Agent:
             temperature=0.1,
             stop_sequences=["\n", END_TOKEN],
             max_new_tokens=3,
-        ).strip()
+        ).rstrip()
 
         for plugin in Plugins:
             if plugin.value.lower() in searchable_answer.lower():
@@ -62,12 +63,17 @@ class Agent:
         Returns:
             str: The generated search question.
         """
-        search_question = self.llm.text_generation(
+        text = self.llm.text_generation(
             prompt=SEARCH_PROMPT.replace("<|question|>", history),
             stop_sequences=["\n", END_TOKEN],
-        ).strip()
+            temperature=0.1,
+        )
 
-        return search_question
+        for _ in TOKENS_TO_STRIP:
+            for token in TOKENS_TO_STRIP:
+                text = text.rstrip(token).rstrip()
+
+        return text
 
     def do_qa(self, question: str, context: str) -> Iterable[str]:
         """
@@ -82,6 +88,7 @@ class Agent:
         """
         text = ""
         QA_Prompt = (
+            QA_SYSTEM_PROMPT + 
             USER_TOKEN
             + context
             + "\n\nFrage: "
@@ -104,7 +111,7 @@ class Agent:
         
         for _ in TOKENS_TO_STRIP:
             for token in TOKENS_TO_STRIP:
-                text = text.strip(token).strip()
+                text = text.rstrip(token).rstrip()
         
         yield text
 
@@ -176,7 +183,7 @@ class Agent:
                 link.get_attribute("href")
                 for link in links
                 if "https://" in link.get_attribute("href")
-            ][:5]
+            ][:3]
             for link in tqdm(links):
                 try:
                     yield f"Reading {link}"
@@ -213,6 +220,6 @@ class Agent:
 
         for _ in TOKENS_TO_STRIP:
             for token in TOKENS_TO_STRIP:
-                text = text.strip(token).strip()
+                text = text.rstrip(token).rstrip()
 
-        yield text.strip()
+        yield text.rstrip()
