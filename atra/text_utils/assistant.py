@@ -11,22 +11,10 @@ from atra.text_utils.prompts import (
     CLASSIFY_SEARCHABLE,
     END_TOKEN,
     SEARCH_PROMPT,
+    TOKENS_TO_STRIP,
     USER_TOKEN,
 )
-
-import os
-import argilla as rg
-
 from atra.text_utils.typesense_search import SemanticSearcher
-
-try:
-    rg.init(
-        api_url=os.environ.get("ARGILLA_API_URL"),
-        api_key=os.environ.get("ARGILLA_API_KEY"),
-        workspace="argilla",
-    )
-except Exception as e:
-    print(e)
 
 
 class Plugins(Enum):
@@ -62,10 +50,6 @@ class Agent:
 
         for plugin in Plugins:
             if plugin.value.lower() in searchable_answer.lower():
-                search_query_record = rg.TextClassificationRecord(
-                    text=history, prediction=[(plugin.value.lower(), 1.0)]
-                )
-                rg.log(search_query_record, "plugin_record")
                 return plugin
 
     def generate_search_question(self, history: str) -> str:
@@ -116,15 +100,13 @@ class Agent:
 
         for token in answer:
             text += token
-            yield text.strip()
-
-        record = rg.Text2TextRecord(
-            text=QA_Prompt,
-            prediction=[text],
-        )
-        rg.log(record, "qa_record")
-
-        yield text.strip()
+            yield text
+        
+        for _ in TOKENS_TO_STRIP:
+            for token in TOKENS_TO_STRIP:
+                text = text.strip(token).strip()
+        
+        yield text
 
     def re_ranking(self, query: str, options: list) -> str:
         """
@@ -202,7 +184,6 @@ class Agent:
                     content += page.locator("body").inner_text()
                 except Exception as e:
                     print(e, link)
-                    break
             browser.close()
 
         content = content.split("\n")
@@ -229,5 +210,9 @@ class Agent:
             text += token
 
             yield text
+
+        for _ in TOKENS_TO_STRIP:
+            for token in TOKENS_TO_STRIP:
+                text = text.strip(token).strip()
 
         yield text.strip()

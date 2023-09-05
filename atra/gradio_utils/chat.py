@@ -10,17 +10,7 @@ from atra.text_utils.assistant import Agent, Plugins
 from sentence_transformers import SentenceTransformer
 from huggingface_hub import InferenceClient
 import os
-
-import argilla as rg
-
-try:
-    rg.init(
-        api_url=os.environ.get("ARGILLA_API_URL"),
-        api_key=os.environ.get("ARGILLA_API_KEY"),
-        workspace="argilla",
-    )
-except Exception as e:
-    print(e)
+import csv
 
 embedder = SentenceTransformer("intfloat/multilingual-e5-large")
 
@@ -114,11 +104,9 @@ def predict(message, chatbot, url):
             yield text
 
 
-def label_chat(history, label):
+def label_chat(history, message):
     messages = (
-        SYSTEM_PROMPT
-        + "\n\n"
-        + "\n".join(
+        "\n".join(
             [
                 "\n".join(
                     [
@@ -130,16 +118,22 @@ def label_chat(history, label):
             ]
         )
     )
-    to_log = rg.TextClassificationRecord(text=messages, prediction=[(label, 1.0)])
-    rg.log(to_log, "chatbot_reward")
+
+    messages = messages.split(message)[0] + message + END_TOKEN
+
+    return messages
+
+def on_like(evt: gr.LikeData, history):
+    chat = label_chat(history, evt.value)
+
+    with open('chat-feedback.csv', mode='a+') as file:
+        writer = csv.writer(file)
+        writer.writerow([chat, "Liked" if evt.liked else "Disliked"])
+
+    return gr.Info("Thanks for your feedback!")
+        
 
 
-def like_chat(history):
-    label_chat(history, "like")
-
-
-def dislike_chat(history):
-    label_chat(history, "dislike")
 
 
 chatter = gr.Chatbot()
@@ -153,12 +147,8 @@ def build_chat_ui():
             chatbot=chatter,
             additional_inputs=[gr.Textbox(lines=1, label="Domain")],
         )
-        with gr.Row():
-            top = gr.Button("👍 Top 👍")
-            flop = gr.Button("👎 Flop 👎")
 
-        top.click(like_chat, inputs=chatter)
-        flop.click(dislike_chat, inputs=chatter)
+        chatter.like(on_like, chatter)
 
     demo.queue(concurrency_count=4)
     demo.launch(server_port=7860, **launch_args)
