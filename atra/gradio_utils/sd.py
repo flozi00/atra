@@ -51,17 +51,6 @@ def build_diffusion_ui():
             if len(CLIENTS) > 0:
                 gr.Markdown("# GPU Vergleich")
         with gr.Row():
-            with gr.Column():
-                if len(CLIENTS) > 0:
-                    gr.Markdown("### Prompt")
-                prompt = gr.Textbox(
-                    label="Prompt", info="Prompt of what you want to see"
-                )
-                negatives = gr.Textbox(
-                    label="Negative Prompt",
-                    info="Prompt describing what you dont want to see, useful for refining image",
-                )
-
             if len(CLIENTS) == 0:
                 _boxes = []
                 with gr.Column():
@@ -74,6 +63,17 @@ def build_diffusion_ui():
                         gr.Markdown("GPU " + str(c))
                         _boxes.append(gr.Image())
                         _boxes.append(gr.Markdown())
+        
+        with gr.Column():
+            if len(CLIENTS) > 0:
+                gr.Markdown("### Prompt")
+            prompt = gr.Textbox(
+                label="Prompt", info="Prompt of what you want to see"
+            )
+            negatives = gr.Textbox(
+                label="Negative Prompt",
+                info="Prompt describing what you dont want to see, useful for refining image",
+            )
 
         prompt.submit(
             generate_images,
