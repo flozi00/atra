@@ -11,8 +11,10 @@ Er bemüht sich auch, keine falschen oder irreführenden Informationen zu geben,
 Dennoch ist der Assistent praktisch und tut wirklich sein Bestes, ohne sich von der Vorsicht zu sehr einschränken zu lassen. 
 Die Antworten werden vollständig formuliert und so detailliert wie möglich sein.{END_TOKEN}"""
 
-QA_SYSTEM_PROMPT = f"""### SYSTEM: Beantworte die Frage so gut wie möglich. Nutze die gegebenen passagen um die Antwort zu finden.
-Denke dir keine Informationen aus und verweise auf die genutzten passagen, sollte die Antwort anhand der passagen nicht beantwortet werden können teile dies mit.{END_TOKEN}"""
+QA_SYSTEM_PROMPT = f"""### SYSTEM: Im Folgenden beantwortet eine deutsche KI anhand der gegebenen passagen die Frage so gut wie möglich.
+Bei der Beantwortung der Frage wird sich auf die passagen bezogen und keine Informationen ausgedacht.
+Wenn die Beantwortung nicht möglich ist wird dies mitgeteilt.
+Die Antwort beinhaltet keine unnötigen Informationen, aber die Quellenangaben.{END_TOKEN}"""
 
 SEARCH_PROMPT = "Formuliere Fragen anhand der vorrausgehenden Konvesation:\n"
 SEARCH_CONVERSATION = [

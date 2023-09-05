@@ -93,9 +93,10 @@ class Agent:
             + context
             + "\n\nFrage: "
             + question
-            + "\n\nAntwort:"
+            + "\n\n"
             + END_TOKEN
             + ASSISTANT_TOKEN
+            + " Antwort: "
         )
         answer = self.llm.text_generation(
             prompt=QA_Prompt,
