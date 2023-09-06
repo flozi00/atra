@@ -9,7 +9,8 @@ With the exception of the audio dataset and training script (at the moment, comi
 An example of training large ASR models on small hardware take a look at the simplepeft project https://github.com/flozi00/simplepeft 
 
 ## How to install
-Install the ffmpeg package for loading the audio files and python3 to run the code
-
-With both packages installed you can just run "pip install -r requirements.txt" to install the python librarys and then start the server with gradio UI using "python app.py"
-For faster deployment you can even use the docker container https://hub.docker.com/r/flozi00/asrasaservice
+The fastest way to run is using docker:
+example given:
+```
+"docker run --gpus all -e ASR_MODEL="openai/whisper-tiny" -p 7868:7860  atra:latest asrapp.py"
+```
