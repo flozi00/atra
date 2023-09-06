@@ -12,5 +12,5 @@ The fastest way to run is using docker:
 example given:
 
 ```
-"docker run --gpus '"device=0"' -e ASR_MODEL="openai/whisper-tiny" -p 7868:7860  atra:latest asrapp.py"
+docker run --gpus '"device=0"' -e ASR_MODEL="openai/whisper-tiny" -p 7868:7860  atra:latest asrapp.py
 ```
