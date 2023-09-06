@@ -40,4 +40,4 @@ def build_asr_ui():
         )
 
     ui.queue(concurrency_count=1, api_open=False)
-    ui.launch(server_port=7862, **launch_args)
+    ui.launch(**launch_args)

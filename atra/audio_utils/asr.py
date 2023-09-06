@@ -9,12 +9,13 @@ from transformers import pipeline
 import gradio as gr
 import warnings
 from optimum.bettertransformer import BetterTransformer
+import os
 
 warnings.filterwarnings(action="ignore")
 
 pipe = pipeline(
     "automatic-speech-recognition",
-    "flozi00/whisper-large-german-lora-cv13",
+    os.getenv("ASR_MODEL","flozi00/whisper-large-german-lora-cv13"),
     torch_dtype=torch.float16,
     device=0,
 )

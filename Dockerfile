@@ -1,15 +1,15 @@
-FROM python:3.9.15-slim
+FROM huggingface/transformers-pytorch-gpu:latest
 
 RUN apt update && apt-get install ffmpeg -y
 
-COPY . /asr-server                                                            
-WORKDIR /asr-server
+COPY . /atra-server                                                            
+WORKDIR /atra-server
 
-RUN pip install torch torchaudio --extra-index-url https://download.pytorch.org/whl/cpu --no-cache-dir && pip install -r requirements.txt --no-cache-dir
+RUN pip install -r requirements.txt
+RUN playwright install
 
-ENV DBBACKEND=sqlite:///database.db
-ENV PORT=7860
+RUN chmod +x ./entrypoint.sh
 
-EXPOSE 7860
+ENTRYPOINT [ "/atra-server/entrypoint.sh" ]
 
-CMD exec python app.py
+CMD [ "chatapp.py" ]

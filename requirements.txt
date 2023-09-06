@@ -16,10 +16,7 @@ transformers>=4.30.1
 peft
 accelerate>=0.20.3
 playwright
-text-generation
 diffusers
 invisible-watermark>=0.2.0
-xformers
-omegaconf
-gpustat
 sentence-transformers
+typesense
