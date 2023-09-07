@@ -85,7 +85,7 @@ refiner.to(f"cuda:{GPU_ID}")
 
 
 @timeit
-def generate_images(prompt: str, negatives: str = ""):
+def generate_images(prompt: str, negatives: str = "") -> tuple[str, str]:
     TIME_LOG = {"GPU Power insert in W": POWER}
 
     # for pattern in BAD_PATTERNS:

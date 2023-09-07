@@ -27,7 +27,7 @@ class Plugins(Enum):
 
 
 class Agent:
-    def __init__(self, llm: InferenceClient, embedder: SentenceTransformer):
+    def __init__(self, llm: InferenceClient, embedder: SentenceTransformer) -> None:
         self.embedder = embedder
         self.llm = llm
         self.searcher = SemanticSearcher(embedder=embedder)

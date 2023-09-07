@@ -19,7 +19,7 @@ client = InferenceClient(model=os.environ.get("LLM", "http://127.0.0.1:8080"))
 agent = Agent(client, embedder)
 
 
-def get_user_messages(history, message) -> str:
+def get_user_messages(history: list, message: str) -> str:
     """
     Returns a string containing all the user messages in the chat history, including the current message.
 
@@ -39,7 +39,7 @@ def get_user_messages(history, message) -> str:
     return users[-4096 * 3 :]
 
 
-def generate_history_as_string(history, message) -> str:
+def generate_history_as_string(history: list, message: str) -> str:
     """
     Generates a string representation of the chat history and the current message.
 
@@ -71,7 +71,7 @@ def generate_history_as_string(history, message) -> str:
     return messages[-4096 * 3 :]
 
 
-def predict(message, chatbot, url):
+def predict(message: str, chatbot: list, url: str):
     yield "Reading History"
     input_prompt = generate_history_as_string(chatbot, message)
 
@@ -104,7 +104,7 @@ def predict(message, chatbot, url):
             yield text
 
 
-def label_chat(history, message):
+def label_chat(history: list, message: str) -> str:
     messages = (
         "\n".join(
             [
@@ -123,7 +123,7 @@ def label_chat(history, message):
 
     return messages
 
-def on_like(evt: gr.LikeData, history):
+def on_like(evt: gr.LikeData, history: list) -> None:
     chat = label_chat(history, evt.value)
 
     with open('chat-feedback.csv', mode='a+') as file:

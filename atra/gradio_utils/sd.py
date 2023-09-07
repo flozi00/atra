@@ -1,6 +1,7 @@
 from atra.gradio_utils.ui import GLOBAL_CSS, GET_GLOBAL_HEADER, launch_args
 import gradio as gr
-
+import json
+import pandas as pd
 from gradio_client import Client
 import os
 
@@ -14,6 +15,24 @@ else:
 
 CLIENTS = [Client(src=backend) for backend in IMAGE_BACKENDS]
 
+def calculate_efficiency(gpu_name, watthours, time_in_seconds) -> int:
+    MAX_PRECISION = 32
+    if "H100" in gpu_name:
+        RAM = 80
+        MIN_PRECISION = 8
+    elif "A6000" in gpu_name:
+        RAM = 48
+        MIN_PRECISION = 16
+    elif "RTX 6000" in gpu_name:
+        RAM = 24
+        MIN_PRECISION = 16
+    else:
+        RAM = 24
+        MIN_PRECISION = 16
+    
+    efficiency = (1/watthours) * RAM * (MAX_PRECISION / MIN_PRECISION) * (1 / time_in_seconds)
+
+    return int(efficiency)
 
 def use_diffusion_ui(prompt, negatives):
     jobs = [client.submit(prompt, negatives, fn_index=0) for client in CLIENTS]
@@ -21,6 +40,7 @@ def use_diffusion_ui(prompt, negatives):
     for c in CLIENTS:
         results.append(None)
         results.append(None)
+    results.append(None)
     running_job = True
 
     while running_job:
@@ -35,6 +55,39 @@ def use_diffusion_ui(prompt, negatives):
                 results[job_index * 2 + 1] = log
 
                 yield results
+    
+    scores = []
+    names = []
+    for i in range(len(results)):
+        if i % 2 == 1:
+            data = results[i].replace("```json\n", "")
+            data = data.replace("\n```", "")
+            data = json.loads(data)
+            score = calculate_efficiency(data["Device Name"], data["Comsumed Watt hours"], data["Time in seconds"])
+            scores.append(score)
+            names.append(data["Device Name"])
+
+    baseline_score = min(scores)
+    scores = [1 / baseline_score * score for score in scores]
+
+    simple = pd.DataFrame(
+        {
+            "GPU": names,
+            "Score": scores,
+        }
+    )
+
+
+    results[-1] = gr.BarPlot.update(simple,
+                x="GPU",
+                y="Score",
+                title="Efficiency Score using the worst GPU as baseline (higher is better)",
+                width=300,
+                min_width=300,
+                vertical=False,
+    )
+
+    yield results
 
 
 if len(CLIENTS) == 0:
@@ -43,7 +96,7 @@ else:
     generate_images = use_diffusion_ui
 
 
-def build_diffusion_ui():
+def build_diffusion_ui() -> None:
     ui = gr.Blocks(css=GLOBAL_CSS)
     with ui:
         with gr.Row():
@@ -63,6 +116,7 @@ def build_diffusion_ui():
                         gr.Markdown("GPU " + str(c))
                         _boxes.append(gr.Image())
                         _boxes.append(gr.Markdown())
+                _boxes.append(gr.BarPlot())
         
         with gr.Column():
             if len(CLIENTS) > 0:

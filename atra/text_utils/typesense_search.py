@@ -33,10 +33,10 @@ class SemanticSearcher:
             ],
         }
 
-    def create_collection(self):
+    def create_collection(self) -> None:
         self.client.collections.create(self.schema)
 
-    def upsert_documents(self, articles: list, sources: list):
+    def upsert_documents(self, articles: list, sources: list) -> None:
         for i in range(len(articles)):
             articles[i] = "passage: " + articles[i]
         embeddings = self.embedder.encode(articles)
@@ -51,7 +51,7 @@ class SemanticSearcher:
     def delete_collection(self):
         self.client.collections[self.collection_name].delete()
 
-    def semantic_search(self, query: str):
+    def semantic_search(self, query: str) -> list:
         search_params = {
             "searches": [
                 {
