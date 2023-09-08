@@ -37,9 +37,11 @@ def calculate_efficiency(gpu_name, watthours, time_in_seconds) -> int:
 def use_diffusion_ui(prompt, negatives):
     jobs = [client.submit(prompt, negatives, fn_index=0) for client in CLIENTS]
     results = []
+    datas = []
     for c in CLIENTS:
         results.append(None)
         results.append(None)
+        datas.append(None)
     results.append(None)
     running_job = True
 
@@ -51,21 +53,24 @@ def use_diffusion_ui(prompt, negatives):
                 running_job = True
             else:
                 img, log = job.result()
+                log = log.replace("```json\n", "")
+                log = log.replace("\n```", "")
+                log = json.loads(log)
+                if log["Device Name"] == "NVIDIA Graphics Device":
+                    log["Device Name"] = "NVIDIA RTX 4090"
+                datas[job_index] = log
                 results[job_index * 2] = img
-                results[job_index * 2 + 1] = log
+                results[job_index * 2 + 1] = f"# {log['Device Name']}"
 
                 yield results
     
     scores = []
     names = []
-    for i in range(len(results)):
-        if i % 2 == 1:
-            data = results[i].replace("```json\n", "")
-            data = data.replace("\n```", "")
-            data = json.loads(data)
-            score = calculate_efficiency(data["Device Name"], data["Comsumed Watt hours"], data["Time in seconds"])
-            scores.append(score)
-            names.append(data["Device Name"])
+    for i in range(len(datas)):
+        data = datas[i]
+        score = calculate_efficiency(data["Device Name"], data["Comsumed Watt hours"], data["Time in seconds"])
+        scores.append(score)
+        names.append(data["Device Name"])
 
     baseline_score = min(scores)
     scores = [1 / baseline_score * score for score in scores]
@@ -83,8 +88,10 @@ def use_diffusion_ui(prompt, negatives):
                 y="Score",
                 title="Efficiency Score using the worst GPU as baseline (higher is better)",
                 width=300,
+                height=300,
                 min_width=300,
                 vertical=False,
+                caption="This score is calculated by taking the worst GPU as baseline and calculating the efficiency of the other GPUs compared to it. The efficiency is calculated by taking the amount of RAM, energy used, the precision of the model and the time it took to generate the image into account."
     )
 
     yield results
@@ -113,7 +120,6 @@ def build_diffusion_ui() -> None:
                 _boxes = []
                 for c in range(len(CLIENTS)):
                     with gr.Column():
-                        gr.Markdown("GPU " + str(c))
                         _boxes.append(gr.Image())
                         _boxes.append(gr.Markdown())
                 _boxes.append(gr.BarPlot())
