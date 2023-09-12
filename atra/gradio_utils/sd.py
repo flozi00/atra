@@ -15,6 +15,23 @@ else:
 
 CLIENTS = [Client(src=backend) for backend in IMAGE_BACKENDS]
 
+BAD_PATTERNS = [
+    "nude",
+    "naked",
+    "nacked",
+    "porn",
+    "undressed",
+    "sex",
+    "erotic",
+    "pornographic",
+    "vulgar",
+    "hentai",
+    "nackt",
+    "nsfw",
+    "nudity",
+]
+
+
 def calculate_efficiency(gpu_name, watthours, time_in_seconds) -> int:
     MAX_PRECISION = 32
     if "H100" in gpu_name:
@@ -29,12 +46,19 @@ def calculate_efficiency(gpu_name, watthours, time_in_seconds) -> int:
     else:
         RAM = 24
         MIN_PRECISION = 16
-    
-    efficiency = (1/watthours) * RAM * (MAX_PRECISION / MIN_PRECISION) * (1 / time_in_seconds)
+
+    efficiency = (
+        (1 / watthours) * RAM * (MAX_PRECISION / MIN_PRECISION) * (1 / time_in_seconds)
+    )
 
     return int(efficiency)
 
+
 def use_diffusion_ui(prompt, negatives):
+    for pattern in BAD_PATTERNS:
+        if pattern in prompt:
+            raise gr.Error("NSFW prompt not allowed")
+
     jobs = [client.submit(prompt, negatives, fn_index=0) for client in CLIENTS]
     results = []
     datas = []
@@ -63,12 +87,14 @@ def use_diffusion_ui(prompt, negatives):
                 results[job_index * 2 + 1] = f"# {log['Device Name']}"
 
                 yield results
-    
+
     scores = []
     names = []
     for i in range(len(datas)):
         data = datas[i]
-        score = calculate_efficiency(data["Device Name"], data["Comsumed Watt hours"], data["Time in seconds"])
+        score = calculate_efficiency(
+            data["Device Name"], data["Comsumed Watt hours"], data["Time in seconds"]
+        )
         scores.append(score)
         names.append(data["Device Name"])
 
@@ -82,16 +108,16 @@ def use_diffusion_ui(prompt, negatives):
         }
     )
 
-
-    results[-1] = gr.BarPlot.update(simple,
-                x="GPU",
-                y="Score",
-                title="Efficiency Score using the worst GPU as baseline (higher is better)",
-                width=300,
-                height=300,
-                min_width=300,
-                vertical=False,
-                caption="This score is calculated by taking the worst GPU as baseline and calculating the efficiency of the other GPUs compared to it. The efficiency is calculated by taking the amount of RAM, energy used, the precision of the model and the time it took to generate the image into account."
+    results[-1] = gr.BarPlot.update(
+        simple,
+        x="GPU",
+        y="Score",
+        title="Efficiency Score using the worst GPU as baseline (higher is better)",
+        width=300,
+        height=300,
+        min_width=300,
+        vertical=False,
+        caption="This score is calculated by taking the worst GPU as baseline and calculating the efficiency of the other GPUs compared to it. The efficiency is calculated by taking the amount of RAM, energy used, the precision of the model and the time it took to generate the image into account.",
     )
 
     yield results
@@ -123,13 +149,11 @@ def build_diffusion_ui() -> None:
                         _boxes.append(gr.Image())
                         _boxes.append(gr.Markdown())
                 _boxes.append(gr.BarPlot())
-        
+
         with gr.Column():
             if len(CLIENTS) > 0:
                 gr.Markdown("### Prompt")
-            prompt = gr.Textbox(
-                label="Prompt", info="Prompt of what you want to see"
-            )
+            prompt = gr.Textbox(label="Prompt", info="Prompt of what you want to see")
             negatives = gr.Textbox(
                 label="Negative Prompt",
                 info="Prompt describing what you dont want to see, useful for refining image",
