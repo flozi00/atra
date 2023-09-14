@@ -16,12 +16,12 @@ tiny model
 docker run --gpus '"device=0"' -e ASR_MODEL="openai/whisper-tiny" -p 7868:7860  flozi00/atra:latest asrapp.py
 ```
 
-# for default german model speech recognition model
+# for default german speech recognition model
 ```
 docker run -d --gpus '"device=0"' -p 7862:7860  flozi00/atra:latest asrapp.py
 ```
 
-# for default german model speech recognition model
+# Stable diffusion dream shaper model
 ```
 docker run -d --gpus '"device=0"' -p 7861:7860  flozi00/atra:latest sdapp.py
 ```
