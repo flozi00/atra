@@ -17,12 +17,18 @@ pipe = pipeline(
     "automatic-speech-recognition",
     os.getenv("ASR_MODEL", "flozi00/whisper-large-german-lora-cv13"),
     torch_dtype=torch.float16,
-    device=0,
     model_kwargs={"load_in_4bit": True},
 )
 pipe.model.eval()
-pipe.model = BetterTransformer.transform(pipe.model)
-pipe.model = torch.compile(pipe.model, backend="onnxrt", mode="reduce-overhead")
+try:
+    pipe.model = BetterTransformer.transform(pipe.model)
+except Exception:
+    pass
+
+try:
+    pipe.model = torch.compile(pipe.model, backend="onnxrt", mode="reduce-overhead")
+except Exception:
+    pass
 
 
 def speech_recognition(data, language, progress=gr.Progress()) -> str:
