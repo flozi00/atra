@@ -27,8 +27,12 @@ BAD_PATTERNS = [
     "vulgar",
     "hentai",
     "nackt",
-    "nsfw",
     "nudity",
+    "nakedness",
+    "pussy",
+    "bdsm",
+    "no clothes",
+    "underwear",
 ]
 
 
@@ -113,9 +117,9 @@ def use_diffusion_ui(prompt, negatives):
         x="GPU",
         y="Score",
         title="Efficiency Score using the worst GPU as baseline (higher is better)",
-        width=300,
+        width=500,
         height=300,
-        min_width=300,
+        min_width=500,
         vertical=False,
         caption="This score is calculated by taking the worst GPU as baseline and calculating the efficiency of the other GPUs compared to it. The efficiency is calculated by taking the amount of RAM, energy used, the precision of the model and the time it took to generate the image into account.",
     )

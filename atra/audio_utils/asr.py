@@ -15,9 +15,10 @@ warnings.filterwarnings(action="ignore")
 
 pipe = pipeline(
     "automatic-speech-recognition",
-    os.getenv("ASR_MODEL","flozi00/whisper-large-german-lora-cv13"),
+    os.getenv("ASR_MODEL", "flozi00/whisper-large-german-lora-cv13"),
     torch_dtype=torch.float16,
     device=0,
+    model_kwargs={"load_in_4bit": True},
 )
 pipe.model.eval()
 pipe.model = BetterTransformer.transform(pipe.model)
