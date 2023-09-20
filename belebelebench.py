@@ -1,5 +1,6 @@
 from huggingface_hub import InferenceClient
 from datasets import load_dataset
+import time
 
 llm = InferenceClient("meta-llama/Llama-2-70b-chat-hf")
 
@@ -23,6 +24,7 @@ runs = 0
 correct = 0
 
 for entry in ds:
+    ERROR = True
     flores_passage = entry["flores_passage"]
     question = entry["question"]
     mc_answer1 = entry["mc_answer1"]
@@ -46,7 +48,13 @@ Frage: {question}
 
 Antwort:"""
 
-    answer = get_answer(PROMPT)
+    while ERROR:
+        try:
+            answer = get_answer(PROMPT)
+            ERROR = False
+        except Exception as e:
+            print(e)
+            time.sleep(5)
 
     if str(correct_answer_num) in answer:
         correct += 1
