@@ -15,7 +15,7 @@ warnings.filterwarnings(action="ignore")
 
 pipe = pipeline(
     "automatic-speech-recognition",
-    os.getenv("ASR_MODEL", "flozi00/whisper-large-german-lora-cv13"),
+    os.getenv("ASR_MODEL", "flozi00/whisper-large-v2-german-cv15"),
     torch_dtype=torch.float16,
     model_kwargs={"load_in_4bit": True},
 )
