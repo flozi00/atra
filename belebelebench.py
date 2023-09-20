@@ -16,7 +16,7 @@ def get_answer(prompt: str) -> str:
         temperature=0.1,
         stop_sequences=["\n"],
         max_new_tokens=3,
-    ).rstrip()
+    ).strip()
 
 
 runs = 0
