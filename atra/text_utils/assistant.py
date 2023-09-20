@@ -53,7 +53,7 @@ class Agent:
             if plugin.value.lower() in searchable_answer.lower():
                 return plugin
 
-    def generate_search_question(self, history: str) -> str:
+    def generate_selfstanding_query(self, history: str) -> str:
         """
         Generates a search question based on the given history using the LLM.
 
@@ -88,8 +88,8 @@ class Agent:
         """
         text = ""
         QA_Prompt = (
-            QA_SYSTEM_PROMPT + 
-            USER_TOKEN
+            QA_SYSTEM_PROMPT
+            + USER_TOKEN
             + context
             + "\n\nFrage: "
             + question
@@ -109,11 +109,11 @@ class Agent:
         for token in answer:
             text += token
             yield text
-        
+
         for _ in TOKENS_TO_STRIP:
             for token in TOKENS_TO_STRIP:
                 text = text.rstrip(token).rstrip()
-        
+
         yield text
 
     def re_ranking(self, query: str, options: list) -> str:

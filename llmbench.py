@@ -2,6 +2,8 @@ from huggingface_hub import InferenceClient
 from datasets import load_dataset
 import time
 
+from atra.utils import timeit
+
 llm = InferenceClient("meta-llama/Llama-2-70b-chat-hf")
 
 
@@ -30,6 +32,7 @@ correct = 0
 # Reading Comprehension
 # Choose the correct answer to the question
 #############################################
+@timeit
 def belebele_benchmark() -> None:
     global runs, correct
     ds = load_dataset(
@@ -74,6 +77,7 @@ Antwort:"""
 # Question Answering
 # Answer the question, extract the answer from the text
 #############################################
+@timeit
 def germanquad_benchmark() -> None:
     global runs, correct
     ds = load_dataset("deepset/germanquad", split="test")

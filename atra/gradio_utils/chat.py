@@ -75,13 +75,15 @@ def predict(message: str, chatbot: list, url: str):
     yield "Reading History"
     input_prompt = generate_history_as_string(chatbot, message)
 
+    yield "Generating own Query"
+    search_question = agent.generate_selfstanding_query(
+        input_prompt.rstrip(ASSISTANT_TOKEN).rstrip().replace(SYSTEM_PROMPT, "")
+    )
+
     yield "Classifying Plugin"
-    plugin = agent.classify_plugin(input_prompt.rstrip(ASSISTANT_TOKEN).rstrip())
+    plugin = agent.classify_plugin(search_question.rstrip(ASSISTANT_TOKEN).rstrip())
 
     if plugin == Plugins.SEARCH:
-        yield "Generating Search Query"
-        search_question = agent.generate_search_question(input_prompt.rstrip(ASSISTANT_TOKEN).rstrip().replace(SYSTEM_PROMPT, ""))
-
         yield "Searching for " + search_question
         if os.getenv("TYPESENSE_API_KEY") is None:
             search_query = search_question
@@ -105,35 +107,31 @@ def predict(message: str, chatbot: list, url: str):
 
 
 def label_chat(history: list, message: str) -> str:
-    messages = (
-        "\n".join(
-            [
-                "\n".join(
-                    [
-                        USER_TOKEN + item[0].rstrip() + END_TOKEN,
-                        ASSISTANT_TOKEN + item[1].rstrip() + END_TOKEN,
-                    ]
-                )
-                for item in history
-            ]
-        )
+    messages = "\n".join(
+        [
+            "\n".join(
+                [
+                    USER_TOKEN + item[0].rstrip() + END_TOKEN,
+                    ASSISTANT_TOKEN + item[1].rstrip() + END_TOKEN,
+                ]
+            )
+            for item in history
+        ]
     )
 
     messages = messages.split(message)[0] + message + END_TOKEN
 
     return messages
 
+
 def on_like(evt: gr.LikeData, history: list) -> None:
     chat = label_chat(history, evt.value)
 
-    with open('chat-feedback.csv', mode='a+') as file:
+    with open("chat-feedback.csv", mode="a+") as file:
         writer = csv.writer(file)
         writer.writerow([chat, "Liked" if evt.liked else "Disliked"])
 
     return gr.Info("Thanks for your feedback!")
-        
-
-
 
 
 chatter = gr.Chatbot()

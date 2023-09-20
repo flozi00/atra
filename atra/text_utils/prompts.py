@@ -16,7 +16,9 @@ Bei der Beantwortung der Frage wird sich auf die passagen bezogen und keine Info
 Wenn die Beantwortung nicht möglich ist wird dies mitgeteilt.
 Die Antwort beinhaltet keine unnötigen Informationen, aber die Quellenangaben.{END_TOKEN}"""
 
-SEARCH_PROMPT = "Formuliere Fragen anhand der vorrausgehenden Konvesation:\n"
+SEARCH_PROMPT = (
+    "Formuliere eine eigenständige Anfrage anhand der vorrausgehenden Konversation:\n"
+)
 SEARCH_CONVERSATION = [
     [["Was ist Chatgpt"], "Was ist Chatgpt"],
     [["Ich habe Hunger"], "Was sind schnelle Rezepte"],
@@ -28,7 +30,10 @@ SEARCH_CONVERSATION = [
     [["Wann iMac 2023"], "Wann ist das iMac 2023 Releasedatum"],
     [["Überwachungskamera"], "Was ist eine gute Überwachungskamera"],
     [["wann kommt gta 6 raus"], "Wann ist der GTA 6 Release"],
-    [["Wer ist der Geschäftsführer von Primeline"], "Wer ist der Geschäftsführer von Primeline"],
+    [
+        ["Wer ist der Geschäftsführer von Primeline"],
+        "Wer ist der Geschäftsführer von Primeline",
+    ],
     [
         ["Wer ist Angela Merkel", "Wann wurde sie geboren"],
         "Wann wurde Angela Merkel geboren",
