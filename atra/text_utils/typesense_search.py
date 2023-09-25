@@ -1,10 +1,33 @@
 import typesense
 import os
-from sentence_transformers import SentenceTransformer
+from optimum.onnxruntime import ORTModelForFeatureExtraction
+from transformers import AutoTokenizer
+import torch
+
+
+class Embedder:
+    def __init__(self, model_path: str) -> None:
+        self.model = ORTModelForFeatureExtraction.from_pretrained(
+            model_path, subfolder="onnx"
+        )
+        self.tokenizer = AutoTokenizer.from_pretrained(model_path)
+
+    def encode(self, sentences: list) -> torch.Tensor:
+        tokenized_input = self.tokenizer(
+            sentences, padding=True, truncation=True, return_tensors="pt"
+        )
+        with torch.no_grad():
+            model_output = self.model(**tokenized_input)
+            # Perform pooling. In this case, cls pooling.
+            sentence_embeddings = model_output[0][:, 0]
+        sentence_embeddings = torch.nn.functional.normalize(
+            sentence_embeddings, p=2, dim=1
+        )
+        return sentence_embeddings
 
 
 class SemanticSearcher:
-    def __init__(self, embedder: SentenceTransformer, collection="articles") -> None:
+    def __init__(self, embedder: Embedder, collection="articles") -> None:
         self.embedder = embedder
         self.collection_name = collection
         self.client = typesense.Client(
@@ -63,13 +86,11 @@ class SemanticSearcher:
             ]
         }
 
-        results = self.client.multi_search.perform(
-            search_params, {}
-        )
+        results = self.client.multi_search.perform(search_params, {})
 
         result = []
         for r in results["results"][0]["hits"]:
-            if (r["vector_distance"] < 0.7):
+            if r["vector_distance"] < 0.7:
                 result.append({r["document"]["source"]: r["document"]["article"]})
 
         return result

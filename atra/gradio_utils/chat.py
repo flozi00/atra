@@ -7,12 +7,12 @@ from atra.text_utils.prompts import (
     USER_TOKEN,
 )
 from atra.text_utils.assistant import Agent, Plugins
-from sentence_transformers import SentenceTransformer
 from huggingface_hub import InferenceClient
 import os
 import csv
+from atra.text_utils.typesense_search import Embedder
 
-embedder = SentenceTransformer("intfloat/multilingual-e5-large")
+embedder = Embedder("intfloat/multilingual-e5-large")
 
 client = InferenceClient(model=os.environ.get("LLM", "http://127.0.0.1:8080"))
 

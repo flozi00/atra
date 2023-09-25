@@ -1,5 +1,5 @@
 from typing import Iterable
-from sentence_transformers import util, SentenceTransformer
+from sentence_transformers import util
 from huggingface_hub import InferenceClient
 import torch
 from playwright.sync_api import sync_playwright
@@ -15,7 +15,7 @@ from atra.text_utils.prompts import (
     TOKENS_TO_STRIP,
     USER_TOKEN,
 )
-from atra.text_utils.typesense_search import SemanticSearcher
+from atra.text_utils.typesense_search import SemanticSearcher, Embedder
 
 
 class Plugins(Enum):
@@ -27,7 +27,7 @@ class Plugins(Enum):
 
 
 class Agent:
-    def __init__(self, llm: InferenceClient, embedder: SentenceTransformer) -> None:
+    def __init__(self, llm: InferenceClient, embedder: Embedder) -> None:
         self.embedder = embedder
         self.llm = llm
         self.searcher = SemanticSearcher(embedder=embedder)
@@ -132,8 +132,8 @@ class Agent:
 
         filtered_corpus = []
 
-        corpus_embeddings = self.embedder.encode(corpus, convert_to_tensor=True)
-        query_embedding = self.embedder.encode(query, convert_to_tensor=True)
+        corpus_embeddings = self.embedder.encode(corpus)
+        query_embedding = self.embedder.encode(query)
 
         cos_scores = util.cos_sim(query_embedding, corpus_embeddings)[0]
         top_results = torch.topk(cos_scores, k=20 if len(corpus) > 20 else len(corpus))
@@ -200,6 +200,7 @@ class Agent:
             if len(co.split(" ")) > 5:
                 filtered += co + "\n"
 
+        yield "Re-ranking"
         filtered = self.re_ranking(query, filtered.split("\n"))
 
         yield filtered
