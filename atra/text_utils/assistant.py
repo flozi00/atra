@@ -16,6 +16,7 @@ from atra.text_utils.prompts import (
     USER_TOKEN,
 )
 from atra.text_utils.typesense_search import SemanticSearcher, Embedder
+import functools
 
 
 class Plugins(Enum):
@@ -32,6 +33,7 @@ class Agent:
         self.llm = llm
         self.searcher = SemanticSearcher(embedder=embedder)
 
+    @functools.cache
     def classify_plugin(self, history: str) -> Plugins:
         """
         Classifies the plugin based on the given history.
@@ -53,6 +55,7 @@ class Agent:
             if plugin.value.lower() in searchable_answer.lower():
                 return plugin
 
+    @functools.cache
     def generate_selfstanding_query(self, history: str) -> str:
         """
         Generates a search question based on the given history using the LLM.
@@ -162,6 +165,7 @@ class Agent:
 
         return options
 
+    @functools.cache
     def get_webpage_content_playwright(self, query: str) -> Iterable[str]:
         """
         Uses Playwright to launch a Chromium browser and navigate to a search engine URL with the given query.
@@ -187,7 +191,6 @@ class Agent:
             ][:3]
             for link in tqdm(links):
                 try:
-                    yield f"Reading {link}"
                     page.goto(link, timeout=5000)
                     content += page.locator("body").inner_text()
                 except Exception as e:
@@ -200,10 +203,9 @@ class Agent:
             if len(co.split(" ")) > 5:
                 filtered += co + "\n"
 
-        yield "Re-ranking"
         filtered = self.re_ranking(query, filtered.split("\n"))
 
-        yield filtered
+        return filtered
 
     def custom_generation(self, query) -> Iterable[str]:
         text = ""

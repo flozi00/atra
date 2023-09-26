@@ -89,10 +89,7 @@ def predict(message: str, chatbot: list, url: str):
             search_query = search_question
             if len(url) > 6:
                 search_query += f" site:{url}"
-            results = agent.get_webpage_content_playwright(search_query)
-            for opt in results:
-                options = opt
-                yield opt
+            options = agent.get_webpage_content_playwright(search_query)
         else:
             options = agent.get_data_from_typesense(search_question)
 
