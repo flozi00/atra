@@ -8,7 +8,7 @@ import torch
 class Embedder:
     def __init__(self, model_path: str) -> None:
         self.model = ORTModelForFeatureExtraction.from_pretrained(
-            model_path, subfolder="onnx", provider="CUDAExecutionProvider"
+            model_path, subfolder="onnx"
         )
         self.tokenizer = AutoTokenizer.from_pretrained(model_path)
 
