@@ -84,7 +84,7 @@ def predict(message: str, chatbot: list, url: str):
     plugin = agent.classify_plugin(search_question.rstrip(ASSISTANT_TOKEN).rstrip())
 
     if plugin == Plugins.SEARCH:
-        yield "Searching for " + search_question
+        yield "Suche: " + search_question
         if os.getenv("TYPESENSE_API_KEY") is None:
             search_query = search_question
             if len(url) > 6:

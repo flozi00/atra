@@ -200,12 +200,12 @@ class Agent:
         content = content.split("\n")
         filtered = ""
         for co in content:
-            if len(co.split(" ")) > 5:
+            if len(co.split(" ")) > 16:
                 filtered += co + "\n"
 
-        filtered = self.re_ranking(query, filtered.split("\n"))
+        # filtered = self.re_ranking(query, filtered.split("\n"))
 
-        return filtered
+        return filtered[: 4096 * 3]
 
     def custom_generation(self, query) -> Iterable[str]:
         text = ""
