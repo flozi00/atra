@@ -36,6 +36,7 @@ pipe.model = BetterTransformer.transform(pipe.model)
 pipe.model = torch.compile(pipe.model, mode="max-autotune")
 
 
+@functools.cache
 def get_dolly_label(prompt: str) -> str:
     return pipe(
         f"classify: {prompt}",
