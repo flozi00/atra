@@ -18,6 +18,7 @@ from atra.text_utils.typesense_search import SemanticSearcher, Embedder
 import functools
 from transformers import pipeline
 from optimum.bettertransformer import BetterTransformer
+import torch
 
 
 class Plugins(Enum):
@@ -32,6 +33,7 @@ pipe = pipeline(
     torch_dtype=torch.float16,
 )
 pipe.model = BetterTransformer.transform(pipe.model)
+pipe.model = torch.compile(pipe.model, mode="max-autotune")
 
 
 def get_dolly_label(prompt: str) -> str:
@@ -70,7 +72,7 @@ class Agent:
         searchable_answer = get_dolly_label(history)
         self.log_text2text(input=history, output=searchable_answer, tasktype="classify")
 
-        if searchable_answer in ["brainstorming", "closed_qa"]:
+        if searchable_answer in ["brainstorming", "open_qa"]:
             return Plugins.SEARCH
         else:
             return Plugins.LOKAL
