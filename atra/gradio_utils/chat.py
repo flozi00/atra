@@ -19,26 +19,6 @@ client = InferenceClient(model=os.environ.get("LLM", "http://127.0.0.1:8080"))
 agent = Agent(client, embedder)
 
 
-def get_user_messages(history: list, message: str) -> str:
-    """
-    Returns a string containing all the user messages in the chat history, including the current message.
-
-    Args:
-    - history (list): A list of tuples containing the user and their message.
-    - message (str): The current message sent by the user.
-
-    Returns:
-    - A string containing all the user messages in the chat history, including the current message.
-    """
-    users = ""
-    for h in history:
-        users += USER_TOKEN + h[0] + END_TOKEN
-
-    users += USER_TOKEN + message + END_TOKEN
-
-    return users[-4096 * 3 :]
-
-
 def generate_history_as_string(history: list, message: str) -> str:
     """
     Generates a string representation of the chat history and the current message.
@@ -68,22 +48,22 @@ def generate_history_as_string(history: list, message: str) -> str:
 
     messages += USER_TOKEN + message.rstrip() + END_TOKEN + ASSISTANT_TOKEN
 
-    return messages[-4096 * 3 :]
+    return messages[-4096 * 3 :].strip()
 
 
 def predict(message: str, chatbot: list, url: str):
     yield "Reading History"
     input_prompt = generate_history_as_string(chatbot, message)
-
-    yield "Generating own Query"
-    search_question = agent.generate_selfstanding_query(
-        input_prompt.rstrip(ASSISTANT_TOKEN).rstrip().replace(SYSTEM_PROMPT, "")
+    history_no_tokens = (
+        input_prompt.rstrip(ASSISTANT_TOKEN).rstrip().replace(SYSTEM_PROMPT, "").strip()
     )
 
     yield "Classifying Plugin"
-    plugin = agent.classify_plugin(search_question.rstrip(ASSISTANT_TOKEN).rstrip())
+    plugin = agent.classify_plugin(history_no_tokens)
 
     if plugin == Plugins.SEARCH:
+        yield "Generating own Query"
+        search_question = agent.generate_selfstanding_query(history_no_tokens)
         yield "Suche: " + search_question
         if os.getenv("TYPESENSE_API_KEY") is None:
             search_query = search_question

@@ -1,24 +1,24 @@
 ASSISTANT_TOKEN = "### ASSISTANT: "
 USER_TOKEN = "### USER: "
 END_TOKEN = "</s>"
+SYSTEM = "### SYSTEM:"
 
 TOKENS_TO_STRIP = ["###", "USER:", "ASSISTANT:", END_TOKEN]
 
-SYSTEM_PROMPT = f"""### SYSTEM: Im Folgenden finden Sie eine Reihe von Dialogen zwischen verschiedenen Personen und einem deutschen KI-Assistenten namens Egino. 
+SYSTEM_PROMPT = f"""{SYSTEM} Im Folgenden finden Sie eine Reihe von Dialogen zwischen verschiedenen Personen und einem deutschen KI-Assistenten namens Egino. 
 Die KI versucht, hilfsbereit, höflich, ehrlich, kultiviert, gefühlsbetont und bescheiden, aber kenntnisreich zu sein. 
 Der Assistent ist gerne bereit, bei fast allem zu helfen, und tut sein Bestes, um genau zu verstehen, was benötigt wird. 
 Er bemüht sich auch, keine falschen oder irreführenden Informationen zu geben, und er macht Vorbehalte, wenn er sich der richtigen Antwort nicht ganz sicher ist. 
 Dennoch ist der Assistent praktisch und tut wirklich sein Bestes, ohne sich von der Vorsicht zu sehr einschränken zu lassen. 
 Die Antworten werden vollständig formuliert und so detailliert wie möglich sein.{END_TOKEN}"""
 
-QA_SYSTEM_PROMPT = f"""### SYSTEM: Im Folgenden beantwortet eine deutsche KI anhand der gegebenen passagen die Frage so gut wie möglich.
+QA_SYSTEM_PROMPT = f"""{SYSTEM} Im Folgenden beantwortet eine deutsche KI anhand der gegebenen passagen die Frage so gut wie möglich.
 Bei der Beantwortung der Frage wird sich auf die passagen bezogen und keine Informationen ausgedacht.
 Wenn die Beantwortung nicht möglich ist wird dies mitgeteilt.
 Die Antwort beinhaltet keine unnötigen Informationen, aber die Quellenangaben.{END_TOKEN}"""
 
-SEARCH_PROMPT = (
-    "Formuliere eine eigenständige Anfrage anhand der vorrausgehenden Konversation:\n"
-)
+SEARCH_PROMPT = f"""{SYSTEM} Im folgenden werden aus Konversationen eigenständige und ausformulierte Sätze gebildet, wenn dies notwendig ist damit alle Informationen enthalten sind{END_TOKEN}"""
+
 SEARCH_CONVERSATION = [
     [["Was ist Chatgpt"], "Was ist Chatgpt"],
     [["Ich habe Hunger"], "Was sind schnelle Rezepte"],
@@ -60,12 +60,14 @@ SEARCH_CONVERSATION = [
     ],
 ]
 
+SEARCH_PROMPT_PROCESSED = SEARCH_PROMPT
+
 for c in SEARCH_CONVERSATION:
     inputs = ""
     for ins in c[0]:
         inputs += USER_TOKEN + ins + END_TOKEN
-    SEARCH_PROMPT += "\n" + inputs + " --> " + c[1]
-SEARCH_PROMPT += "\n<|question|> -->"
+    SEARCH_PROMPT_PROCESSED += "\n" + inputs + " --> " + c[1]
+SEARCH_PROMPT_PROCESSED += "\n<|question|> -->"
 
 
 CLASSIFY_SEARCHABLE = """Klassifiziere welches Plugin für die Beantwortung der Frage genutzt werden sollte.
@@ -104,6 +106,7 @@ LOCALS_SEARCH_CONVERSATION = [
     ],
     ["Math", ["Wie Berechne ich die Wurzel aus 4"]],
     ["Search", ["Was ist Chatgpt"]],
+    ["Search", ["Was ist der Standort von AWS"]],
     [
         "Coding",
         [
@@ -114,6 +117,7 @@ LOCALS_SEARCH_CONVERSATION = [
     ["Math", ["Erkläre mir die Ableitung von x^2"]],
     ["Search", ["Wer ist der geschäftsführer von Primeline"]],
     ["Lokal", ["Ich habe Hunger"]],
+    ["Search", ["Wo ist Frankfurt"]],
     ["Math", ["Was ist die Wurzel aus 4"]],
     ["Writing", ["Verfasse einen Artikel darüber, dass die Erde eine Scheibe ist"]],
     ["Coding", ["Was bedeutet der % Operator in c++"]],

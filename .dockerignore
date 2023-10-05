@@ -24,3 +24,5 @@ coverage.xml
 *.bin
 *.safetensor
 *.safetensors
+*.json*
+*.csv

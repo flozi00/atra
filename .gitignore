@@ -16,3 +16,4 @@ data/
 *.jpg
 .env
 typesense-data/
+*.json*

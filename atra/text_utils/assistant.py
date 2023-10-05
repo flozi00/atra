@@ -11,12 +11,14 @@ from atra.text_utils.prompts import (
     CLASSIFY_SEARCHABLE,
     END_TOKEN,
     QA_SYSTEM_PROMPT,
+    SEARCH_PROMPT_PROCESSED,
     SEARCH_PROMPT,
     TOKENS_TO_STRIP,
     USER_TOKEN,
 )
 from atra.text_utils.typesense_search import SemanticSearcher, Embedder
 import functools
+import json
 
 
 class Plugins(Enum):
@@ -32,6 +34,14 @@ class Agent:
         self.embedder = embedder
         self.llm = llm
         self.searcher = SemanticSearcher(embedder=embedder)
+
+    def log_text2text(self, input: str, output: str, tasktype: str) -> None:
+        """
+        Logs a text2text example to jsonlines file.
+        """
+        json_data = {"input": input, "output": output}
+        with open(f"{tasktype}.jsonl", "a+") as f:
+            f.write(json.dumps(json_data) + "\n")
 
     @functools.cache
     def classify_plugin(self, history: str) -> Plugins:
@@ -67,7 +77,7 @@ class Agent:
             str: The generated search question.
         """
         text = self.llm.text_generation(
-            prompt=SEARCH_PROMPT.replace("<|question|>", history),
+            prompt=SEARCH_PROMPT_PROCESSED.replace("<|question|>", history),
             stop_sequences=["\n", END_TOKEN],
             temperature=0.1,
         )
@@ -75,6 +85,10 @@ class Agent:
         for _ in TOKENS_TO_STRIP:
             for token in TOKENS_TO_STRIP:
                 text = text.rstrip(token).rstrip()
+
+        self.log_text2text(
+            input=SEARCH_PROMPT + history, output=text, tasktype="selfquery"
+        )
 
         return text
 
