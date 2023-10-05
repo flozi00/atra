@@ -59,11 +59,10 @@ def predict(message: str, chatbot: list, url: str):
     )
 
     yield "Classifying Plugin"
-    plugin = agent.classify_plugin(history_no_tokens)
+    search_question = agent.generate_selfstanding_query(history_no_tokens)
+    plugin = agent.classify_plugin(search_question)
 
     if plugin == Plugins.SEARCH:
-        yield "Generating own Query"
-        search_question = agent.generate_selfstanding_query(history_no_tokens)
         yield "Suche: " + search_question
         if os.getenv("TYPESENSE_API_KEY") is None:
             search_query = search_question

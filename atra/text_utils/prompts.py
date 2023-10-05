@@ -21,13 +21,18 @@ SEARCH_PROMPT = f"""{SYSTEM} Im folgenden werden aus Konversationen eigenständi
 
 SEARCH_CONVERSATION = [
     [["Was ist Chatgpt"], "Was ist Chatgpt"],
-    [["Ich habe Hunger"], "Was sind schnelle Rezepte"],
+    [["Ich habe Hunger"], "Was hilft gegen Hunger"],
+    [["Gib mir eine Übersicht über den Konzern Meta"], "Was ist der Konzern Meta"],
     [["Wer ist der aktuelle Bundespräsident"], "Wer ist der aktuelle Bundespräsident"],
-    [["Sichere Programmierung"], "Wie programmiere ich sicher"],
-    [["Ich suche einen guten Artikel über .net Autorisierung"], ".net Autorisierung"],
-    [["Wer ist Jeff Bezos"], "Wer ist jeff Bezos"],
-    [["Ich suche einen Artikel über Wallbox"], "Wallbox"],
-    [["Wann iMac 2023"], "Wann ist das iMac 2023 Releasedatum"],
+    [["Sichere Programmierung"], "Was bedeutet sichere Programmierung"],
+    [
+        ["Ich suche einen guten Artikel über .net Autorisierung"],
+        "Artikel über .net Autorisierung",
+    ],
+    [["Wer ist Jeff Bezos"], "Wer ist Jeff Bezos"],
+    [["Ich suche einen Artikel über Wallbox"], "Wallbox Artikel"],
+    [["Erzähl mir etwas über Barack Obama"], "Wer ist Barack Obama"],
+    [["Wann iMac 2023"], "Wann ist das Releasedatum für den iMac 2023"],
     [["Überwachungskamera"], "Was ist eine gute Überwachungskamera"],
     [["wann kommt gta 6 raus"], "Wann ist der GTA 6 Release"],
     [
@@ -46,6 +51,7 @@ SEARCH_CONVERSATION = [
         ["Wie ist das Wetter in Berlin", "und in München", "und in Hamburg"],
         "Wie ist das Wetter in Hamburg",
     ],
+    [["Hi, wer bist denn du ?"], "Wer bist du"],
     [
         [
             "Was war die erste Partei von Angela Merkel ? ",
@@ -68,78 +74,3 @@ for c in SEARCH_CONVERSATION:
         inputs += USER_TOKEN + ins + END_TOKEN
     SEARCH_PROMPT_PROCESSED += "\n" + inputs + " --> " + c[1]
 SEARCH_PROMPT_PROCESSED += "\n<|question|> -->"
-
-
-CLASSIFY_SEARCHABLE = """Klassifiziere welches Plugin für die Beantwortung der Frage genutzt werden sollte.
-Nutze eine der folgenden Kategorien: Lokal, Search, Coding, Writing, Math\n"""
-LOCALS_SEARCH_CONVERSATION = [
-    ["Lokal", ["Wer bist du ?"]],
-    ["Writing", ["Schreibe einen Text über die Geschichte von Deutschland"]],
-    ["Search", ["Erkläre mir den Unterschied zwischen der SPD und der CDU"]],
-    ["Lokal", ["Was kannst du ?"]],
-    ["Coding", ["Erkläre folgendes Rust Programm"]],
-    [
-        "Writing",
-        [
-            "Schreibe ein Entschuldingungsschreiben für meinen Professor, weil ich die Hausaufgaben nicht gemacht habe"
-        ],
-    ],
-    ["Lokal", ["Und auf Deutsch ?"]],
-    ["Coding", ["Schreibe ein Bash Skript um alle Cronjobs aufzulisten"]],
-    ["Lokal", ["Plane einen 3tägigen Trip nach Hawaii"]],
-    ["Math", ["Was ist 2 + 2"]],
-    ["Search", ["Wie ist das Wetter in Berlin", "und in München"]],
-    [
-        "Coding",
-        [
-            "Ich brauche eine Funktion welche eine Liste von Strings nach der Anzahl der Vokale sortiert"
-        ],
-    ],
-    ["Search", ["Wie ist das Wetter in Berlin", "und in München", "und in Hamburg"]],
-    ["Writing", ["Ich brauche ein Referat über den Covid Ausbruch in Deutschland"]],
-    [
-        "Search",
-        [
-            "Was war die erste Partei von Angela Merkel ? ",
-            "Seit wann ist sie Bundeskanzlerin ?",
-        ],
-    ],
-    ["Math", ["Wie Berechne ich die Wurzel aus 4"]],
-    ["Search", ["Was ist Chatgpt"]],
-    ["Search", ["Was ist der Standort von AWS"]],
-    [
-        "Coding",
-        [
-            "Schreibe ein Python Programm welches die höchste Primzahl bis 9999 errechnet"
-        ],
-    ],
-    ["Search", ["Wer ist Stefan"]],
-    ["Math", ["Erkläre mir die Ableitung von x^2"]],
-    ["Search", ["Wer ist der geschäftsführer von Primeline"]],
-    ["Lokal", ["Ich habe Hunger"]],
-    ["Search", ["Wo ist Frankfurt"]],
-    ["Math", ["Was ist die Wurzel aus 4"]],
-    ["Writing", ["Verfasse einen Artikel darüber, dass die Erde eine Scheibe ist"]],
-    ["Coding", ["Was bedeutet der % Operator in c++"]],
-    ["Search", ["Wer ist der aktuelle Bundespräsident"]],
-    [
-        "Lokal",
-        [
-            "Plane einen 3tägigen Ausflug nach Mallorca",
-            "Erstelle eine Liste mit dem tagesablauf für jeden Tag",
-        ],
-    ],
-    [
-        "Lokal",
-        [
-            "Classify if in that conversation jokes are made or not. Answer with Joke or No Joke"
-        ],
-    ],
-]
-
-for c in LOCALS_SEARCH_CONVERSATION:
-    inputs = ""
-    for ins in c[1]:
-        inputs += USER_TOKEN + ins + END_TOKEN
-    CLASSIFY_SEARCHABLE += "\n" + inputs + " --> " + c[0]
-CLASSIFY_SEARCHABLE += "\n<|question|> -->"

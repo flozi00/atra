@@ -8,25 +8,38 @@ from enum import Enum
 from tqdm.auto import tqdm
 from atra.text_utils.prompts import (
     ASSISTANT_TOKEN,
-    CLASSIFY_SEARCHABLE,
     END_TOKEN,
     QA_SYSTEM_PROMPT,
     SEARCH_PROMPT_PROCESSED,
-    SEARCH_PROMPT,
     TOKENS_TO_STRIP,
     USER_TOKEN,
 )
 from atra.text_utils.typesense_search import SemanticSearcher, Embedder
 import functools
-import json
+from transformers import pipeline
+from optimum.bettertransformer import BetterTransformer
 
 
 class Plugins(Enum):
     LOKAL = "lokal"
     SEARCH = "search"
-    CODING = "coding"
-    WRITING = "writing"
-    MATH = "math"
+
+
+pipe = pipeline(
+    "text2text-generation",
+    model="flozi00/t5-small-llm-tasks",
+    device=0,
+    torch_dtype=torch.float16,
+)
+pipe.model = BetterTransformer.transform(pipe.model)
+
+
+def get_dolly_label(prompt: str) -> str:
+    return pipe(
+        f"Labels: closed_qa, classification, open_qa, information_extraction, brainstorming, general_qa, summarization, creative_writing </s> Input: {prompt}",
+        max_new_tokens=5,
+        do_sample=False,
+    )[0]["generated_text"].strip()
 
 
 class Agent:
@@ -37,11 +50,11 @@ class Agent:
 
     def log_text2text(self, input: str, output: str, tasktype: str) -> None:
         """
-        Logs a text2text example to jsonlines file.
+        Logs a text2text example to csv file.
         """
-        json_data = {"input": input, "output": output}
-        with open(f"{tasktype}.jsonl", "a+") as f:
-            f.write(json.dumps(json_data) + "\n")
+        with open(f"_{tasktype}.txt", mode="a+") as file:
+            file.write(f"{input} --> {output}\n")
+            file.write("*" * 20 + "\n")
 
     @functools.cache
     def classify_plugin(self, history: str) -> Plugins:
@@ -54,16 +67,13 @@ class Agent:
         Returns:
             Plugins: The plugin that matches the searchable answer.
         """
-        searchable_answer = self.llm.text_generation(
-            prompt=CLASSIFY_SEARCHABLE.replace("<|question|>", history),
-            temperature=0.1,
-            stop_sequences=["\n", END_TOKEN],
-            max_new_tokens=3,
-        ).rstrip()
+        searchable_answer = get_dolly_label(history)
+        self.log_text2text(input=history, output=searchable_answer, tasktype="classify")
 
-        for plugin in Plugins:
-            if plugin.value.lower() in searchable_answer.lower():
-                return plugin
+        if searchable_answer in ["brainstorming", "closed_qa"]:
+            return Plugins.SEARCH
+        else:
+            return Plugins.LOKAL
 
     @functools.cache
     def generate_selfstanding_query(self, history: str) -> str:
@@ -86,9 +96,7 @@ class Agent:
             for token in TOKENS_TO_STRIP:
                 text = text.rstrip(token).rstrip()
 
-        self.log_text2text(
-            input=SEARCH_PROMPT + history, output=text, tasktype="selfquery"
-        )
+        self.log_text2text(input=history, output=text, tasktype="selfquery")
 
         return text
 
