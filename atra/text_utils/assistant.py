@@ -28,7 +28,7 @@ class Plugins(Enum):
 
 pipe = pipeline(
     "text2text-generation",
-    model="flozi00/t5-small-llm-tasks",
+    model="flozi00/t5-base-llm-tasks",
     device=0,
     torch_dtype=torch.float16,
 )
@@ -38,10 +38,12 @@ pipe.model = torch.compile(pipe.model, mode="max-autotune")
 
 def get_dolly_label(prompt: str) -> str:
     return pipe(
-        f"Labels: closed_qa, classification, open_qa, information_extraction, brainstorming, general_qa, summarization, creative_writing </s> Input: {prompt}",
+        f"classify: {prompt}",
         max_new_tokens=5,
         do_sample=False,
-    )[0]["generated_text"].strip()
+    )[
+        0
+    ]["generated_text"].strip()
 
 
 class Agent:
