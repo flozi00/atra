@@ -54,7 +54,7 @@ class Agent:
 
     def log_text2text(self, input: str, output: str, tasktype: str) -> None:
         """
-        Logs a text2text example to csv file.
+        Logs a text2text to txt file.
         """
         with open(f"_{tasktype}.txt", mode="a+") as file:
             file.write(f"{input} --> {output}".strip())
