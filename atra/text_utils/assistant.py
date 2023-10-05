@@ -55,8 +55,8 @@ class Agent:
         Logs a text2text example to csv file.
         """
         with open(f"_{tasktype}.txt", mode="a+") as file:
-            file.write(f"{input} --> {output}\n")
-            file.write("*" * 20 + "\n")
+            file.write(f"{input} --> {output}".strip())
+            file.write("\n" + "*" * 20 + "\n")
 
     @functools.cache
     def classify_plugin(self, history: str) -> Plugins:
