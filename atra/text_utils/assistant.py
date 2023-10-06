@@ -75,7 +75,7 @@ class Agent:
         searchable_answer = get_dolly_label(history)
         self.log_text2text(input=history, output=searchable_answer, tasktype="classify")
 
-        if searchable_answer in ["brainstorming", "open_qa"]:
+        if searchable_answer in ["open_qa"]:
             return Plugins.SEARCH
         else:
             return Plugins.LOKAL

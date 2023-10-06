@@ -10,3 +10,9 @@ Wer bist du --> general_qa
 ********************
 Was kann ich von dir erwarten ? --> general_qa
 ********************
+Wie geht es dir --> general_qa
+********************
+Wer ist Olaf Scholz --> open_qa
+********************
+Wann wurde Olaf Scholz geboren --> open_qa
+********************

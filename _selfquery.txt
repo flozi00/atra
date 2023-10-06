@@ -78,3 +78,11 @@ geringes BAföG Vermögen (max. 10.000 Euro)</s> ### USER: Wie hoch ist das elte
 ### ASSISTANT:  Hallo, ich bin Egino, ein deutscher KI-Assistent. Ich bin hier, um Ihnen zu helfen und Ihre Fragen zu beantworten. Wie kann ich Ihnen helfen?</s>
 ### USER: Was kannst du denn alles ?</s> -->  Was sind deine Fähigkeiten
 ********************
+### USER: Wie geht es dir ?</s> -->  Wie geht es dir
+********************
+### USER: Wer ist Olaf Scholz</s> -->  Wer ist Olaf Scholz
+********************
+### USER: Wer ist Olaf Scholz</s>
+### ASSISTANT: Olaf Scholz ist ein deutscher Politiker (SPD). Er ist seit dem 8. Dezember 2021 der neunte Bundeskanzler der Bundesrepublik Deutschland.</s>
+### USER: Wann wurde er geboren ?</s> -->  Wann wurde Olaf Scholz geboren
+********************
