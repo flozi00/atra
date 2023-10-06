@@ -18,3 +18,4 @@ data/
 typesense-data/
 *.json*
 *.txt
+!_selfquery.txt

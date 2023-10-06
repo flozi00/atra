@@ -46,7 +46,7 @@ def generate_history_as_string(history: list, message: str) -> str:
         )
     )
 
-    messages += USER_TOKEN + message.rstrip() + END_TOKEN + ASSISTANT_TOKEN
+    messages += "\n" + USER_TOKEN + message.rstrip() + END_TOKEN + ASSISTANT_TOKEN
 
     return messages[-4096 * 3 :].strip()
 

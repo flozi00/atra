@@ -1,0 +1,74 @@
+### USER: Wer bist du ?</s> -->  Wer bist du
+********************
+### USER: Wie ist dein Name ?</s> -->  Was ist dein Name
+********************
+### USER: Wie heist du</s> -->  Wie heist du
+********************
+### USER: Wer bist du</s> -->  Wer bist du
+********************
+### USER: Plane einen Urlaub für mich. Ich bin 3 tage in Italien und möchte Aktivitätsvorschläge haben</s> -->  Urlaubsaktivitäten für 3 Tage in Italien
+********************
+### USER: Ich möchte einen Urlaub planen. Ich bin 3 tage in Italien und möchte Aktivitätsvorschläge haben</s> -->  Urlaubsaktivitäten für 3 Tage in Italien
+********************
+### USER: Erkläre mir was ein Urlaub ist</s> -->  Was ist ein Urlaub
+********************
+### USER: Gib mir eine Definition von Urlaub</s> -->  Was ist ein Urlaub
+********************
+### USER: Wer ist Elon Musk</s> -->  Wer ist Elon Musk
+********************
+### USER: Erkläre mir wer Elon Musk ist</s> -->  Wer ist Elon Musk
+********************
+### USER: Erzähl mir etwas über Barack Obama</s> -->  Wer ist Barack Obama
+********************
+### USER: Erzähl mir etwas über Donald Trump</s> ### USER: Wie alt ist seine Frau</s> --> Wie alt ist Donald Trumps Frau
+********************
+### USER: Was war die erste Partei von Angela Merkel ?</s> ### USER: Seit wann ist sie Bundeskanzlerin</s> -->  Seit wann ist Angela Merkel Bundeskanzlerin
+********************
+### USER: Erkläre mir den Unterschied zwischen der SPD und der CDU</s> -->  Was ist der Unterschied zwischen der SPD und der CDU
+********************
+### USER: Wie ist das Wetter in Berlin</s> ### USER: Und in München</s> -->  Wie ist das Wetter in München
+********************
+### USER: Wie ist das Wetter in München</s> ### USER: Und in Berlin</s> -->  Wie ist das Wetter in Berlin
+********************
+### USER: Wann wurde die Grube Porta Westfalica gebaut</s> ### USER: Und wann wurde sie geschlossen</s> -->  Wann wurde die Grube Porta Westfalica geschlossen
+********************
+### USER: Wie groß ist das Kanzleramt</s> ### USER: Und wie viele Mitarbeiter hat es</s> -->  Wie viele Mitarbeiter hat das Kanzleramt
+********************
+### USER: Wer ist der 45. Präsident der USA</s> ### ASSISTANT: Donald Trump</s> ### USER: Wer ist sein Nachfolger</s> -->  Wer ist der Nachfolger von Donald Trump
+********************
+### USER: Schreibe eine Geschichte über einen kleinen Bären der gerne Honig isst</s> ### USER: Die Geschichte ist mir zu kurz</s> -->  Schreibe eine lange Geschichte über einen kleinen Bären der gerne Honig isst
+********************
+### USER: Wie heist der Ehemann von Angela Merkel</s> ### USER: Und wie heist ihre Mutter</s> -->  Wie heist die Mutter von Angela Merkel
+********************
+### USER: Wie heist die Mutter von Angela Merkel</s> ### USER: Und wie heist ihr Ehemann</s> -->  Wie heist der Ehemann von Angela Merkels Mutter
+********************
+### USER: Wie heist der Ehemann von Angela Merkel</s> ### USER: Und wie heist seine Mutter</s> -->  Wie heist die Mutter von Angela Merkels Ehemann
+********************
+### USER: Wie ist der Vorname von Barack Obama seiner Frau</s> ### ASSISTANT: Michelle</s> ### USER: Und wie ist der Mädchenname von ihr ?</s> -->  Wie ist der Mädchenname von Michelle Obama
+********************
+### USER: Was ist das größte Land der Welt</s> ### USER: Und das kleinste</s> -->  Was ist das kleinste Land der Welt
+********************
+### USER: Was ist das kleinste Land der Welt</s> ### USER: Und das größte</s> -->  Was ist das größte Land der Welt
+********************
+### USER: Wie viele Einwohner hat Deutschland</s> ### USER: Und wie viele hat die USA</s> -->  Wie viele Einwohner hat die USA
+********************
+### USER: Wie viele Einwohner hat die USA</s> ### USER: Und wie viele hat Deutschland</s> -->  Wie viele Einwohner hat Deutschland
+********************
+### USER: Wie viele Einwohner hat Deutschland</s> ### USER: Wieviele davon sind Männer</s> -->  Wie viele Männer leben in Deutschland
+********************
+### USER: Wie viele Einwohner hat Deutschland</s> ### USER: Wieviele davon sind Frauen</s> -->  Wie viele Frauen leben in Deutschland
+********************
+### USER: Wie viele Einwohner hat Deutschland</s> ### USER: Wieviele davon sind Kinder</s> -->  Wie viele Kinder leben in Deutschland
+********************
+### USER: Wieviele Menschen in Deutschland beziehen Bürgergeld</s> ### USER: Was sind die Gründe dafür</s> -->  Warum beziehen Menschen in Deutschland Bürgergeld
+********************
+### USER: Wie hoch ist der Bürgergeld Anspruch in 2024</s> ### ASSISTANT: Der Regelsatz für Alleinstehende beträgt 563€</s>
+### USER: Wie hoch ist der Mindestlohn in 2024</s> ### ASSISTANT: 12,50€</s>
+### USER: Dann bleiben mir weniger als 1500€ im Monat. Nach Abzug der Miete nurnoch 800€. Wie hoch ist die Differenz zum Bürgergeld ?</s> -->  Wie hoch ist die Differenz zwischen 563€ und 800€
+********************
+### USER: Was sind die Vorraussetzungen für BAFÖG</s> ### ASSISTANT: Die Vorraussetzungen für BAFÖG sind folgende: deutsche Staatsangehörigkeit
+Alter (max. 30 bzw. 35)
+geringer Verdienst
+elterliches Einkommen im BAföG-Rahmen
+geringes BAföG Vermögen (max. 10.000 Euro)</s> ### USER: Wie hoch ist das elterliche Einkommen</s> -->  Wie hoch ist das elterliche Einkommen im BAföG-Rahmen
+********************
