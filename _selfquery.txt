@@ -104,3 +104,21 @@ geringes BAföG Vermögen (max. 10.000 Euro)</s> ### USER: Wie hoch ist das elte
 ### ASSISTANT: 9</s>
 ### USER: Wer war vor ihm Kanzler ?</s> -->  Wer war vor Olaf Scholz Kanzler
 ********************
+### USER: Ist Robert Habeck verheiratet ?</s>
+### ASSISTANT: Robert Habeck ist seit 1996 mit Andrea Paluch verheiratet. Das Paar hat vier gemeinsame Söhne.</s>
+### USER: Was ist der Beruf seiner Frau ?</s> -->  Was ist der Beruf von Andrea Paluch
+********************
+### USER: Ist Robert Habeck verheiratet ?</s>
+### ASSISTANT: Robert Habeck ist seit 1996 mit Andrea Paluch verheiratet. Das Paar hat vier gemeinsame Söhne.</s>
+### USER: Was ist der Beruf seiner Frau ?</s>
+### ASSISTANT:  Schriftstellerin, Übersetzerin und Literaturwissenschaftlerin.</s>
+### USER: Wie heisen die Söhne ?</s> -->  Wie heißen die Söhne von Robert Habeck und Andrea Paluch
+********************
+### USER: Ist Robert Habeck verheiratet ?</s>
+### ASSISTANT: Robert Habeck ist seit 1996 mit Andrea Paluch verheiratet. Das Paar hat vier gemeinsame Söhne.</s>
+### USER: Was ist der Beruf seiner Frau ?</s>
+### ASSISTANT:  Schriftstellerin, Übersetzerin und Literaturwissenschaftlerin.</s>
+### USER: Wie heisen die Söhne ?</s>
+### ASSISTANT:  Die Söhne von Robert Habeck heißen: 1, 2, 3, 4.</s>
+### USER: Nenne 3 Bücher die sie geschrieben hat</s> -->  Bücher von Andrea Paluch
+********************

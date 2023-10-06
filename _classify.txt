@@ -32,3 +32,13 @@ Der wievielte Kanzler ist Olaf Scholz --> open_qa
 ********************
 Wer war vor Olaf Scholz Kanzler --> open_qa
 ********************
+Wer bist du --> general_qa
+********************
+Ist Robert Habeck verheiratet ? --> open_qa
+********************
+Was ist der Beruf von Andrea Paluch --> open_qa
+********************
+Wie heißen die Söhne von Robert Habeck --> open_qa
+********************
+3 Bücher die sie geschrieben hat --> brainstorming
+********************

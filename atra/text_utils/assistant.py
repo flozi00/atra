@@ -145,7 +145,7 @@ class Agent:
                 text = text.rstrip(token).rstrip()
 
         self.log_text2text(input=QA_Prompt, output=text, tasktype="qa")
-        yield text
+        yield text.strip()
 
     def re_ranking(self, query: str, options: list) -> str:
         """
@@ -253,4 +253,4 @@ class Agent:
             for token in TOKENS_TO_STRIP:
                 text = text.rstrip(token).rstrip()
 
-        yield text.rstrip()
+        yield text.strip()
