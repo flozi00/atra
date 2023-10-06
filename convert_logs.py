@@ -3,6 +3,7 @@ import datasets
 logs = [
     ["_selfquery.txt", "single-queries-german"],
     ["_classify.txt", "classify-llm-tasks-german"],
+    ["_qa.txt", "qa-tasks-german"],
 ]
 
 

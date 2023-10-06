@@ -59,7 +59,10 @@ def predict(message: str, chatbot: list, url: str):
     )
 
     yield "Classifying Plugin"
-    search_question = agent.generate_selfstanding_query(history_no_tokens)
+    if input_prompt.count(USER_TOKEN) == 1:
+        search_question = message
+    else:
+        search_question = agent.generate_selfstanding_query(history_no_tokens)
     plugin = agent.classify_plugin(search_question)
 
     if plugin == Plugins.SEARCH:

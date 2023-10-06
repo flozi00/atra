@@ -16,3 +16,19 @@ Wer ist Olaf Scholz --> open_qa
 ********************
 Wann wurde Olaf Scholz geboren --> open_qa
 ********************
+Geschenk zum Geburtstag mit Sozialpädagogik und Autismus --> brainstorming
+********************
+Vorschläge für ein Geschenk zum Geburtstag für eine Mutter mit Autismus --> creative_writing
+********************
+Wer bist du --> general_qa
+********************
+Wer bist du --> general_qa
+********************
+Wann wurde Olaf Scholz als Kanzler ernannt --> open_qa
+********************
+Wie viele Kanzler ist Olaf Scholz --> open_qa
+********************
+Der wievielte Kanzler ist Olaf Scholz --> open_qa
+********************
+Wer war vor Olaf Scholz Kanzler --> open_qa
+********************

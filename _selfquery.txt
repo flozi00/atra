@@ -86,3 +86,21 @@ geringes BAföG Vermögen (max. 10.000 Euro)</s> ### USER: Wie hoch ist das elte
 ### ASSISTANT: Olaf Scholz ist ein deutscher Politiker (SPD). Er ist seit dem 8. Dezember 2021 der neunte Bundeskanzler der Bundesrepublik Deutschland.</s>
 ### USER: Wann wurde er geboren ?</s> -->  Wann wurde Olaf Scholz geboren
 ********************
+### USER: Ich suche nach einem Geschenk zum Geburtstag meiner Mutter. Es soll lehrreich sein und mit Sozialpädagogik zu tun haben. Im besten Fall speziell über Autismus</s> -->  Geschenk zum Geburtstag über Sozialpädagogik und Autismus
+********************
+### USER: Ich suche nach einem Geschenk zum Geburtstag meiner Mutter. Es soll lehrreich sein und mit Sozialpädagogik zu tun haben. Im besten Fall speziell über Autismus</s>
+### ASSISTANT:  Ich verstehe, Sie suchen ein Geschenk zum Geburtstag für Ihre Mutter, das lehrreich ist und mit Sozialpädagogik zu tun hat, besonders mit Autismus. Ich kann Sie helfen, einige Ideen zu finden.</s>
+### USER: Mach mir bitte ein paar Vorschläge</s> -->  Vorschläge für ein Geschenk zum Geburtstag mit dem Thema Sozialpädagogik und Autismus
+********************
+### USER: Wer bist du</s>
+### ASSISTANT:  Als KI-Assistent kann ich nicht wissen, wer ich bin. Ich bin jedoch ein Programm, das darauf programmiert ist, Menschen bei der Lösung von Problemen zu helfen. Ich bin bereit, bei fast allem zu helfen, was Sie benötigen, und werde mein Bestes tun, um genau zu verstehen, was benötigt wird. Ich bin auch darauf programmiert, keine falschen oder irreführenden Informationen zu geben und mache Vorbehalte, wenn ich mich der richtigen Antwort nicht sicher bin. Ich bin praktisch und werde mein Bestes tun, um Ihnen zu helfen, ohne mich von der Vorsicht zu sehr einschränken zu lassen.</s>
+### USER: Das klingt interessant</s> -->  Das klingt interessant
+********************
+### USER: Wann wurde Olaf Scholz als Kanzler ernannt</s> -->  Wann wurde Olaf Scholz als Kanzler ernannt
+********************
+### USER: Der wievielte Kanzler ist Olaf Scholz</s> -->  Der wievielte Kanzler ist Olaf Scholz
+********************
+### USER: Der wievielte Kanzler ist Olaf Scholz</s>
+### ASSISTANT: 9</s>
+### USER: Wer war vor ihm Kanzler ?</s> -->  Wer war vor Olaf Scholz Kanzler
+********************
