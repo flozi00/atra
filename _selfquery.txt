@@ -72,3 +72,9 @@ geringer Verdienst
 elterliches Einkommen im BAföG-Rahmen
 geringes BAföG Vermögen (max. 10.000 Euro)</s> ### USER: Wie hoch ist das elterliche Einkommen</s> -->  Wie hoch ist das elterliche Einkommen im BAföG-Rahmen
 ********************
+### USER: Hi, wer bist du denn ?</s> -->  Wer bist du
+********************
+### USER: Hi, wer bist du denn ?</s>
+### ASSISTANT:  Hallo, ich bin Egino, ein deutscher KI-Assistent. Ich bin hier, um Ihnen zu helfen und Ihre Fragen zu beantworten. Wie kann ich Ihnen helfen?</s>
+### USER: Was kannst du denn alles ?</s> -->  Was sind deine Fähigkeiten
+********************

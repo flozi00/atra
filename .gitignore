@@ -17,5 +17,3 @@ data/
 .env
 typesense-data/
 *.json*
-*.txt
-!_selfquery.txt
