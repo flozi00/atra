@@ -224,7 +224,8 @@ class Agent:
             pass
 
         try:
-            text += answer_box.get("answer", "")
+            text += answer_box.get("title", "") + ": "
+            text += answer_box.get("answer", "") + "\n"
         except:
             pass
 

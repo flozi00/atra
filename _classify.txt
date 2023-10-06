@@ -44,3 +44,7 @@ Wie heißen die Söhne von Robert Habeck --> open_qa
 ********************
 Wann wurde Google gegründet --> open_qa
 ********************
+Wann war die Gründung der AFD --> open_qa
+********************
+Der wievielte Präsident war Barack Obama --> open_qa
+********************
