@@ -1,18 +1,30 @@
 import datasets
 
-input, output = [], []
+logs = [
+    ["_selfquery.txt", "single-queries-german"],
+    ["_classify.txt", "classify-llm-tasks-german"],
+]
 
-with open("_selfquery.txt", "r") as f:
-    content = f.read()
 
-content = content.split("********************")
-for entrie in content:
-    if len(entrie) < 10:
-        continue
-    entrie = entrie.split("</s> -->")
-    input.append(entrie[0])
-    output.append(entrie[1])
+def convert_file(filename, ds_name):
+    input, output = [], []
 
-dataset = datasets.Dataset.from_dict({"input": input, "output": output})
+    with open(filename, "r") as f:
+        content = f.read()
 
-dataset.push_to_hub("single-queries-german")
+    content = content.split("********************")
+    for entrie in content:
+        if len(entrie) < 10:
+            continue
+        entrie = entrie.strip()
+        entrie = entrie.split("-->")
+        input.append(entrie[0])
+        output.append(entrie[1])
+
+    dataset = datasets.Dataset.from_dict({"input": input, "output": output})
+
+    dataset.push_to_hub(ds_name)
+
+
+for log in logs:
+    convert_file(log[0], log[1])
