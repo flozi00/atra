@@ -42,3 +42,5 @@ Wie heißen die Söhne von Robert Habeck --> open_qa
 ********************
 3 Bücher die sie geschrieben hat --> brainstorming
 ********************
+Wann wurde Google gegründet --> open_qa
+********************

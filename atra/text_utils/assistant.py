@@ -1,3 +1,4 @@
+import os
 from typing import Iterable
 from sentence_transformers import util
 from huggingface_hub import InferenceClient
@@ -19,6 +20,8 @@ import functools
 from transformers import pipeline
 from optimum.bettertransformer import BetterTransformer
 import torch
+import requests
+import json
 
 
 class Plugins(Enum):
@@ -194,6 +197,44 @@ class Agent:
         return options
 
     @functools.cache
+    def get_serp(self, query: str):
+        url = "https://google.serper.dev/search"
+
+        payload = json.dumps({"q": query, "gl": "de", "hl": "de"})
+        headers = {
+            "X-API-KEY": os.getenv("SERP_API_KEY", ""),
+            "Content-Type": "application/json",
+        }
+
+        text = ""
+        links = []
+        response = requests.request("POST", url, headers=headers, data=payload).json()
+        knowledge_graph = response.get("knowledgeGraph", {})
+        answer_box = response.get("answerBox", {})
+        organic_results = response.get("organic", [])
+
+        try:
+            text += knowledge_graph.get("description", "")
+        except:
+            pass
+
+        try:
+            text += str(knowledge_graph.get("attributes", ""))
+        except:
+            pass
+
+        try:
+            text += answer_box.get("answer", "")
+        except:
+            pass
+
+        for result in organic_results:
+            text += result["snippet"] + "\n"
+            links.append(result["link"])
+
+        return text, links
+
+    @functools.cache
     def get_webpage_content_playwright(self, query: str) -> Iterable[str]:
         """
         Uses Playwright to launch a Chromium browser and navigate to a search engine URL with the given query.
@@ -205,22 +246,15 @@ class Agent:
         Returns:
         - filtered (str): The filtered and re-ranked text content of the webpage.
         """
-        url = "https://duckduckgo.com/?t=h_&ia=web&q=" + urllib.parse.quote(query)
+        serp_text, links = self.get_serp(query)
+        content = ""
         with sync_playwright() as p:
             browser = p.chromium.launch()
             page = browser.new_page()
-            page.goto(url)
-            content = page.locator("body").inner_text()
-            links = page.locator("body").get_by_role("link").all()
-            links = [
-                link.get_attribute("href")
-                for link in links
-                if "https://" in link.get_attribute("href")
-            ][:3]
-            for link in tqdm(links):
+            for link in tqdm(links[:2]):
                 try:
-                    page.goto(link, timeout=5000)
-                    content += page.locator("body").inner_text()
+                    page.goto(link, timeout=3000)
+                    content += page.locator("body").inner_text() + "\n"
                 except Exception as e:
                     print(e, link)
             browser.close()
@@ -231,9 +265,11 @@ class Agent:
             if len(co.split(" ")) > 16:
                 filtered += co + "\n"
 
+        content = serp_text + filtered
+
         # filtered = self.re_ranking(query, filtered.split("\n"))
 
-        return filtered[: 4096 * 3]
+        return content[: 4096 * 3]
 
     def custom_generation(self, query) -> Iterable[str]:
         text = ""
