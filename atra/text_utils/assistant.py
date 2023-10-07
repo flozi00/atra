@@ -122,7 +122,9 @@ class Agent:
         text = ""
         QA_Prompt = (
             QA_SYSTEM_PROMPT
+            + "\n"
             + USER_TOKEN
+            + "\n"
             + context
             + "\n\nFrage: "
             + question
@@ -225,12 +227,12 @@ class Agent:
 
         try:
             text += answer_box.get("title", "") + ": "
-            text += answer_box.get("answer", "") + "\n"
+            text += answer_box.get("answer", "") + "\n\n"
         except:
             pass
 
         for result in organic_results:
-            text += result["snippet"] + "\n"
+            text += result["snippet"] + "\n\n"
             links.append(result["link"])
 
         return text, links
@@ -255,7 +257,7 @@ class Agent:
             for link in tqdm(links[:2]):
                 try:
                     page.goto(link, timeout=3000)
-                    content += page.locator("body").inner_text() + "\n"
+                    content += page.locator("body").inner_text() + "\n\n"
                 except Exception as e:
                     print(e, link)
             browser.close()
