@@ -122,3 +122,21 @@ geringes BAföG Vermögen (max. 10.000 Euro)</s> ### USER: Wie hoch ist das elte
 ### ASSISTANT:  Die Söhne von Robert Habeck heißen: 1, 2, 3, 4.</s>
 ### USER: Nenne 3 Bücher die sie geschrieben hat</s> -->  Bücher von Andrea Paluch
 ********************
+### USER: Current time of day</s>
+### ASSISTANT: Es tut mir leid, aber ich kann keine genaue Antwort auf diese Frage geben, da ich nicht weiß, welche Zeitzone oder welche Uhrzeit Sie meinen. Bitte geben Sie mir mehr Informationen, damit ich Ihnen besser helfen kann.</s>
+### USER: Entfernung zum Mond</s> -->  Wie weit ist der Mond von der Erde entfernt?
+********************
+### USER: Current time of day</s>
+### ASSISTANT: Es tut mir leid, aber ich kann keine genaue Antwort auf diese Frage geben, da ich nicht weiß, welche Zeitzone oder welche Uhrzeit Sie meinen. Bitte geben Sie mir mehr Informationen, damit ich Ihnen besser helfen kann.</s>
+### USER: Entfernung zum Mond</s>
+### ASSISTANT: Der Abstand zwischen Erde und Mond beträgt im zeitlichen Mittel rund 384.400 Kilometer.</s>
+### USER: Gibt es eine dunkle Seite des Monds?</s> -->  Gibt es eine dunkle Seite des Mondes?
+********************
+### USER: Current time of day</s>
+### ASSISTANT: Es tut mir leid, aber ich kann keine genaue Antwort auf diese Frage geben, da ich nicht weiß, welche Zeitzone oder welche Uhrzeit Sie meinen. Bitte geben Sie mir mehr Informationen, damit ich Ihnen besser helfen kann.</s>
+### USER: Entfernung zum Mond</s>
+### ASSISTANT: Der Abstand zwischen Erde und Mond beträgt im zeitlichen Mittel rund 384.400 Kilometer.</s>
+### USER: Gibt es eine dunkle Seite des Monds?</s>
+### ASSISTANT: Ja, der Mond hat eine dunkle Seite, die nicht von der Erde aus sichtbar ist. Diese Seite ist aufgrund der Gravitationswirkung der Erde und des Mondes nicht beleuchtet.</s>
+### USER: Das ist falsch</s> -->  Das ist falsch
+********************

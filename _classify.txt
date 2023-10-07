@@ -48,3 +48,11 @@ Wann war die Gründung der AFD --> open_qa
 ********************
 Der wievielte Präsident war Barack Obama --> open_qa
 ********************
+Current time of day --> creative_writing
+********************
+Wie weit ist der Mond von der Erde entfernt? --> open_qa
+********************
+Gibt es eine dunkle Seite des Mondes? --> open_qa
+********************
+Was ist das falsche an dieser Aussage? --> general_qa
+********************
