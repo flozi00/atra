@@ -9,12 +9,7 @@ An example of training large ASR models on small hardware take a look at the sim
 
 ## How to install
 The fastest way to run is using docker:
-example given:
-tiny model
 
-```
-docker run --gpus '"device=0"' -e ASR_MODEL="openai/whisper-tiny" -p 7868:7860  flozi00/atra:latest asrapp.py
-```
 
 # for default german speech recognition model
 ```
