@@ -25,3 +25,8 @@ docker run -d --gpus '"device=0"' -p 7862:7860  flozi00/atra:latest asrapp.py
 ```
 docker run -d --gpus '"device=0"' -p 7861:7860  flozi00/atra:latest sdapp.py
 ```
+
+# Jupyter notebook development
+```
+docker run -d --gpus '"device=0"' -p 8888:8888  flozi00/atra:latest devapp.py
+```
