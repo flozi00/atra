@@ -119,7 +119,7 @@ chatter = gr.Chatbot()
 def build_chat_ui():
     with gr.Blocks() as demo:
         GET_GLOBAL_HEADER()
-        chat_ui = gr.ChatInterface(
+        gr.ChatInterface(
             predict,
             chatbot=chatter,
             additional_inputs=[gr.Textbox(lines=1, label="Domain")],

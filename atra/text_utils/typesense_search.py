@@ -1,29 +1,45 @@
 import typesense
 import os
-from optimum.onnxruntime import ORTModelForFeatureExtraction
-from transformers import AutoTokenizer
+from transformers import AutoTokenizer, AutoModel
 import torch
+import torch.nn.functional as F
+
+from torch import Tensor
 
 
 class Embedder:
     def __init__(self, model_path: str) -> None:
-        self.model = ORTModelForFeatureExtraction.from_pretrained(
-            model_path, subfolder="onnx"
-        )
+        self.model = AutoModel.from_pretrained(model_path)
         self.tokenizer = AutoTokenizer.from_pretrained(model_path)
+        self.model = torch.compile(self.model, mode="max-autotune")
+
+    def average_pool(
+        self, last_hidden_states: Tensor, attention_mask: Tensor
+    ) -> Tensor:
+        last_hidden = last_hidden_states.masked_fill(
+            ~attention_mask[..., None].bool(), 0.0
+        )
+        return last_hidden.sum(dim=1) / attention_mask.sum(dim=1)[..., None]
 
     def encode(self, sentences: list) -> torch.Tensor:
-        tokenized_input = self.tokenizer(
-            sentences, padding=True, truncation=True, return_tensors="pt"
+        # Tokenize the input texts
+        batch_dict = self.tokenizer(
+            sentences,
+            max_length=512,
+            padding=True,
+            truncation=True,
+            return_tensors="pt",
         )
-        with torch.no_grad():
-            model_output = self.model(**tokenized_input)
-            # Perform pooling. In this case, cls pooling.
-            sentence_embeddings = model_output[0][:, 0]
-        sentence_embeddings = torch.nn.functional.normalize(
-            sentence_embeddings, p=2, dim=1
+
+        outputs = self.model(**batch_dict)
+        embeddings = self.average_pool(
+            outputs.last_hidden_state, batch_dict["attention_mask"]
         )
-        return sentence_embeddings
+
+        # normalize embeddings
+        embeddings = F.normalize(embeddings, p=2, dim=1)
+
+        return embeddings
 
 
 class SemanticSearcher:

@@ -4,7 +4,6 @@ from sentence_transformers import util
 from huggingface_hub import InferenceClient
 import torch
 from playwright.sync_api import sync_playwright
-import urllib.parse
 from enum import Enum
 from tqdm.auto import tqdm
 from atra.text_utils.prompts import (
@@ -268,9 +267,9 @@ class Agent:
             if len(co.split(" ")) > 16:
                 filtered += co + "\n"
 
-        content = serp_text + filtered
-
         # filtered = self.re_ranking(query, filtered.split("\n"))
+
+        content = serp_text + filtered
 
         return content[: 4096 * 3]
 
