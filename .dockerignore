@@ -26,4 +26,3 @@ coverage.xml
 *.safetensors
 *.json*
 *.csv
-*.txt
