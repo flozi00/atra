@@ -56,3 +56,5 @@ Gibt es eine dunkle Seite des Mondes? --> open_qa
 ********************
 Was ist das falsche an dieser Aussage? --> general_qa
 ********************
+Wo wurde Olaf Scholz geboren --> open_qa
+********************
