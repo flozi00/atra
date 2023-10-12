@@ -3,15 +3,20 @@ import os
 from transformers import AutoTokenizer, AutoModel
 import torch
 import torch.nn.functional as F
+from optimum.bettertransformer import BetterTransformer
 
 from torch import Tensor
+
+from atra.utils import timeit
 
 
 class Embedder:
     def __init__(self, model_path: str) -> None:
         self.model = AutoModel.from_pretrained(model_path)
+        if torch.cuda.is_available():
+            self.model = self.model.cuda()
         self.tokenizer = AutoTokenizer.from_pretrained(model_path)
-        self.model = torch.compile(self.model, mode="max-autotune")
+        self.model = BetterTransformer.transform(self.model)
 
     def average_pool(
         self, last_hidden_states: Tensor, attention_mask: Tensor
@@ -30,6 +35,8 @@ class Embedder:
             truncation=True,
             return_tensors="pt",
         )
+        if torch.cuda.is_available():
+            batch_dict = {k: v.cuda() for k, v in batch_dict.items()}
 
         outputs = self.model(**batch_dict)
         embeddings = self.average_pool(
@@ -75,6 +82,7 @@ class SemanticSearcher:
     def create_collection(self) -> None:
         self.client.collections.create(self.schema)
 
+    @timeit
     def upsert_documents(self, articles: list, sources: list) -> None:
         for i in range(len(articles)):
             articles[i] = "passage: " + articles[i]
@@ -90,6 +98,7 @@ class SemanticSearcher:
     def delete_collection(self):
         self.client.collections[self.collection_name].delete()
 
+    @timeit
     def semantic_search(self, query: str) -> list:
         search_params = {
             "searches": [

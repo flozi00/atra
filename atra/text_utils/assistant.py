@@ -267,11 +267,11 @@ class Agent:
             if len(co.split(" ")) > 16:
                 filtered += co + "\n"
 
-        # filtered = self.re_ranking(query, filtered.split("\n"))
+        filtered = self.re_ranking(query, filtered.split("\n"))
 
         content = serp_text + filtered
 
-        return content[: 4096 * 3]
+        return content[: 3072 * 3]
 
     def custom_generation(self, query) -> Iterable[str]:
         text = ""
