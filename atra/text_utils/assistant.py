@@ -215,12 +215,12 @@ class Agent:
         organic_results = response.get("organic", [])
 
         try:
-            text += knowledge_graph.get("description", "")
+            text += "passage: " + knowledge_graph.get("description", "")
         except:
             pass
 
         try:
-            text += str(knowledge_graph.get("attributes", ""))
+            text += "passage: " + str(knowledge_graph.get("attributes", ""))
         except:
             pass
 
@@ -231,7 +231,7 @@ class Agent:
             pass
 
         for result in organic_results:
-            text += result["snippet"] + "\n\n"
+            text += "passage: " + result["snippet"] + "\n"
             links.append(result["link"])
 
         return text, links
@@ -267,7 +267,12 @@ class Agent:
             if len(co.split(" ")) > 16:
                 filtered += co + "\n"
 
-        filtered = self.re_ranking(query, filtered.split("\n"))
+        filtered_words = filtered.split(" ")
+        filtered = []
+        for i in range(0, len(filtered_words), 200):
+            filtered.append(" ".join(filtered_words[i : i + 250]))
+
+        filtered = self.re_ranking(query, filtered)
 
         content = serp_text + filtered
 

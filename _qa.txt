@@ -209,3 +209,57 @@ Frage: Wo wurde Olaf Scholz geboren
 
 </s>### ASSISTANT:  Antwort:  -->  Olaf Scholz wurde in Osnabrück geboren.
 ********************
+### SYSTEM: Im Folgenden beantwortet eine deutsche KI anhand der gegebenen passagen die Frage so gut wie möglich.
+Bei der Beantwortung der Frage wird sich auf die passagen bezogen und keine Informationen ausgedacht.
+Wenn die Beantwortung nicht möglich ist wird dies mitgeteilt.
+Die Antwort beinhaltet keine unnötigen Informationen, aber die Quellenangaben.</s>
+### USER: 
+Angela Merkel / Geburtsort: Hamburg
+
+Angela Merkel wurde im Elim-Krankenhaus im Hamburger Stadtteil Eimsbüttel als erstes Kind des evangelischen Theologen Horst Kasner (* 6. August 1926 in Berlin; ...
+
+Geboren wird Angela Dorothea Kasner am 17. Juli 1954 in Hamburg als Tochter des evangelischen Theologen Horst Kasner und der Lehrerin Herlind Kasner, geb.
+
+Die Tochter des evangelischen Theologen Horst Kasner und seiner Frau Herlind wurde am 17. Juli 1954 als Angela Dorothea Kasner geboren. ... Angela Merkel wurde ...
+
+Geboren am 17. Juli 1954 in Hamburg; evangelisch; verheiratet. Abitur 1973 in Templin. Physikstudium an der Universität Leipzig 1973 bis 1978.
+
+Der Steckbrief von Angela Merkel begann 1954 in Hamburg als Angela Kasner. Die Familie zog kurz nach ihrer Geburt in die DDR, denn ihr Vater Horst Kasner sollte ...
+
+Biografie Angela Merkel. Geboren am 17. Juli 1954 in Hamburg; evangelisch ... Link kopieren. Angela Merkel. Foto: Bundesregierung/Eckel. 1973, Abitur in Templin.
+
+Elternhaus und Geschwister Angela Dorothea Kasner wurde am 17. Juli 1954 in Hamburg-Barmbek geboren. Hier hatten sich ihre Eltern während des Studiums ihres ...
+
+Angela Merkel wurde am 17. Juli 1954 in Hamburg geboren. Wenige Wochen später trat ihr Vater eine Pfarrstelle in der damaligen DDR an und ...
+
+Geboren wurde Angela Merkel am 17. Juli 1954 in Hamburg als Angela Dorothea Kasner. Schon wenige Wochen später zog die Familie nach Quitzow in Brandenburg ...
+
+passage: Angela[1] Dorothea Merkel (geb. Kasner; * 17. Juli 1954 in Hamburg) ist eine ehemalige deutsche Politikerin (CDU). Sie war vom 22. November 2005 bis zum 8. Dezember 2021 achter Bundeskanzler und als Frau die erste Bundeskanzlerin der Bundesrepublik Deutschland. Sie war im Amt des Bundeskanzlers sowohl die erste Person aus Ostdeutschland als auch die erste nach der Gründung der Bundesrepublik geborene Person.
+Merkel wuchs in der DDR auf und war dort als Physikerin am Zentralinstitut für Physikalische Chemie tätig. Erstmals politisch aktiv wurde sie während der Wendezeit in der Partei Demokratischer Aufbruch, die sich 1990 der CDU anschloss. In der ersten und gleichzeitig letzten demokratisch gewählten Regierung der DDR übte sie das Amt der stellvertretenden Regierungssprecherin aus.
+Bei der Bundestagswahl am 2. Dezember 1990 errang sie erstmals ein Bundestagsmandat. Bei den folgenden sieben Bundestagswahlen wurde sie in ihrem Wahlkreis in Vorpommern direkt gewählt.[2] Von 1991 bis 1994 war Merkel Bundesministerin für Frauen und Jugend im Kabinett Kohl IV und von 1994 bis 1998 Bundesministerin für Umwelt, Naturschutz und Reaktorsicherheit im Kabinett Kohl V. Von 1998 bis zu ihrer Wahl zur Bundesvorsitzenden der Partei im Jahr 2000 amtierte sie als Generalsekretärin der CDU. Von April 2000 bis Dezember 2018 war sie Bundesvorsitzende der CDU.
+Nach dem knappen Sieg der Unionsparteien bei der vorgezogenen Bundestagswahl 2005 löste Merkel Gerhard Schröder (SPD) als Bundeskanzler ab. Als Regierungschefin führte sie zunächst bis 2009 eine große Koalition mit der SPD (Kabinett Merkel I). Nach der Bundestagswahl 2009 ging sie mit der FDP eine schwarz-gelbe Koalition ein (Kabinett Merkel II),
+passage: zu den Urhebern und zum Lizenzstatus eingebundener Mediendateien (etwa Bilder oder Videos) können im Regelfall durch Anklicken dieser abgerufen werden. Möglicherweise unterliegen die Inhalte jeweils zusätzlichen Bedingungen. Durch die Nutzung dieser Website erklären Sie sich mit den Nutzungsbedingungen und der Datenschutzrichtlinie einverstanden.
+Diese Webseite verwendet Cookies, die für den Betrieb und die Sicherheit der Seite notwendig sind. Darüber hinaus sammelt die Webseite anonyme Nutzerdaten für statistische Analysen und um eingebundene Inhalte externer Seiten anzuzeigen. Die Cookie-Einstellungen können Sie jederzeit ändern. Erfahren Sie mehr
+Als Angela Merkel 2005 ihr Amt im Alter von 51 Jahren antrat, war sie die jüngste der bislang acht Amtsinhaber. Inzwischen gehört sie zu den Regierungschefs, die am längsten amtieren. Ende des Jahres 2019 hat sie Konrad Adenauer eingeholt. Scheidet sie 2021 aus dem Amt, hat Angela Merkel mit Helmut Kohl, der bisher die längste Zeit regierte, gleichgezogen.
+Bundeskanzlerin Angela Merkel anlässlich des 50. Todestages von Konrad Adenauer an der Seite seiner Tochter Libet Werhahn und Hans-Gert Pöttering.
+Bundeskanzlerin Angela Merkel anlässlich des 50. Todestages von Konrad Adenauer an der Seite seiner Tochter Libet Werhahn und Hans-Gert Pöttering.
+Geboren wird Angela Dorothea Kasner am 17. Juli 1954 in Hamburg als Tochter des evangelischen Theologen Horst Kasner und der Lehrerin Herlind Kasner, geb. Jentzsch. Wenige Wochen nach der Geburt übernimmt ihr Vater im Dorf Quitzow, heute ein Teil von Perleberg, eine Pfarrstelle in der von Bischof Otto Dibelius geleiteten Evangelischen Kirche in Berlin-Brandenburg. Der Vater wird als Horst Kazmierczak 1926 in Berlin geboren. Die Eltern stammen aus Posen, das nach den Regelungen des
+passage: dem knappen Sieg der Unionsparteien bei der vorgezogenen Bundestagswahl 2005 löste Merkel Gerhard Schröder (SPD) als Bundeskanzler ab. Als Regierungschefin führte sie zunächst bis 2009 eine große Koalition mit der SPD (Kabinett Merkel I). Nach der Bundestagswahl 2009 ging sie mit der FDP eine schwarz-gelbe Koalition ein (Kabinett Merkel II), der 2013 eine erneute große Koalition folgte, die auch nach der Bundestagswahl 2017 fortgesetzt wurde (Kabinett Merkel III und IV). Am 29. Oktober 2018 kündigte sie an, zur Bundestagswahl 2021 nicht mehr zu kandidieren.[3]
+Merkel galt während des Großteils ihrer Amtszeit als Bundeskanzlerin international als De-facto-Anführerin der Europäischen Union und als mächtigste Frau der Welt.[4]
+Angela Merkel wurde im Elim-Krankenhaus im Hamburger Stadtteil Eimsbüttel als erstes Kind des evangelischen Theologen Horst Kasner (* 6. August 1926 in Berlin; † 2. September 2011 ebenda) und seiner Frau Herlind Kasner, geb. Jentzsch (* 8. Juli 1928 in Danzig; † 6. April 2019 in Berlin[5]), geboren. Horst Kasner hatte ab 1948 an den Universitäten Heidelberg und Hamburg sowie an der Kirchlichen Hochschule Bethel in Bielefeld Theologie studiert. Seine Frau Herlind war Lehrerin für Latein und Englisch.
+Noch 1954, einige Wochen nach der Geburt der Tochter, siedelte die Familie von Hamburg-Eppendorf, Isestraße 95, in die DDR über. Für die Evangelische Kirche in Berlin-Brandenburg trat Horst Kasner im Dorf Quitzow (heute ein Ortsteil von Perleberg) eine Pfarrstelle an. Angela Merkel ist ebenfalls evangelisch.
+1957 wechselte Kasner dauerhaft nach Templin in der Uckermark, um sich am Aufbau einer innerkirchlichen Weiterbildungsstelle zu beteiligen. Dort wuchs Angela Merkel im Haus Fichtengrund auf. Ihre
+passage: die Evangelische Kirche in Berlin-Brandenburg trat Horst Kasner im Dorf Quitzow (heute ein Ortsteil von Perleberg) eine Pfarrstelle an. Angela Merkel ist ebenfalls evangelisch.
+1957 wechselte Kasner dauerhaft nach Templin in der Uckermark, um sich am Aufbau einer innerkirchlichen Weiterbildungsstelle zu beteiligen. Dort wuchs Angela Merkel im Haus Fichtengrund auf. Ihre Mutter war aufgrund des Pfarrberufs des Vaters im Schuldienst der DDR unerwünscht.[6] Am 7. Juli 1957 wurde Angelas Bruder Marcus, am 19. August 1964 ihre Schwester Irene geboren.
+In Polen erregte 2013 die Entdeckung ihrer polnischen Wurzeln Aufmerksamkeit: Ihr Großvater, der Polizeibeamte Ludwig Kasner (1896–1959), hatte als Ludwig Kazmierczak als Pole im Deutschen Kaiserreich in Posen gelebt, im Ersten Weltkrieg erst für die deutsche Armee und dann als Angehöriger der polnischen Haller-Armee möglicherweise gegen die deutsche Armee an der Westfront gekämpft.[7] Er siedelte später nach Berlin über.
+1961 wurde Angela Kasner an der Polytechnischen Oberschule (POS) in Templin (heute Aktive Naturschule Templin) eingeschult. Sie zeigte überdurchschnittliche schulische Leistungen, in den Schulfächern Russisch und Mathematik war sie Klassenbeste. Sie gewann Russisch-Olympiaden bis hin zur DDR-Ebene – ihre Russischlehrerin bezeichnete sie als „hochbegabt“, „ehrgeizig“ und „schüchtern“[8] – und war Mitglied der Freien Deutschen Jugend (FDJ).[9] Bei den Mitschülern war Kasner (Spitzname „Kasi“) „superbeliebt“ und „superschlau“, sie „[h]abe andere immer abschreiben lassen“.[10] 1973 legte sie in der Klasse 12b der Erweiterten Oberschule (EOS) in Templin das Abitur mit der Note 1,0 ab[11] und erhielt die Lessing-Medaille.[10]
+Kasner hatte sich bereits während ihrer Schulzeit für das Studium der Physik an der Karl-Marx-Universität (heute: „Universität Leipzig“) in Leipzig entschieden, das
+passage: Staaten abgeschwächt und von der Vollversammlung der Vereinten Nationen am 26. November 2013 einstimmig beschlossen.[126][127][128][129]
+Am 22. September 2013 fand die Wahl zum 18. Deutschen Bundestag statt. Während die Unionsparteien mit 41,5 Prozent das beste Zweitstimmenergebnis seit 1990 erhielten, schaffte der bisherige Koalitionspartner, die FDP, den Wiedereinzug in den Bundestag mit 4,8 Prozent erstmals seit 1949 nicht. Merkel selbst siegte im Wahlkreis 15 (Stralsund – Nordvorpommern – Rügen) mit 56,2 Prozent der Erststimmen und erreichte damit einen Zuwachs von 6,9 Proz
+
+Frage: Wo wurde Angela Merkel geboren
+
+</s>### ASSISTANT:  Antwort:  --> 
+
+Angela Merkel wurde im Elim-Krankenhaus im Hamburger Stadtteil Eimsbüttel als erstes Kind des evangelischen Theologen Horst Kasner und seiner Frau Herlind Kasner, geb. Jentzsch geboren.
+********************
