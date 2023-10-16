@@ -13,7 +13,7 @@ from atra.text_utils.typesense_search import Embedder
 
 embedder = Embedder("intfloat/multilingual-e5-large")
 
-client = InferenceClient(model=os.environ.get("LLM", "http://127.0.0.1:8080"))
+client = InferenceClient(model=os.getenv("LLM", "http://127.0.0.1:8080"))
 
 agent = Agent(client, embedder)
 
