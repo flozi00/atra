@@ -30,6 +30,7 @@ class Plugins(Enum):
 pipe = pipeline(
     "text2text-generation",
     model="flozi00/t5-base-llm-tasks",
+    device=-1,
 )
 pipe.model = BetterTransformer.transform(pipe.model)
 pipe.model = torch.compile(pipe.model, mode="max-autotune")
