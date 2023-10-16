@@ -60,3 +60,5 @@ Wo wurde Olaf Scholz geboren --> open_qa
 ********************
 Wo wurde Angela Merkel geboren --> open_qa
 ********************
+Wer bist du --> general_qa
+********************

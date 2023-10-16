@@ -1,6 +1,9 @@
 import time
 from datetime import datetime
 from functools import wraps
+from functools import lru_cache, update_wrapper
+from typing import Callable, Any
+from math import floor
 
 
 def timeit(func):
@@ -16,12 +19,6 @@ def timeit(func):
         return result
 
     return timeit_wrapper
-
-
-from functools import lru_cache, update_wrapper
-from typing import Callable, Any
-from math import floor
-import time
 
 
 def ttl_cache(maxsize: int = 128, typed: bool = False, ttl: int = -1):

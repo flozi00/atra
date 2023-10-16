@@ -17,6 +17,8 @@ def convert_file(filename, ds_name):
     for entrie in content:
         if len(entrie) < 10:
             continue
+        if entrie[0] in input:
+            continue
         entrie = entrie.strip()
         entrie = entrie.split("-->")
         input.append(entrie[0])

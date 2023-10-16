@@ -18,7 +18,6 @@ from atra.text_utils.typesense_search import SemanticSearcher, Embedder
 import functools
 from transformers import pipeline
 from optimum.bettertransformer import BetterTransformer
-import torch
 import requests
 import json
 
@@ -31,8 +30,6 @@ class Plugins(Enum):
 pipe = pipeline(
     "text2text-generation",
     model="flozi00/t5-base-llm-tasks",
-    device=0,
-    torch_dtype=torch.float16,
 )
 pipe.model = BetterTransformer.transform(pipe.model)
 pipe.model = torch.compile(pipe.model, mode="max-autotune")
@@ -88,7 +85,8 @@ class Agent:
         Generates a search question based on the given history using the LLM.
 
         Args:
-            history (str): The history to use as context for generating the search question.
+            history (str): The history to use as context
+            for generating the search question.
 
         Returns:
             str: The generated search question.
@@ -160,7 +158,8 @@ class Agent:
             options (list): A list of strings representing the options to be ranked.
 
         Returns:
-            str: A string containing the top-ranked options that have a cosine similarity score greater than 0.7.
+            str: A string containing the top-ranked options that have a
+            cosine similarity score greater than 0.7.
         """
         corpus = ["passage: " + o for o in options]
         query = "query: " + query
@@ -181,7 +180,8 @@ class Agent:
 
     def get_data_from_typesense(self, query: str) -> str:
         """
-        Searches for data in Typesense using the given query and returns an iterable of passages containing the query.
+        Searches for data in Typesense using the given query and returns an
+        iterable of passages containing the query.
 
         Args:
             query (str): The query to search for in Typesense.
@@ -216,18 +216,18 @@ class Agent:
 
         try:
             text += "passage: " + knowledge_graph.get("description", "")
-        except:
+        except Exception:
             pass
 
         try:
             text += "passage: " + str(knowledge_graph.get("attributes", ""))
-        except:
+        except Exception:
             pass
 
         try:
             text += answer_box.get("title", "") + ": "
             text += answer_box.get("answer", "") + "\n\n"
-        except:
+        except Exception:
             pass
 
         for result in organic_results:
@@ -239,7 +239,8 @@ class Agent:
     @functools.cache
     def get_webpage_content_playwright(self, query: str) -> Iterable[str]:
         """
-        Uses Playwright to launch a Chromium browser and navigate to a search engine URL with the given query.
+        Uses Playwright to launch a Chromium browser and navigate
+        to a search engine URL with the given query.
         Returns the filtered and re-ranked text content of the webpage.
 
         Args:

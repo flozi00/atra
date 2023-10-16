@@ -9,7 +9,6 @@ from atra.text_utils.prompts import (
 from atra.text_utils.assistant import Agent, Plugins
 from huggingface_hub import InferenceClient
 import os
-import csv
 from atra.text_utils.typesense_search import Embedder
 
 embedder = Embedder("intfloat/multilingual-e5-large")
@@ -106,9 +105,9 @@ def label_chat(history: list, message: str) -> str:
 def on_like(evt: gr.LikeData, history: list) -> None:
     chat = label_chat(history, evt.value)
 
-    with open("chat-feedback.csv", mode="a+") as file:
-        writer = csv.writer(file)
-        writer.writerow([chat, "Liked" if evt.liked else "Disliked"])
+    agent.log_text2text(
+        input=chat, output="Liked" if evt.liked else "Disliked", tasktype="Feedback"
+    )
 
     return gr.Info("Thanks for your feedback!")
 

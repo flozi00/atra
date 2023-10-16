@@ -7,7 +7,7 @@ searcher = SemanticSearcher(embedder=embedder)
 
 try:
     searcher.delete_collection()
-except:
+except Exception:
     pass
 searcher.create_collection()
 for x in range(1):
