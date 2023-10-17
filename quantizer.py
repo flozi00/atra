@@ -15,9 +15,9 @@ def convert_model(BITS, model):
     pretrained_model_dir = model
     quantized_model_dir = f"{pretrained_model_dir.split('/')[-1]}-{BITS}bit-autogptq"
 
-    ds = datasets.load_dataset(
-        "flozi00/conversations", split="train", cache_dir="./downloadcache"
-    ).select(range(50))["conversations"]
+    ds = datasets.load_dataset("flozi00/conversations", split="train").select(
+        range(50)
+    )["conversations"]
 
     tokenizer = AutoTokenizer.from_pretrained(
         pretrained_model_dir, use_fast=True, legacy=False

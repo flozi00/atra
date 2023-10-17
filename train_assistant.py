@@ -31,10 +31,7 @@ def combine_strings(strings):
 
 
 def main():
-    ds = datasets.load_dataset(
-        "flozi00/conversations", split="train", cache_dir="./downloadcache"
-    )
-    labels = ds.unique("labels")
+    ds = datasets.load_dataset("flozi00/conversations", split="train")
 
     # load model, processor by using the get_model function
     model, processor = get_model(
@@ -52,7 +49,7 @@ def main():
 
     ds_part = Dataset.from_dict(
         {
-            "conversations": combine_strings(ds_part["conversations"]),
+            "conversations": combine_strings(ds["conversations"]),
         }
     )
 

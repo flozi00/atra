@@ -15,9 +15,7 @@ LR = 1e-5
 
 
 def main():
-    ds = datasets.load_dataset(
-        "flozi00/LLM-Task-Classification", split="train", cache_dir="./downloadcache"
-    )
+    ds = datasets.load_dataset("flozi00/LLM-Task-Classification", split="train")
 
     model, processor = get_model(
         task=TASK,
