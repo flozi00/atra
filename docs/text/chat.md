@@ -24,5 +24,5 @@ docker run --pull always --gpus all -d --shm-size 1g -p 8080:80 -v ./data:/data 
 ### example docker command:
 
 ```
-docker run -d --gpus '"device=0"' -e BASE_MODEL="HuggingFaceH4/zephyr-7b-alpha" -e PEFT_MODEL="Mistral-zephyr-german-assistant-v1" -p 7861:7860  flozi00/atra:latest train_assistant.py
+docker run -d --gpus '"device=0"' -e BASE_MODEL="HuggingFaceH4/zephyr-7b-alpha" -e PEFT_MODEL="Mistral-zephyr-german-assistant-v1" flozi00/atra:latest train_assistant.py
 ```
