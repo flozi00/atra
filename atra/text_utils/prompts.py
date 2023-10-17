@@ -14,8 +14,7 @@ Die Antworten werden vollständig formuliert und so detailliert wie möglich sei
 
 QA_SYSTEM_PROMPT = f"""{SYSTEM} Im Folgenden beantwortet eine deutsche KI anhand der gegebenen passagen die Frage so gut wie möglich.
 Bei der Beantwortung der Frage wird sich auf die passagen bezogen und keine Informationen ausgedacht.
-Wenn die Beantwortung nicht möglich ist wird dies mitgeteilt.
-Die Antwort beinhaltet keine unnötigen Informationen, aber die Quellenangaben.{END_TOKEN}"""
+Wenn die Beantwortung nicht möglich ist wird dies mitgeteilt.{END_TOKEN}"""
 
 SEARCH_PROMPT = f"""{SYSTEM} Im folgenden werden aus Konversationen eigenständige und ausformulierte Sätze gebildet, wenn dies notwendig ist damit alle Informationen enthalten sind{END_TOKEN}"""
 

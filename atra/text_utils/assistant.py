@@ -57,7 +57,7 @@ class Agent:
         """
         Logs a text2text to txt file.
         """
-        with open(f"_{tasktype}.txt", mode="a+") as file:
+        with open(f"logging/_{tasktype}.txt", mode="a+") as file:
             file.write(f"{input} --> {output}".strip())
             file.write("\n" + "*" * 20 + "\n")
 

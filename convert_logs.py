@@ -4,14 +4,14 @@ logs = [
     ["_selfquery.txt", "single-queries-german"],
     ["_classify.txt", "classify-llm-tasks-german"],
     ["_qa.txt", "qa-tasks-german"],
-    ["Feedback.txt", "chat-feedback-german"],
+    ["_Feedback.txt", "chat-feedback-german"],
 ]
 
 
 def convert_file(filename, ds_name):
     input, output = [], []
 
-    with open(filename, "r") as f:
+    with open(f"logging/{filename}", "r") as f:
         content = f.read()
 
     content = content.split("********************")
