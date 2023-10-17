@@ -9,8 +9,8 @@ import simplepeft.train.train
 simplepeft.train.train.ACCUMULATION_STEPS = 4
 
 BATCH_SIZE = 2
-BASE_MODEL = "flozi00/Mistral-7B-german-assistant-v2"
-PEFT_MODEL = "Mistral-7B-german-assistant-v2-MoE-"
+BASE_MODEL = "HuggingFaceH4/zephyr-7b-alpha"
+PEFT_MODEL = "Mistral-7B-german-assistant-v3"
 TASK = Tasks.TEXT_GEN
 LR = 1e-5
 

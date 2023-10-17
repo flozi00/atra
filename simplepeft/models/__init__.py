@@ -191,6 +191,8 @@ def get_model(
                     isinstance(module, bnb.nn.Linear4bit)
                     or isinstance(module, bnb.nn.Linear8bitLt)
                     or isinstance(module, torch.nn.Linear)
+                    or isinstance(module, torch.nn.Embedding)
+                    or isinstance(module, bnb.nn.StableEmbedding)
                 ):
                     names = name.split(".")
                     lora_module_names.add(names[0] if len(names) == 1 else names[-1])
