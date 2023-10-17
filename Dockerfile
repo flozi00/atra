@@ -6,6 +6,7 @@ COPY . /atra-server
 WORKDIR /atra-server
 
 RUN pip install -r requirements.txt
+RUN pip install flash-attn --no-build-isolation --upgrade
 RUN playwright install
 
 RUN chmod +x ./entrypoint.sh
