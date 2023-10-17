@@ -5,19 +5,20 @@ from simplepeft.utils import Tasks
 from datasets import Dataset
 from peft import PeftModelForCausalLM
 import simplepeft.train.train
+import os
 
-simplepeft.train.train.ACCUMULATION_STEPS = 4
+simplepeft.train.train.ACCUMULATION_STEPS = int(os.getenv("ACCUMULATION_STEPS", 4))
 
-BATCH_SIZE = 2
-BASE_MODEL = "HuggingFaceH4/zephyr-7b-alpha"
-PEFT_MODEL = "Mistral-7B-german-assistant-v3"
+BATCH_SIZE = int(os.getenv("BATCH_SIZE", 1))
+BASE_MODEL = os.getenv("BASE_MODEL", "HuggingFaceH4/zephyr-7b-alpha")
+PEFT_MODEL = os.getenv("PEFT_MODEL", "Mistral-zephyr-german-assistant-v1")
 TASK = Tasks.TEXT_GEN
 LR = 1e-5
 
-SEQ_LENGTH = 4096
+SEQ_LENGTH = int(os.getenv("SEQ_LENGTH", 4096))
 
 
-def combine_strings(strings):
+def combine_strings(strings) -> list:
     result = []
     current_string = strings[0]
     for string in strings[1:]:
@@ -31,7 +32,9 @@ def combine_strings(strings):
 
 
 def main():
-    ds = datasets.load_dataset("flozi00/conversations", split="train")
+    ds = datasets.load_dataset(
+        os.getenv("DATASET_PATH", "flozi00/conversations"), split="train"
+    )
 
     # load model, processor by using the get_model function
     model, processor = get_model(
@@ -49,7 +52,9 @@ def main():
 
     ds_part = Dataset.from_dict(
         {
-            "conversations": combine_strings(ds["conversations"]),
+            "conversations": combine_strings(
+                ds[os.getenv("DATASET_COLUMN", "conversations")]
+            ),
         }
     )
 

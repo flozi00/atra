@@ -20,6 +20,7 @@ from transformers import pipeline
 from optimum.bettertransformer import BetterTransformer
 import requests
 import json
+import re
 
 
 class Plugins(Enum):
@@ -269,16 +270,17 @@ class Agent:
             if len(co.split(" ")) > 16:
                 filtered += co + "\n"
 
-        filtered_words = filtered.split(" ")
+        filtered_words = re.split(";|.|!|?", filtered)
         filtered = []
-        for i in range(0, len(filtered_words), 200):
-            filtered.append(" ".join(filtered_words[i : i + 250]))
+        STEPSIZE = 2
+        for i in range(0, len(filtered_words), STEPSIZE):
+            filtered.append(" ".join(filtered_words[i : i + 3]))
 
         filtered = self.re_ranking(query, filtered)
 
         content = serp_text + filtered
 
-        return content[: 3072 * 3]
+        return content[: 1024 * 4 * 3]
 
     def custom_generation(self, query) -> Iterable[str]:
         text = ""

@@ -55,14 +55,18 @@ def start_training(
             state_dict=accelerator.get_state_dict(model),
             safe_serialization=False,
         )
-        model.push_to_hub(
-            PEFT_MODEL,
-            save_function=accelerator.save,
-            state_dict=accelerator.get_state_dict(model),
-            safe_serialization=False,
-        )
         processor.save_pretrained(PEFT_MODEL)
-        processor.push_to_hub(PEFT_MODEL)
+
+        try:
+            model.push_to_hub(
+                PEFT_MODEL,
+                save_function=accelerator.save,
+                state_dict=accelerator.get_state_dict(model),
+                safe_serialization=False,
+            )
+            processor.push_to_hub(PEFT_MODEL)
+        except Exception as e:
+            warnings.warn(f"Could not push to hub: {e}")
 
     index = 1
     for epoch in range(num_epochs):

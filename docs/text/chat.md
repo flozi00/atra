@@ -3,9 +3,26 @@
 docker run --pull always --gpus all -d --shm-size 1g -p 8080:80 -v ./data:/data ghcr.io/huggingface/text-generation-inference:1.1.0 --max-total-tokens 8192 --max-batch-prefill-tokens 8192 --max-input-length 7600 --model-id flozi00/Mistral-7B-german-assistant-v2-4bit-autogptq --quantize=gptq --cuda-memory-fraction 1
 ```
 
-## Environment variables
+## Environment variables for chatapp
 
 * LLM - the model to use for language model, either TGI endpoint or HF model
 * TYPESENSE_API_KEY - the api key for typesense
 * TYPESENSE_HOST - the host ip or domain for typesense
 * SERP_API_KEY - the api key for serper.dev
+
+
+## Environment variables for train_assistant
+
+* BASE_MODEL - the base model to use for training, huggingface hub id
+* PEFT_MODEL - the model to use for peft, name of the target model
+* DATASET_PATH - the path to the dataset to use for training, huggingface hub id
+* DATASET_COLUMN - the column in the dataset to use for training, contains the text
+* BATCH_SIZE - the batch size to use for training
+* ACCUMULATION_STEPS - the gradient accumulation steps to use for training
+* SEQ_LENGTH - the sequence length to use for training
+
+### example docker command:
+
+```
+docker run -d --gpus '"device=0"' -e BASE_MODEL="HuggingFaceH4/zephyr-7b-alpha" -e PEFT_MODEL="Mistral-zephyr-german-assistant-v1" -p 7861:7860  flozi00/atra:latest train_assistant.py
+```
