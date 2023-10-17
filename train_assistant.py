@@ -45,7 +45,7 @@ def main():
         use_py_flash=False,
         use_flash_v2=True,
         use_bnb=True,
-        lora_depth=32,
+        lora_depth=int(os.getenv("LORA_DEPTH", 256)),
     )
 
     model: PeftModelForCausalLM = model

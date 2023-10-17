@@ -20,6 +20,7 @@ docker run --pull always --gpus all -d --shm-size 1g -p 8080:80 -v ./data:/data 
 * BATCH_SIZE - the batch size to use for training
 * ACCUMULATION_STEPS - the gradient accumulation steps to use for training
 * SEQ_LENGTH - the sequence length to use for training
+* LORA_DEPTH - the depth of the lora model to use for training
 
 ### example docker command:
 
