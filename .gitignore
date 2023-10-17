@@ -17,3 +17,4 @@ data/
 .env
 typesense-data/
 *.json*
+wandb
