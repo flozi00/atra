@@ -3,7 +3,7 @@ from .AUDIOCollator import ASRDataCollator, TTSDataCollator
 from torch.utils.data import DataLoader
 from ..data.TEXTCollator import CLMDataCollator, TextTextDataCollator
 
-from ..utils import IS_WINDOWS, Tasks
+from ..utils import Tasks
 
 
 def get_dataloader(

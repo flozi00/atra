@@ -27,8 +27,10 @@ except ImportError:
 
 def prepare_model_for_kbit_training(model, use_gradient_checkpointing=True):
     r"""
-    This method wraps the entire protocol for preparing a model before running a training. This includes:
-        1- Cast the layernorm in fp32 2- making output embedding layer require grads 3- Add the upcasting of the lm
+    This method wraps the entire protocol for preparing a model 
+    before running a training. This includes:
+        1- Cast the layernorm in fp32 2- making output embedding layer 
+        require grads 3- Add the upcasting of the lm
         head to fp32
 
     Args:
