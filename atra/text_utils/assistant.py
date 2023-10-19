@@ -59,7 +59,7 @@ class Agent:
         self.embedder = embedder
         self.llm = llm
         self.searcher = SemanticSearcher(embedder=embedder)
-        self.temperature = 0.1 if creative is False else 0.8
+        self.temperature = 0.1 if creative is False else 0.4
 
     def log_text2text(self, input: str, output: str, tasktype: str) -> None:
         """
@@ -69,7 +69,7 @@ class Agent:
         output = output.replace("-->", "~~>")
 
         try:
-            with open(f"logging/{tasktype}.txt", mode="r+") as file:
+            with open(f"logging/_{tasktype}.txt", mode="r+") as file:
                 content = file.read()
         except Exception:
             content = ""
