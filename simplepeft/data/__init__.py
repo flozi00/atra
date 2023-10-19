@@ -1,7 +1,11 @@
 import random
 from .AUDIOCollator import ASRDataCollator, TTSDataCollator
 from torch.utils.data import DataLoader
-from ..data.TEXTCollator import CLMDataCollator, TextTextDataCollator
+from ..data.TEXTCollator import (
+    CLMDataCollator,
+    TextTextDataCollator,
+    ClassificationDataCollator,
+)
 
 from ..utils import Tasks
 
@@ -58,6 +62,22 @@ def get_dataloader(
             text_key=kwargs.get(
                 "text_key", "text"
             ),  # text_key is a key to get the text from the dataset
+            max_input_length=kwargs.get(
+                "max_input_length", 1024
+            ),  # max_input_length is the maximum length in tokens of the input text
+        )
+    elif task == Tasks.TEXT_CLASSIFICATION:
+        data_collator = ClassificationDataCollator(
+            tok=processor,
+            text_key=kwargs.get(
+                "text_key", "text"
+            ),  # text_key is a key to get the text from the dataset
+            label_key=kwargs.get(
+                "label_key", "label"
+            ),  # label_key is a key to get the label from the dataset
+            label_to_id=kwargs.get(
+                "label_to_id", None
+            ),  # dictionary to map labels to ids
             max_input_length=kwargs.get(
                 "max_input_length", 1024
             ),  # max_input_length is the maximum length in tokens of the input text

@@ -255,4 +255,6 @@ def get_model(
         model.push_to_hub(PUSH_NAME, safe_serialization=task != Tasks.ASR)
         processor.push_to_hub(PUSH_NAME)
 
+    model = model.train()
+
     return model, processor

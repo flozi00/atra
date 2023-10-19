@@ -76,3 +76,44 @@ class CLMDataCollator:
         }
 
         return batch
+
+
+@dataclass
+class ClassificationDataCollator:
+    tok: AutoTokenizer
+    text_key: str = "input"
+    label_key: str = "labels"
+    label_to_id: Dict[str, int] = None
+    max_input_length: int = 1024
+
+    def __call__(
+        self, features: List[Dict[str, Union[List[int], torch.Tensor]]]
+    ) -> Dict[str, torch.Tensor]:
+        inputs = [
+            f[self.text_key] for f in features
+        ]  # list of strings (sentences) to be tokenized as inputs
+
+        # tokenize batched inputs
+        inputs = self.tok(
+            inputs,
+            max_length=self.max_input_length,
+            padding="max_length" if self.tok.pad_token is not None else False,
+            truncation=True,
+            return_tensors="pt",
+        )
+
+        input_ids = inputs.input_ids
+        attention_mask = inputs.attention_mask
+
+        labels = [f[self.label_key] for f in features]
+        for i, label in enumerate(labels):
+            labels[i] = self.label_to_id[label]
+        labels = torch.tensor(labels)
+        # create batch dict with inputs and labels where labels = inputs
+        batch = {
+            "input_ids": input_ids,
+            "attention_mask": attention_mask,
+            "labels": labels,
+        }
+
+        return batch
