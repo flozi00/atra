@@ -6,7 +6,7 @@ from atra.text_utils.prompts import (
     SYSTEM_PROMPT,
     USER_TOKEN,
 )
-from atra.text_utils.assistant import Agent, Plugins
+from atra.text_utils.assistant import Agent
 from huggingface_hub import InferenceClient
 import os
 from atra.text_utils.typesense_search import Embedder
@@ -53,35 +53,12 @@ def generate_history_as_string(history: list, message: str) -> str:
 def predict(message: str, chatbot: list, url: str):
     yield "Reading History"
     input_prompt = generate_history_as_string(chatbot, message)
-    history_no_tokens = (
-        input_prompt.rstrip(ASSISTANT_TOKEN).rstrip().replace(SYSTEM_PROMPT, "").strip()
-    )
 
-    yield "Classifying Plugin"
-    if input_prompt.count(USER_TOKEN) == 1:
-        search_question = message
-    else:
-        search_question = agent.generate_selfstanding_query(history_no_tokens)
-    plugin = agent.classify_plugin(search_question)
+    yield "Generating Response"
+    response = agent.__call__(last_message=message, full_history=input_prompt, url=url)
 
-    if plugin == Plugins.SEARCH:
-        yield "Suche: " + search_question
-        if os.getenv("TYPESENSE_API_KEY") is None:
-            search_query = search_question
-            if len(url) > 6:
-                search_query += f" site:{url}"
-            options = agent.get_webpage_content_playwright(search_query)
-        else:
-            options = agent.get_data_from_typesense(search_question)
-
-        yield "Answering"
-        answer = agent.do_qa(search_question, options)
-        for text in answer:
-            yield text
-    else:
-        answer = agent.custom_generation(input_prompt)
-        for text in answer:
-            yield text
+    for r in response:
+        yield r
 
 
 def label_chat(history: list, message: str) -> str:

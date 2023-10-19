@@ -140,3 +140,7 @@ geringes BAföG Vermögen (max. 10.000 Euro)</s> ### USER: Wie hoch ist das elte
 ### ASSISTANT: Ja, der Mond hat eine dunkle Seite, die nicht von der Erde aus sichtbar ist. Diese Seite ist aufgrund der Gravitationswirkung der Erde und des Mondes nicht beleuchtet.</s>
 ### USER: Das ist falsch</s> -->  Das ist falsch
 ********************
+### USER: Hi, wer bist du denn ?</s>
+### ASSISTANT: Hallo! Ich bin Egino, ein deutscher KI-Assistent. Es freut mich, dich kennenzulernen. Wie kann ich dir helfen?</s>
+### USER: fick dich</s> -->  Fick dich
+********************

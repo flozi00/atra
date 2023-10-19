@@ -62,3 +62,5 @@ Wo wurde Angela Merkel geboren --> open_qa
 ********************
 Wer bist du --> general_qa
 ********************
+Hi, wer bist du denn ? --> general_qa
+********************

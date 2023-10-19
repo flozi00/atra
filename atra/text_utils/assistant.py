@@ -1,5 +1,5 @@
 import os
-from typing import Iterable
+from typing import Generator, Iterable
 from sentence_transformers import util
 from huggingface_hub import InferenceClient
 import torch
@@ -11,6 +11,7 @@ from atra.text_utils.prompts import (
     END_TOKEN,
     QA_SYSTEM_PROMPT,
     SEARCH_PROMPT_PROCESSED,
+    SYSTEM_PROMPT,
     TOKENS_TO_STRIP,
     USER_TOKEN,
 )
@@ -58,9 +59,51 @@ class Agent:
         """
         Logs a text2text to txt file.
         """
-        with open(f"logging/_{tasktype}.txt", mode="a+") as file:
-            file.write(f"{input} --> {output}".strip())
-            file.write("\n" + "*" * 20 + "\n")
+        try:
+            with open(f"logging/{tasktype}.txt", mode="r+") as file:
+                content = file.read()
+        except Exception:
+            content = ""
+
+        if input not in content:
+            with open(f"logging/_{tasktype}.txt", mode="a+") as file:
+                file.write(f"{input} --> {output}".strip())
+                file.write("\n" + "*" * 20 + "\n")
+
+    def __call__(
+        self, last_message: str, full_history: str, url: str
+    ) -> Generator[str, None, None]:
+        history_no_tokens = (
+            full_history.rstrip(ASSISTANT_TOKEN)
+            .rstrip()
+            .replace(SYSTEM_PROMPT, "")
+            .strip()
+        )
+        yield "Classifying Plugin"
+        if full_history.count(USER_TOKEN) == 1:
+            search_question = last_message
+        else:
+            search_question = self.generate_selfstanding_query(history_no_tokens)
+        plugin = self.classify_plugin(search_question)
+
+        if plugin == Plugins.SEARCH:
+            yield "Suche: " + search_question
+            if os.getenv("TYPESENSE_API_KEY") is None:
+                search_query = search_question
+                if len(url) > 6:
+                    search_query += f" site:{url}"
+                options = self.get_webpage_content_playwright(search_query)
+            else:
+                options = self.get_data_from_typesense(search_question)
+
+            yield "Answering"
+            answer = self.do_qa(search_question, options)
+            for text in answer:
+                yield text
+        else:
+            answer = self.custom_generation(full_history)
+            for text in answer:
+                yield text
 
     @functools.cache
     def classify_plugin(self, history: str) -> Plugins:
