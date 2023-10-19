@@ -15,7 +15,7 @@ embedder = Embedder("intfloat/multilingual-e5-large")
 
 client = InferenceClient(model=os.getenv("LLM", "http://127.0.0.1:8080"))
 
-agent = Agent(client, embedder)
+agent = Agent(client, embedder, creative=True)
 
 
 def generate_history_as_string(history: list, message: str) -> str:

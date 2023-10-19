@@ -29,6 +29,9 @@ class Plugins(Enum):
     SEARCH = "search"
 
 
+SERP_API_KEY = os.getenv("SERP_API_KEY")
+TYPESENSE_API_KEY = os.getenv("TYPESENSE_API_KEY")
+
 pipe = pipeline(
     "text2text-generation",
     model="flozi00/t5-base-llm-tasks",
@@ -50,15 +53,21 @@ def get_dolly_label(prompt: str) -> str:
 
 
 class Agent:
-    def __init__(self, llm: InferenceClient, embedder: Embedder) -> None:
+    def __init__(
+        self, llm: InferenceClient, embedder: Embedder, creative: bool = False
+    ) -> None:
         self.embedder = embedder
         self.llm = llm
         self.searcher = SemanticSearcher(embedder=embedder)
+        self.temperature = 0.1 if creative is False else 0.8
 
     def log_text2text(self, input: str, output: str, tasktype: str) -> None:
         """
         Logs a text2text to txt file.
         """
+        input = input.replace("-->", "~~>")
+        output = output.replace("-->", "~~>")
+
         try:
             with open(f"logging/{tasktype}.txt", mode="r+") as file:
                 content = file.read()
@@ -73,6 +82,15 @@ class Agent:
     def __call__(
         self, last_message: str, full_history: str, url: str
     ) -> Generator[str, None, None]:
+        """
+        Generates a response to a given message based on the given history.
+        Args:
+            last_message (str): The last message in the chat.
+            full_history (str): The full chat history.
+            url (str): The URL of the website to be searched.
+        Yields:
+            Generator[str, None, None]: A generator of strings representing the response.
+        """
         history_no_tokens = (
             full_history.rstrip(ASSISTANT_TOKEN)
             .rstrip()
@@ -86,9 +104,11 @@ class Agent:
             search_question = self.generate_selfstanding_query(history_no_tokens)
         plugin = self.classify_plugin(search_question)
 
-        if plugin == Plugins.SEARCH:
+        if plugin == Plugins.SEARCH and (
+            TYPESENSE_API_KEY is not None or SERP_API_KEY is not None
+        ):
             yield "Suche: " + search_question
-            if os.getenv("TYPESENSE_API_KEY") is None:
+            if TYPESENSE_API_KEY is None:
                 search_query = search_question
                 if len(url) > 6:
                     search_query += f" site:{url}"
@@ -96,7 +116,7 @@ class Agent:
             else:
                 options = self.get_data_from_typesense(search_question)
 
-            yield "Answering"
+            yield "Antworten..."
             answer = self.do_qa(search_question, options)
             for text in answer:
                 yield text
@@ -178,7 +198,7 @@ class Agent:
         answer = self.llm.text_generation(
             prompt=QA_Prompt,
             max_new_tokens=512,
-            temperature=0.1,
+            temperature=self.temperature,
             stop_sequences=[END_TOKEN, "###"],
             stream=True,
         )
@@ -248,7 +268,7 @@ class Agent:
 
         payload = json.dumps({"q": query, "gl": "de", "hl": "de"})
         headers = {
-            "X-API-KEY": os.getenv("SERP_API_KEY", ""),
+            "X-API-KEY": SERP_API_KEY,
             "Content-Type": "application/json",
         }
 
@@ -329,8 +349,8 @@ class Agent:
         text = ""
         result = self.llm.text_generation(
             prompt=query,
-            max_new_tokens=512,
-            temperature=0.1,
+            max_new_tokens=1024,
+            temperature=self.temperature,
             stop_sequences=[END_TOKEN, "###"],
             stream=True,
         )

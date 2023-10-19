@@ -64,3 +64,5 @@ Wer bist du --> general_qa
 ********************
 Hi, wer bist du denn ? --> general_qa
 ********************
+Hi, wer bist du --> general_qa
+********************
