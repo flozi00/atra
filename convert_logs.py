@@ -22,8 +22,8 @@ def convert_file(filename, ds_name):
             continue
         entrie = entrie.strip()
         entrie = entrie.split("-->")
-        input.append(entrie[0])
-        output.append(entrie[1])
+        input.append(entrie[0].strip())
+        output.append(entrie[1].strip())
 
     dataset = datasets.Dataset.from_dict({"input": input, "output": output})
 

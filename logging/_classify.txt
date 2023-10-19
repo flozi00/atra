@@ -86,3 +86,7 @@ Huhu --> creative_writing
 ********************
 Hello --> creative_writing
 ********************
+Hey Hey --> creative_writing
+********************
+Halli Hallou --> creative_writing
+********************

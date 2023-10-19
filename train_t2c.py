@@ -5,9 +5,11 @@ from simplepeft.data import get_dataloader
 from simplepeft.utils import Tasks
 import simplepeft.train.train
 
-BATCH_SIZE = 4
-BASE_MODEL = "intfloat/multilingual-e5-small"
-PEFT_MODEL = "multilingual-e5-small-llm-tasks"
+simplepeft.train.train.ACCUMULATION_STEPS = 64
+
+BATCH_SIZE = 8
+BASE_MODEL = "intfloat/multilingual-e5-large"
+PEFT_MODEL = "multilingual-e5-large-llm-tasks"
 TASK = Tasks.TEXT_CLASSIFICATION
 LR = 1e-5
 
@@ -60,5 +62,5 @@ simplepeft.train.train.start_training(
     dloader=dloader,
     PEFT_MODEL=PEFT_MODEL,
     LR=LR,
-    num_epochs=2,
+    num_epochs=10,
 )
