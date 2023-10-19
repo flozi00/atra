@@ -3,10 +3,10 @@ import warnings
 from tqdm.auto import tqdm
 from torch.optim.lr_scheduler import ExponentialLR
 from bitsandbytes.optim import PagedLion32bit
-
-warnings.simplefilter("ignore")
+import os
 
 ACCUMULATION_STEPS = 16
+TOKEN = os.getenv("HF_TOKEN", None)
 
 
 def get_lr(optimizer):
@@ -63,8 +63,9 @@ def start_training(
                 save_function=accelerator.save,
                 state_dict=accelerator.get_state_dict(model),
                 safe_serialization=False,
+                token=TOKEN,
             )
-            processor.push_to_hub(PEFT_MODEL)
+            processor.push_to_hub(PEFT_MODEL, token=TOKEN)
         except Exception as e:
             warnings.warn(f"Could not push to hub: {e}")
 

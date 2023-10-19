@@ -104,8 +104,10 @@ class Agent:
             search_question = self.generate_selfstanding_query(history_no_tokens)
         plugin = self.classify_plugin(search_question)
 
-        if plugin == Plugins.SEARCH and (
-            TYPESENSE_API_KEY is not None or SERP_API_KEY is not None
+        if (
+            plugin == Plugins.SEARCH
+            and (TYPESENSE_API_KEY is not None or SERP_API_KEY is not None)
+            and len(search_question) > 10
         ):
             yield "Suche: " + search_question
             if TYPESENSE_API_KEY is None:

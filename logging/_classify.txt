@@ -1,4 +1,4 @@
-Wie heist du --> creative_writing
+Wie heist du --> general_qa
 ********************
 Wer bist du --> general_qa
 ********************
@@ -65,4 +65,24 @@ Wer bist du --> general_qa
 Hi, wer bist du denn ? --> general_qa
 ********************
 Hi, wer bist du --> general_qa
+********************
+Hallo --> creative_writing
+********************
+Hi --> creative_writing
+********************
+Was geht ab --> general_qa
+********************
+Moin --> creative_writing
+********************
+Was geht --> general_qa
+********************
+Wie geht es dir --> general_qa
+********************
+Hey --> creative_writing
+********************
+Hi Ho --> creative_writing
+********************
+Huhu --> creative_writing
+********************
+Hello --> creative_writing
 ********************

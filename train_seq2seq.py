@@ -4,11 +4,11 @@ from simplepeft.utils import Tasks
 import simplepeft.train.train
 import datasets
 
-simplepeft.train.train.ACCUMULATION_STEPS = 1
+simplepeft.train.train.ACCUMULATION_STEPS = 4
 
 
 BATCH_SIZE = 4
-BASE_MODEL = "t5-base"
+BASE_MODEL = "flozi00/t5-base-llm-tasks"
 PEFT_MODEL = "t5-base-llm-tasks"
 TASK = Tasks.Text2Text
 LR = 1e-5
@@ -16,6 +16,14 @@ LR = 1e-5
 
 def main():
     ds = datasets.load_dataset("flozi00/LLM-Task-Classification", split="train")
+    texts = ds["text"]
+    named_labels = ds["named_labels"]
+
+    ds = datasets.load_dataset("flozi00/classify-llm-tasks-german", split="train")
+    texts += ds["input"]
+    named_labels += ds["output"]
+
+    ds = datasets.Dataset.from_dict({"text": texts, "named_labels": named_labels})
 
     model, processor = get_model(
         task=TASK,
@@ -23,7 +31,7 @@ def main():
         peft_name=PEFT_MODEL,
         use_peft=True,
         use_bnb=False,
-        lora_depth=128,
+        lora_depth=512,
     )
 
     # get the dataloader and define config for data loading and transformation
