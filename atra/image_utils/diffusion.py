@@ -123,6 +123,6 @@ def generate_images(prompt: str, negatives: str = ""):
     MD = json.dumps(TIME_LOG, indent=4)
     MD = "```json\n" + MD + "\n```"
 
-    image.save("output_image.jpg", "JPEG")
-    image = pathlib.Path("output_image.jpg")
+    # image.save("output_image.jpg", "JPEG")
+    # image = pathlib.Path("output_image.jpg")
     return image, MD
