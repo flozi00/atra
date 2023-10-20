@@ -34,10 +34,10 @@ TYPESENSE_API_KEY = os.getenv("TYPESENSE_API_KEY")
 
 pipe = pipeline(
     "text-classification",
-    model="flozi00/mDeBERTa-v3-llm-tasks-classification",
+    model="flozi00/multilingual-e5-large-llm-tasks",
     device=-1,
 )
-# pipe.model = BetterTransformer.transform(pipe.model)
+pipe.model = BetterTransformer.transform(pipe.model)
 pipe.model = torch.compile(pipe.model, mode="max-autotune")
 
 

@@ -98,3 +98,7 @@ Was soll ich tun? --> general_qa
 ********************
 Hi wer bist du --> general_qa
 ********************
+Hallo, wer bist denn du --> general_qa
+********************
+Wie geht es dir --> general_qa
+********************

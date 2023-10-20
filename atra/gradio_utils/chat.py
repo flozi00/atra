@@ -103,5 +103,5 @@ def build_chat_ui():
 
         chatter.like(on_like, chatter)
 
-    demo.queue(concurrency_count=4)
+    demo.queue()
     demo.launch(**launch_args)

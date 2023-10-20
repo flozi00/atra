@@ -154,3 +154,7 @@ geringes BAföG Vermögen (max. 10.000 Euro)</s> ### USER: Wie hoch ist das elte
 ### ASSISTANT: Als KI-Assistent kann ich keine spezifische Antwort auf diese Frage geben, da es sich um eine allgemeine Frage handelt. Bitte geben Sie mehr Informationen oder kontextualisieren Sie Ihre Frage, damit ich Ihnen besser helfen kann.</s>
 ### USER: </s> -->  Was soll ich tun?
 ********************
+### USER: Huhu</s>
+### ASSISTANT: Hallo! Wie kann ich dir helfen?</s>
+### USER: Wie geht es dir</s> -->  Wie geht es dir
+********************
