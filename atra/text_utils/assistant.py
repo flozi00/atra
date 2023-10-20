@@ -35,10 +35,11 @@ TYPESENSE_API_KEY = os.getenv("TYPESENSE_API_KEY")
 pipe = pipeline(
     "text-classification",
     model="flozi00/multilingual-e5-large-llm-tasks",
-    device=-1,
+    device=0,
+    torch_dtype=torch.float16,
 )
 pipe.model = BetterTransformer.transform(pipe.model)
-pipe.model = torch.compile(pipe.model, mode="max-autotune")
+# pipe.model = torch.compile(pipe.model, mode="max-autotune")
 
 
 @functools.cache
@@ -329,17 +330,17 @@ class Agent:
             if len(co.split(" ")) > 16:
                 filtered += co + "\n"
 
-        filtered_words = re.split(";|.|!|?", filtered)
+        filtered_words = filtered.split(" ")
         filtered = []
-        STEPSIZE = 2
+        STEPSIZE = 200
         for i in range(0, len(filtered_words), STEPSIZE):
-            filtered.append(" ".join(filtered_words[i : i + 3]))
+            filtered.append(" ".join(filtered_words[i : i + int(STEPSIZE * 1.3)]))
 
         filtered = self.re_ranking(query, filtered)
 
         content = serp_text + filtered
 
-        return content[: 1024 * 4 * 3]
+        return content[: 1024 * 3 * 3]
 
     def custom_generation(self, query) -> Iterable[str]:
         text = ""

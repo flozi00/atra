@@ -263,3 +263,61 @@ Frage: Wo wurde Angela Merkel geboren
 
 Angela Merkel wurde im Elim-Krankenhaus im Hamburger Stadtteil Eimsbüttel als erstes Kind des evangelischen Theologen Horst Kasner und seiner Frau Herlind Kasner, geb. Jentzsch geboren.
 ********************
+### SYSTEM: Im Folgenden beantwortet eine deutsche KI anhand der gegebenen passagen die Frage so gut wie möglich.
+Bei der Beantwortung der Frage wird sich auf die passagen bezogen und keine Informationen ausgedacht.
+Wenn die Beantwortung nicht möglich ist wird dies mitgeteilt.</s>
+### USER: 
+passage: passage: Blasenentzündung – Brennen beim Wasserlassen - Patienten-Information.de: 
+
+passage: Ständiger Harndrang, Brennen beim Wasserlassen und Schmerzen sind typische Symptome einer Blasenentzündung (Zystitis).
+passage: Eine Blasenentzündung macht sich vor allem durch häufigen Harndrang, Schmerzen oder Brennen beim Wasserlassen bemerkbar. Frauen bekommen viel häufiger eine ...
+passage: Blasenentzündungen sind teilweise sehr unangenehm. Wasserlassen kann brennen, ständig kann starker Harndrang plagen, und der Unterbauch kann schmerzen. Doch die ...
+passage: Typische Anzeichen einer Blasenentzündung sind Schmerzen und Brennen beim Wasserlassen, häufiger Harndrang sowie Schmerzen im Unterleib. Der ...
+passage: Eine Blasenentzündung erkennen die meisten Frauen schon im Anfangsstadium an einem verstärkten Harndrang und einem unangenehmen Gefühl beim ...
+passage: Hierbei können Bakterien, weiße und/oder rote Blutkörperchen und Pilze entdeckt und gezählt werden. Zusätzlich kann ein so genanntes Antibiogramm erstellt ...
+passage: Man spürt vermehrten Harndrang, doch auf der Toilette kommt nur eine kleine Menge Urin. Auch brennende Schmerzen beim Wasserlassen gehören zu den Anzeichen ...
+passage: Üblicherweise gehen Blasenentzündungen mit typischen Symptomen einher. So kann man auch ohne spezifische Tests eine Blasenentzündung erkennen ...
+passage: Die klassischen Anzeichen einer gewöhnlichen (unkomplizierten) Blasenentzündung sind Schmerzen beim Wasserlassen, die meist als Brennen zu ...
+passage: belastend sein kann. Der Urin kann trübe verfärbt sein und auffällig riechen, manchmal ist auch Blut zu sehen.
+Die Schmerzen können in den ganzen Unterleib oder in den Rücken ausstrahlen. Eine starke Blasenentzündung kann dazu führen, dass man sich insgesamt krank und abgeschlagen fühlt, reizbar ist und schlecht schläft.
+Es kann auch sein, dass keine Symptome bestehen – aber in einem Urintest Bakterien nachgewiesen werden. Dann spricht man von einer asymptomatischen Bakteriurie. Diese ist in der Regel harmlos.
+Bei einer unkomplizierten Blasenentzündung entzündet sich die Schleimhaut der Harnblase. Die Entzündung wird normalerweise von Bakterien verursacht, die über die Harnröhre in die Blase aufsteigen und sich dort vermehren.
+Geschlechtsverkehr erhöht das Risiko für eine Blasenentzündung, weil dabei Bakterien in die Harnröhre gelangen können. Spermienabtötende Verhütungscremes und -gele sowie Diaphragmen können das Risiko ebenfalls etwas erhöhen.
+Schwangere Frauen bekommen häufiger Blasenentzündungen. Auch Menschen, die einen Blasenkatheter tragen, haben ein erhöhtes Risiko – außerdem Menschen mit anatomischen Veränderungen im Harnwegsbereich, mit Diabetes mellitus, Multipler Sklerose oder urologischen Erkrankungen.
+Frauen, die schon einmal eine Blasenentzündung hatten, erkranken mit höherer Wahrscheinlichkeit wieder daran. Ab den Wechseljahren sind Blasenentzündungen häufiger.
+Frauen bekommen viel öfter eine Blasenentzündung als Männer, da ihre Harnröhre kürzer ist. Bakterien gelangen deshalb leichter bis in die Blase. Etwa 10 von 100 Frauen bekommen mindestens einmal im Jahr eine Blasenentzündung. Die Hälfte dieser Frauen bekommt innerhalb eines Jahres eine weitere.
+Von einer unkomplizierten Blasenentzündung spricht man, wenn sich die Beschwerden auf den unteren Harntrakt – also auf Harnblase und Harnröhre – beschränken und es keine Risikofaktoren für einen schweren Verlauf oder Folgeschäden gibt. Sie kann leicht behandelt werden und heilt meist problemlos
+passage: Ständiger Harndrang, Brennen beim Wasserlassen und Schmerzen sind typische Symptome einer Blasenentzündung (Zystitis). Was hilft bei einem akuten Harnwegsinfekt?
+Eine Blasenentzündung kann akut auftreten oder chronisch werden. Unter Zystitis leiden vor allem junge Frauen, Schwangere und Frauen in den Wechseljahren. Bei Männern ist die Infektionskrankheit eher selten.
+Frauen sind besonders häufig betroffen, weil ihre Harnröhre kürzer ist (circa 4 Zentimeter lang) als die der Männer (circa 20 Zentimeter lang). Und Harnröhre und Darmausgang liegen bei Frauen näher beieinander. Die Folge: Nützliche Darmbakterien, häufig Escherichia coli (E. coli), können leicht in die Blase gelangen. Wenn sie sich dort an die Schleimhautwand heften, kann es zu einer Blasenentzündung kommen.
+Auch Pilze, Viren oder Parasiten (zum Beispiel Würmer) können eine Blasenentzündung auslösen. Dies ist aber eher selten der Fall.
+Jaana B. hat immer wieder Blasenentzündungen, keine Behandlung konnte dagegen dauerhaft helfen. Warum es sich lohnt, den Zuckerkonsum zu reduzieren, erklärt Doc Riedl im Gespräch mit Julia Demann.
+Harnwegsinfekte werden meistens von Bakterien ausgelöst, die aus der eigenen Darmflora oder Scheidenflora stammen. Sie gelangen in die Harnröhre und wandern aufwärts in die Blase. Bei einem gesunden Körper verhindern Abwehrkräfte, dass sich unerwünschte Bakterien in der Harnröhre oder Blase festsetzen. Durch häufige Antibiotika-Therapien wird die Schutzschicht in der Blasenhaut porös. Das ermöglicht erst das Andocken der Bakterien. Im Kampf gegen die Bakterien schwillt die Blasenwand an und entzündet sich.
+Eine Blasenentzündung kann akut auftreten oder immer wiederkehren, also chronisch werden. Typische Anzeichen für eine Blasenentzündung sind:
+Beim Verdacht auf eine Blasenentzündung bittet der Arzt oder die Ärztin um eine Urinprobe. Ist der Urin getrübt und schlecht riechend, deutet das auf eine Entzündung
+passage: pro Tag sollten es sein.
+Eine gesunde Darmflora wirkt sich positiv auf unsere gesamte Gesundheit und unser Wohlbefinden aus. Wie kan man sie fördern?
+Vitamine und andere Antioxidantien, Omega-3-Fettsäuren - wo stecken sie drin? Unsere Liste macht Ihre Küche zur Hausapotheke.
+Spannende und informative Dokus, Serien und Magazine über die Gesundheit: Entdecken Sie unsere Themenwelt in der ARD Mediathek.
+Viele Frauen kennen die Anzeichen einer Blasenentzündung nur zu gut: Sie müssen sehr oft zur Toilette, es sticht und brennt beim Wasserlassen. Die Beschwerden sind häufig sehr unangenehm, lassen sich aber gut behandeln.
+Eine unkomplizierte Blasenentzündung (Zystitis) heilt meistens ohne Probleme aus. Antibiotika helfen gut, sind jedoch nicht immer notwendig.
+Leider gibt es aber kein Patentrezept, um Blasenentzündungen zuverlässig zu verhindern. Zudem sind viele Tipps zur Vorbeugung wissenschaftlich noch nicht untersucht.
+Wer eine Blasenentzündung hat, muss oft Wasser lassen und kann dabei stechende Schmerzen oder ein Brennen verspüren. Man muss also nicht nur häufiger zur Toilette, es kann auch sehr unangenehm sein.
+Bei vielen Frauen nehmen die Schmerzen zu, wenn ihre Blase fast oder ganz leer ist. Häufig kommt der Harndrang sehr schnell, sodass sie plötzlich zur Toilette müssen – trotzdem gehen dann meist nur geringe Mengen Urin ab. Manche Frauen haben Schwierigkeiten, den Harn zu halten, was sehr belastend sein kann. Der Urin kann trübe verfärbt sein und auffällig riechen, manchmal ist auch Blut zu sehen.
+Die Schmerzen können in den ganzen Unterleib oder in den Rücken ausstrahlen. Eine starke Blasenentzündung kann dazu führen, dass man sich insgesamt krank und abgeschlagen fühlt, reizbar ist und schlecht schläft.
+Es kann auch sein, dass keine Symptome bestehen – aber in einem Urintest
+passage: Das ermöglicht erst das Andocken der Bakterien. Im Kampf gegen die Bakterien schwillt die Blasenwand an und entzündet sich.
+Eine Blasenentzündung kann akut auftreten oder immer wiederkehren, also chronisch werden. Typische Anzeichen für eine Blasenentzündung sind:
+Beim Verdacht auf eine Blasenentzündung bittet der Arzt oder die Ärztin um eine Urinprobe. Ist der Urin getrübt und schlecht riechend, deutet das auf eine Entzündung hin, denn normalerweise ist Urin klar. Ein Harnstreifentest gibt weiteren Aufschluss. Dabei wird zum Beispiel der Wert der weißen Blutkörperchen (Leukozyten) ermittelt. Ist dieser erhöht, ist das Immunsystem bereits aktiviert, um eine Entzündung im Körper zu bekämpfen. Nitrit deutet auf starken Bakterienbefall hin. Bei leichten Beschwerden und einem eindeutigen Ergebnis genügt dieser Test für die Diagnose.
+Wenn Blasenentzündungen immer wiederkehren, aber auch wenn Fieber, Blut im Urin oder starke Schmerzen im Bauch und der Nierengegend auftreten, wird meist eine Blutuntersuchung durchgeführt. Eine Blasenspiegelung (Zystoskopie) kann zudem andere Ursachen wie einen Blasentumor ausschließen.
+Wenn man Blaseninfekte ohne Antibiotika kurieren will, gibt es als Sofortmaßnahme bei den ersten Anzeichen eine Wasserkur und bei häufigen Infekten eine Impfung.
+Wasserkur: Dazu löst man zunächst ein paar Löffel Natron in Wasser auf, ein bekanntes Haushaltsmittel beim Backen. Natron lindert das Brennen beim Wasserlassen. Für eine Wasserkur alle 15 Minuten ein großes Glas mit klarem Wasser trinken, in wenigen Stunden insgesamt drei bis vier Liter. Natron ist basisch und verändert den Säuregehalt im Urin. Das hindert manche Bakterien an der Vermehrung. Das Wasser spült die Erreger heraus, bevor sie sich festsetzen.
+Viel trinken: Bei einer Blasenentzündung ist es ohnehin besonders wichtig, auf eine hohe Flüssigkeitszufuhr zu achten. Gut geeignet sind
+passage: Arzt die Nieren und die Harnblase
+
+Frage: Woran erkennt man eine Blasenentzündung ?
+
+</s>### ASSISTANT:  Antwort:  --> 
+
+Die Symptome einer Blasenentzündung sind Schmerzen beim Wasserlassen, häufiger Harndrang und Brennen beim Wasserlassen.
+********************

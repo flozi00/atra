@@ -158,3 +158,61 @@ geringes BAföG Vermögen (max. 10.000 Euro)</s> ### USER: Wie hoch ist das elte
 ### ASSISTANT: Hallo! Wie kann ich dir helfen?</s>
 ### USER: Wie geht es dir</s> -->  Wie geht es dir
 ********************
+### USER: Beantworte folgende Frage F:
+
+F = {Wann wird eine Harnwegsinfektion bei Kindern als kompliziert eingestuft?}
+
+Beantworte die Frage F nach dem Schema S. 
+Moduliere das Schema bei der Beantwortung der Frage F so, dass es zur Frage F passt.
+Nutze bei der Beantwortung der Frage F alle Schritte (Frage, Gedanke, Aktion, Beobachtung, Handle). Nutze bei jedem Schritt die Statements Suche[] und Beende[], dann und nur dann, wenn sie im Schema S im entsprechenden Schritt vorhanden sind.
+Gib als Output nur das gesamte modulierte Schema zur Beantwortung der Frage F aus.
+
+S = {
+Frage: Wann ist eine Blasenentzündung gefährlich? 
+Gedanke: Ich muss herausfinden, unter welchen Umständen eine Blasenentzündung als gefährlich angesehen werden kann. 
+Aktion: Suche[Blasenentzündung gefährlich] 
+Beobachtung: Die Gefährlichkeit einer Blasenentzündung kann von der Zugehörig zu einer bestimmten Patientengruppe abhängen.
+Gedanke: Wenn die Gefährlichkeit einer Blasenentzündung von der Zugehörigkeit einer Patientengruppe abhängt, muss ich verstellen, bei welchen Patientengruppen eine Blasenentzündung eher gefährlich und bei welchen Patientengruppen eine Blasenentzündung eher ungefährlich ist.
+Aktion: Suche[Patientengruppen Blasenentzündung gefährlich]
+Beobachtung: Eine Blasenentzündung ist bei nicht schwangeren Frauen ohne relevante Begleiterkrankungen meistens ungefährlich, solange die Blasenentzündung unkompliziert ist. Bei allen anderen Patientengruppen ist im Vergleich zur vorherigen Patientengruppe eher mit einem gefährlichen Verlauf zu rechnen.
+Gedanke: Neben der Patientengruppe muss ich feststellen, welche Symptome für einen gefährlichen Verlauf einer Blasenentzündung sprechen.
+Aktion: Suche[Blasenentzündung gefährliche Symptome]
+Beobachtung: Fieber erhöht die Wahrscheinlichkeit eines schwierigen Verlaufs einer Blasenentzündung.
+Gedanke: Die Symptome einer Blasenentzündung könne auch für das vorliegen anderer Erkrankungen sprechen. Es ist also wichtig gefährliche Differentialdiagnosen auszuschließen
+Aktion: Suche[Blasenentzündung gefährliche Differentialdiagnosen]
+Beobachtung: Häufige Differentialdiagnosen der Blasenentzündungen sind sexuell übertragbare Krankheiten.
+Gedanke: Zusammengefasst ist die Wahrscheinlichkeit eines gefährlichen Verlaufs einer Blasenentzündung dann erhöht, wenn die/der PatientIn nicht der Gruppe der nicht schwangeren Frauen ohne relevante Begleiterkrankungen angehört. Weiter Faktoren, die das zu einem gefährlichen Verlauf führen können sind Fieber und das vorliegen einer komplizierten Blasenentzündung. Zudem sollten gefährliche Differentialdiagnosen, wie z.B. sexuell übertragbare Krankheiten ausgeschlossen werden. 
+Handle: Beende[Die Wahrscheinlichkeit eines gefährlichen Verlaufs bei einer Blasenentzündung ist u. a. erhöht wenn folgende Punkte zutreffen:
+- Die Erkrankte Person gehört nicht der Gruppe der nicht Schwangeren Frauen ohne relevanten Begleiterkrankungen an
+Es wird empfohlen das vorliegen andrer gefährlicher Erkrankungen differentialdiagnostisch abzusichern.]
+}</s>
+### ASSISTANT: Classifying Plugin</s>
+### USER: Beantworte folgende Frage F:
+
+F = {Wann wird eine Harnwegsinfektion bei Kindern als kompliziert eingestuft?}
+
+Beantworte die Frage F nach dem Schema S. 
+Moduliere das Schema bei der Beantwortung der Frage F so, dass es zur Frage F passt.
+Nutze bei der Beantwortung der Frage F alle Schritte (Frage, Gedanke, Aktion, Beobachtung, Handle). Nutze bei jedem Schritt die Statements Suche[] und Beende[], dann und nur dann, wenn sie im Schema S im entsprechenden Schritt vorhanden sind.
+Gib als Output nur das gesamte modulierte Schema zur Beantwortung der Frage F aus.
+
+S = {
+Frage: Wann ist eine Blasenentzündung gefährlich? 
+Gedanke: Ich muss herausfinden, unter welchen Umständen eine Blasenentzündung als gefährlich angesehen werden kann. 
+Aktion: Suche[Blasenentzündung gefährlich] 
+Beobachtung: Die Gefährlichkeit einer Blasenentzündung kann von der Zugehörig zu einer bestimmten Patientengruppe abhängen.
+Gedanke: Wenn die Gefährlichkeit einer Blasenentzündung von der Zugehörigkeit einer Patientengruppe abhängt, muss ich verstellen, bei welchen Patientengruppen eine Blasenentzündung eher gefährlich und bei welchen Patientengruppen eine Blasenentzündung eher ungefährlich ist.
+Aktion: Suche[Patientengruppen Blasenentzündung gefährlich]
+Beobachtung: Eine Blasenentzündung ist bei nicht schwangeren Frauen ohne relevante Begleiterkrankungen meistens ungefährlich, solange die Blasenentzündung unkompliziert ist. Bei allen anderen Patientengruppen ist im Vergleich zur vorherigen Patientengruppe eher mit einem gefährlichen Verlauf zu rechnen.
+Gedanke: Neben der Patientengruppe muss ich feststellen, welche Symptome für einen gefährlichen Verlauf einer Blasenentzündung sprechen.
+Aktion: Suche[Blasenentzündung gefährliche Symptome]
+Beobachtung: Fieber erhöht die Wahrscheinlichkeit eines schwierigen Verlaufs einer Blasenentzündung.
+Gedanke: Die Symptome einer Blasenentzündung könne auch für das vorliegen anderer Erkrankungen sprechen. Es ist also wichtig gefährliche Differentialdiagnosen auszuschließen
+Aktion: Suche[Blasenentzündung gefährliche Differentialdiagnosen]
+Beobachtung: Häufige Differentialdiagnosen der Blasenentzündungen sind sexuell übertragbare Krankheiten.
+Gedanke: Zusammengefasst ist die Wahrscheinlichkeit eines gefährlichen Verlaufs einer Blasenentzündung dann erhöht, wenn die/der PatientIn nicht der Gruppe der nicht schwangeren Frauen ohne relevante Begleiterkrankungen angehört. Weiter Faktoren, die das zu einem gefährlichen Verlauf führen können sind Fieber und das vorliegen einer komplizierten Blasenentzündung. Zudem sollten gefährliche Differentialdiagnosen, wie z.B. sexuell übertragbare Krankheiten ausgeschlossen werden. 
+Handle: Beende[Die Wahrscheinlichkeit eines gefährlichen Verlaufs bei einer Blasenentzündung ist u. a. erhöht wenn folgende Punkte zutreffen:
+- Die Erkrankte Person gehört nicht der Gruppe der nicht Schwangeren Frauen ohne relevanten Begleiterkrankungen an
+Es wird empfohlen das vorliegen andrer gefährlicher Erkrankungen differentialdiagnostisch abzusichern.]
+}</s> -->  Wann ist eine Blasenentzündung gefährlich?
+********************

@@ -47,6 +47,8 @@ elif "A6000" in GPU_NAME:
     POWER = 300
 elif "RTX 6000" in GPU_NAME:
     POWER = 240
+elif "L40" in GPU_NAME:
+    POWER = 350
 
 PACKED_MODEL = os.getenv(
     "SDXL_FILE",
