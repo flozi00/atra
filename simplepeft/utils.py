@@ -9,5 +9,5 @@ IS_WINDOWS = os == "Windows"
 class Tasks(Enum):
     ASR = "ASR"
     Text2Text = "T2T"
-    TEXT_GEN = "TEXT_GEN"
+    TEXT_GEN = "TG"
     TEXT_CLASSIFICATION = "T2C"

@@ -3,7 +3,6 @@ from diffusers import (
     StableDiffusionXLPipeline,
     StableDiffusionXLImg2ImgPipeline,
     EulerAncestralDiscreteScheduler,
-    AutoencoderTiny,
 )
 from diffusers.models.attention_processor import AttnProcessor2_0
 import torch
@@ -11,6 +10,7 @@ from atra.utils import timeit
 import time
 import json
 import diffusers.pipelines.stable_diffusion_xl.watermark
+import os
 
 
 def apply_watermark_dummy(self, images: torch.FloatTensor):
@@ -48,8 +48,13 @@ elif "A6000" in GPU_NAME:
 elif "RTX 6000" in GPU_NAME:
     POWER = 240
 
-diffusion_pipe = StableDiffusionXLPipeline.from_single_file(
+PACKED_MODEL = os.getenv(
+    "SDXL_FILE",
     "https://huggingface.co/jayparmr/DreamShaper_XL1_0_Alpha2/blob/main/dreamshaperXL10.safetensors",
+)
+
+diffusion_pipe = StableDiffusionXLPipeline.from_single_file(
+    PACKED_MODEL,
     torch_dtype=torch.float16,
 )
 
@@ -60,9 +65,6 @@ refiner = StableDiffusionXLImg2ImgPipeline.from_pretrained(
     torch_dtype=torch.float16,
     use_safetensors=True,
     variant="fp16",
-)
-refiner.vae = AutoencoderTiny.from_pretrained(
-    "madebyollin/taesdxl", torch_dtype=torch.float16
 )
 
 # set attention processor
@@ -85,7 +87,7 @@ refiner.to(f"cuda:{GPU_ID}")
 
 
 @timeit
-def generate_images(prompt: str, negatives: str = "") -> tuple[str, str]:
+def generate_images(prompt: str, negatives: str = ""):
     TIME_LOG = {"GPU Power insert in W": POWER}
 
     # for pattern in BAD_PATTERNS:

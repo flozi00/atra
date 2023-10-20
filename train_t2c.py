@@ -5,11 +5,11 @@ from simplepeft.data import get_dataloader
 from simplepeft.utils import Tasks
 import simplepeft.train.train
 
-simplepeft.train.train.ACCUMULATION_STEPS = 64
+simplepeft.train.train.ACCUMULATION_STEPS = 32
 
 BATCH_SIZE = 8
-BASE_MODEL = "intfloat/multilingual-e5-large"
-PEFT_MODEL = "multilingual-e5-large-llm-tasks"
+BASE_MODEL = "mDeBERTa-v3-llm-tasks-classification"
+PEFT_MODEL = "mDeBERTa-v3-llm-tasks-classification"
 TASK = Tasks.TEXT_CLASSIFICATION
 LR = 1e-5
 
@@ -29,6 +29,8 @@ labels.sort()
 
 LABELS_TO_IDS = {label: i for i, label in enumerate(labels)}
 IDS_TO_LABELS = {i: label for i, label in enumerate(labels)}
+
+print(LABELS_TO_IDS)
 
 model = AutoModelForSequenceClassification.from_pretrained(
     BASE_MODEL,

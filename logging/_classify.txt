@@ -90,3 +90,11 @@ Hey Hey --> creative_writing
 ********************
 Halli Hallou --> creative_writing
 ********************
+house sitting on a dolphin jumping over a vulcano --> creative_writing
+********************
+Was soll ich hier eingeben? --> general_qa
+********************
+Was soll ich tun? --> general_qa
+********************
+Hi wer bist du --> general_qa
+********************

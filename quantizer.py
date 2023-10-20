@@ -2,12 +2,6 @@ from transformers import AutoTokenizer, AutoModelForCausalLM, GPTQConfig
 import fire
 import datasets
 
-TESTS = [
-    "<|prompter|>Können Sie das Rätsel des umweltfreundlichen Einkaufs lösen? Berücksichtigen Sie die Korrelation zwischen dem Preis eines Produkts und dessen Umweltauswirkungen. Aber Vorsicht, nicht alle teuren Artikel sind notwendigerweise umweltverträglich. Achten Sie auf irreführende Marketingtaktiken und Greenwashing in der Industrie. Können Sie die wahren umweltfreundlichen Optionen entschlüsseln, ohne dabei pleite zu gehen? Lass uns deine Denkfähigkeiten auf die Probe stellen. <|endoftext|><|assistant|>",
-    "<|prompter|>Erstellen Sie eine Liste von 5 Arten von Dinosauriern. <|endoftext|><|assistant|>",
-    "<|prompter|>Wer bist denn du ?<|endoftext|><|assistant|>",
-]
-
 
 def convert_model(BITS, model):
     BITS = int(BITS)

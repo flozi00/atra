@@ -33,23 +33,17 @@ SERP_API_KEY = os.getenv("SERP_API_KEY")
 TYPESENSE_API_KEY = os.getenv("TYPESENSE_API_KEY")
 
 pipe = pipeline(
-    "text2text-generation",
-    model="flozi00/t5-base-llm-tasks",
+    "text-classification",
+    model="flozi00/mDeBERTa-v3-llm-tasks-classification",
     device=-1,
 )
-pipe.model = BetterTransformer.transform(pipe.model)
+# pipe.model = BetterTransformer.transform(pipe.model)
 pipe.model = torch.compile(pipe.model, mode="max-autotune")
 
 
 @functools.cache
 def get_dolly_label(prompt: str) -> str:
-    return pipe(
-        f"classify: {prompt}",
-        max_new_tokens=5,
-        do_sample=False,
-    )[
-        0
-    ]["generated_text"].strip()
+    return pipe(prompt)[0]["label"].strip()
 
 
 class Agent:
