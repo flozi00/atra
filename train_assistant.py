@@ -7,8 +7,6 @@ from peft import PeftModelForCausalLM
 import simplepeft.train.train
 import os
 
-simplepeft.train.train.ACCUMULATION_STEPS = int(os.getenv("ACCUMULATION_STEPS", 4))
-
 BATCH_SIZE = int(os.getenv("BATCH_SIZE", 1))
 BASE_MODEL = os.getenv("BASE_MODEL", "HuggingFaceH4/zephyr-7b-alpha")
 PEFT_MODEL = os.getenv("PEFT_MODEL", "Mistral-zephyr-german-assistant-v1")

@@ -5,7 +5,7 @@ from torch.optim.lr_scheduler import ExponentialLR
 from bitsandbytes.optim import PagedLion32bit
 import os
 
-ACCUMULATION_STEPS = 16
+ACCUMULATION_STEPS = int(os.getenv("ACCUMULATION_STEPS", 16))
 TOKEN = os.getenv("HF_TOKEN", None)
 
 
