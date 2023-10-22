@@ -21,7 +21,6 @@ from transformers import pipeline
 from optimum.bettertransformer import BetterTransformer
 import requests
 import json
-import re
 
 
 class Plugins(Enum):
@@ -346,7 +345,7 @@ class Agent:
         text = ""
         result = self.llm.text_generation(
             prompt=query,
-            max_new_tokens=1024,
+            max_new_tokens=512,
             temperature=self.temperature,
             stop_sequences=[END_TOKEN, "###"],
             stream=True,

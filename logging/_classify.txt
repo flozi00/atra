@@ -106,3 +106,5 @@ Wann ist eine Blasenentzündung gefährlich? --> open_qa
 ********************
 Woran erkennt man eine Blasenentzündung ? --> open_qa
 ********************
+Hi, was geht --> general_qa
+********************

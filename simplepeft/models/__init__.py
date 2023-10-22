@@ -125,7 +125,7 @@ def get_model(
 
     try:
         processor = tok_class.from_pretrained(peft_name, legacy=False)
-    except:
+    except Exception:
         # load the processor
         processor = tok_class.from_pretrained(
             model_name if processor_name is None else processor_name,
@@ -166,7 +166,7 @@ def get_model(
         if processor.pad_token is None:
             processor.pad_token = processor.eos_token
             print("Setting pad token to eos token")
-    except:
+    except Exception:
         if processor.tokenizer.pad_token is None:
             processor.tokenizer.pad_token = processor.tokenizer.eos_token
             print("Setting pad token to eos token")

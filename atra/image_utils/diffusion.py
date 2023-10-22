@@ -1,4 +1,3 @@
-import pathlib
 from diffusers import (
     StableDiffusionXLPipeline,
     StableDiffusionXLImg2ImgPipeline,
