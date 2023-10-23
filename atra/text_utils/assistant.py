@@ -68,15 +68,16 @@ def get_serp(query: str):
     answer_box = response.get("answerBox", {})
     organic_results = response.get("organic", [])
 
-    try:
-        text += "passage: " + knowledge_graph.get("description", "")
-    except Exception:
-        pass
+    if knowledge_graph != {}:
+        try:
+            text += "passage: " + knowledge_graph.get("description", "")
+        except Exception:
+            pass
 
-    try:
-        text += "passage: " + str(knowledge_graph.get("attributes", ""))
-    except Exception:
-        pass
+        try:
+            text += "passage: " + str(knowledge_graph.get("attributes", ""))
+        except Exception:
+            pass
 
     try:
         text += answer_box.get("title", "") + ": "
@@ -85,7 +86,7 @@ def get_serp(query: str):
         pass
 
     for result in organic_results:
-        text += "passage: " + result["snippet"] + "\n\n"
+        text += "passage: " + result["snippet"] + "\n"
         links.append(result["link"])
 
     return text, links
