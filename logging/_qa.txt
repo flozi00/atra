@@ -321,3 +321,45 @@ Frage: Woran erkennt man eine Blasenentzündung ?
 
 Die Symptome einer Blasenentzündung sind Schmerzen beim Wasserlassen, häufiger Harndrang und Brennen beim Wasserlassen.
 ********************
+### SYSTEM: Im Folgenden beantwortet eine deutsche KI anhand der gegebenen passagen die Frage so gut wie möglich.
+Bei der Beantwortung der Frage wird sich auf die passagen bezogen und keine Informationen ausgedacht.
+Wenn die Beantwortung nicht möglich ist wird dies mitgeteilt.</s>
+### USER: 
+passage: passage: Olaf Scholz / Geburtsdatum: 14. Juni 1958
+
+passage: Olaf Scholz ist seit Dezember 2021 der Bundes-Kanzler der Bundes-Republik Deutschland. Er wurde am 14. Juni 1958 in Osnabrück geboren. Von 2018 – 2021 war ...
+passage: Ich bin 1958 in Osnabrück geboren und in Hamburg-Altona getauft, mittlerweile lebe ich in Potsdam. Mein Großvater war Eisenbahner, meine Eltern arbeiteten ...
+passage: 14. Juni: Olaf Scholz wird als ältestes von drei Kindern in Osnabrück geboren. Seine Eltern arbeiten in der Textilbranche. Die Familie wohnt in Hamburg- ...
+passage: Seit Dezember 2021 ist Olaf Scholz der neunte Bundeskanzler der ... Biografie Olaf Scholz. Geboren am 14. Juni 1958 in Osnabrück. per E-Mail teilen, Olaf ...
+passage: Geburtstag, 14.06.1958. Sternzeichen, Zwillinge. Geburtsort, Osnabrück / Niedersachsen ... Dezember 2021 wurde Olaf Scholz schließlich mit 395 von 707 abgegebenen ...
+passage: Scholz wurde am 14. Juni 1958 in Osnabrück geboren. Aktuell ist er damit 63. Aufgewachsen ist der SPD-Politiker in der Stadt, in der er später ...
+passage: Bundeskanzler Olaf Scholz feiert am 14. Juni seinen 65. Geburtstag. Ein Überblick über die Stationen seines Lebens.
+passage: Geboren am 14. Juni 1958 in Osnabrück; konfessionslos; verheiratet. 1975 Eintritt in die SPD; 1977 Abitur in Hamburg-Rahlstedt; 1984 Jurastudium erfolgreich ...
+passage: Juni 1958 in Osnabrück geboren. Scholz ist mit zwei Brüdern, als Sohn bürgerlicher Kaufleute des Textilgewerbes, in Hamburg aufgewachsen. Das Abitur legte er am ...
+passage: Wir verwenden Cookies, um Ihnen die optimale Nutzung unserer Webseite zu ermöglichen. Es werden für den Betrieb der Seite notwendige Cookies gesetzt. Darüber hinaus können Sie Cookies für Statistikzwecke zulassen. Zur Datenschutzerklärung
+Wir verwenden Cookies, die zur Nutzung der Webseite notwendig sind. Daneben nehmen wir in unserem Interesse zur Feststellung der Reichweite unserer Inhalte mithilfe des Webanalysedienstes Matomo eine Reichweitenanalyse vor, wobei wir gekürzte IP-Adressen verwenden, die eine Personenbeziehbarkeit ausschließen. Dem kannst Du hier widersprechen. Weitere Informationen findest Du in unseren Datenschutzhinweisen.
+Ich bin 1958 in Osnabrück geboren und in Hamburg-Altona getauft, mittlerweile lebe ich in Potsdam. Mein Großvater war Eisenbahner, meine Eltern arbeiteten in der Textilwirtschaft. In Hamburg verbrachte ich gemeinsam mit meinen Brüdern Jens und Ingo eine schöne Kindheit.
+Ich war schon immer politisch engagiert, bin früh Schulsprecher geworden in meinem Gymnasium in Hamburg-Rahlstedt. Ich glaube, mein Engagement hat etwas zu tun mit der Einstellung meiner Eltern. Vor allem Helmut Schmidt und Willy Brandt haben sie begeistert.
+Helmut Schmidt war auch für mich eine prägende politische Persönlichkeit, die mich mit 17 Jahren in die SPD geführt hat. Noch wichtiger war mir aber schon als Jugendlicher, Partei zu ergreifen für Gerechtigkeit. Und dafür gab und gibt es eben nur eine Partei: die SPD.
+Ich zähle zu denen, die die Chancen genutzt haben, studieren zu können. Das habe ich wie viele andere auch dem Engagement sozialdemokratischer Bildungspolitiker zu verdanken. Ich studierte in Hamburg Rechtswissenschaften und machte danach meinen Zivildienst.
+Von 1982 bis 1988 war ich stellvertretender Bundesvorsitzender der Jusos, der Jugendorganisation der SPD. Von 1987 bis 1989 außerdem Vizepräsident der International Union of Socialists Youth. Ab
+passage: Rad.
+1998 bewarb ich mich um einen Sitz im Deutschen Bundestag und wurde direkt gewählt im Wahlkreis Hamburg-Altona. 2001 wurde ich Innensenator in Hamburg, ein Jahr später SPD-Generalsekretär. 2005 dann Parlamentarischer Geschäftsführer der SPD-Bundestagsfraktion. Von 2007 bis 2009 setzte ich als Bundesminister für Arbeit und Soziales Branchenmindestlöhne durch. Während der Finanzkrise entwickelte ich das Instrument der Kurzarbeit weiter und kämpfte damit für die Sicherung von Millionen Jobs.
+2011 wurde ich zu Hamburgs Erstem Bürgermeister gewählt. Sieben Jahre bekleidete ich dieses Amt und konnte sehr konkret in meiner Heimatstadt wichtige Ziele voranbringen. Zum Beispiel gebührenfreie Kitas und flächendeckend Ganztagsschulen. Und ich trieb den Wohnungsbau früh und energisch voran.
+Nach der Bundestagswahl 2017 wurde ich Vizekanzler und Bundesminister der Finanzen. Mir ist es wichtig, entschlossen in die Zukunft zu investieren, in eine bessere Infrastruktur, schnelle Breitbandkabel, gebührenfreie Kitas, sozialen Wohnungsbau und vieles mehr. Und zugleich solide Finanzen zu haben, damit wir für Krisenzeiten gewappnet sind.
+Am 8. Dezember 2021 wurde ich zum Kanzler der Bundesrepublik Deutschland gewählt. Ich möchte, dass die Zwanzigerjahre eine Zeit des Aufbruchs werden. Ich stehe für eine Gesellschaft, die vom gegenseitigen Respekt füreinander geprägt ist. Für ein Zukunftsprogramm, das die wichtigen technologischen und wirtschaftlichen Weichen stellen wird, um effektiv den Kampf gegen den Klimawandel zu führen. Das unsere Wirtschaft modernisiert und dafür sorgt, dass wir auch künftig technologisch an der Spitze stehen. Und ich kämpfe für ein souveränes und solidarisches Europa.
+... ich es kann, weil es mir Spaß macht und weil ich dazu beitragen möchte, dass die Welt gerechter und friedlicher wird.
+… nie eine Kategorie, in der ich denke. Als Politiker versuche
+passage: zähle zu denen, die die Chancen genutzt haben, studieren zu können. Das habe ich wie viele andere auch dem Engagement sozialdemokratischer Bildungspolitiker zu verdanken. Ich studierte in Hamburg Rechtswissenschaften und machte danach meinen Zivildienst.
+Von 1982 bis 1988 war ich stellvertretender Bundesvorsitzender der Jusos, der Jugendorganisation der SPD. Von 1987 bis 1989 außerdem Vizepräsident der International Union of Socialists Youth. Ab Ende der achtziger Jahre arbeitete ich als Anwalt für Arbeitsrecht. In dieser Zeit vertrat ich hunderte Beschäftigte in Kündigungsschutzklagen. Im Zuge der Wiedervereinigung beriet ich viele neue Betriebsräte in den Verhandlungen mit der Treuhand-Gesellschaft.
+FÜR MICH IST DIE SPD DIE EINZIGE PARTEI, DIE VON JEHER DAFÜR STEHT, DASS ES UM JEDE UND JEDEN IN DER GESELLSCHAFT GEHT. SIE IST EINE SOZIALE PARTEI, DIE EINE BESSERE ZUKUNFT DURCH DEMOKRATISCHE POLITIK FÜR MÖGLICH HÄLT UND OHNE RESSENTIMENTS AUFTRITT.
+Mitte der 80er Jahre lernte ich meine heutige Frau Britta Ernst in Hamburg kennen, seit 1998 sind wir verheiratet. Meine Frau war es auch, die mich zum Sport gebracht hat. In Schulzeiten habe ich Sport gehasst, heute jogge ich so oft es geht. Ich versuche, mir zwei oder drei Mal pro Woche Zeit für Sport zu nehmen - joggen, rudern oder wandern. Außerdem fahren wir gerne Rad.
+1998 bewarb ich mich um einen Sitz im Deutschen Bundestag und wurde direkt gewählt im Wahlkreis Hamburg-Altona. 2001 wurde ich Innensenator in Hamburg, ein Jahr später SPD-Generalsekretär. 2005 dann Parlamentarischer Geschäftsführer der SPD-Bundestagsfraktion. Von 2007 bis 2009 setzte ich als Bundesminister für Arbeit und Soziales Branchenmindestlöhne durch. Während der Finanzkrise entwickelte ich das Instrument der Kurzarbeit weiter und kämpfte damit
+passage: den Klimawandel zu führen. Das unsere Wirtschaft modernisiert und dafür sorgt, dass wir auch künftig technologisch an der Spitze stehen. Und ich kämpfe für ein souveränes und solidarisches Europa.
+... ich es kann, weil es mir Spaß macht und weil ich dazu beitragen möchte, dass die Welt gerechter und friedlicher wird.
+… nie eine Kategorie, in der ich denke. Als Politiker versuche ich, konkrete Probleme zu lösen. Und wenn das gelingt, etwa bei der Schaffung der Kurzarbeit-Regelung in der Finanzkrise, beim Schmieden einer europäischen Allianz für den Wiederaufbau nach der Corona-Krise oder auch bei einer Reihe von Projekten aus meiner Hamburger Zeit wie dem Wohnungsbau und dem Ausbau der Kita-Plätze, habe ich das schöne Gefühl, meinen Job gemacht zu haben. Und dann geht es weiter. Denn: „Fertig“ ist fortschrittliche Politik natürlich nie – es gibt immer etwas zu tun.
+…, dass unsere liberalen Demokratien immer stärker unter Druck geraten. Wir werden nicht nachlassen darin, für die Errungenschaften von Rechtsstaat und Demokratie einzustehen. Und wir müssen die Probleme lösen, damit die billigen Parolen der Populisten nicht verfangen.
+
+
+Frage: Wann wurde Olaf Scholz geboren</s>### ASSISTANT:  Antwort:  --> 14. Juni 1958
+********************

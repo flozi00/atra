@@ -16,11 +16,17 @@ from atra.text_utils.prompts import (
     USER_TOKEN,
 )
 from atra.text_utils.typesense_search import SemanticSearcher, Embedder
-import functools
 from transformers import pipeline
 from optimum.bettertransformer import BetterTransformer
 import requests
 import json
+from redis_cache import RedisCache
+from redis import StrictRedis
+
+redis_client = StrictRedis(
+    host=os.getenv("CACHE_HOST", "localhost"), decode_responses=True
+)
+cache = RedisCache(redis_client=redis_client)
 
 
 class Plugins(Enum):
@@ -38,12 +44,66 @@ pipe = pipeline(
     torch_dtype=torch.float16,
 )
 pipe.model = BetterTransformer.transform(pipe.model)
-# pipe.model = torch.compile(pipe.model, mode="max-autotune")
 
 
-@functools.cache
+@cache.cache(ttl=60 * 60 * 24 * 7)
 def get_dolly_label(prompt: str) -> str:
     return pipe(prompt)[0]["label"].strip()
+
+
+@cache.cache(ttl=60 * 60 * 24 * 7)
+def get_serp(query: str):
+    url = "https://google.serper.dev/search"
+
+    payload = json.dumps({"q": query, "gl": "de", "hl": "de"})
+    headers = {
+        "X-API-KEY": SERP_API_KEY,
+        "Content-Type": "application/json",
+    }
+
+    text = ""
+    links = []
+    response = requests.request("POST", url, headers=headers, data=payload).json()
+    knowledge_graph = response.get("knowledgeGraph", {})
+    answer_box = response.get("answerBox", {})
+    organic_results = response.get("organic", [])
+
+    try:
+        text += "passage: " + knowledge_graph.get("description", "")
+    except Exception:
+        pass
+
+    try:
+        text += "passage: " + str(knowledge_graph.get("attributes", ""))
+    except Exception:
+        pass
+
+    try:
+        text += answer_box.get("title", "") + ": "
+        text += answer_box.get("answer", "") + "\n\n"
+    except Exception:
+        pass
+
+    for result in organic_results:
+        text += "passage: " + result["snippet"] + "\n"
+        links.append(result["link"])
+
+    return text, links
+
+
+@cache.cache(ttl=60 * 60 * 24 * 7)
+def do_browsing(url: str) -> str:
+    content = ""
+    with sync_playwright() as p:
+        browser = p.chromium.launch()
+        page = browser.new_page()
+        try:
+            page.goto(url, timeout=3000)
+            content += page.locator("body").inner_text() + "\n\n"
+        except Exception as e:
+            print(e, url)
+        browser.close()
+    return content
 
 
 class Agent:
@@ -54,24 +114,6 @@ class Agent:
         self.llm = llm
         self.searcher = SemanticSearcher(embedder=embedder)
         self.temperature = 0.1 if creative is False else 0.4
-
-    def log_text2text(self, input: str, output: str, tasktype: str) -> None:
-        """
-        Logs a text2text to txt file.
-        """
-        input = input.replace("-->", "~~>")
-        output = output.replace("-->", "~~>")
-
-        try:
-            with open(f"logging/_{tasktype}.txt", mode="r+") as file:
-                content = file.read()
-        except Exception:
-            content = ""
-
-        if input not in content:
-            with open(f"logging/_{tasktype}.txt", mode="a+") as file:
-                file.write(f"{input} --> {output}".strip())
-                file.write("\n" + "*" * 20 + "\n")
 
     def __call__(
         self, last_message: str, full_history: str, url: str
@@ -108,7 +150,11 @@ class Agent:
                 search_query = search_question
                 if len(url) > 6:
                     search_query += f" site:{url}"
-                options = self.get_webpage_content_playwright(search_query)
+                serp_text, links = get_serp(search_query)
+                options = self.get_filtered_webpage_content(
+                    search_question, links=links
+                )
+                options = serp_text + options
             else:
                 options = self.get_data_from_typesense(search_question)
 
@@ -121,7 +167,24 @@ class Agent:
             for text in answer:
                 yield text
 
-    @functools.cache
+    def log_text2text(self, input: str, output: str, tasktype: str) -> None:
+        """
+        Logs a text2text to txt file.
+        """
+        input = input.replace("-->", "~~>")
+        output = output.replace("-->", "~~>")
+
+        try:
+            with open(f"logging/_{tasktype}.txt", mode="r+") as file:
+                content = file.read()
+        except Exception:
+            content = ""
+
+        if input not in content:
+            with open(f"logging/_{tasktype}.txt", mode="a+") as file:
+                file.write(f"{input} --> {output}".strip())
+                file.write("\n" + "*" * 20 + "\n")
+
     def classify_plugin(self, history: str) -> Plugins:
         """
         Classifies the plugin based on the given history.
@@ -140,7 +203,6 @@ class Agent:
         else:
             return Plugins.LOKAL
 
-    @functools.cache
     def generate_selfstanding_query(self, history: str) -> str:
         """
         Generates a search question based on the given history using the LLM.
@@ -258,47 +320,7 @@ class Agent:
 
         return options
 
-    @functools.cache
-    def get_serp(self, query: str):
-        url = "https://google.serper.dev/search"
-
-        payload = json.dumps({"q": query, "gl": "de", "hl": "de"})
-        headers = {
-            "X-API-KEY": SERP_API_KEY,
-            "Content-Type": "application/json",
-        }
-
-        text = ""
-        links = []
-        response = requests.request("POST", url, headers=headers, data=payload).json()
-        knowledge_graph = response.get("knowledgeGraph", {})
-        answer_box = response.get("answerBox", {})
-        organic_results = response.get("organic", [])
-
-        try:
-            text += "passage: " + knowledge_graph.get("description", "")
-        except Exception:
-            pass
-
-        try:
-            text += "passage: " + str(knowledge_graph.get("attributes", ""))
-        except Exception:
-            pass
-
-        try:
-            text += answer_box.get("title", "") + ": "
-            text += answer_box.get("answer", "") + "\n\n"
-        except Exception:
-            pass
-
-        for result in organic_results:
-            text += "passage: " + result["snippet"] + "\n"
-            links.append(result["link"])
-
-        return text, links
-
-    @functools.cache
-    def get_webpage_content_playwright(self, query: str) -> Iterable[str]:
+    def get_filtered_webpage_content(self, query: str, links: list) -> Iterable[str]:
         """
         Uses Playwright to launch a Chromium browser and navigate
         to a search engine URL with the given query.
@@ -310,19 +332,9 @@ class Agent:
         Returns:
         - filtered (str): The filtered and re-ranked text content of the webpage.
         """
-        serp_text, links = self.get_serp(query)
         content = ""
-        with sync_playwright() as p:
-            browser = p.chromium.launch()
-            page = browser.new_page()
-            for link in tqdm(links[:2]):
-                try:
-                    page.goto(link, timeout=3000)
-                    content += page.locator("body").inner_text() + "\n\n"
-                except Exception as e:
-                    print(e, link)
-            browser.close()
-
+        for link in tqdm(links[:2]):
+            content += do_browsing(link) + "\n"
         content = content.split("\n")
         filtered = ""
         for co in content:
@@ -337,9 +349,7 @@ class Agent:
 
         filtered = self.re_ranking(query, filtered)
 
-        content = serp_text + filtered
-
-        return content[: 1024 * 3 * 3]
+        return filtered[: 1024 * 3 * 3]
 
     def custom_generation(self, query) -> Iterable[str]:
         text = ""
