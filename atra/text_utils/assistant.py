@@ -85,7 +85,7 @@ def get_serp(query: str):
         pass
 
     for result in organic_results:
-        text += "passage: " + result["snippet"] + "\n"
+        text += "passage: " + result["snippet"] + "\n\n"
         links.append(result["link"])
 
     return text, links
@@ -218,6 +218,7 @@ class Agent:
             prompt=SEARCH_PROMPT_PROCESSED.replace("<|question|>", history),
             stop_sequences=["\n", END_TOKEN],
             temperature=0.1,
+            do_sample=False,
         )
 
         for _ in TOKENS_TO_STRIP:
@@ -299,7 +300,7 @@ class Agent:
             if score > 0.7:
                 filtered_corpus.append(corpus[idx])
 
-        return "\n".join(filtered_corpus)
+        return "\n\n".join(filtered_corpus)
 
     def get_data_from_typesense(self, query: str) -> str:
         """
@@ -316,7 +317,7 @@ class Agent:
         result = self.searcher.semantic_search(query)
         for res in result:
             for key, value in res.items():
-                options += "passage: " + value + "\n"
+                options += "passage: " + value + "\n\n"
 
         return options
 
@@ -343,13 +344,14 @@ class Agent:
 
         filtered_words = filtered.split(" ")
         filtered = []
-        STEPSIZE = 200
+        STEPSIZE = 250
         for i in range(0, len(filtered_words), STEPSIZE):
             filtered.append(" ".join(filtered_words[i : i + int(STEPSIZE * 1.3)]))
 
         filtered = self.re_ranking(query, filtered)
+        filtered = "\npassage: ".join(filtered.split("passage: ")[:3])
 
-        return filtered[: 1024 * 3 * 3]
+        return filtered
 
     def custom_generation(self, query) -> Iterable[str]:
         text = ""

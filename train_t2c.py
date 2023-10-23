@@ -7,9 +7,9 @@ import simplepeft.train.train
 
 simplepeft.train.train.ACCUMULATION_STEPS = 32
 
-BATCH_SIZE = 8
-BASE_MODEL = "mDeBERTa-v3-llm-tasks-classification"
-PEFT_MODEL = "mDeBERTa-v3-llm-tasks-classification"
+BATCH_SIZE = 1
+BASE_MODEL = "flozi00/multilingual-e5-large-llm-tasks"
+PEFT_MODEL = "multilingual-e5-large-llm-tasks"
 TASK = Tasks.TEXT_CLASSIFICATION
 LR = 1e-5
 

@@ -363,3 +363,57 @@ passage: den Klimawandel zu führen. Das unsere Wirtschaft modernisiert und daf�
 
 Frage: Wann wurde Olaf Scholz geboren</s>### ASSISTANT:  Antwort:  --> 14. Juni 1958
 ********************
+### SYSTEM: Im Folgenden beantwortet eine deutsche KI anhand der gegebenen passagen die Frage so gut wie möglich.
+Bei der Beantwortung der Frage wird sich auf die passagen bezogen und keine Informationen ausgedacht.
+Wenn die Beantwortung nicht möglich ist wird dies mitgeteilt.</s>
+### USER: 
+passage: passage: APP.2.2: Active Directory - BSI: 
+
+passage: Active Directory, kurz AD, ist ein zentraler Verzeichnisdienst von Microsoft, der erstmals mit Windows 2000 eingeführt worden ist.
+passage: Das Active Directory ist der Verzeichnisdienst, den Microsoft erstmalig mit Windows 2000 (NT 5.0) ausgeliefert und in Windows Server 2003 ...
+passage: Active Directory ist ein wichtiger Bestandteil in der Netzwerk- und Nutzerverwaltung. Wir erklären, wozu diese Microsoft-Technologien ...
+passage: Active Directory (AD) heißt der mit Windows 2000 eingeführte Verzeichnisdienst von Microsoft Windows Server, dessen Kernkomponente auch als Active Directory ...
+passage: Das Active Directory (AD) ist ein von Microsoft entwickelter Verzeichnisdienst, der in vielen Unternehmensnetzwerken unerlässlich geworden ist.
+passage: Das Active Directory (AD) ist für die IT-Abteilung das Gleiche, wie eine HR-Software für die Personalabteilung. Ähnlich zu einem Verzeichnis oder Telefonbuch.
+passage: Verzeichnisdienste sind heutzutage ein wichtiger Bestandteil einer modernen IT-Infrastruktur. Sie verwalten Benutzerdaten zentral und regeln ...
+passage: Lightweight Directory Access Protocol ist ein Anwendungsprotokoll, das dazu dient, auf Verzeichnisdienste über ein Netzwerk zuzugreifen und diese zu verwalten.
+passage: Die IT-Organisation des Unternehmens verwaltet und unterstützt die Arbeitslasten und die Infrastruktur, auf der sie gehostet werden ...
+passage: Active Directory, kurz AD, ist ein zentraler Verzeichnisdienst von Microsoft, der erstmals mit Windows 2000 eingeführt worden ist. Die Microsoft Active Directory ist die zentrale Informationsquelle eines Netzwerks. Der Verzeichnisdienst bündelt alle Informationen über Benutzer, Passwörter, Zugriffsfreigaben und -beschränkungen sowie mit dem Netzwerk verbundene Objekte. Es verschafft dem Systemadministrator einen Überblick über die Netzwerkstruktur und ist eine essentielle Hilfe für die Netzwerkverwaltung. Durch die Bündelung der Netzwerkinformationen und die zentrale Rechtevergabe kann der Verzeichnisdienst helfen, ein Firmennetzwerk einfacher und effizienter zu verwalten – besonders dort, wo die Anzahl der mit dem Netzwerk verbundenen Rechner hoch ist. Im Gegensatz zur dezentralen Verwaltung verbessert die Microsoft Active Directory die flächendeckende Einhaltung von Sicherheitsrichtlinien. Grundlegende Voraussetzung dafür ist jedoch eine penible Planung der Active Directory, um diesen Verzeichnisdienst auch sicher einsetzen und von den Vorteilen profitieren zu können.
+Die Windows Active Directory funktioniert ähnlich wie ein Telefonbuch, in dem Rufnummern und Adressen zu bestimmten Namen gespeichert sind. Der Verzeichnisdienst ermöglicht den zentralen Zugriff auf alle ihm zugeteilten Objekte wie Rechner, Software, Datenbanken und Drucker innerhalb des Firmennetzwerkes – unabhängig vom Rechner und mit nur einer einzigen Anmeldung. Die Microsoft Active Directory ist hierarchisch gegliedert und kann in Gruppen, sogenannte Domänen, unterteilt werden, die abgeschlossene Sicherheitsbereiche innerhalb eines Netzwerkes darstellen.
+In unserem Lexikon finden Sie Definitionen, Beschreibungen und verständliche Erklärungen zu den relevantesten Fachbegriffen rund der IT-Branche.
+Wir nutzen Cookies auf unserer Website. Einige von ihnen sind essenziell, während andere uns helfen, diese Website und Ihre Erfahrung zu verbessern.
+Indem Sie weiterhin diese Webseite nutzen, stimmen Sie der Verwendung von Cookies zu. Weitere Informationen zu Cookies und Datenschutz
+Das
+passage: Sicherheitsbereiche innerhalb eines Netzwerkes darstellen.
+In unserem Lexikon finden Sie Definitionen, Beschreibungen und verständliche Erklärungen zu den relevantesten Fachbegriffen rund der IT-Branche.
+Wir nutzen Cookies auf unserer Website. Einige von ihnen sind essenziell, während andere uns helfen, diese Website und Ihre Erfahrung zu verbessern.
+Indem Sie weiterhin diese Webseite nutzen, stimmen Sie der Verwendung von Cookies zu. Weitere Informationen zu Cookies und Datenschutz
+Das Active Directory ist der Verzeichnisdienst, den Microsoft erstmalig mit Windows 2000 (NT 5.0) ausgeliefert und in Windows Server 2003 (NT 5.2) verbessert hat. Mit dem Active Directory Application Mode (ADAM) alias Active Directory Lightweight Directory Services existiert inzwischen auch eine funktionsreduzierte Version, die Softwarehersteller als Basis für selbst entwickelte Anwendungen nutzen können.
+Das Active Directory besitzt über die Fähigkeiten von LDAP hinaus weiteren Funktionen, z.B. die Multi-Master Replikation, die ermöglicht, dass alle Domänencontroller in einer Windows-Domäne einen identischen Satz von Daten halten.
+Das Active Directory besitzt keine eigene Versionszählung. In jeder neuen Version von Windows Server gab es jedoch Erweiterungen an
+Ein Active Directory hat eine komplexe Struktur. Grundbaustein eines Active Directory sind die aus NT 4.0 bekannten Domänen. Eine Domäne besitzt einen oder mehrere im Wesentlichen gleichberechtigte Domänen-Controller (DC). Eine Unterscheidung in Primary Domain Controller (PDC) und Backup Domain Controller (BDC) findet nicht mehr statt. Nach dem Multi-Master-Prinzip kann auf jedem Domänen-Controller das Verzeichnis nicht nur gelesen, sondern auch verändert werden. Lediglich die Modifikation des Schemas ist nur auf einem bestimmten ausgewählten DC, dem Schema-Master, möglich.
+AD kennt einige wenige Sonderrollen, die nur ein Server haben kann. Diese werden Flexible Single Master Operations (FSMO) genannt. In der deutschen MMC findet man den Begriff
+passage: nicht mehr statt. Nach dem Multi-Master-Prinzip kann auf jedem Domänen-Controller das Verzeichnis nicht nur gelesen, sondern auch verändert werden. Lediglich die Modifikation des Schemas ist nur auf einem bestimmten ausgewählten DC, dem Schema-Master, möglich.
+AD kennt einige wenige Sonderrollen, die nur ein Server haben kann. Diese werden Flexible Single Master Operations (FSMO) genannt. In der deutschen MMC findet man den Begriff „Betriebsmaster“.
+Domänen können zu so genannten Trees (Bäumen) und diese wiederum zu Forests (Wäldern) zusammengefasst werden. Eine Site ist dagegen kein logisches Strukturierungsmittel für den Verzeichnisdienst, sondern spiegelt die physikalische Struktur des Rechnernetzes wider. Die Definition von Sites dient vor allem dazu, die Replikationslast zwischen den Domänen-Controllern eines Active Directory zu regulieren.
+Auf das Active Directory kann auch mit Hilfe des WinNT-Providers zugegriffen werden. Für die Benutzerverwaltung ist davon jedoch abzuraten, da dieses Vorgehen großen Einschränkungen unterworfen ist:
+Die Hierarchisierung in Organisationseinheiten ist nicht sichtbar: Alle Benutzer und Gruppen werden wie in NT 4.0 üblich in einer flachen Liste angezeigt.
+Diese Einschränkung gilt jedoch nur für die Verwaltung von Benutzern, Gruppen, Computern und Organisationseinheiten sowie für die im Active Directory abgebildeten Konfigurationsinformationen. Die Verwaltung von anderen Verzeichnisobjekten wie Windows-Diensten, Freigaben, Sitzungen etc. ist im Active Directory nicht möglich, so dass dafür weiterhin ausschließlich der WinNT-Provider verwendet werden kann.
+ DevOps / Continuous Integration (CI)/Continuous Delivery (CD) mit Pipelines in Azure DevOps Server / Azure DevOps Services (ADO) - Build- und Releasemanagement
+ Professional Agile Leadership Essentials (PAL-E) - Das Training für Führungskräfte im agilen Kontext - Offizielles Training der scrum.org inkl. Zertifizierungsmöglichkeit.
+  Windows PowerShell und PowerShell Core - Der schnelle Einstieg: Skriptbasierte Systemadministration für Windows, Linux und macOS
+ 
+passage: WinNT-Provider verwendet werden kann.
+ DevOps / Continuous Integration (CI)/Continuous Delivery (CD) mit Pipelines in Azure DevOps Server / Azure DevOps Services (ADO) - Build- und Releasemanagement
+ Professional Agile Leadership Essentials (PAL-E) - Das Training für Führungskräfte im agilen Kontext - Offizielles Training der scrum.org inkl. Zertifizierungsmöglichkeit.
+  Windows PowerShell und PowerShell Core - Der schnelle Einstieg: Skriptbasierte Systemadministration für Windows, Linux und macOS
+  SQL Server 2008 R2: Das Programmierhandbuch. Inkl. ADO.NET 3.5, LINQ to Entities und LINQ to SQL
+
+
+Frage: Was bedeutet AD im IT Kontext
+
+</s>### ASSISTANT:  Antwort:  --> 
+Im IT-Kontext steht AD für Active Directory.
+
+Das Active Directory ist der Verzeichnisdienst, den Microsoft erstmalig mit Windows 2000 (NT 5.0) ausgeliefert und in Windows Server 2003 (NT 5.2) verbessert hat. Mit dem Active Directory Application Mode (ADAM) alias Active Directory Lightweight Directory Services existiert inzwischen auch eine funktionsreduzierte Version, die Softwarehersteller als Basis für selbst entwickelte Anwendungen nutzen können.
+********************

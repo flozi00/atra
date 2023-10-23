@@ -214,5 +214,5 @@ Gedanke: Zusammengefasst ist die Wahrscheinlichkeit eines gefährlichen Verlaufs
 Handle: Beende[Die Wahrscheinlichkeit eines gefährlichen Verlaufs bei einer Blasenentzündung ist u. a. erhöht wenn folgende Punkte zutreffen:
 - Die Erkrankte Person gehört nicht der Gruppe der nicht Schwangeren Frauen ohne relevanten Begleiterkrankungen an
 Es wird empfohlen das vorliegen andrer gefährlicher Erkrankungen differentialdiagnostisch abzusichern.]
-}</s> -->  Wann ist eine Blasenentzündung gefährlich?
+}</s> -->  Wann wird eine Harnwegsinfektion bei Kindern als kompliziert eingestuft?
 ********************

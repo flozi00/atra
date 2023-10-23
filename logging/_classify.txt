@@ -108,3 +108,7 @@ Woran erkennt man eine Blasenentzündung ? --> open_qa
 ********************
 Hi, was geht --> general_qa
 ********************
+Was bedeutet AD im IT Kontext --> open_qa
+********************
+Wann wurde Primeline Solutions aus Bad Oeynhausen gegründet --> open_qa
+********************
