@@ -5,7 +5,7 @@ from diffusers import (
 )
 from diffusers.models.attention_processor import AttnProcessor2_0
 import torch
-from atra.utils import timeit
+from atra.utilities.stats import timeit
 import time
 import json
 import diffusers.pipelines.stable_diffusion_xl.watermark

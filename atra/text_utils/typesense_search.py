@@ -7,7 +7,7 @@ from optimum.bettertransformer import BetterTransformer
 
 from torch import Tensor
 
-from atra.utils import timeit
+from atra.utilities.stats import timeit
 
 
 class Embedder:
@@ -50,12 +50,16 @@ class Embedder:
 
 
 class SemanticSearcher:
-    def __init__(self, embedder: Embedder, collection="articles") -> None:
+    def __init__(
+        self, embedder: Embedder, api_key: str = None, collection="articles"
+    ) -> None:
         self.embedder = embedder
         self.collection_name = collection
+        if api_key is None:
+            api_key = "xyz"
         self.client = typesense.Client(
             {
-                "api_key": os.getenv("TYPESENSE_API_KEY", "xyz"),
+                "api_key": api_key,
                 "nodes": [
                     {
                         "host": os.getenv("TYPESENSE_HOST") or "localhost",

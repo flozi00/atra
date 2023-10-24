@@ -116,3 +116,5 @@ Der wievielte Kanzler ist Joe Biden --> open_qa
 ********************
 Wann war Obama präsident --> open_qa
 ********************
+Wer war der erste Kanzler von der SPD --> open_qa
+********************

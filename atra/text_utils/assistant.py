@@ -3,7 +3,6 @@ from typing import Generator, Iterable
 from sentence_transformers import util
 from huggingface_hub import InferenceClient
 import torch
-from playwright.sync_api import sync_playwright
 from enum import Enum
 from tqdm.auto import tqdm
 from atra.text_utils.prompts import (
@@ -19,15 +18,8 @@ from atra.text_utils.prompts import (
 from atra.text_utils.typesense_search import SemanticSearcher, Embedder
 from transformers import pipeline
 from optimum.bettertransformer import BetterTransformer
-import requests
-import json
-from redis_cache import RedisCache
-from redis import StrictRedis
-
-redis_client = StrictRedis(
-    host=os.getenv("CACHE_HOST", "localhost"), decode_responses=True
-)
-cache = RedisCache(redis_client=redis_client)
+from atra.utilities.redis_client import cache
+from atra.utilities.retrieval import get_serp, do_browsing
 
 
 class Plugins(Enum):
@@ -52,69 +44,13 @@ def get_dolly_label(prompt: str) -> str:
     return pipe(prompt)[0]["label"].strip()
 
 
-@cache.cache(ttl=60 * 60 * 24 * 7)
-def get_serp(query: str) -> tuple[list, list, str | None]:
-    url = "https://google.serper.dev/search"
-
-    payload = json.dumps({"q": query, "gl": "de", "hl": "de"})
-    headers = {
-        "X-API-KEY": SERP_API_KEY,
-        "Content-Type": "application/json",
-    }
-
-    passages = []
-    answer = None
-    links = []
-    response = requests.request("POST", url, headers=headers, data=payload).json()
-    knowledge_graph = response.get("knowledgeGraph", {})
-    answer_box = response.get("answerBox", {})
-    organic_results = response.get("organic", [])
-
-    if knowledge_graph != {}:
-        try:
-            passages.append(knowledge_graph.get("description", ""))
-        except Exception:
-            pass
-
-        try:
-            passages.append(str(knowledge_graph.get("attributes", "")))
-        except Exception:
-            pass
-
-    try:
-        answer = answer_box.get("answer", None)
-    except Exception:
-        pass
-
-    for result in organic_results:
-        passages.append(result["snippet"])
-        links.append(result["link"])
-
-    return passages, links, answer
-
-
-@cache.cache(ttl=60 * 60 * 24 * 7)
-def do_browsing(url: str) -> str:
-    content = ""
-    with sync_playwright() as p:
-        browser = p.chromium.launch()
-        page = browser.new_page()
-        try:
-            page.goto(url, timeout=3000)
-            content += page.locator("body").inner_text() + "\n\n"
-        except Exception as e:
-            print(e, url)
-        browser.close()
-    return content
-
-
 class Agent:
     def __init__(
         self, llm: InferenceClient, embedder: Embedder, creative: bool = False
     ) -> None:
         self.embedder = embedder
         self.llm = llm
-        self.searcher = SemanticSearcher(embedder=embedder)
+        self.searcher = SemanticSearcher(embedder=embedder, api_key=TYPESENSE_API_KEY)
         self.temperature = 0.1 if creative is False else 0.4
 
     def __call__(
@@ -152,7 +88,7 @@ class Agent:
                 search_query = search_question
                 if len(url) > 6:
                     search_query += f" site:{url}"
-                serp_passages, links, answer = get_serp(search_query)
+                serp_passages, links, answer = get_serp(search_query, SERP_API_KEY)
                 options = self.get_filtered_webpage_content(
                     search_question, links=links
                 )

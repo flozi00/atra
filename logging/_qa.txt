@@ -452,3 +452,41 @@ Frage: Wann war Obama präsident
 
 </s>### ASSISTANT:  Antwort:  --> 2009 - 2017
 ********************
+### USER: 
+passage: Reichskanzler Friedrich Ebert (* 1871 † 1925) Amtszeit: 09.11.1918 - 11.02.1919 ; Ministerpräsident Philipp Scheidemann (* 1865 † 1939) Amtszeit: 13.02.1919 - ...
+passage: Angefangen von Konrad Adenauer im Jahr 1949 bis zur Wahl von Olaf Scholz 2021 — die Bundeskanzler und die Bundeskanzlerin der Bundesrepublik Deutschland im ...
+passage: Amtierender Bundeskanzler ist Olaf Scholz (SPD). Er wurde am 8. Dezember 2021 zum neunten Bundeskanzler der Bundesrepublik Deutschland gewählt und ...
+passage: Seit der Gründung der Bundesrepublik Deutschland 1949 war die CDU an der Regierung und stellte den Bundeskanzler: zunächst Konrad Adenauer, dann Ludwig Erhard, ...
+passage: In der Großen Koalition von CDU/CSU und SPD ist Willy Brandt ab Ende 1966 Außenminister und Vizekanzler. 1969 wird er der erste sozialdemokratische ...
+passage: Als Gerhard Schröder (SPD) 1998 zum ersten Mal gewählt wurde, posierte der ". 7 / 9. Gerhard Schröder (1998-2005).
+passage: Die Bundeskanzler mit der längsten Amtszeit sind Angela Merkel und Helmut Kohl mit jeweils rund 16 Jahren. Danach folgt der erste Kanzler Konrad Adenauer.
+passage: Brandts Wille zur politischen Erneuerung der SPD und zum Wandel gesellschaftlicher Verhältnisse in der Bundesrepublik ist geprägt von seinen ...
+passage: Die sozial-liberale Koalition aus SPD und FDP wählt Brandt zum ersten sozialdemokratischen Bundeskanzler. Seine Regierung verwirklicht innere Reformen und ...
+passage: Konrad Adenauer etwa, der erste Kanzler ... 17 Jahre nach Gründung der Bundesrepublik war damit zum ersten Mal auch die SPD an der Regierung ...
+passage: Inhaltsmessung sowie Erkenntnisse über Zielgruppen gesendet werden und um Produkte zu entwickeln und zu verbessern. Mit Ihrer Erlaubnis dürfen wir und unsere 701 Partner über Gerätescans genaue Standortdaten und Kenndaten abfragen. Sie können auf die entsprechende Schaltfläche klicken, um der o. a. Datenverarbeitung durch uns und unsere Partner zuzustimmen. Alternativ können Sie auf detailliertere Informationen zugreifen und Ihre Einstellungen ändern, bevor Sie der Verarbeitung zustimmen oder diese ablehnen. Bitte beachten Sie, dass die Verarbeitung mancher personenbezogenen Daten ohne Ihre Einwilligung stattfinden kann, obwohl Sie das Recht haben, einer solchen Verarbeitung zu widersprechen. Ihre Einstellungen gelten lediglich für diese Website.
+1969 war Willy Brandt der erste deutsche Bundeskanzler, den die SPD stellte. Hier besucht er im März 1974 ein Kohlebergwerk in Dortmund. Kurz danach trat er zurück.
+Willy Brandt und Walter Scheel freuen sich über die gewonnene Bundestagswahl im November 1972. Brandt wurde wieder Kanzler.
+Willy Brandt (links) und Helmut Schmidt (rechts) sitzen 1976 auf dem SPD-Parteitag nebeneinander. Brandt war 1974 als Bundeskanzler zurückgetreten, Schmidt wurde sein Nachfolger. Brandt blieb noch bis 1987 Parteivorsitzender der SPD.
+Seit der Gründung der Bundesrepublik Deutschland 1949 war die CDU an der Regierung und stellte den Bundeskanzler: zunächst Konrad Adenauer, dann Ludwig Erhard, und schließlich in einer Großen Koalition Kurt Georg Kiesinger.
+Bei der Bundestagswahl 1969 erreichten SPD und FDP zusammen genügend Stimmen für die Mehrheit im Bundestag. In einer gemeinsamen Koalition - der ersten sozialliberalen Koalition - regierten nun diese beiden Parteien. Und die SPD stellte den Bundeskanzler: Willy Brandt.
+Das Ziel der neuen Regierung war es, die Nachkriegsstarre zu überwinden. Reformen wurden angestoßen, zum Beispiel im Bereich der Bildung.
+Bekannt ist Willy Brandt aber vor allem für seine Neue Ostpolitik. Unter ihm wurde das angespannte Verhältnis zur DDR und zu den anderen Ostblockstaaten überwunden.
+Die neue Verständigungspolitik im Ost-West-Konflikt stand unter der Losung "Wandel durch Annäherung" und folgte einer "Politik der kleinen Schritte".
+Im Bundestag gab es aber nicht nur Zustimmung zur neuen Ostpolitik. Mehrere Abgeordnete wechselten aus Protest die Partei. So traten einige FDP-Abgeordnete in die
+
+
+passage: der politisch mächtigste deutsche Amtsträger. Man spricht zuweilen sogar von einer „Kanzlerdemokratie“. Er steht jedoch in der deutschen protokollarischen Rangfolge nach dem Bundespräsidenten (als Staatsoberhaupt) sowie dem Bundestagspräsidenten erst an dritter Stelle.[3]
+Amtierender Bundeskanzler ist Olaf Scholz (SPD). Er wurde am 8. Dezember 2021 zum neunten Bundeskanzler der Bundesrepublik Deutschland gewählt und anschließend vom Bundespräsidenten ernannt. Er steht an der Spitze einer Koalition aus SPD, Bündnis 90/Die Grünen und FDP.
+Karl zu Leiningen war 1848 der erste gesamtdeutsche Regierungschef, der Vorsitzende des Ministerrates in der Provisorischen Zentralgewalt. Der eigentliche starke Mann im Kabinett Leiningen, und zumindest de facto sein Nachfolger, war hingegen der Österreicher Anton von Schmerling.
+Der Ausdruck Kanzler kommt aus dem Mittelalter: Am feudalen Hof war der Kanzler der Leiter der herrschaftlichen Schreibstube, der Kanzlei. Unter den Bediensteten des Herrschers hatte der Kanzler die höchste Autorität und war damit mit den ägyptischen Staatsschreibern vergleichbar. Die sprachhistorische Herkunft leitet sich aus dem mittellateinischen Substantiv „cancelli“ ab: der Kanzler ist eine Person, die in einem durch Schranken oder Gitter (cancelli) abgetrennten Raum arbeitet und insbesondere Beglaubigungen ausstellt.
+Andere Titel trugen deutsche Regierungschefs nur in der kurzen verfassungslosen Zeit 1918/19 („Vorsitzender des Rates der Volksbeauftragten“ bzw. „Reichsministerpräsident“). Später in der DDR 1949–1990 lautete der Titel „Vorsitzender des Ministerrates“.
+In der deutschen Verfassungsgeschichte gehörte bereits im Heiligen Römischen Reich das Amt des Erzkanzlers zu den Erzämtern. Es wurde bis 1806, als das Alte Reich endete, als Erzkanzler für Deutschland vom Kurfürsten von Mainz ausgeübt. Der Deutsche Bund (1815–1866) hatte als Organ nur den Bundestag, keine gesonderte Exekutive und keinen Kanzler etwa als ausführenden Beamten.
+Im entstehenden Deutschen Reich der Revolutionszeit 1848/1849 gab es die erste gesamtdeutsche Regierung, die Provisorische Zentralgewalt. Die vorläufige Verfassungsordnung, das Zentralgewaltgesetz, sprach nur von Ministern, die der Reichsverweser einsetzte. Die Minister trafen sich im Ministerrat, dem ein Reichsministerpräsident vorsaß.
+Der Norddeutsche Bund (mit Bundesverfassung vom 1. Juli 1867) hatte einen einzigen verantwortlichen Minister auf Bundesebene, den „Bundeskanzler“. Im Jahr 1871 wurde das Amt für das Deutsche Kaiserreich in „Reichskanzler“ umbenannt. Die
+
+
+
+Frage: Wer war der erste Kanzler von der SPD
+
+</s>### ASSISTANT:  Antwort:  -->  Willy Brandt
+********************

@@ -2,7 +2,7 @@ import torch
 from text_to_num.transforms import alpha2digit
 
 from atra.statics import WHISPER_LANG_MAPPING
-from atra.utils import timeit
+from atra.utilities.stats import timeit
 import pyloudnorm as pyln
 from transformers.pipelines.audio_utils import ffmpeg_read
 from transformers import pipeline
