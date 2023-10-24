@@ -112,3 +112,7 @@ Was bedeutet AD im IT Kontext --> open_qa
 ********************
 Wann wurde Primeline Solutions aus Bad Oeynhausen gegründet --> open_qa
 ********************
+Der wievielte Kanzler ist Joe Biden --> open_qa
+********************
+Wann war Obama präsident --> open_qa
+********************

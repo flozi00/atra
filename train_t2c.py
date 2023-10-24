@@ -8,21 +8,13 @@ import simplepeft.train.train
 simplepeft.train.train.ACCUMULATION_STEPS = 32
 
 BATCH_SIZE = 1
-BASE_MODEL = "flozi00/multilingual-e5-large-llm-tasks"
+BASE_MODEL = "intfloat/multilingual-e5-large"
 PEFT_MODEL = "multilingual-e5-large-llm-tasks"
 TASK = Tasks.TEXT_CLASSIFICATION
 LR = 1e-5
 
 # get all the data
 ds = datasets.load_dataset("flozi00/LLM-Task-Classification", split="train")
-texts = ds["text"]
-named_labels = ds["named_labels"]
-
-ds = datasets.load_dataset("flozi00/classify-llm-tasks-german", split="train")
-texts += ds["input"]
-named_labels += ds["output"]
-
-ds = datasets.Dataset.from_dict({"text": texts, "named_labels": named_labels})
 
 labels = ds.unique("named_labels")
 labels.sort()

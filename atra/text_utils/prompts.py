@@ -16,6 +16,8 @@ QA_SYSTEM_PROMPT = f"""{SYSTEM} Im Folgenden beantwortet eine deutsche KI anhand
 Bei der Beantwortung der Frage wird sich auf die passagen bezogen und keine Informationen ausgedacht.
 Wenn die Beantwortung nicht möglich ist wird dies mitgeteilt.{END_TOKEN}"""
 
+FULL_FORMULATE_SYSTEM_PROMPT = f"""{SYSTEM} Im folgenden gibt der User eine Frage und eine passende Antwort darauf. Der Assistant formuliert die Antwort passend zu der Frage vollständig aus.{END_TOKEN}"""
+
 SEARCH_PROMPT = f"""{SYSTEM} Im folgenden werden aus Konversationen eigenständige und ausformulierte Sätze gebildet, wenn dies notwendig ist damit alle Informationen enthalten sind{END_TOKEN}"""
 
 SEARCH_CONVERSATION = [

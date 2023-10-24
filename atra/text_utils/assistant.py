@@ -14,6 +14,7 @@ from atra.text_utils.prompts import (
     SYSTEM_PROMPT,
     TOKENS_TO_STRIP,
     USER_TOKEN,
+    FULL_FORMULATE_SYSTEM_PROMPT,
 )
 from atra.text_utils.typesense_search import SemanticSearcher, Embedder
 from transformers import pipeline
@@ -52,7 +53,7 @@ def get_dolly_label(prompt: str) -> str:
 
 
 @cache.cache(ttl=60 * 60 * 24 * 7)
-def get_serp(query: str):
+def get_serp(query: str) -> tuple[list, list, str | None]:
     url = "https://google.serper.dev/search"
 
     payload = json.dumps({"q": query, "gl": "de", "hl": "de"})
@@ -61,7 +62,8 @@ def get_serp(query: str):
         "Content-Type": "application/json",
     }
 
-    text = ""
+    passages = []
+    answer = None
     links = []
     response = requests.request("POST", url, headers=headers, data=payload).json()
     knowledge_graph = response.get("knowledgeGraph", {})
@@ -70,26 +72,25 @@ def get_serp(query: str):
 
     if knowledge_graph != {}:
         try:
-            text += "passage: " + knowledge_graph.get("description", "")
+            passages.append(knowledge_graph.get("description", ""))
         except Exception:
             pass
 
         try:
-            text += "passage: " + str(knowledge_graph.get("attributes", ""))
+            passages.append(str(knowledge_graph.get("attributes", "")))
         except Exception:
             pass
 
     try:
-        text += answer_box.get("title", "") + ": "
-        text += answer_box.get("answer", "") + "\n\n"
+        answer = answer_box.get("answer", None)
     except Exception:
         pass
 
     for result in organic_results:
-        text += "passage: " + result["snippet"] + "\n"
+        passages.append(result["snippet"])
         links.append(result["link"])
 
-    return text, links
+    return passages, links, answer
 
 
 @cache.cache(ttl=60 * 60 * 24 * 7)
@@ -151,16 +152,17 @@ class Agent:
                 search_query = search_question
                 if len(url) > 6:
                     search_query += f" site:{url}"
-                serp_text, links = get_serp(search_query)
+                serp_passages, links, answer = get_serp(search_query)
                 options = self.get_filtered_webpage_content(
                     search_question, links=links
                 )
+                serp_text = "passage: " + "\npassage: ".join(serp_passages)
                 options = serp_text + options
             else:
                 options = self.get_data_from_typesense(search_question)
 
             yield "Antworten..."
-            answer = self.do_qa(search_question, options)
+            answer = self.do_qa(search_question, options, answer)
             for text in answer:
                 yield text
         else:
@@ -230,7 +232,7 @@ class Agent:
 
         return text
 
-    def do_qa(self, question: str, context: str) -> Iterable[str]:
+    def do_qa(self, question: str, context: str, serp_answer: str) -> Iterable[str]:
         """
         Generates an answer to a question based on the given context using the LLM.
 
@@ -242,19 +244,33 @@ class Agent:
             str: The generated answer.
         """
         text = ""
-        QA_Prompt = (
-            QA_SYSTEM_PROMPT
-            + "\n"
-            + USER_TOKEN
-            + "\n"
-            + context
-            + "\n\nFrage: "
-            + question
-            + "\n\n"
-            + END_TOKEN
-            + ASSISTANT_TOKEN
-            + " Antwort: "
-        )
+        if serp_answer is None:
+            QA_Prompt = (
+                QA_SYSTEM_PROMPT
+                + "\n"
+                + USER_TOKEN
+                + "\n"
+                + context
+                + "\n\nFrage: "
+                + question
+                + "\n\n"
+                + END_TOKEN
+                + ASSISTANT_TOKEN
+                + " Antwort: "
+            )
+        else:
+            QA_Prompt = (
+                FULL_FORMULATE_SYSTEM_PROMPT
+                + "\n"
+                + USER_TOKEN
+                + +"\n\nFrage: "
+                + question
+                + "\n\nAntwort:"
+                + serp_answer
+                + END_TOKEN
+                + ASSISTANT_TOKEN
+                + "Die vollständig ausformulierte Antwort lautet: "
+            ).strip()
         answer = self.llm.text_generation(
             prompt=QA_Prompt,
             max_new_tokens=512,
@@ -271,7 +287,11 @@ class Agent:
             for token in TOKENS_TO_STRIP:
                 text = text.rstrip(token).rstrip()
 
-        self.log_text2text(input=QA_Prompt, output=text, tasktype="qa")
+        self.log_text2text(
+            input=QA_Prompt.replace(QA_SYSTEM_PROMPT + "\n", ""),
+            output=text,
+            tasktype="qa",
+        )
         yield text.strip()
 
     def re_ranking(self, query: str, options: list) -> str:
@@ -335,7 +355,7 @@ class Agent:
         - filtered (str): The filtered and re-ranked text content of the webpage.
         """
         content = ""
-        for link in tqdm(links[:2]):
+        for link in tqdm(links[:5]):
             content += do_browsing(link) + "\n"
         content = content.split("\n")
         filtered = ""
@@ -347,7 +367,9 @@ class Agent:
         filtered = []
         STEPSIZE = 250
         for i in range(0, len(filtered_words), STEPSIZE):
-            filtered.append(" ".join(filtered_words[i : i + int(STEPSIZE * 1.3)]))
+            filtered.append(
+                " ".join(filtered_words[i : i + int(STEPSIZE * 1.3)]).strip()
+            )
 
         filtered = self.re_ranking(query, filtered)
         filtered = "\npassage: ".join(filtered.split("passage: ")[:3])

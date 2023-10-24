@@ -1,7 +1,4 @@
-### SYSTEM: Im Folgenden beantwortet eine deutsche KI anhand der gegebenen passagen die Frage so gut wie möglich.
-Bei der Beantwortung der Frage wird sich auf die passagen bezogen und keine Informationen ausgedacht.
-Wenn die Beantwortung nicht möglich ist wird dies mitgeteilt.
-Die Antwort beinhaltet keine unnötigen Informationen, aber die Quellenangaben.</s>### USER: Title: Google LLC - Wikipedia
+### USER: Title: Google LLC - Wikipedia
 Paragraph: Das Unternehmen wurde am 4. September 1998 von Larry Page und Sergey Brin gegründet. Noch am selben Tag brachten sie eine Testversion des Programms auf den ...
 Title: Unsere Unternehmensgeschichte: Von der Garage zum Googleplex
 Paragraph: Gegründet: 1998 ; Gründer: Larry Page und Sergey Brin ; Gesellschaftsgründung: 4. September 1998 ; Börsengang (NASDAQ): 19. August 2004 ...
@@ -44,10 +41,7 @@ Frage: Wann wurde Google gegründet
 
 </s>### ASSISTANT:  Antwort:  --> 4. September 1998
 ********************
-### SYSTEM: Im Folgenden beantwortet eine deutsche KI anhand der gegebenen passagen die Frage so gut wie möglich.
-Bei der Beantwortung der Frage wird sich auf die passagen bezogen und keine Informationen ausgedacht.
-Wenn die Beantwortung nicht möglich ist wird dies mitgeteilt.
-Die Antwort beinhaltet keine unnötigen Informationen, aber die Quellenangaben.</s>### USER: 6. Februar 2013, OberurselDie Alternative für Deutschland (Kurzbezeichnung AfD) ist eine rechtspopulistische und rechtsextreme politische Partei in Deutschland.
+### USER: 6. Februar 2013, OberurselDie Alternative für Deutschland (Kurzbezeichnung AfD) ist eine rechtspopulistische und rechtsextreme politische Partei in Deutschland.
 Die Alternative für Deutschland ist eine der sieben im Deutschen Bundestag vertretenen Parteien. Foto: RONNY HARTMANN/AFP. 2013 wurde die AfD ...
 Unter der Regie von Bernd Lucke, Frauke Petry, Beatrix von Storch und Alexander Gauland entstand eine vollwertige Partei, die recht schnell neue ...
 Die Gründung der AfD. Die Alternative für Deutschland ist eine verhältnismäßig sehr junge Partei. Erst im Februar 2013 wurde sie in Oberursel in ...
@@ -80,10 +74,7 @@ Frage: Wann war die Gründung der AFD
 
 </s>### ASSISTANT:  Antwort:  --> 6. Februar 2013
 ********************
-### SYSTEM: Im Folgenden beantwortet eine deutsche KI anhand der gegebenen passagen die Frage so gut wie möglich.
-Bei der Beantwortung der Frage wird sich auf die passagen bezogen und keine Informationen ausgedacht.
-Wenn die Beantwortung nicht möglich ist wird dies mitgeteilt.
-Die Antwort beinhaltet keine unnötigen Informationen, aber die Quellenangaben.</s>### USER: Barack Obama / Nummer: 44
+### USER: Barack Obama / Nummer: 44
 Obama ist von 2009 bis 2017 44. Präsident der Vereinigten Staaten und Mitglied der Demokratischen Partei. Er ist der erste Afroamerikaner in diesem Amt. Während ...
 2008 wurde Barack Obama zum 44. Präsidenten der Vereinigten Staaten von Amerika gewählt. Nur ein Jahr wurde ihm der Friedensnobelpreis verliehen. Der ...
 42, William (Bill) Jefferson Clinton, 1993 – 2001 ; 43, George Walker Bush, 2001 – 2009 ; 44, Barack Hussein Obama, 2009 – 2017 ; 45, Donald Trump, 2017 – 2021.
@@ -128,10 +119,7 @@ Frage: Der wievielte Präsident war Barack Obama
 
 </s>### ASSISTANT:  Antwort:  --> 44.
 ********************
-### SYSTEM: Im Folgenden beantwortet eine deutsche KI anhand der gegebenen passagen die Frage so gut wie möglich.
-Bei der Beantwortung der Frage wird sich auf die passagen bezogen und keine Informationen ausgedacht.
-Wenn die Beantwortung nicht möglich ist wird dies mitgeteilt.
-Die Antwort beinhaltet keine unnötigen Informationen, aber die Quellenangaben.</s>### USER: Mond / Entfernung zur Erde: 384.400 km
+### USER: Mond / Entfernung zur Erde: 384.400 km
 Unser Mond umkreist die Erde jedoch auf einer fast kreisförmigen Bahn mit einer mittleren Entfernung von 384.400 Kilometern, also mehr als dem ...
 Im zeitlichen Mittel beträgt der Abstand der beiden Planeten derzeit rund 384.400 Kilometer, das ist 9,6 Mal der Erdumfang (40.000 Kilometer), ...
 Wie weit ist der Mond von der Erde entfernt? Entfernung Mond-Erde in km & Meilen. Genaue Zeitpunkte für kleinste und größte Distanz.
@@ -164,10 +152,6 @@ Frage:  Wie weit ist der Mond von der Erde entfernt?
 
 Der Abstand zwischen Erde und Mond beträgt im zeitlichen Mittel rund 384.400 Kilometer.
 ********************
-### SYSTEM: Im Folgenden beantwortet eine deutsche KI anhand der gegebenen passagen die Frage so gut wie möglich.
-Bei der Beantwortung der Frage wird sich auf die passagen bezogen und keine Informationen ausgedacht.
-Wenn die Beantwortung nicht möglich ist wird dies mitgeteilt.
-Die Antwort beinhaltet keine unnötigen Informationen, aber die Quellenangaben.</s>
 ### USER: 
 Olaf Scholz / Geburtsort: Osnabrück
 
@@ -209,10 +193,6 @@ Frage: Wo wurde Olaf Scholz geboren
 
 </s>### ASSISTANT:  Antwort:  -->  Olaf Scholz wurde in Osnabrück geboren.
 ********************
-### SYSTEM: Im Folgenden beantwortet eine deutsche KI anhand der gegebenen passagen die Frage so gut wie möglich.
-Bei der Beantwortung der Frage wird sich auf die passagen bezogen und keine Informationen ausgedacht.
-Wenn die Beantwortung nicht möglich ist wird dies mitgeteilt.
-Die Antwort beinhaltet keine unnötigen Informationen, aber die Quellenangaben.</s>
 ### USER: 
 Angela Merkel / Geburtsort: Hamburg
 
@@ -263,9 +243,6 @@ Frage: Wo wurde Angela Merkel geboren
 
 Angela Merkel wurde im Elim-Krankenhaus im Hamburger Stadtteil Eimsbüttel als erstes Kind des evangelischen Theologen Horst Kasner und seiner Frau Herlind Kasner, geb. Jentzsch geboren.
 ********************
-### SYSTEM: Im Folgenden beantwortet eine deutsche KI anhand der gegebenen passagen die Frage so gut wie möglich.
-Bei der Beantwortung der Frage wird sich auf die passagen bezogen und keine Informationen ausgedacht.
-Wenn die Beantwortung nicht möglich ist wird dies mitgeteilt.</s>
 ### USER: 
 passage: passage: Blasenentzündung – Brennen beim Wasserlassen - Patienten-Information.de: 
 
@@ -321,9 +298,6 @@ Frage: Woran erkennt man eine Blasenentzündung ?
 
 Die Symptome einer Blasenentzündung sind Schmerzen beim Wasserlassen, häufiger Harndrang und Brennen beim Wasserlassen.
 ********************
-### SYSTEM: Im Folgenden beantwortet eine deutsche KI anhand der gegebenen passagen die Frage so gut wie möglich.
-Bei der Beantwortung der Frage wird sich auf die passagen bezogen und keine Informationen ausgedacht.
-Wenn die Beantwortung nicht möglich ist wird dies mitgeteilt.</s>
 ### USER: 
 passage: passage: Olaf Scholz / Geburtsdatum: 14. Juni 1958
 
@@ -363,9 +337,6 @@ passage: den Klimawandel zu führen. Das unsere Wirtschaft modernisiert und daf�
 
 Frage: Wann wurde Olaf Scholz geboren</s>### ASSISTANT:  Antwort:  --> 14. Juni 1958
 ********************
-### SYSTEM: Im Folgenden beantwortet eine deutsche KI anhand der gegebenen passagen die Frage so gut wie möglich.
-Bei der Beantwortung der Frage wird sich auf die passagen bezogen und keine Informationen ausgedacht.
-Wenn die Beantwortung nicht möglich ist wird dies mitgeteilt.</s>
 ### USER: 
 passage: passage: APP.2.2: Active Directory - BSI: 
 
@@ -416,4 +387,68 @@ Frage: Was bedeutet AD im IT Kontext
 Im IT-Kontext steht AD für Active Directory.
 
 Das Active Directory ist der Verzeichnisdienst, den Microsoft erstmalig mit Windows 2000 (NT 5.0) ausgeliefert und in Windows Server 2003 (NT 5.2) verbessert hat. Mit dem Active Directory Application Mode (ADAM) alias Active Directory Lightweight Directory Services existiert inzwischen auch eine funktionsreduzierte Version, die Softwarehersteller als Basis für selbst entwickelte Anwendungen nutzen können.
+********************
+### USER: 
+passage: Joe Biden. 46. Präsident der Vereinigten Staaten.
+passage: Aktueller Amtsinhaber und 46. Präsident ist seit dem 20. Januar 2021 Joe Biden. Die Wahl des Präsidenten erfolgt indirekt: Die Bürger der einzelnen ...
+passage: Im Mittelpunkt der USA-Reise von Bundeskanzler Scholz steht ein Gespräch mit US-Präsident Joe Biden im Weißen Haus.
+passage: Joe Biden bei der FAZ: Hier erhalten Sie ausführliche Nachrichten zum 46. Präsidenten der Vereinigten Staaten. ▷ Jetzt informieren!
+passage: Für einen Kurztrip ist Kanzler Scholz zu US-Präsident Biden gereist. Im Weißen Haus unterstrichen beide ihre Unterstützung für die Ukraine.
+passage: Bundeskanzler Olaf Scholz ist in Washington, D.C. zu einem Austausch mit US-Präsident Joe Biden im Weißen Haus zusammengekommen. Im ...
+passage: 44. 2009-2017, Barack Hussein Obama, Demokrat. 45. 2017-2021, Donald Trump, Republikaner. 46. seit 2021, Joseph (Joe) Robinette Biden Jr ...
+passage: Kanzler Scholz in Ägypten, US-Präsident Biden in Israel ... Auch US-Präsident Joe Biden bemüht sich in der Region um diplomatische Lösungen.
+passage: Biden war bereits der 47. US-Vizepräsident unter Barack Obama. Zuvor war er US-Senator für den Bundesstaat Delaware. Joe Biden wurde 1942 im US-Bundesstaat ...
+passage: Joseph „Joe“ Robinette Biden, Jr. (Aussprache [ˈd͡ʒoʊ̯zəf ˌɹɑbɪˈnɛt ˈbaɪ̯dən],[1] * 20. November 1942 in Scranton, Pennsylvania) ist ein US-amerikanischer Politiker der Demokratischen Partei und seit dem 20. Januar 2021 der 46. Präsident der Vereinigten Staaten. Von 1973 bis 2009 gehörte er als Vertreter des Bundesstaates Delaware dem Senat der Vereinigten Staaten an. Von 2009 bis 2017 war er während der Amtszeit Barack Obamas der 47. Vizepräsident der Vereinigten Staaten.
+Biden studierte Geschichte und Recht und war vor seiner politischen Karriere als Rechtsanwalt tätig. Er verlor seine erste Frau Neilia und eine Tochter durch einen Unfall sowie einen Sohn durch Krankheit. 1972 wurde er als 29-jähriger Lokalpolitiker in den nationalen Senat gewählt. Dort wirkte er auf die Verschärfung des Strafrechts hin und profilierte sich als Außenpolitiker sowie als katholischer Vertreter der politischen Mitte. 1988 und 2008 bewarb er sich erfolglos um die Nominierung als demokratischer Präsidentschaftskandidat. An der Seite von Barack Obama gelang ihm 2008 und 2012 die Wahl als Vizepräsident.
+2020 setzte sich Biden gegen starke innerparteiliche Konkurrenz vor allem vom linken Parteiflügel als Präsidentschaftskandidat der Demokraten und Herausforderer Donald Trumps durch. In der Wahl vom 3. November 2020 schlug Biden Trump mit 51,3 % der Stimmen und 306 (gegen 232) Wahlleuten. Im Januar 2021 trat er das Amt vor dem Hintergrund der COVID-19-Pandemie und der Erstürmung des Kapitols durch Trump-Anhänger als bisher ältester Präsident in der amerikanischen Geschichte an. Am 25. April 2023 gab Biden seine Kandidatur bei der Präsidentschaftswahl 2024 bekannt.
+Der Sohn von Joseph „Joe“ Robinette Biden, Sr. (1915–2002) und Catherine Eugenia „Jean“ Finnegan (1917–2010)[2] wuchs mit zwei Brüdern, James Brian und Francis W. Biden, und einer Schwester, Valerie Biden, verh. Owens, auf. Die Familie ist römisch-katholisch und irischer Herkunft.[3] Bidens väterliche Abstammungslinie führt jedoch nach England zurück: Sein Ur-Ur-Ur-Großvater war der Steinmetz William Biden, der 1789 in dem Dorf Westbourne in der südenglischen Grafschaft Sussex geboren wurde und 1820 als Einwanderer im US-Bundesstaat Maryland registriert wurde. Dessen ungeachtet betonte Biden öffentlich nur seine irischen Wurzeln.[4]
+Als Joe Biden Jr. zehn Jahre
+
+
+passage: deren Krankenbett ab. Am 17. Juni 1977 heiratete er in New York City Jill Tracy Jacobs; die gemeinsame Tochter Ashley kam 1981 zur Welt.[6] Am 30. Mai 2015 starb sein Sohn Beau an einem Gehirntumor.[7] Biden hat sieben Enkel.[8] Zur Zeit von Bidens Präsidentschaft wohnen neben Joe und Jill Biden auch seine Enkeltochter Naomi Biden (Tochter von Robert Hunter) und ihr Mann Peter Neal im Weißen Haus. Naomi Biden und Peter Neal heirateten dort im November 2022.[9]
+Biden leidet unter Stottern, das sich nach seinen eigenen Angaben seit seinen frühen Zwanzigern verbessert hat.[10] Er sagt, er habe es reduziert, indem er Gedichte vor einem Spiegel rezitiert habe,[11] wobei er eine Vorliebe für irische Dichter, und besonders Seamus Heaney, den er heute noch gern zitiert, entwickelt habe.[12]
+Politisch aktiv wurde Biden in den Jahren 1968 bis 1969, da die Inhaber der Anwaltskanzleien, in denen er arbeitete, jeweils aktive Lokalpolitiker waren. Seine (anfängliche) Registrierung als Unabhängiger führt er darauf zurück, dass er sowohl den republikanischen Präsidenten Richard Nixon als auch den demokratischen Gouverneur Charles L. Terry nicht leiden konnte – Letzterer hatte die Nationalgarde nach Rassismusunruhen in Wilmington patrouillieren lassen und war als „The Great Divider“ bekannt. Obwohl sich Biden selbst nicht in der Bürgerrechtsbewegung engagierte, nannte er sie immer wieder als einen Auslöser seiner Politisierung.[13]
+Biden gewann sein erstes politisches Mandat, als er (nunmehr Demokrat) im November 1970 in den Rat des New Castle County gewählt wurde. Bei der Wahl zum US-Senat 1972 trat er gegen Cale Boggs an, der als ehemaliger Gouverneur Delawares und langjähriger republikanischer Vertreter des Bundesstaates ein etabliertes Profil hatte. Als einer der Jüngsten überhaupt siegte er mit 29 Jahren und vertrat ab 1973 bis zum Antritt der Vizepräsidentschaft 2009 den Bundesstaat Delaware im Senat der Vereinigten Staaten.[8] Dabei gewann er sechs Wiederwahlen. Als täglicher Bahnfahrer vertrat er im Senat die Interessen von Amtrak und sah sich als Interessenvertreter der Dover Air Force Base und der Hühnerverarbeitungsindustrie Delawares. Als Redner ist er bekannt für seine sprachgewandten
+
+
+
+Frage: Der wievielte Kanzler ist Joe Biden
+
+</s>### ASSISTANT:  Antwort:  --> 46
+********************
+### USER: 
+passage: Obama ist von 2009 bis 2017 44. Präsident der Vereinigten Staaten und Mitglied der Demokratischen Partei. Er ist der erste Afroamerikaner in diesem Amt. Während ...
+passage: 2008 wurde Barack Obama zum 44. Präsidenten der Vereinigten Staaten von Amerika gewählt. Nur ein Jahr wurde ihm der Friedensnobelpreis verliehen. Der ...
+passage: Barack Obama ist ein demokratischer Politiker in den USA und war von 2008 bis 2016 der 44. amtierende Präsident. Wer hat gegen Obama kandidiert? 2007 ...
+passage: Es war ein historischer Tag, als Barack Obama am 20. Januar 2009 als US-Präsident vereidigt wurde. Die Erwartungen an ihn waren riesig – und ...
+passage: Barack Obama war von 2008 bis 2016 der 44. Präsident der Vereinigten Staaten. Als erster afroamerikanischer Präsident der USA machte er ...
+passage: Als 44. Präsident der Vereinigten Staaten von Amerika war Barack Obama von 2009 bis 2017 ein großer Hoffnungsträger in der Weltpolitik. Jemand, der Frieden ...
+passage: Barack Obama war der 44. Präsident der Vereinigten Staaten. Seine Amtszeit dauerte von 2009 bis 2017. Sein Nachfolger war Donald Trump .
+passage: Seit dem 20. Januar 2009 ist Barack Obama der 44. Präsident der Vereinigten Staaten von Amerika. Als Sohn einer Amerikanerin und eines Kenianers ist er ...
+passage: Der ehemalige US-Präsident Barack Obama kommt nach Deutschland. Am 3. Mai will er an einer Diskussionsveranstaltung in Berlin teilnehmen.
+passage: 1989 in der Kanzlei Sidley Austin in Chicago absolvierte. Während dieses Praktikums lernte er seine spätere Ehefrau kennen, die damals noch Michelle Robinson hieß und ihn in der Kanzlei betreute. 1992 heirateten sie. Ein Jahr darauf, 1993, erhielt er eine Anstellung bei den auf Bürgerrecht spezialisierten Anwälten Miner, Barnhill und Garland in Chicago. Bis 2004 lehrte Obama an der University of Chicago Verfassungsrecht.
+1992 trat Barack Obama in die Demokratische Partei ein. Im Rahmen seines ersten politischen Engagements mobilisierte er in Chicago mit einer Kampagne zur Wählerregistrierung mehr als 150.000 afroamerikanische Wähler. Damals wurde Bill Clinton (*19.08.1946) zum Präsidenten gewählt. 1996 und 1998 wurde Barack Obama als Abgeordneter in den Senat von Illinois gewählt. Ab 2005 war Barack Obama Senator von Illinois. 2008 wurde er schließlich zum 44. Präsidenten der Vereinigten Staaten von Amerika gewählt. Damit bekleidete er dieses Amt als erster Afroamerikaner. Sein Wahlkampf erzielte zahlreiche Spendenrekorde, zudem nutzte er als erster Präsidentschaftskandidat das Internet zur Gewinnung neuer Wähler. Er erhielt am 10. Dezember 2009 den Friedensnobelpreis – eine stark umstrittene Entscheidung, da unter seinem Kommando unzählige Drohnenangriffe im Nahen Osten geflogen wurden, bei denen Zivilisten und Kinder getötet wurden.
+2012 wurde Barack Obama in seinem Amt bestätigt. Während beider Amtszeiten stand Barack Obama sein Parteikollege Joseph „Joe“ Biden (*20.11.1942) als Vizepräsident zur Seite. Nach seiner zweiten Amtszeit wurde Barack Obama durch die TV-Persönlichkeit Donald Trump abgelöst.
+Als Präsident der Vereinigten Staaten hatte Barack Obama zwei Themen, für die er bis heute bekannt ist. Eines dieser Anliegen war eine Reform des Gesundheitssystems. Im Oktober 2013 gelang es ihm, eine allgemeine Krankenversicherung einzuführen. Diese wurde allerdings Umfragen zufolge von 59 % der Bevölkerung abgelehnt. Dies ist nicht zuletzt auch auf technische Pannen in der Umsetzung zurückzuführen.
+Außenpolitisch war eines seiner Ziele, den Iran daran zu hindern, Atomwaffen herzustellen. Zu diesem Zwecke gab es seinerzeit ein wegweisendes Abkommen zwischen den USA und dem Iran, das als historische Annährung der beiden verfeindeten Systeme zu verstehen war. 2015 wurde das Abkommen unterzeichnet.
+
+
+passage: Obama ist von 2009 bis 2017 44. Präsident der Vereinigten Staaten und Mitglied der Demokratischen Partei. Er ist der erste Afroamerikaner in diesem Amt. Während seiner Präsidentschaftskandidatur entwickelt er sich mit seinem Wahlslogan „Change“ für viele Menschen zu einem Hoffnungsträger. Die Euphorie legt sich, als Obama sich auch zunehmend als Realpolitiker zeigt.
+4. August: Obama wird als Sohn des Kenianers Barack Obama und der US-Amerikanerin Ann Dunham in Honolulu (Hawaii) geboren.
+1972 kehrt Obama nach Hawaii zurück und lebt bei den Großeltern mütterlicherseits. Besuch der privaten Punahou School in Honolulu, High School Abschluss mit Auszeichnung.
+Studium am Occidental College in Los Angeles, Kalifornien, anschließend an der Columbia University in New York City. Abschluss mit dem Bachelor-Grad in Politikwissenschaften und Internationalen Beziehungen
+Jurastudium an der Harvard Law School in Cambridge, Massachusetts. Obama schließt sein Studium mit dem Juris Doctor und der Bewertung "magna cum laude” ab. Während des Studiums lernt er Michelle LaVaughn Robinson,seine spätere Frau, kennen.
+Rückkehr nach Chicago, Illinois. Obama tritt der Demokratischen Partei bei. Im Zuge des Präsidentschaftswahlkampfes Bill Clintons leitet Obama erfolgreich eine Kampagne zur Wahlregistrierung afroamerikanischer Bürger.
+Engagement in verschiedenen sozialpolitischen und bürgerrechtlichen Organisationen. Lehrbeauftragter für Verfassungsrecht an der University of Chicago Law School.
+Obama vertritt den Bundesstaat Illinois im US-Senat. Zum Zeitpunkt seiner Vereidigung ist er der einzige afroamerikanische Senator. Im Jahr 2004 wird er als Grundsatzredner auf dem Wahlparteitag der Demokraten national bekannt.
+10. Februar: Obama bewirbt sich offiziell für die Präsidentschaftskandidatur der Demokraten. Im Wahlkampf fordert er ein schnelles Ende des Irakkrieges, ein Umdenken in der Energieversorgung und eine bessere Gesundheitsversorgung für alle US-Bürger.
+24. Juli: Während einer Auslandsreise hält Obama vor 200.000 Zuhörern an der Siegessäule in Berlin eine weltweit übertragene Rede.
+27. August: Obama wird auf dem Parteitag der Demokraten in Denver, Colorado zum Präsidentschaftskandidaten gewählt. Seine schärfste Konkurrentin, Hillary Rodham Clinton, gibt ihre Kandidatur auf.
+6. November: Bei der Präsidentschaftswahl erhält Obama 52,9 Prozent der Stimmen und gewinnt 365 der 538 Wahlmännerstimmen. Republikanischer Kandidat ist Senator John McCain. Zusätzlich erringen die Demokraten die Mehrheit in Senat
+
+
+
+Frage: Wann war Obama präsident
+
+</s>### ASSISTANT:  Antwort:  --> 2009 - 2017
 ********************
