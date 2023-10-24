@@ -101,7 +101,7 @@ def build_chat_ui():
             additional_inputs=[gr.Textbox(lines=1, label="Domain")],
         )
 
-        chatter.like(on_like, chatter)
+        # chatter.like(on_like, chatter)
 
     demo.queue()
     demo.launch(**launch_args)

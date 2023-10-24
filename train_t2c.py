@@ -7,7 +7,7 @@ import simplepeft.train.train
 
 simplepeft.train.train.ACCUMULATION_STEPS = 32
 
-BATCH_SIZE = 1
+BATCH_SIZE = 4
 BASE_MODEL = "intfloat/multilingual-e5-large"
 PEFT_MODEL = "multilingual-e5-large-llm-tasks"
 TASK = Tasks.TEXT_CLASSIFICATION

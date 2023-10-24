@@ -20,3 +20,5 @@ typesense-data/
 wandb
 !simplepeft/data/
 *.run
+*.model
+*.bin

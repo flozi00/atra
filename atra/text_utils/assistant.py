@@ -52,6 +52,7 @@ class Agent:
         self.llm = llm
         self.searcher = SemanticSearcher(embedder=embedder, api_key=TYPESENSE_API_KEY)
         self.temperature = 0.1 if creative is False else 0.4
+        self.creative = creative
 
     def __call__(
         self, last_message: str, full_history: str, url: str
@@ -213,6 +214,7 @@ class Agent:
             temperature=self.temperature,
             stop_sequences=[END_TOKEN, "###"],
             stream=True,
+            do_sample=self.creative,
         )
 
         for token in answer:
@@ -320,6 +322,7 @@ class Agent:
             temperature=self.temperature,
             stop_sequences=[END_TOKEN, "###"],
             stream=True,
+            do_sample=self.creative,
         )
         for token in result:
             text += token
