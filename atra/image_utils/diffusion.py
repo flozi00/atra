@@ -10,6 +10,10 @@ import time
 import json
 import diffusers.pipelines.stable_diffusion_xl.watermark
 import os
+from atra.image_utils.free_lunch_utils import (
+    register_free_upblock2d,
+    register_free_crossattn_upblock2d,
+)
 
 
 def apply_watermark_dummy(self, images: torch.FloatTensor):
@@ -57,6 +61,14 @@ PACKED_MODEL = os.getenv(
 diffusion_pipe = StableDiffusionXLPipeline.from_single_file(
     PACKED_MODEL,
     torch_dtype=torch.float16,
+)
+
+register_free_crossattn_upblock2d(
+    diffusion_pipe,
+    b1=1.3,
+    b2=1.4,
+    s1=0.9,
+    s2=0.2,
 )
 
 refiner = StableDiffusionXLImg2ImgPipeline.from_pretrained(
