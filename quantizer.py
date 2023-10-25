@@ -10,7 +10,7 @@ def convert_model(BITS, model):
     quantized_model_dir = f"{pretrained_model_dir.split('/')[-1]}-{BITS}bit-autogptq"
 
     ds = datasets.load_dataset("flozi00/conversations", split="train").select(
-        range(50)
+        range(500)
     )["conversations"]
 
     tokenizer = AutoTokenizer.from_pretrained(
