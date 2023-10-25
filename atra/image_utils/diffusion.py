@@ -3,17 +3,16 @@ from diffusers import (
     StableDiffusionXLImg2ImgPipeline,
     EulerAncestralDiscreteScheduler,
 )
-from diffusers.models.attention_processor import AttnProcessor2_0
 import torch
 from atra.utilities.stats import timeit
 import time
 import json
 import diffusers.pipelines.stable_diffusion_xl.watermark
-import os
 from atra.image_utils.free_lunch_utils import (
     register_free_upblock2d,
     register_free_crossattn_upblock2d,
 )
+import gradio as gr
 
 
 def apply_watermark_dummy(self, images: torch.FloatTensor):
@@ -25,22 +24,7 @@ diffusers.pipelines.stable_diffusion_xl.watermark.StableDiffusionXLWatermarker.a
 )
 
 high_noise_frac = 0.7
-INFER_STEPS = 80
-
-BAD_PATTERNS = [
-    "nude",
-    "naked",
-    "nacked",
-    "porn",
-    "undressed",
-    "sex",
-    "erotic",
-    "pornographic",
-    "vulgar",
-    "hentai",
-    "nackt",
-]
-
+INFER_STEPS = 60
 GPU_ID = 0
 POWER = 450
 GPU_NAME = torch.cuda.get_device_name(GPU_ID)
@@ -53,22 +37,11 @@ elif "RTX 6000" in GPU_NAME:
 elif "L40" in GPU_NAME:
     POWER = 350
 
-PACKED_MODEL = os.getenv(
-    "SDXL_FILE",
-    "https://huggingface.co/jayparmr/DreamShaper_XL1_0_Alpha2/blob/main/dreamshaperXL10.safetensors",
-)
-
-diffusion_pipe = StableDiffusionXLPipeline.from_single_file(
-    PACKED_MODEL,
+diffusion_pipe = StableDiffusionXLPipeline.from_pretrained(
+    "stabilityai/stable-diffusion-xl-base-1.0",
     torch_dtype=torch.float16,
-)
-
-register_free_crossattn_upblock2d(
-    diffusion_pipe,
-    b1=1.3,
-    b2=1.4,
-    s1=0.9,
-    s2=0.2,
+    use_safetensors=True,
+    variant="fp16",
 )
 
 refiner = StableDiffusionXLImg2ImgPipeline.from_pretrained(
@@ -79,10 +52,6 @@ refiner = StableDiffusionXLImg2ImgPipeline.from_pretrained(
     use_safetensors=True,
     variant="fp16",
 )
-
-# set attention processor
-refiner.unet.set_attn_processor(AttnProcessor2_0())
-diffusion_pipe.unet.set_attn_processor(AttnProcessor2_0())
 
 refiner.vae = torch.compile(refiner.vae, mode="reduce-overhead", fullgraph=True)
 
@@ -100,18 +69,28 @@ refiner.to(f"cuda:{GPU_ID}")
 
 
 @timeit
-def generate_images(prompt: str, negatives: str = ""):
+def generate_images(
+    prompt: str,
+    negatives: str = "",
+    lora: str = "",
+    progress=gr.Progress(track_tqdm=True),
+):
     TIME_LOG = {"GPU Power insert in W": POWER}
-
-    # for pattern in BAD_PATTERNS:
-    #    if pattern in prompt:
-    #        raise gr.Error("NSFW prompt not allowed")
-    # raise "NSFW prompt not allowed"
 
     if negatives is None:
         negatives = ""
 
     start_time = time.time()
+    diffusion_pipe.unload_lora_weights()
+    if len(lora) >= 3:
+        diffusion_pipe.load_lora_weights(lora)
+    register_free_crossattn_upblock2d(
+        diffusion_pipe,
+        b1=1.3,
+        b2=1.4,
+        s1=0.9,
+        s2=0.2,
+    )
     with torch.inference_mode():
         image = diffusion_pipe(
             prompt=prompt,
@@ -120,6 +99,7 @@ def generate_images(prompt: str, negatives: str = ""):
             denoising_end=high_noise_frac,
             output_type="latent",
         ).images[0]
+
         image = refiner(
             prompt=prompt,
             num_inference_steps=INFER_STEPS,
@@ -136,6 +116,4 @@ def generate_images(prompt: str, negatives: str = ""):
     MD = json.dumps(TIME_LOG, indent=4)
     MD = "```json\n" + MD + "\n```"
 
-    # image.save("output_image.jpg", "JPEG")
-    # image = pathlib.Path("output_image.jpg")
     return image, MD
