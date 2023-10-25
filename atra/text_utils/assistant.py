@@ -33,8 +33,7 @@ TYPESENSE_API_KEY = os.getenv("TYPESENSE_API_KEY")
 pipe = pipeline(
     "text-classification",
     model="flozi00/multilingual-e5-large-llm-tasks",
-    device=0,
-    torch_dtype=torch.float16,
+    device=-1,
 )
 pipe.model = BetterTransformer.transform(pipe.model)
 
@@ -249,8 +248,8 @@ class Agent:
 
         filtered_corpus = []
 
-        corpus_embeddings = self.embedder.encode(corpus)
-        query_embedding = self.embedder.encode(query)
+        corpus_embeddings = [self.embedder(corp) for corp in corpus]
+        query_embedding = self.embedder(query)
 
         cos_scores = util.cos_sim(query_embedding, corpus_embeddings)[0]
         top_results = torch.topk(cos_scores, k=20 if len(corpus) > 20 else len(corpus))

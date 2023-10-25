@@ -1,52 +1,27 @@
 import typesense
 import os
-from transformers import AutoTokenizer, AutoModel
 import torch
-import torch.nn.functional as F
-from optimum.bettertransformer import BetterTransformer
-
 from torch import Tensor
+import requests
 
 from atra.utilities.stats import timeit
 
 
 class Embedder:
-    def __init__(self, model_path: str) -> None:
-        self.model = AutoModel.from_pretrained(model_path)
-        if torch.cuda.is_available():
-            self.model = self.model.cuda()
-        self.tokenizer = AutoTokenizer.from_pretrained(model_path)
-        self.model = BetterTransformer.transform(self.model)
+    def __init__(self) -> None:
+        self.headers = {
+            "Content-Type": "application/json",
+        }
+        self.host = os.getenv("EMBEDDER_HOST", "http://127.0.0.1:8081")
 
-    def average_pool(
-        self, last_hidden_states: Tensor, attention_mask: Tensor
-    ) -> Tensor:
-        last_hidden = last_hidden_states.masked_fill(
-            ~attention_mask[..., None].bool(), 0.0
+    def __call__(self, text: str) -> Tensor:
+        json_data = {
+            "inputs": text,
+        }
+        response = requests.post(
+            f"{self.host}/embed", headers=self.headers, json=json_data
         )
-        return last_hidden.sum(dim=1) / attention_mask.sum(dim=1)[..., None]
-
-    def encode(self, sentences: list) -> torch.Tensor:
-        # Tokenize the input texts
-        batch_dict = self.tokenizer(
-            sentences,
-            max_length=512,
-            padding=True,
-            truncation=True,
-            return_tensors="pt",
-        )
-        if torch.cuda.is_available():
-            batch_dict = {k: v.cuda() for k, v in batch_dict.items()}
-
-        outputs = self.model(**batch_dict)
-        embeddings = self.average_pool(
-            outputs.last_hidden_state, batch_dict["attention_mask"]
-        )
-
-        # normalize embeddings
-        embeddings = F.normalize(embeddings, p=2, dim=1)
-
-        return embeddings
+        return torch.tensor(response.json()[0])
 
 
 class SemanticSearcher:
@@ -90,7 +65,7 @@ class SemanticSearcher:
     def upsert_documents(self, articles: list, sources: list) -> None:
         for i in range(len(articles)):
             articles[i] = "passage: " + articles[i]
-        embeddings = self.embedder.encode(articles)
+        embeddings = [self.embedder(article) for article in articles]
         for article, source, embeds in zip(articles, sources, embeddings):
             document = {
                 "article": article,
@@ -110,7 +85,7 @@ class SemanticSearcher:
                     "collection": self.collection_name,
                     "q": "*",
                     "vector_query": "embedding:(%s, k:50)"
-                    % self.embedder.encode(["query: " + query])[0].tolist(),
+                    % self.embedder("query: " + query).tolist(),
                 }
             ]
         }
