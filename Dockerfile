@@ -19,6 +19,8 @@ RUN [ "$PYTORCH" != "pre" ] && python3 -m pip install --no-cache-dir -U $VERSION
 COPY . /atra-server                                                            
 WORKDIR /atra-server
 
+RUN pip uninstall transformers -y
+RUN pip install transformers --upgrade
 RUN pip install -r requirements.txt
 RUN pip install flash-attn --no-build-isolation --upgrade
 RUN playwright install
