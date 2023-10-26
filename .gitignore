@@ -16,7 +16,6 @@ data/
 *.jpg
 .env
 typesense-data/
-*.json*
 wandb
 !simplepeft/data/
 *.run

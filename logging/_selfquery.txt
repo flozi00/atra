@@ -216,3 +216,7 @@ Handle: Beende[Die Wahrscheinlichkeit eines gefährlichen Verlaufs bei einer Bla
 Es wird empfohlen das vorliegen andrer gefährlicher Erkrankungen differentialdiagnostisch abzusichern.]
 }</s> -->  Wann wird eine Harnwegsinfektion bei Kindern als kompliziert eingestuft?
 ********************
+### USER: Wer bist du</s>
+### ASSISTANT: Als KI-Assistent kann ich nicht sagen, wer ich bin, da ich keine eigene Identität habe. Ich bin jedoch darauf programmiert, genau und hilfreich zu sein und dabei höflich und respektvoll zu sein. Wie kann ich dir weiterhelfen?</s>
+### USER: Wer bist du</s> -->  Wer bist du
+********************

@@ -7,6 +7,7 @@ import os
 
 ACCUMULATION_STEPS = int(os.getenv("ACCUMULATION_STEPS", 16))
 TOKEN = os.getenv("HF_TOKEN", None)
+EPOCHS = int(os.getenv("EPOCHS", 1))
 
 
 def get_lr(optimizer):
@@ -21,7 +22,6 @@ def start_training(
     PEFT_MODEL,
     LR: float,
     callback=None,
-    num_epochs=1,
 ):
     accelerator = Accelerator(
         log_with="wandb",
@@ -70,7 +70,7 @@ def start_training(
             warnings.warn(f"Could not push to hub: {e}")
 
     index = 1
-    for epoch in range(num_epochs):
+    for epoch in range(EPOCHS):
         for data in (pbar := tqdm(dloader)):
             if index / ACCUMULATION_STEPS % 1000 == 0:
                 do_save_stuff()
