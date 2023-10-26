@@ -120,3 +120,11 @@ Wer war der erste Kanzler von der SPD --> open_qa
 ********************
 Hi, wer bist denn du ? --> general_qa
 ********************
+Wer bist du --> general_qa
+********************
+Was kannst du alles ? --> general_qa
+********************
+Verfasse eine Beschwerde Email in der ich mich an den Bürgermeister wende und hinterfrage warum ich den Regen welcher auf mein Grundstück fällt besteuern muss. --> creative_writing
+********************
+Verfasse eine Beschwerde Email in der ich mich an den Bürgermeister wende und hinterfrage warum ich den Regen welcher auf mein Grundstück fällt in den Steuern bezahlen muss, obwohl ich nicht kontrollieren kann wieviel es regnet. --> creative_writing
+********************

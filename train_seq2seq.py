@@ -54,7 +54,6 @@ def main():
         dloader=dloader,
         PEFT_MODEL=PEFT_MODEL,
         LR=LR,
-        num_epochs=2,
     )
 
 

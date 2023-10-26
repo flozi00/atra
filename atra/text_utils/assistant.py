@@ -1,3 +1,4 @@
+import json
 import os
 from typing import Generator, Iterable
 from sentence_transformers import util
@@ -13,7 +14,6 @@ from atra.text_utils.prompts import (
     SYSTEM_PROMPT,
     TOKENS_TO_STRIP,
     USER_TOKEN,
-    FULL_FORMULATE_SYSTEM_PROMPT,
 )
 from atra.text_utils.typesense_search import SemanticSearcher, Embedder
 from transformers import pipeline
@@ -124,6 +124,29 @@ class Agent:
                 file.write(f"{input} --> {output}".strip())
                 file.write("\n" + "*" * 20 + "\n")
 
+    def log_preferences(self, input: str, output: str, liked: bool) -> None:
+        """
+        Logs input as key and output into liked or disliked.
+        Stores in json file.
+        """
+        try:
+            with open(f"logging/_dpo.json", mode="r+") as file:
+                content = json.loads(file.read())
+        except Exception:
+            content = {}
+
+        key = content.get(input, {"liked": [], "disliked": []})
+        if output not in key["liked"] and output not in key["disliked"]:
+            if liked:
+                key["liked"].append(output)
+            else:
+                key["disliked"].append(output)
+
+        content[input] = key
+
+        with open(f"logging/_dpo.json", mode="w+") as file:
+            file.write(json.dumps(content))
+
     def classify_plugin(self, history: str) -> Plugins:
         """
         Classifies the plugin based on the given history.
@@ -180,33 +203,20 @@ class Agent:
             str: The generated answer.
         """
         text = ""
-        if serp_answer is None:
-            QA_Prompt = (
-                QA_SYSTEM_PROMPT
-                + "\n"
-                + USER_TOKEN
-                + "\n"
-                + context
-                + "\n\nFrage: "
-                + question
-                + "\n\n"
-                + END_TOKEN
-                + ASSISTANT_TOKEN
-                + " Antwort: "
-            )
-        else:
-            QA_Prompt = (
-                FULL_FORMULATE_SYSTEM_PROMPT
-                + "\n"
-                + USER_TOKEN
-                + +"\n\nFrage: "
-                + question
-                + "\n\nAntwort:"
-                + serp_answer
-                + END_TOKEN
-                + ASSISTANT_TOKEN
-                + "Die vollständig ausformulierte Antwort lautet: "
-            ).strip()
+        QA_Prompt = (
+            QA_SYSTEM_PROMPT
+            + "\n"
+            + USER_TOKEN
+            + "\n"
+            + context
+            + "\n\nFrage: "
+            + question
+            + "\n\n"
+            + END_TOKEN
+            + ASSISTANT_TOKEN
+            + " Antwort: "
+        )
+
         answer = self.llm.text_generation(
             prompt=QA_Prompt,
             max_new_tokens=512,

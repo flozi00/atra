@@ -74,7 +74,7 @@ def label_chat(history: list, message: str) -> str:
         ]
     )
 
-    messages = messages.split(message)[0] + message + END_TOKEN
+    messages = messages.split(message)[0]
 
     return messages
 
@@ -82,9 +82,7 @@ def label_chat(history: list, message: str) -> str:
 def on_like(evt: gr.LikeData, history: list) -> None:
     chat = label_chat(history, evt.value)
 
-    agent.log_text2text(
-        input=chat, output="Liked" if evt.liked else "Disliked", tasktype="Feedback"
-    )
+    agent.log_preferences(input=chat, output=evt.value, liked=evt.liked)
 
     return gr.Info("Thanks for your feedback!")
 
@@ -101,7 +99,7 @@ def build_chat_ui():
             additional_inputs=[gr.Textbox(lines=1, label="Domain")],
         )
 
-        # chatter.like(on_like, chatter)
+        chatter.like(on_like, chatter)
 
     demo.queue()
     demo.launch(**launch_args)
