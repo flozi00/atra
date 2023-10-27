@@ -50,7 +50,7 @@ class Agent:
         self.embedder = embedder
         self.llm = llm
         self.searcher = SemanticSearcher(embedder=embedder, api_key=TYPESENSE_API_KEY)
-        self.temperature = 0.1 if creative is False else 0.4
+        self.temperature = 0.1 if creative is False else 1
         self.creative = creative
 
     def __call__(
@@ -145,7 +145,7 @@ class Agent:
         content[input] = key
 
         with open(f"logging/_dpo.json", mode="w+") as file:
-            file.write(json.dumps(content))
+            file.write(json.dumps(content, indent=4))
 
     def classify_plugin(self, history: str) -> Plugins:
         """
