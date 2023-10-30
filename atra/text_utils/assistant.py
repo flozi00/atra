@@ -17,7 +17,6 @@ from atra.text_utils.prompts import (
 )
 from atra.text_utils.typesense_search import SemanticSearcher, Embedder
 from transformers import pipeline
-from optimum.bettertransformer import BetterTransformer
 from atra.utilities.redis_client import cache
 from atra.utilities.retrieval import get_serp, do_browsing
 
@@ -35,7 +34,6 @@ pipe = pipeline(
     model="flozi00/multilingual-e5-large-llm-tasks",
     device=-1,
 )
-pipe.model = BetterTransformer.transform(pipe.model)
 
 
 @cache.cache(ttl=60 * 60 * 24 * 7)
@@ -50,7 +48,7 @@ class Agent:
         self.embedder = embedder
         self.llm = llm
         self.searcher = SemanticSearcher(embedder=embedder, api_key=TYPESENSE_API_KEY)
-        self.temperature = 0.1 if creative is False else 0.4
+        self.temperature = 0.1 if creative is False else 0.7
         self.creative = creative
 
     def __call__(
@@ -145,7 +143,8 @@ class Agent:
         content[input] = key
 
         with open(f"logging/_dpo.json", mode="w+") as file:
-            file.write(json.dumps(content))
+            file.write(json.dumps(content, indent=4))
+
 
     def classify_plugin(self, history: str) -> Plugins:
         """

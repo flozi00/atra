@@ -62,16 +62,20 @@ def predict(message: str, chatbot: list, url: str):
 
 
 def label_chat(history: list, message: str) -> str:
-    messages = "\n".join(
-        [
-            "\n".join(
-                [
-                    USER_TOKEN + item[0].rstrip() + END_TOKEN,
-                    ASSISTANT_TOKEN + item[1].rstrip() + END_TOKEN,
-                ]
-            )
-            for item in history
-        ]
+    messages = messages = (
+        SYSTEM_PROMPT
+        + "\n\n"
+        + "\n".join(
+            [
+                "\n".join(
+                    [
+                        USER_TOKEN + item[0].rstrip() + END_TOKEN,
+                        ASSISTANT_TOKEN + item[1].rstrip() + END_TOKEN,
+                    ]
+                )
+                for item in history
+            ]
+        )
     )
 
     messages = messages.split(message)[0]

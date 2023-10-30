@@ -40,7 +40,6 @@ def main():
         model_name=BASE_MODEL,
         peft_name=PEFT_MODEL,
         use_peft=True,
-        use_py_flash=False,
         use_flash_v2=True,
         use_bnb=True,
         lora_depth=int(os.getenv("LORA_DEPTH", 128)),
