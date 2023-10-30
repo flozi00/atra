@@ -7,7 +7,6 @@ from peft import (
 from peft import TaskType
 from transformers import AutoConfig, BitsAndBytesConfig
 from ..utils import Tasks
-from optimum.bettertransformer import BetterTransformer
 from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
@@ -75,7 +74,6 @@ def get_model(
     use_peft=True,
     push_to_hub=False,
     processor_name: str = None,
-    use_py_flash=True,
     use_flash_v2=False,
     use_bnb=True,
     lora_depth=128,
@@ -144,7 +142,6 @@ def get_model(
 
     if use_flash_v2:
         kwargs["use_flash_attention_2"] = True
-        use_py_flash = False
 
     # load the pre-trained model and check if its 8-bit compatible
     model = model_class.from_pretrained(
@@ -154,13 +151,6 @@ def get_model(
         device_map="auto",
         **kwargs,
     )
-
-    if use_py_flash is True:
-        try:
-            model = BetterTransformer.transform(model)
-            print("converted to Bettertransformer")
-        except Exception as e:
-            print(e)
 
     try:
         if processor.pad_token is None:
@@ -245,10 +235,6 @@ def get_model(
     if push_to_hub:
         PUSH_NAME = peft_name.split(sep="/")[-1]
         model.half()
-        try:
-            model = BetterTransformer.reverse(model)
-        except Exception as e:
-            print(e)
         model.save_pretrained(PUSH_NAME, safe_serialization=task != Tasks.ASR)
         processor.save_pretrained(PUSH_NAME)
 

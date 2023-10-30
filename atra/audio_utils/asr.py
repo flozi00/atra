@@ -8,7 +8,6 @@ from transformers.pipelines.audio_utils import ffmpeg_read
 from transformers import pipeline
 import gradio as gr
 import warnings
-from optimum.bettertransformer import BetterTransformer
 import os
 
 warnings.filterwarnings(action="ignore")
@@ -20,10 +19,6 @@ pipe = pipeline(
     model_kwargs={"load_in_4bit": True},
 )
 pipe.model.eval()
-try:
-    pipe.model = BetterTransformer.transform(pipe.model)
-except Exception:
-    pass
 
 try:
     pipe.model = torch.compile(pipe.model, backend="onnxrt", mode="reduce-overhead")
