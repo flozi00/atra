@@ -145,6 +145,7 @@ class Agent:
         with open(f"logging/_dpo.json", mode="w+") as file:
             file.write(json.dumps(content, indent=4))
 
+
     def classify_plugin(self, history: str) -> Plugins:
         """
         Classifies the plugin based on the given history.
