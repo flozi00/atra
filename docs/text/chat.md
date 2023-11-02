@@ -30,5 +30,5 @@ docker run --gpus all -p 8081:80 --pull always ghcr.io/huggingface/text-embeddin
 ### example docker command:
 
 ```
-docker run -d --gpus '"device=0"' -e BASE_MODEL="HuggingFaceH4/zephyr-7b-alpha" -e PEFT_MODEL="Mistral-zephyr-german-assistant-v1" flozi00/atra:latest train_assistant.py
+docker run -d --pull always --gpus '"device=0"' -e BASE_MODEL="HuggingFaceH4/zephyr-7b-alpha" -e PEFT_MODEL="Mistral-zephyr-german-assistant-v1" flozi00/atra:latest train_assistant.py
 ```
