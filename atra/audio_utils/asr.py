@@ -28,7 +28,7 @@ except Exception:
 
 def speech_recognition(data, language, progress=gr.Progress()) -> str:
     if data is None:
-        return ""
+        return "", []
     progress.__call__(progress=0.0, desc="Loading Data")
     if isinstance(data, str):
         with open(file=data, mode="rb") as f:
@@ -44,17 +44,21 @@ def speech_recognition(data, language, progress=gr.Progress()) -> str:
     )
 
     progress.__call__(progress=0.8, desc="Transcribing Audio")
-    transcription = inference_asr(pipe=pipe, data=data, language=language)
+    transcription, timestamps = inference_asr(pipe=pipe, data=data, language=language)
 
     progress.__call__(progress=0.9, desc="Converting to Text")
     try:
         transcription = alpha2digit(
             text=transcription, lang=WHISPER_LANG_MAPPING[language]
         )
+        for i in range(len(timestamps)):
+            timestamps[i]["text"] = alpha2digit(
+                text=timestamps[i]["text"], lang=WHISPER_LANG_MAPPING[language]
+            )
     except Exception:
         pass
 
-    return transcription
+    return transcription, timestamps
 
 
 @timeit
@@ -63,9 +67,10 @@ def inference_asr(pipe, data, language) -> str:
         data,
         chunk_length_s=30,
         stride_length_s=(10, 0),
+        return_timestamps="word",
         generate_kwargs={
             "task": "transcribe",
             "language": f"<|{WHISPER_LANG_MAPPING[language]}|>",
         },
     )
-    return generated_ids["text"]
+    return generated_ids["text"], generated_ids["chunks"]
