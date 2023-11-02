@@ -21,10 +21,9 @@ def build_diffusion_ui() -> None:
     with ui:
         with gr.Row():
             GET_GLOBAL_HEADER()
-        with gr.Row():
-            with gr.Column():
-                images = gr.Image()
-                stats = gr.Markdown()
+        with gr.Column():
+            images = gr.Image(height=512, width=512, label="Image")
+            stats = gr.Markdown()
 
         with gr.Column():
             prompt = gr.Textbox(label="Prompt", info="Prompt of what you want to see")
@@ -63,6 +62,19 @@ def build_diffusion_ui() -> None:
                     "artificialguybr/LogoRedmond-LogoLoraForSDXL-V2",
                 ],
                 ["cyborg style, golden retriever", "goofyai/cyborg_style_xl"],
+                [
+                    "High nation-geographic symmetrical close-up portrait shoot in green jungle of an expressive lizard, anamorphic lens, ultra-realistic, hyper-detailed, green-core, jungle-core",
+                    "",
+                ],
+                ["Glowing jellyfish floating through a foggy forest at twilight", ""],
+                [
+                    "Elegant lavender garnish cocktail idea, cocktail glass, realistic, sharp focus, 8k high definition",
+                    "",
+                ],
+                [
+                    "General Artificial Intelligence in data center, futuristic concept art, 3d rendering",
+                    "",
+                ],
             ],
             inputs=[prompt, lora],
         )

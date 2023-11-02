@@ -38,10 +38,9 @@ elif "L40" in GPU_NAME:
     POWER = 350
 
 diffusion_pipe = StableDiffusionXLPipeline.from_pretrained(
-    "stabilityai/stable-diffusion-xl-base-1.0",
+    "femboysLover/DreamShaper-fp16-XL",
     torch_dtype=torch.float16,
     use_safetensors=True,
-    variant="fp16",
 )
 
 refiner = StableDiffusionXLImg2ImgPipeline.from_pretrained(
