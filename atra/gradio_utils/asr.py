@@ -1,7 +1,7 @@
 import gradio as gr
 from atra.audio_utils.asr import speech_recognition
 from atra.gradio_utils.ui import GLOBAL_CSS, GET_GLOBAL_HEADER, launch_args
-from atra.statics import WHISPER_LANG_MAPPING
+from atra.audio_utils.whisper_langs import WHISPER_LANG_MAPPING
 
 asr_langs = sorted(list(WHISPER_LANG_MAPPING.keys()))
 
