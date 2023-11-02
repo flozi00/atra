@@ -16,11 +16,11 @@ def build_asr_ui():
         with gr.Row():
             with gr.TabItem("Microphone"):
                 microphone_file = gr.Audio(
-                    source="microphone", type="filepath", label="Audio"
+                    sources="microphone", type="filepath", label="Audio"
                 )
             with gr.TabItem("File Upload"):
                 audio_file = gr.Audio(
-                    source="upload", type="filepath", label="Audiofile"
+                    sources="upload", type="filepath", label="Audiofile"
                 )
 
         with gr.Row():
@@ -41,5 +41,5 @@ def build_asr_ui():
             outputs=[transcription_finished, timestamps_finished],
         )
 
-    ui.queue(concurrency_count=1, api_open=False)
+    ui.queue(api_open=False)
     ui.launch(**launch_args)

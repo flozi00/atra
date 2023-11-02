@@ -34,7 +34,6 @@ def build_diffusion_ui() -> None:
             lora = gr.Dropdown(
                 label="Lora",
                 choices=LORAS,
-                default="",
                 info="Model to use for generating image",
             )
 
@@ -79,5 +78,5 @@ def build_diffusion_ui() -> None:
             inputs=[prompt, lora],
         )
 
-    ui.queue(concurrency_count=1, api_open=False)
+    ui.queue(api_open=False)
     ui.launch(**launch_args)
