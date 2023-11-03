@@ -65,12 +65,13 @@ def speech_recognition(data, language, progress=gr.Progress()) -> str:
 def inference_asr(pipe, data, language) -> str:
     generated_ids = pipe(
         data,
-        chunk_length_s=30,
+        chunk_length_s=20,
         stride_length_s=(10, 0),
         return_timestamps="word",
         generate_kwargs={
             "task": "transcribe",
             "language": f"<|{WHISPER_LANG_MAPPING[language]}|>",
         },
+        batch_size=4,
     )
     return generated_ids["text"], generated_ids["chunks"]
