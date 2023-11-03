@@ -23,11 +23,16 @@ diffusers.pipelines.stable_diffusion_xl.watermark.StableDiffusionXLWatermarker.a
     apply_watermark_dummy
 )
 
+GPU_AVAILABLE = torch.cuda.is_available()
+
 high_noise_frac = 0.7
-INFER_STEPS = 60
+INFER_STEPS = 60 if GPU_AVAILABLE else 20
 GPU_ID = 0
-POWER = 450
-GPU_NAME = torch.cuda.get_device_name(GPU_ID)
+POWER = 450 if GPU_AVAILABLE else 100
+if GPU_AVAILABLE:
+    GPU_NAME = torch.cuda.get_device_name(GPU_ID)
+else:
+    GPU_NAME = "CPU"
 if "H100" in GPU_NAME:
     POWER = 310
 elif "A6000" in GPU_NAME:
@@ -39,7 +44,7 @@ elif "L40" in GPU_NAME:
 
 diffusion_pipe = StableDiffusionXLPipeline.from_pretrained(
     "femboysLover/DreamShaper-fp16-XL",
-    torch_dtype=torch.float16,
+    torch_dtype=torch.float16 if GPU_AVAILABLE else torch.float32,
     use_safetensors=True,
 )
 
@@ -47,7 +52,7 @@ refiner = StableDiffusionXLImg2ImgPipeline.from_pretrained(
     "stabilityai/stable-diffusion-xl-refiner-1.0",
     text_encoder_2=diffusion_pipe.text_encoder_2,
     vae=diffusion_pipe.vae,
-    torch_dtype=torch.float16,
+    torch_dtype=torch.float16 if GPU_AVAILABLE else torch.float32,
     use_safetensors=True,
     variant="fp16",
 )
@@ -63,8 +68,9 @@ refiner.scheduler = EulerAncestralDiscreteScheduler.from_config(
 )
 
 # set to GPU
-diffusion_pipe = diffusion_pipe.to(f"cuda:{GPU_ID}")
-refiner.to(f"cuda:{GPU_ID}")
+if GPU_AVAILABLE:
+    diffusion_pipe = diffusion_pipe.to(f"cuda:{GPU_ID}")
+    refiner.to(f"cuda:{GPU_ID}")
 
 
 @timeit
