@@ -13,7 +13,7 @@ import os
 warnings.filterwarnings(action="ignore")
 
 if torch.cuda.is_available():
-    GPU_NAME = torch.cuda.get_device_name(0)
+    GPU_NAME = torch.cuda.get_device_name(0).split(" ")[-1]
 else:
     GPU_NAME = "CPU"
 
