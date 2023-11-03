@@ -12,14 +12,21 @@ import os
 
 warnings.filterwarnings(action="ignore")
 
+if torch.cuda.is_available():
+    GPU_NAME = torch.cuda.get_device_name(0)
+else:
+    GPU_NAME = "CPU"
+
+
 pipe = pipeline(
     "automatic-speech-recognition",
     os.getenv("ASR_MODEL", "flozi00/whisper-large-v2-german-cv15"),
     torch_dtype=torch.float16,
-    model_kwargs={"load_in_4bit": True},
-    chunk_length_s=20,
-    stride_length_s=(10, 0),
-    batch_size=4,
+    model_kwargs={
+        "load_in_4bit": True,
+        "use_flash_attention_2": "A" in GPU_NAME or "H" in GPU_NAME or "L" in GPU_NAME,
+    },
+    batch_size=16,
 )
 pipe.model.eval()
 
@@ -68,13 +75,12 @@ def speech_recognition(data, language, progress=gr.Progress()) -> str:
 def inference_asr(pipe, data, language) -> str:
     generated_ids = pipe(
         data,
-        chunk_length_s=20,
+        chunk_length_s=30,
         stride_length_s=(10, 0),
-        return_timestamps="word",
+        # return_timestamps="word",
         generate_kwargs={
             "task": "transcribe",
             "language": f"<|{WHISPER_LANG_MAPPING[language]}|>",
         },
-        batch_size=4,
     )
-    return generated_ids["text"], generated_ids["chunks"]
+    return generated_ids["text"], {}
