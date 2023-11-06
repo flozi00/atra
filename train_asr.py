@@ -64,11 +64,31 @@ def get_dataset() -> datasets.Dataset:
         column="audio", feature=datasets.features.Audio(sampling_rate=16000)
     )
 
+    columns = d_sets.column_names
+    for column in columns:
+        if column not in ["audio", "sentence"]:
+            d_sets = d_sets.remove_columns(column)
+
     return d_sets
+
+
+def get_hf_datasets() -> datasets.Dataset:
+    ds = datasets.load_dataset("facebook/voxpopuli", "de", split="train")
+    ds = ds.rename_column("raw_text", "sentence")
+
+    columns = ds.column_names
+    for column in columns:
+        if column not in ["audio", "sentence"]:
+            ds = ds.remove_columns(column)
+
+    return ds
 
 
 def main():
     cv_data = get_dataset()
+    vox_data = get_hf_datasets()
+    cv_data = datasets.concatenate_datasets([cv_data, vox_data])
+
     cv_data = cv_data.map(normalize_text, num_proc=8)
     model, processor = get_model(
         task=TASK,
