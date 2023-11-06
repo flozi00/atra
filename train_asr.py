@@ -89,6 +89,9 @@ def main():
     vox_data = get_hf_datasets()
     cv_data = datasets.concatenate_datasets([cv_data, vox_data])
 
+    new_column = ["de"] * len(cv_data)
+    cv_data = cv_data.add_column("locale", new_column)
+
     cv_data = cv_data.map(normalize_text, num_proc=8)
     model, processor = get_model(
         task=TASK,
