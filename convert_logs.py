@@ -7,7 +7,7 @@ logs = [
     ["_qa.txt", "qa-tasks-german"],
 ]
 
-preferences = [["_dpo.json", "atra-dpo"]]
+preferences = []
 
 
 def convert_file_t2t(filename, ds_name):

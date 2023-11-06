@@ -147,7 +147,7 @@ def get_model(
     model = model_class.from_pretrained(
         model_name,
         config=conf,
-        torch_dtype=torch.float16 if task != Tasks.ASR else torch.float32,
+        torch_dtype=torch.float16,
         device_map="auto",
         **kwargs,
     )
@@ -183,8 +183,8 @@ def get_model(
                     isinstance(module, bnb.nn.Linear4bit)
                     or isinstance(module, bnb.nn.Linear8bitLt)
                     or isinstance(module, torch.nn.Linear)
-                    or isinstance(module, torch.nn.Embedding)
-                    or isinstance(module, bnb.nn.StableEmbedding)
+                    # or isinstance(module, torch.nn.Embedding)
+                    # or isinstance(module, bnb.nn.StableEmbedding)
                 ):
                     names = name.split(".")
                     lora_module_names.add(names[0] if len(names) == 1 else names[-1])

@@ -15,13 +15,7 @@ def build_asr_ui():
         )
         with gr.Row():
             with gr.TabItem("Microphone"):
-                microphone_file = gr.Audio(
-                    sources="microphone", type="filepath", label="Audio"
-                )
-            with gr.TabItem("File Upload"):
-                audio_file = gr.Audio(
-                    sources="upload", type="filepath", label="Audiofile"
-                )
+                microphone_file = gr.Audio(type="filepath", label="Audio")
 
         with gr.Row():
             with gr.TabItem("Transcription"):
@@ -29,12 +23,6 @@ def build_asr_ui():
             with gr.TabItem("Timestamps"):
                 timestamps_finished = gr.JSON()
 
-        audio_file.change(
-            fn=speech_recognition,
-            inputs=[audio_file, input_lang],
-            outputs=[transcription_finished, timestamps_finished],
-            api_name="transcription",
-        )
         microphone_file.change(
             fn=speech_recognition,
             inputs=[microphone_file, input_lang],

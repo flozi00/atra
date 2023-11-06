@@ -21,7 +21,7 @@ else:
 pipe = pipeline(
     "automatic-speech-recognition",
     os.getenv("ASR_MODEL", "flozi00/whisper-large-v2-german-cv15"),
-    torch_dtype=torch.float16,
+    torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
     model_kwargs={
         "load_in_4bit": True,
         "use_flash_attention_2": "A" in GPU_NAME or "H" in GPU_NAME or "L" in GPU_NAME,
@@ -31,7 +31,7 @@ pipe = pipeline(
 pipe.model.eval()
 
 try:
-    pipe.model = torch.compile(pipe.model, backend="onnxrt", mode="reduce-overhead")
+    pipe.model = torch.compile(pipe.model, backend="onnxrt", mode="max-autotune")
 except Exception:
     pass
 
@@ -81,6 +81,8 @@ def inference_asr(pipe, data, language) -> str:
         generate_kwargs={
             "task": "transcribe",
             "language": f"<|{WHISPER_LANG_MAPPING[language]}|>",
+            "do_sample": False,
+            "num_beams": 1,
         },
     )
     return generated_ids["text"], {}
