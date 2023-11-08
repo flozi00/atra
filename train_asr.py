@@ -7,12 +7,12 @@ import pandas as pd
 from unidecode import unidecode
 
 BATCH_SIZE = 16
-BASE_MODEL = "flozi00/whisper-small-german-cv15-v1"
-PEFT_MODEL = "whisper-small-german-cv15-v2"
+BASE_MODEL = "whisper-large-v3-german-cv15-v1"
+PEFT_MODEL = "whisper-large-v3-german-cv15-v2"
 TASK = Tasks.ASR
 LR = 1e-5
 
-simplepeft.train.train.ACCUMULATION_STEPS = 16
+simplepeft.train.train.ACCUMULATION_STEPS = 4
 
 
 def normalize_text(batch):
@@ -86,8 +86,8 @@ def get_hf_datasets() -> datasets.Dataset:
 
 def main():
     cv_data = get_dataset()
-    vox_data = get_hf_datasets()
-    cv_data = datasets.concatenate_datasets([cv_data, vox_data])
+    # vox_data = get_hf_datasets()
+    # cv_data = datasets.concatenate_datasets([cv_data, vox_data])
 
     new_column = ["de"] * len(cv_data)
     cv_data = cv_data.add_column("locale", new_column)
@@ -100,7 +100,7 @@ def main():
         use_peft=True,
         use_flash_v2=True,
         use_bnb=True,
-        lora_depth=1024,
+        lora_depth=512,
     )
 
     model.config.forced_decoder_ids = None

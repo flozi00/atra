@@ -105,7 +105,7 @@ def get_dataloader(
         collate_fn=data_collator,
         batch_size=BATCH_SIZE,
         pin_memory=True,
-        num_workers=4,
+        num_workers=8,
     )
 
     return dloader

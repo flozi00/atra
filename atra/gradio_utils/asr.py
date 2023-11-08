@@ -20,13 +20,11 @@ def build_asr_ui():
         with gr.Row():
             with gr.TabItem("Transcription"):
                 transcription_finished = gr.Textbox(max_lines=10)
-            with gr.TabItem("Timestamps"):
-                timestamps_finished = gr.JSON()
 
         microphone_file.change(
             fn=speech_recognition,
             inputs=[microphone_file, input_lang],
-            outputs=[transcription_finished, timestamps_finished],
+            outputs=[transcription_finished],
         )
 
     ui.queue(api_open=False)

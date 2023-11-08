@@ -128,15 +128,14 @@ def get_model(
         processor = tok_class.from_pretrained(
             model_name if processor_name is None else processor_name,
             legacy=False,
+            trust_remote_code=True,
         )
 
     if bnb_compatible:
         kwargs["quantization_config"] = BitsAndBytesConfig(
             load_in_4bit=True,
             bnb_4bit_use_double_quant=False,
-            bnb_4bit_compute_dtype=torch.float16
-            if task != Tasks.ASR
-            else torch.float32,
+            bnb_4bit_compute_dtype=torch.float16,
             bnb_4bit_quant_type="fp4",
         )
 
@@ -149,6 +148,7 @@ def get_model(
         config=conf,
         torch_dtype=torch.float16,
         device_map="auto",
+        trust_remote_code=True,
         **kwargs,
     )
 
