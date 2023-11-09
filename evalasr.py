@@ -70,11 +70,13 @@ def get_dataset() -> datasets.Dataset:
     return d_sets
 
 
-ds = get_dataset().select(range(1_000))
+ds = get_dataset().select(range(100_000))
 
 ds = ds.map(normalize_text, num_proc=8)
 
-for d in tqdm(ds):
+pbar = tqdm(ds)
+
+for d in pbar:
     # normalize base transcription
     base_str_orig = d["sentence"]
 
@@ -89,4 +91,6 @@ for d in tqdm(ds):
     predicted.append(pred_str_orig)
 
     if len(base) % 10 == 0:
-        print(wer(base, predicted) * 100, cer(base, predicted) * 100)
+        pbar.set_description(
+            f"WER: {wer(base, predicted) * 100} CER: {cer(base, predicted) * 100}"
+        )

@@ -17,7 +17,7 @@ else:
 
 pipe = pipeline(
     "automatic-speech-recognition",
-    os.getenv("ASR_MODEL", "flozi00/whisper-large-v2-german-cv15"),
+    os.getenv("ASR_MODEL", "primeline/whisper-large-v3-german"),
     torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
     model_kwargs={
         "load_in_4bit": True,
@@ -61,7 +61,7 @@ def inference_asr(pipe, data, language) -> str:
             "task": "transcribe",
             "language": f"<|{WHISPER_LANG_MAPPING[language]}|>",
             "do_sample": False,
-            "num_beams": 5,
+            "num_beams": 10,
         },
     )
     return generated_ids["text"]
