@@ -1,7 +1,7 @@
 from diffusers import (
     StableDiffusionXLPipeline,
     StableDiffusionXLImg2ImgPipeline,
-    EulerAncestralDiscreteScheduler,
+    UniPCMultistepScheduler,
 )
 import torch
 from atra.utilities.stats import timeit
@@ -26,7 +26,7 @@ diffusers.pipelines.stable_diffusion_xl.watermark.StableDiffusionXLWatermarker.a
 GPU_AVAILABLE = torch.cuda.is_available()
 
 high_noise_frac = 0.7
-INFER_STEPS = 60 if GPU_AVAILABLE else 20
+INFER_STEPS = 10
 GPU_ID = 0
 POWER = 450 if GPU_AVAILABLE else 100
 if GPU_AVAILABLE:
@@ -41,6 +41,7 @@ elif "RTX 6000" in GPU_NAME:
     POWER = 240
 elif "L40" in GPU_NAME:
     POWER = 350
+
 
 diffusion_pipe = StableDiffusionXLPipeline.from_pretrained(
     "femboysLover/DreamShaper-fp16-XL",
@@ -60,12 +61,10 @@ refiner = StableDiffusionXLImg2ImgPipeline.from_pretrained(
 refiner.vae = torch.compile(refiner.vae, mode="reduce-overhead", fullgraph=True)
 
 # change scheduler
-diffusion_pipe.scheduler = EulerAncestralDiscreteScheduler.from_config(
+diffusion_pipe.scheduler = UniPCMultistepScheduler.from_config(
     diffusion_pipe.scheduler.config
 )
-refiner.scheduler = EulerAncestralDiscreteScheduler.from_config(
-    refiner.scheduler.config
-)
+refiner.scheduler = UniPCMultistepScheduler.from_config(refiner.scheduler.config)
 
 # set to GPU
 if GPU_AVAILABLE:
@@ -77,7 +76,6 @@ if GPU_AVAILABLE:
 def generate_images(
     prompt: str,
     negatives: str = "",
-    lora: str = "",
     progress=gr.Progress(track_tqdm=True),
 ):
     TIME_LOG = {"GPU Power insert in W": POWER}
@@ -86,9 +84,6 @@ def generate_images(
         negatives = ""
 
     start_time = time.time()
-    diffusion_pipe.unload_lora_weights()
-    if len(lora) >= 3:
-        diffusion_pipe.load_lora_weights(lora)
     register_free_crossattn_upblock2d(
         diffusion_pipe,
         b1=1.3,
