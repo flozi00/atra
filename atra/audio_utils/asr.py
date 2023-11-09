@@ -23,7 +23,7 @@ pipe = pipeline(
         "load_in_4bit": True,
         "use_flash_attention_2": "A" in GPU_NAME or "H" in GPU_NAME or "L" in GPU_NAME,
     },
-    batch_size=8,
+    batch_size=4,
 )
 pipe.model.eval()
 
