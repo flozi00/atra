@@ -6,6 +6,7 @@ from tqdm.auto import tqdm
 from unidecode import unidecode
 import diff_match_patch as dmp_module
 import pandas as pd
+import re
 
 base = []
 predicted = []
@@ -70,6 +71,25 @@ def get_dataset() -> datasets.Dataset:
     return d_sets
 
 
+def normalize_str(text):
+    text = (
+        re.sub(r"[^\w\s]", "", text.strip())
+        .lower()
+        .replace("-", " ")
+        .replace(",", "")
+        .replace(".", "")
+        .replace("?", "")
+        .replace("!", "")
+        .replace(":", "")
+        .replace(";", "")
+        .replace("  ", " ")
+        .replace("ph", "f")
+        .replace("ß", "ss")
+    )
+
+    return text
+
+
 ds = get_dataset().select(range(100_000))
 
 ds = ds.map(normalize_text, num_proc=8)
@@ -79,13 +99,14 @@ pbar = tqdm(ds)
 for d in pbar:
     # normalize base transcription
     base_str_orig = d["sentence"]
+    base_str_orig = normalize_str(base_str_orig)
 
     # load audio
     audio_data = d["audio"]["path"]
 
     # normalize prediction
     pred_str_orig = speech_recognition(audio_data, "german")
-    pred_str_orig = pred_str_orig.replace("ß", "ss")
+    pred_str_orig = normalize_str(pred_str_orig)
 
     base.append(base_str_orig)
     predicted.append(pred_str_orig)
