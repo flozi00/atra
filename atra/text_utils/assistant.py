@@ -1,7 +1,6 @@
 import json
 import os
 from typing import Generator, Iterable
-from sentence_transformers import util
 from huggingface_hub import InferenceClient
 import torch
 from enum import Enum
@@ -226,7 +225,9 @@ class Agent:
                 text = text.rstrip(token).rstrip()
 
         self.log_text2text(
-            input=QA_Prompt.replace(QA_SYSTEM_PROMPT + "\n", ""),
+            input=QA_Prompt.replace(QA_SYSTEM_PROMPT + "\n", "").replace(
+                ASSISTANT_TOKEN + " Antwort: ", ASSISTANT_TOKEN
+            ),
             output=text,
             tasktype="qa",
         )

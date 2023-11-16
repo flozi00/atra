@@ -39,7 +39,7 @@ Gemäß Angaben des Konzerns im Bundesanzeiger zahlte die Google Germany GmbH (H
 
 Frage: Wann wurde Google gegründet
 
-</s>### ASSISTANT:  Antwort:  --> 4. September 1998
+</s>### ASSISTANT:  --> 4. September 1998
 ********************
 ### USER: 6. Februar 2013, OberurselDie Alternative für Deutschland (Kurzbezeichnung AfD) ist eine rechtspopulistische und rechtsextreme politische Partei in Deutschland.
 Die Alternative für Deutschland ist eine der sieben im Deutschen Bundestag vertretenen Parteien. Foto: RONNY HARTMANN/AFP. 2013 wurde die AfD ...
@@ -72,7 +72,7 @@ Die AfD vertritt in der Geschlechterpolitik konservativ-antifeministische Positi
 
 Frage: Wann war die Gründung der AFD
 
-</s>### ASSISTANT:  Antwort:  --> 6. Februar 2013
+</s>### ASSISTANT:  --> 6. Februar 2013
 ********************
 ### USER: Barack Obama / Nummer: 44
 Obama ist von 2009 bis 2017 44. Präsident der Vereinigten Staaten und Mitglied der Demokratischen Partei. Er ist der erste Afroamerikaner in diesem Amt. Während ...
@@ -117,7 +117,7 @@ Nach seiner Präsidentschaft schlossen Obama und seine Ehefrau 2018 einen Vertra
 
 Frage: Der wievielte Präsident war Barack Obama
 
-</s>### ASSISTANT:  Antwort:  --> 44.
+</s>### ASSISTANT:  --> 44.
 ********************
 ### USER: Mond / Entfernung zur Erde: 384.400 km
 Unser Mond umkreist die Erde jedoch auf einer fast kreisförmigen Bahn mit einer mittleren Entfernung von 384.400 Kilometern, also mehr als dem ...
@@ -148,7 +148,7 @@ Diese pausenlose Autofahrt ohne Staus und sonstigen Stopps würde fünfeinhalb M
 
 Frage:  Wie weit ist der Mond von der Erde entfernt?
 
-</s>### ASSISTANT:  Antwort:  --> 
+</s>### ASSISTANT:  --> 
 
 Der Abstand zwischen Erde und Mond beträgt im zeitlichen Mittel rund 384.400 Kilometer.
 ********************
@@ -191,7 +191,7 @@ passage: FÜR MICH IST DIE SPD DIE EINZIGE PARTEI, DIE VON JEHER DAFÜR STEHT, D
 
 Frage: Wo wurde Olaf Scholz geboren
 
-</s>### ASSISTANT:  Antwort:  -->  Olaf Scholz wurde in Osnabrück geboren.
+</s>### ASSISTANT:  -->  Olaf Scholz wurde in Osnabrück geboren.
 ********************
 ### USER: 
 Angela Merkel / Geburtsort: Hamburg
@@ -239,7 +239,7 @@ Am 22. September 2013 fand die Wahl zum 18. Deutschen Bundestag statt. Während 
 
 Frage: Wo wurde Angela Merkel geboren
 
-</s>### ASSISTANT:  Antwort:  --> 
+</s>### ASSISTANT:  --> 
 
 Angela Merkel wurde im Elim-Krankenhaus im Hamburger Stadtteil Eimsbüttel als erstes Kind des evangelischen Theologen Horst Kasner und seiner Frau Herlind Kasner, geb. Jentzsch geboren.
 ********************
@@ -294,7 +294,7 @@ passage: Arzt die Nieren und die Harnblase
 
 Frage: Woran erkennt man eine Blasenentzündung ?
 
-</s>### ASSISTANT:  Antwort:  --> 
+</s>### ASSISTANT:  --> 
 
 Die Symptome einer Blasenentzündung sind Schmerzen beim Wasserlassen, häufiger Harndrang und Brennen beim Wasserlassen.
 ********************
@@ -335,7 +335,7 @@ passage: den Klimawandel zu führen. Das unsere Wirtschaft modernisiert und daf�
 …, dass unsere liberalen Demokratien immer stärker unter Druck geraten. Wir werden nicht nachlassen darin, für die Errungenschaften von Rechtsstaat und Demokratie einzustehen. Und wir müssen die Probleme lösen, damit die billigen Parolen der Populisten nicht verfangen.
 
 
-Frage: Wann wurde Olaf Scholz geboren</s>### ASSISTANT:  Antwort:  --> 14. Juni 1958
+Frage: Wann wurde Olaf Scholz geboren</s>### ASSISTANT:  --> 14. Juni 1958
 ********************
 ### USER: 
 passage: passage: APP.2.2: Active Directory - BSI: 
@@ -383,7 +383,7 @@ passage: WinNT-Provider verwendet werden kann.
 
 Frage: Was bedeutet AD im IT Kontext
 
-</s>### ASSISTANT:  Antwort:  --> 
+</s>### ASSISTANT:  --> 
 Im IT-Kontext steht AD für Active Directory.
 
 Das Active Directory ist der Verzeichnisdienst, den Microsoft erstmalig mit Windows 2000 (NT 5.0) ausgeliefert und in Windows Server 2003 (NT 5.2) verbessert hat. Mit dem Active Directory Application Mode (ADAM) alias Active Directory Lightweight Directory Services existiert inzwischen auch eine funktionsreduzierte Version, die Softwarehersteller als Basis für selbst entwickelte Anwendungen nutzen können.
@@ -414,7 +414,7 @@ Biden gewann sein erstes politisches Mandat, als er (nunmehr Demokrat) im Novemb
 
 Frage: Der wievielte Kanzler ist Joe Biden
 
-</s>### ASSISTANT:  Antwort:  --> 46
+</s>### ASSISTANT:  --> 46
 ********************
 ### USER: 
 passage: Obama ist von 2009 bis 2017 44. Präsident der Vereinigten Staaten und Mitglied der Demokratischen Partei. Er ist der erste Afroamerikaner in diesem Amt. Während ...
@@ -450,7 +450,7 @@ Obama vertritt den Bundesstaat Illinois im US-Senat. Zum Zeitpunkt seiner Vereid
 
 Frage: Wann war Obama präsident
 
-</s>### ASSISTANT:  Antwort:  --> 2009 - 2017
+</s>### ASSISTANT:  --> 2009 - 2017
 ********************
 ### USER: 
 passage: Reichskanzler Friedrich Ebert (* 1871 † 1925) Amtszeit: 09.11.1918 - 11.02.1919 ; Ministerpräsident Philipp Scheidemann (* 1865 † 1939) Amtszeit: 13.02.1919 - ...
@@ -521,5 +521,5 @@ Scholz wuchs in
 
 Frage: Wann wurde Olaf Scholz Kanzler
 
-</s>### ASSISTANT:  Antwort:  --> 8. Dezember 2021
+</s>### ASSISTANT: --> 8. Dezember 2021
 ********************
