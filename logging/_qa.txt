@@ -523,3 +523,53 @@ Frage: Wann wurde Olaf Scholz Kanzler
 
 </s>### ASSISTANT: --> 8. Dezember 2021
 ********************
+### USER: 
+passage: ... primeLine Unternehmensgruppe am 8. April 2016 offiziell den Grundstein für ihren Neubau im Gewerbegebiet Eidinghausen (Bad Oeynhausen) gelegt.
+passage: ... primeLine Unternehmensgruppe am 8. April 2016 offiziell den Grundstein für ihren Neubau im Gewerbegebiet Eidinghausen (Bad Oeynhausen) gelegt.
+passage: Wir verwenden Cookies gemäß unserer unten verlinkten Datenschutzerklärung zur Verarbeitung von Endgeräteinformationen und personenbezogenen Daten. Dies dient der Einbindung von Inhalten, externen Diensten und Elementen Dritter, der statistischen Analyse/Messung, personalisierten Werbung sowie der Einbindung sozialer Medien. Je nach Funktion werden dabei Daten an Dritte, auch in den USA, mit dem Risiko eines geheimen Zugriffs durch US-Behörden und der Nutzung zu Überwachungszwecken, möglicherweise auch ohne Rechtsbehelfsmöglichkeiten weitergegeben und von diesen verarbeitet. Durch Betätigen des Buttons "Alles akzeptieren" stimmen Sie der obigen Verwendung zu. Diese Einwilligung ist freiwillig und kann jederzeit über den Link "Cookie-Einstellungen" ganz unten im Fußbereich der Website widerrufen werden. Bei Betätigung des Buttons "Alles ablehnen" werden nur essentielle Cookies gesetzt, die für den Betrieb der Website notwendig sind. Links unten über "Erweiterte Einstellungen" können Sie im Detail auswählen, welche Cookies Sie zulassen möchten.
+Bad Oeynhausen, 11. April 2016. Gemeinsam mit rund 60 Gästen, darunter Geschäftspartner, Kunden, Nachbarn sowie Vertreter der Wirtschaftsförderung Bad Oeynhausen, hat die primeLine Unternehmensgruppe am 8. April 2016 offiziell den Grundstein für ihren Neubau im Gewerbegebiet Eidinghausen (Bad Oeynhausen) gelegt. Die Geschäftsführer Stefan Bangel und Petros Jossifidis mauerten eine Zeitkapsel hinter dem Grundstein ein. Bestückt mit der aktuellen Ausgabe einer örtlichen Zeitung, Unternehmensbroschüren sowie dem grasgrünen Unternehmensmaskottchen Egino bildet sie ein Stück Zeit- und Unternehmensgeschichte ab. Die Geschäftsführung und das rund 20-köpfige Team freuen sich, dass es nun losgeht, denn das Unternehmen ist in den letzten Jahren kontinuierlich gewachsen und braucht dringend mehr Platz für Büros, Produktion und ein neues Hochregallager. Schon Ende August soll der neue Firmensitz, der von der Bielefelder Goldbeck Nord GmbH entworfen
+
+
+passage: ist bereits das fünfte in Deutschland und neben dem ARCOTEL Rubin das zweite in Hamburg. Dazu Manfred Mayer, Vorstand der ARCOTEL Hotel AG: "Ich bin … 
+… Europa-Allee 101-103 inmitten des citynahen Stadtteils Europaviertel in Anwesenheit von Bürgermeister Olaf Cunitz, von Dr. Thomas Hain, dem leitenden Geschäftsführer der Unternehmensgruppe Nassauische Heimstätte/ Wohnstadt und von Prof. Dr. Joachim Pös, dem Geschäftsführer der NH ProjektStadt GmbH, die festliche Grundsteinlegung des neuen Wohnhochhauses … 
+Wir verwenden Cookies gemäß unserer unten verlinkten Datenschutzerklärung zur Verarbeitung von Endgeräteinformationen und personenbezogenen Daten. Dies dient der Einbindung von Inhalten, externen Diensten und Elementen Dritter, der statistischen Analyse/Messung, personalisierten Werbung sowie der Einbindung sozialer Medien. Je nach Funktion werden dabei Daten an Dritte, auch in den USA, mit dem Risiko eines geheimen Zugriffs durch US-Behörden und der Nutzung zu Überwachungszwecken, möglicherweise auch ohne Rechtsbehelfsmöglichkeiten weitergegeben und von diesen verarbeitet. Durch Betätigen des Buttons "Alles akzeptieren" stimmen Sie der obigen Verwendung zu. Diese Einwilligung ist freiwillig und kann jederzeit über den Link "Cookie-Einstellungen" ganz unten im Fußbereich der Website widerrufen werden. Bei Betätigung des Buttons "Alles ablehnen" werden nur essentielle Cookies gesetzt, die für den Betrieb der Website notwendig sind. Links unten über "Erweiterte Einstellungen" können Sie im Detail auswählen, welche Cookies Sie zulassen möchten.
+Bad Oeynhausen, 2. November 2016. Rund ein halbes Jahr nach der Grundsteinlegung hat die primeLine Unternehmensgruppe Ende Oktober ihren neuen Firmensitz in Eidinghausen bezogen. Die Geschäftsführer Stefan Bangel, Petros Jossifidis und das 24-köpfige Team freuen sich über den reibungslosen Ablauf des 2,5 Millionen Projektes. Am Standort Dornenbreite war es nach dem stetigen Wachstumskurs des IT-Unternehmens
+
+
+
+Frage: wann wurde der Grundstein vom Neubau von primeline gelegt
+
+</s>### ASSISTANT:  --> 8. April 2016
+
+********************
+### USER: 
+passage: 1954. 17. Juli: Angela Merkel wird als Angela Dorothea Kasner in Hamburg als erstes Kind des Theologiestudenten Horst Kasner und der Lehrerin Herlind Kasner ( ...
+passage: Geboren wird Angela Dorothea Kasner am 17. Juli 1954 in Hamburg als Tochter des evangelischen Theologen Horst Kasner und der Lehrerin Herlind Kasner, geb.
+passage: Bürgerlicher Name, Angela Dorothea Merkel ; Beruf, Ehemalige Bundeskanzlerin, Politikerin, Wissenschaftlerin ; Geburtstag, 17.07.1954 ; Sternzeichen, Krebs.
+passage: Geboren am 17. Juli 1954 in Hamburg; evangelisch; verheiratet. Abitur 1973 in Templin. Physikstudium an der Universität Leipzig 1973 bis 1978.
+passage: Bundeskanzlerin Angela Merkel ist nicht nur die erste Frau, die dieses Amt ... Geburtstag17.07.1954. SternzeichenKrebs. Geschlechtw. 2005 konnte Angela Merkel ...
+passage: Elternhaus und Geschwister Angela Dorothea Kasner wurde am 17. Juli 1954 in Hamburg-Barmbek geboren. ... wurde Angela Merkel am 17. November zur Bundesministerin ...
+passage: Angela Dorothea Merkel, geb. Kasner, wurde am 17. Juli 1954 in Hamburg geboren. Sie war das älteste von drei Kindern des evangelischen Pfarrers Horst Kasner ...
+passage: Angela Merkel ist eine deutsche CDU-Politikerin und ist von 2005 bis 2021 die erste Bundeskanzlerin der Bundesrepublik Deutschland. Die in der DDR aufgewachsene promovierte Physikerin engagiert sich schon früh politisch und tritt im Zuge des Zusammenbruchs des Regimes der politischen Gruppierung „Demokratischer Aufbruch“ (DA) bei. Als 1990 der DA in der CDU aufgeht, wird Merkel Bundestagsmitglied und erhält in den Kabinetten Kohls der Jahre 1990-1998 Posten als Familienministerin und Umweltministerin, bevor sie weitere Positionen als CDU-Generalsekretärin (1998–2000), CDU-Vorsitzende (2000-2018) und Oppositionsführerin (2002–2005) übernimmt. Sie prägt als Kanzlerin der Bundesrepublik Deutschland auch die Politik in Europa. Merkel ist eine der mächtigsten Frauen weltweit.
+17. Juli: Angela Merkel wird als Angela Dorothea Kasner in Hamburg als erstes Kind des Theologiestudenten Horst Kasner und der Lehrerin Herlind Kasner (Geburtsname: Jentzsch) geboren. Horst Kasner tritt in Quitzow (Brandenburg) eine Pfarrstelle an.
+Merkel verbringt ihre Kindheit, Jugend und frühe Erwachsenenzeit im Spannungsfeld zwischen den Anforderungen des sozialistischen Staates und der Kirche.
+Abitur an der Erweiterten Oberschule (EOS) "Hermann Matern" in Templin und Beginn des Physikstudiums an der Universität Leipzig. Kontakte zur Evangelischen Studentengemeinde.
+Abschluss als Diplomphysikerin und Einstellung als Wissenschaftliche Mitarbeiterin im Zentralinstitut für Physikalische Chemie an der Akademie der Wissenschaften (AdW) in Berlin. Forschungsgebiet wird die Quantenchemie. Kulturfunktionärin der FDJ an der AdW. Der Sozialistischen Einheitspartei Deutschlands (SED) tritt sie jedoch nicht bei.
+Promotion zum Dr. rer. nat. mit einer Dissertation über die Berechnung von Geschwindigkeitskonstanten von Reaktionen einfacher Kohlenwasserstoffe.
+Februar: Merkel wird Pressesprecherin des DA. Mit Blick auf die Volkskammerwahl im März gründen DA, "Deutsche Soziale Union" (DSU) und Christlich Demokratische Union (CDU) der DDR das Bündnis "Allianz für
+
+
+passage: Angela Merkel, in: LeMO-Biografien, Lebendiges Museum Online, Stiftung Haus der Geschichte der Bundesrepublik Deutschland,
+Die Stiftung verwendet technisch notwendige Cookies zur Darstellung der Website. Zusätzlich nutzt sie Google Analytics, um anonymisierte Informationen zur Verbesserung unserer Website zu erhalten. Informationen finden Sie in unserer Datenschutzerklärung.
+Diese Webseite verwendet Cookies, die für den Betrieb und die Sicherheit der Seite notwendig sind. Darüber hinaus sammelt die Webseite anonyme Nutzerdaten für statistische Analysen und um eingebundene Inhalte externer Seiten anzuzeigen. Die Cookie-Einstellungen können Sie jederzeit ändern. Erfahren Sie mehr
+Als Angela Merkel 2005 ihr Amt im Alter von 51 Jahren antrat, war sie die jüngste der bislang acht Amtsinhaber. Inzwischen gehört sie zu den Regierungschefs, die am längsten amtieren. Ende des Jahres 2019 hat sie Konrad Adenauer eingeholt. Scheidet sie 2021 aus dem Amt, hat Angela Merkel mit Helmut Kohl, der bisher die längste Zeit regierte, gleichgezogen.
+Bundeskanzlerin Angela Merkel anlässlich des 50. Todestages von Konrad Adenauer an der Seite seiner Tochter Libet Werhahn und Hans-Gert Pöttering.
+Bundeskanzlerin Angela Merkel anlässlich des 50. Todestages von Konrad Adenauer an der Seite seiner Tochter Libet Werhahn und Hans-Gert Pöttering.
+Geboren wird Angela Dorothea Kasner am 17. Juli 1954 in Hamburg als Tochter des evangelischen Theologen Horst Kasner und der Lehrerin Herlind Kasner, geb. Jentzsch. Wenige Wochen nach der Geburt übernimmt ihr Vater im Dorf Quitzow, heute ein Teil von Perleberg, eine Pfarrstelle in der von Bischof Otto Dibelius geleiteten Evangelischen Kirche in Berlin-Brandenburg. Der Vater wird als Horst Kazmierczak 1926 in Berlin geboren. Die Eltern stammen aus Posen, das nach den Regelungen des Ersten Weltkriegs in polnisches Staatsgebiet einverleibt wurde und gehören
+
+
+
+Frage: Wann wurde Angela Merkel geboren
+
+</s>### ASSISTANT:  --> 17. Juli 1954
+********************

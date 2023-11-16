@@ -132,3 +132,7 @@ Hi, wer bist du ? --> general_qa
 ********************
 Wann wurde Olaf Scholz Kanzler --> open_qa
 ********************
+wann wurde der Grundstein vom Neubau von primeline gelegt --> open_qa
+********************
+Wann wurde Angela Merkel geboren --> open_qa
+********************
