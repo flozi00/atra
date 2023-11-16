@@ -15,7 +15,7 @@ from atra.text_utils.prompts import (
     TOKENS_TO_STRIP,
     USER_TOKEN,
 )
-from atra.text_utils.typesense_search import SemanticSearcher, Embedder
+from atra.text_utils.embeddings import Embedder
 from transformers import pipeline
 from atra.utilities.redis_client import cache
 from atra.utilities.retrieval import get_serp, do_browsing
@@ -27,7 +27,6 @@ class Plugins(Enum):
 
 
 SERP_API_KEY = os.getenv("SERP_API_KEY")
-TYPESENSE_API_KEY = os.getenv("TYPESENSE_API_KEY")
 
 pipe = pipeline(
     "text-classification",
@@ -47,7 +46,6 @@ class Agent:
     ) -> None:
         self.embedder = embedder
         self.llm = llm
-        self.searcher = SemanticSearcher(embedder=embedder, api_key=TYPESENSE_API_KEY)
         self.temperature = 0.1 if creative is False else 0.7
         self.creative = creative
 
@@ -78,22 +76,17 @@ class Agent:
 
         if (
             plugin == Plugins.SEARCH
-            and (TYPESENSE_API_KEY is not None or SERP_API_KEY is not None)
+            and (SERP_API_KEY is not None)
             and len(search_question) > 10
         ):
             yield "Suche: " + search_question
-            if TYPESENSE_API_KEY is None:
-                search_query = search_question
-                if len(url) > 6:
-                    search_query += f" site:{url}"
-                serp_passages, links, answer = get_serp(search_query, SERP_API_KEY)
-                options = self.get_filtered_webpage_content(
-                    search_question, links=links
-                )
-                serp_text = "passage: " + "\npassage: ".join(serp_passages)
-                options = serp_text + options
-            else:
-                options = self.get_data_from_typesense(search_question)
+            search_query = search_question
+            if len(url) > 6:
+                search_query += f" site:{url}"
+            serp_passages, links, answer = get_serp(search_query, SERP_API_KEY)
+            options = self.get_filtered_webpage_content(search_question, links=links)
+            serp_text = "passage: " + "\npassage: ".join(serp_passages)
+            options = serp_text + options
 
             yield "Antworten..."
             answer = self.do_qa(search_question, options, answer)
@@ -128,7 +121,7 @@ class Agent:
         Stores in json file.
         """
         try:
-            with open(f"logging/_dpo.json", mode="r+") as file:
+            with open("logging/_dpo.json", mode="r+") as file:
                 content = json.loads(file.read())
         except Exception:
             content = {}
@@ -142,9 +135,8 @@ class Agent:
 
         content[input] = key
 
-        with open(f"logging/_dpo.json", mode="w+") as file:
+        with open("logging/_dpo.json", mode="w+") as file:
             file.write(json.dumps(content, indent=4))
-
 
     def classify_plugin(self, history: str) -> Plugins:
         """
@@ -260,7 +252,17 @@ class Agent:
         corpus_embeddings = [self.embedder(corp) for corp in corpus]
         query_embedding = self.embedder(query)
 
-        cos_scores = util.cos_sim(query_embedding, corpus_embeddings)[0]
+        a = torch.tensor(query_embedding)
+        b = torch.tensor(corpus_embeddings)
+        if len(a.shape) == 1:
+            a = a.unsqueeze(0)
+
+        if len(b.shape) == 1:
+            b = b.unsqueeze(0)
+
+        a_norm = torch.nn.functional.normalize(a, p=2, dim=1)
+        b_norm = torch.nn.functional.normalize(b, p=2, dim=1)
+        cos_scores = torch.mm(a_norm, b_norm.transpose(0, 1))[0]
         top_results = torch.topk(cos_scores, k=20 if len(corpus) > 20 else len(corpus))
 
         for score, idx in zip(top_results[0], top_results[1]):
@@ -268,25 +270,6 @@ class Agent:
                 filtered_corpus.append(corpus[idx])
 
         return "\n\n".join(filtered_corpus)
-
-    def get_data_from_typesense(self, query: str) -> str:
-        """
-        Searches for data in Typesense using the given query and returns an
-        iterable of passages containing the query.
-
-        Args:
-            query (str): The query to search for in Typesense.
-
-        Yields:
-            Iterable[str]: An iterable of passages containing the query.
-        """
-        options = ""
-        result = self.searcher.semantic_search(query)
-        for res in result:
-            for key, value in res.items():
-                options += "passage: " + value + "\n\n"
-
-        return options
 
     def get_filtered_webpage_content(self, query: str, links: list) -> Iterable[str]:
         """
@@ -311,7 +294,7 @@ class Agent:
 
         filtered_words = filtered.split(" ")
         filtered = []
-        STEPSIZE = 250
+        STEPSIZE = 200
         for i in range(0, len(filtered_words), STEPSIZE):
             filtered.append(
                 " ".join(filtered_words[i : i + int(STEPSIZE * 1.3)]).strip()

@@ -130,3 +130,5 @@ Verfasse eine Beschwerde Email in der ich mich an den Bürgermeister wende und h
 ********************
 Hi, wer bist du ? --> general_qa
 ********************
+Wann wurde Olaf Scholz Kanzler --> open_qa
+********************

@@ -9,7 +9,6 @@ import time
 import json
 import diffusers.pipelines.stable_diffusion_xl.watermark
 from atra.image_utils.free_lunch_utils import (
-    register_free_upblock2d,
     register_free_crossattn_upblock2d,
 )
 import gradio as gr

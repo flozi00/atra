@@ -9,9 +9,9 @@ from atra.text_utils.prompts import (
 from atra.text_utils.assistant import Agent
 from huggingface_hub import InferenceClient
 import os
-from atra.text_utils.typesense_search import Embedder
+from atra.text_utils.embeddings import Embedder
 
-embedder = Embedder()
+embedder = Embedder
 
 client = InferenceClient(model=os.getenv("LLM", "http://127.0.0.1:8080"))
 

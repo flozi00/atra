@@ -490,3 +490,36 @@ Frage: Wer war der erste Kanzler von der SPD
 
 </s>### ASSISTANT:  Antwort:  -->  Willy Brandt
 ********************
+### USER: 
+passage: Seit Dezember 2021 ist Olaf Scholz der neunte Bundeskanzler der Bundesrepublik Deutschland. Von März 2018 bis 2021 war er Bundesminister der Finanzen.
+passage: Olaf Scholz ist seit Dezember 2021 der Bundes-Kanzler der Bundes-Republik Deutschland. Er wurde am 14. Juni 1958 in Osnabrück geboren. Von 2018 – 2021 war ...
+passage: Seit dem 08.12.2021 ist Olaf Scholz Bundeskanzler der Bundesrepublik Deutschland. Seinen Lebenslauf finden Sie hier.
+passage: Am 8. Dezember 2021 wurde ich zum Kanzler der Bundesrepublik Deutschland gewählt. Ich möchte, dass die Zwanzigerjahre eine Zeit des Aufbruchs werden. Ich stehe ...
+passage: Olaf Scholz ist ein deutscher SPD-Politiker und seit Dezember 2021 Bundeskanzler der Bundesrepublik Deutschland. Zuvor war er Vizekanzler und Finanzminister ...
+passage: Olaf Scholz als Bundeskanzler vereidigt. Bundestagspräsidentin Bärbel Bas hat dem neuen Bundeskanzler Olaf Scholz (SPD) am Mittwoch, 8. Dezember 2021, im ...
+passage: Olaf Scholz als Bundesfinanzminister und SPD-Kanzlerkandidat während seines Wahlkampfes im April 2021.
+passage: Olaf Scholz ist SPD-Politiker und seit dem 8. Dezember 2021 der neunte Bundeskanzler der Bundesrepublik Deutschland.
+passage: Von 2007 bis 2009 war Scholz Bundesminister für Arbeit und Soziales, 2011-2018 Erster Bürgermeister von Hamburg. 2017 wurde er Vizekanzler Bundesfinanzminister.
+passage: unsere liberalen Demokratien immer stärker unter Druck geraten. Wir werden nicht nachlassen darin, für die Errungenschaften von Rechtsstaat und Demokratie einzustehen. Und wir müssen die Probleme lösen, damit die billigen Parolen der Populisten nicht verfangen.
+Olaf Scholz ist ein deutscher SPD-Politiker und seit Dezember 2021 Bundeskanzler der Bundesrepublik Deutschland. Zuvor war er Vizekanzler und Finanzminister im Kabinett Angela Merkels.
+Scholz wuchs in Osnabrück als ältester von drei Brüdern auf. Er absolvierte ein Studium der Rechtswissenschaft, war Fachanwalt für Arbeitsrecht und ist Partner der Anwaltskanzlei "Zimmermann, Scholz und Partner" in Hamburg.
+Seine politische Laufbahn begann er 1975, als er als Gymnasiast in die SPD eintrat: Er engagierte sich bei den Jusos und war sechs Jahre lang stellvertretender Juso-Bundesvorsitzender. 1994 war Scholz Kreisvorsitzender des SPD-Bezirks Hamburg-Altona, stieg dann 2000 zum Landesvorsitzenden der SPD Hamburg auf und ist seit 2001 Mitglied im Parteivorstand. 2002 wurde er zum Generalsekretär der SPD ernannt. Seit Ende 2009 war er Landesvorsitzender der SPD Hamburg und stellvertretender Parteivorsitzender der SPD.
+In die Kritik geriet Scholz 2001 als Hamburger Innensenator wegen seines Einsatzes für die zwangsweise Verabreichung von Brechmitteln zur Beweissicherung bei Drogendealern. 2006 wurde der Brechmitteleinsatz vom Europäischen Gerichtshof für Menschenrechte als menschenrechtswidrig verurteilt.
+Von 2007 bis 2009 war Scholz Bundesminister für Arbeit und Soziales, von 2009 bis 2011 stellvertretender Vorsitzender der SPD-Bundestagsfraktion und von März 2011 bis März 2018 Erster Bürgermeister der Freien und Hansestadt Hamburg. Nach dem Rücktritt von Martin Schulz übernahm Scholz im Februar 2018 zudem den Posten als kommissarischer Parteivorsitzender der SPD.
+Auch im Amt des Bürgermeisters von Hamburg geriet der spätere Bundeskanzler 2017 in die Kritik. Obwohl Scholz der
+
+
+passage: Und zugleich solide Finanzen zu haben, damit wir für Krisenzeiten gewappnet sind.
+Am 8. Dezember 2021 wurde ich zum Kanzler der Bundesrepublik Deutschland gewählt. Ich möchte, dass die Zwanzigerjahre eine Zeit des Aufbruchs werden. Ich stehe für eine Gesellschaft, die vom gegenseitigen Respekt füreinander geprägt ist. Für ein Zukunftsprogramm, das die wichtigen technologischen und wirtschaftlichen Weichen stellen wird, um effektiv den Kampf gegen den Klimawandel zu führen. Das unsere Wirtschaft modernisiert und dafür sorgt, dass wir auch künftig technologisch an der Spitze stehen. Und ich kämpfe für ein souveränes und solidarisches Europa.
+... ich es kann, weil es mir Spaß macht und weil ich dazu beitragen möchte, dass die Welt gerechter und friedlicher wird.
+… nie eine Kategorie, in der ich denke. Als Politiker versuche ich, konkrete Probleme zu lösen. Und wenn das gelingt, etwa bei der Schaffung der Kurzarbeit-Regelung in der Finanzkrise, beim Schmieden einer europäischen Allianz für den Wiederaufbau nach der Corona-Krise oder auch bei einer Reihe von Projekten aus meiner Hamburger Zeit wie dem Wohnungsbau und dem Ausbau der Kita-Plätze, habe ich das schöne Gefühl, meinen Job gemacht zu haben. Und dann geht es weiter. Denn: „Fertig“ ist fortschrittliche Politik natürlich nie – es gibt immer etwas zu tun.
+…, dass unsere liberalen Demokratien immer stärker unter Druck geraten. Wir werden nicht nachlassen darin, für die Errungenschaften von Rechtsstaat und Demokratie einzustehen. Und wir müssen die Probleme lösen, damit die billigen Parolen der Populisten nicht verfangen.
+Olaf Scholz ist ein deutscher SPD-Politiker und seit Dezember 2021 Bundeskanzler der Bundesrepublik Deutschland. Zuvor war er Vizekanzler und Finanzminister im Kabinett Angela Merkels.
+Scholz wuchs in
+
+
+
+Frage: Wann wurde Olaf Scholz Kanzler
+
+</s>### ASSISTANT:  Antwort:  --> 8. Dezember 2021
+********************
