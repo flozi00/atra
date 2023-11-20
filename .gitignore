@@ -24,3 +24,4 @@ wandb
 *.safetensors
 cv-*
 *-*-*
+distil-*
