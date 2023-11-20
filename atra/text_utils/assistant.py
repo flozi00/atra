@@ -84,11 +84,14 @@ class Agent:
                 search_query += f" site:{url}"
             serp_passages, links, answer = get_serp(search_query, SERP_API_KEY)
             options = self.get_filtered_webpage_content(search_question, links=links)
-            serp_text = "passage: " + "\npassage: ".join(serp_passages) + "\n"
-            options = serp_text + options
+            serp_text = ""
+            for passage in serp_passages:
+                serp_text += "passage: " + passage + "\n"
+            for option in options:
+                serp_text += "passage: " + option + "\n"
 
             yield "Antworten..."
-            answer = self.do_qa(search_question, options, answer)
+            answer = self.do_qa(search_question, serp_text, answer)
             for text in answer:
                 yield text
         else:
@@ -198,7 +201,7 @@ class Agent:
             + "\n"
             + USER_TOKEN
             + "\n"
-            + context
+            + context[: 4096 * 2]
             + "\n\nFrage: "
             + question
             + "\n\n"
@@ -268,9 +271,9 @@ class Agent:
 
         for score, idx in zip(top_results[0], top_results[1]):
             if score > 0.7:
-                filtered_corpus.append(corpus[idx])
+                filtered_corpus.append(options[idx])
 
-        return "\n".join(filtered_corpus)
+        return filtered_corpus
 
     def get_filtered_webpage_content(self, query: str, links: list) -> Iterable[str]:
         """
@@ -302,7 +305,6 @@ class Agent:
             )
 
         filtered = self.re_ranking(query, filtered)
-        filtered = "passage: ".join(filtered.split("passage: ")[:3])
 
         return filtered
 
