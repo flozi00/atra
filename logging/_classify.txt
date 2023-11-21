@@ -140,3 +140,5 @@ wer ist alan smithee --> open_qa
 ********************
 Wann wurde Baerbock Ministerin --> open_qa
 ********************
+wo arbeitet sam altman heute --> open_qa
+********************

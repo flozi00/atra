@@ -25,3 +25,5 @@ onnxruntime>=1.16.0
 python-redis-cache>=2.2.5
 redis
 qdrant-client
+unidecode
+accelerate

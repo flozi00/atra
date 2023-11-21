@@ -146,7 +146,6 @@ def get_model(
     model = model_class.from_pretrained(
         model_name,
         config=conf,
-        torch_dtype=torch.float16,
         device_map="auto",
         trust_remote_code=True,
         **kwargs,

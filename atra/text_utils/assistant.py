@@ -9,6 +9,7 @@ from atra.text_utils.prompts import (
     ASSISTANT_TOKEN,
     END_TOKEN,
     QA_SYSTEM_PROMPT,
+    RAG_FILTER_PROMPT,
     SEARCH_PROMPT_PROCESSED,
     SYSTEM_PROMPT,
     TOKENS_TO_STRIP,
@@ -84,9 +85,9 @@ class Agent:
                 search_query += f" site:{url}"
             serp_passages, links, answer = get_serp(search_query, SERP_API_KEY)
             options = self.get_filtered_webpage_content(search_question, links=links)
+            options.extend(serp_passages)
+            options = self.re_ranking(search_question, options)
             serp_text = ""
-            for passage in serp_passages:
-                serp_text += "passage: " + passage + "\n"
             for option in options:
                 serp_text += "passage: " + option + "\n"
 
@@ -172,7 +173,6 @@ class Agent:
         text = self.llm.text_generation(
             prompt=SEARCH_PROMPT_PROCESSED.replace("<|question|>", history),
             stop_sequences=["\n", END_TOKEN],
-            temperature=0.1,
             do_sample=False,
         )
 
@@ -183,6 +183,33 @@ class Agent:
         self.log_text2text(input=history, output=text, tasktype="selfquery")
 
         return text
+
+    def filter_rag(self, question: str, passage: str) -> str:
+        PROMPT = RAG_FILTER_PROMPT.replace("<|question|>", question).replace(
+            "<|passage|>", passage
+        )
+
+        text = self.llm.text_generation(
+            prompt=PROMPT,
+            stop_sequences=["\n", END_TOKEN],
+            do_sample=False,
+        )
+
+        for _ in TOKENS_TO_STRIP:
+            for token in TOKENS_TO_STRIP:
+                text = text.rstrip(token).rstrip()
+
+        relevant = "irrelevant" not in text.lower()
+
+        self.log_text2text(
+            input=PROMPT.split(f"{END_TOKEN}{USER_TOKEN}")[-1].replace(
+                f"{END_TOKEN}{ASSISTANT_TOKEN}", ""
+            ),
+            output="relevant" if relevant else "irrelevant",
+            tasktype="ragfilter",
+        )
+
+        return relevant
 
     def do_qa(self, question: str, context: str, serp_answer: str) -> Iterable[str]:
         """
@@ -236,7 +263,7 @@ class Agent:
         )
         yield text.strip()
 
-    def re_ranking(self, query: str, options: list) -> str:
+    def re_ranking(self, query: str, options: list) -> list:
         """
         Re-ranks a list of options based on their similarity to a given query.
 
@@ -270,12 +297,12 @@ class Agent:
         top_results = torch.topk(cos_scores, k=20 if len(corpus) > 20 else len(corpus))
 
         for score, idx in zip(top_results[0], top_results[1]):
-            if score > 0.7:
+            if self.filter_rag(query, options[idx]):
                 filtered_corpus.append(options[idx])
 
         return filtered_corpus
 
-    def get_filtered_webpage_content(self, query: str, links: list) -> Iterable[str]:
+    def get_filtered_webpage_content(self, query: str, links: list) -> list:
         """
         Uses Playwright to launch a Chromium browser and navigate
         to a search engine URL with the given query.
@@ -288,7 +315,7 @@ class Agent:
         - filtered (str): The filtered and re-ranked text content of the webpage.
         """
         content = ""
-        for link in tqdm(links[:5]):
+        for link in tqdm(links[:3]):
             content += do_browsing(link) + "\n"
         content = content.split("\n")
         filtered = ""
@@ -303,8 +330,6 @@ class Agent:
             filtered.append(
                 " ".join(filtered_words[i : i + int(STEPSIZE * 1.3)]).strip()
             )
-
-        filtered = self.re_ranking(query, filtered)
 
         return filtered
 

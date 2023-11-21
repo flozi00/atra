@@ -6,13 +6,13 @@ from simplepeft.utils import Tasks
 import pandas as pd
 from unidecode import unidecode
 
-BATCH_SIZE = 64
-BASE_MODEL = "primeline/whisper-large-v3-german"
-PEFT_MODEL = "whisper-large-v3-german-v1"
+BATCH_SIZE = 4
+BASE_MODEL = "distilwhisper-german-v1"
+PEFT_MODEL = "distilwhisper-german-v1"
 TASK = Tasks.ASR
-LR = 1e-6
+LR = 1e-5
 
-simplepeft.train.train.ACCUMULATION_STEPS = 1
+simplepeft.train.train.ACCUMULATION_STEPS = 64
 
 
 def normalize_text(batch):
@@ -97,9 +97,9 @@ def main():
         task=TASK,
         model_name=BASE_MODEL,
         peft_name=PEFT_MODEL,
-        use_peft=True,
+        use_peft=False,
         use_flash_v2=True,
-        use_bnb=True,
+        use_bnb=False,
         lora_depth=512,
     )
 

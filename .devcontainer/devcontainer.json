@@ -1,0 +1,7 @@
+{
+    "image": "flozi00/atra:latest",
+    "runArgs": [
+        "--gpus",
+        "all"
+    ]
+}

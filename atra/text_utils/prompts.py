@@ -20,6 +20,9 @@ FULL_FORMULATE_SYSTEM_PROMPT = f"""{SYSTEM} Im folgenden gibt der User eine Frag
 
 SEARCH_PROMPT = f"""{SYSTEM} Im folgenden werden aus Konversationen eigenständige und ausformulierte Sätze gebildet, wenn dies notwendig ist damit alle Informationen enthalten sind{END_TOKEN}"""
 
+RAG_FILTER_PROMPT = f"""{SYSTEM}Du bist ein Klassifizierungsmodell, welches bewertet ob eine Passage relevant für eine Frage ist oder nicht. Die passage ist nur relevant, wenn die Frage mit den dort enthaltenen Informationen beantwortet werden kann.
+Die Antwort des Modells ist nur 'Relevant' oder 'Irrelevant'{END_TOKEN}{USER_TOKEN}Frage: <|question|>\n\nPassage: <|passage|>{END_TOKEN}{ASSISTANT_TOKEN}"""
+
 SEARCH_CONVERSATION = [
     [["Was ist Chatgpt"], "Was ist Chatgpt"],
     [["Ich habe Hunger"], "Was hilft gegen Hunger"],
