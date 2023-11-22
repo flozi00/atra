@@ -182,8 +182,8 @@ def get_model(
                     isinstance(module, bnb.nn.Linear4bit)
                     or isinstance(module, bnb.nn.Linear8bitLt)
                     or isinstance(module, torch.nn.Linear)
-                    # or isinstance(module, torch.nn.Embedding)
-                    # or isinstance(module, bnb.nn.StableEmbedding)
+                    or isinstance(module, torch.nn.Embedding)
+                    or isinstance(module, bnb.nn.StableEmbedding)
                 ):
                     names = name.split(".")
                     lora_module_names.add(names[0] if len(names) == 1 else names[-1])
@@ -191,8 +191,9 @@ def get_model(
             for head in ["lm_head", "proj_out"]:
                 if head in lora_module_names:  # needed for 16-bit
                     lora_module_names.remove(head)
-            print(lora_module_names)
-            return list(set(lora_module_names))
+            lora_module_names =  list(set(lora_module_names))
+            
+            return lora_module_names
 
         # create the lora config
         peft_config = LoraConfig(

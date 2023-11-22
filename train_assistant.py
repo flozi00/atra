@@ -31,7 +31,9 @@ def combine_strings(strings) -> list:
 
 def main():
     ds = datasets.load_dataset(
-        os.getenv("DATASET_PATH", "flozi00/conversations"), split="train"
+        os.getenv("DATASET_PATH", "flozi00/conversations"),
+        split="train",
+        cache_dir="./ds_cache",
     )
 
     # load model, processor by using the get_model function

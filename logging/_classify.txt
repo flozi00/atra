@@ -142,3 +142,5 @@ Wann wurde Baerbock Ministerin --> open_qa
 ********************
 wo arbeitet sam altman heute --> open_qa
 ********************
+Wer bist du ? --> general_qa
+********************

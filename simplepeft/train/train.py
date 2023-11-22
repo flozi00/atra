@@ -99,5 +99,5 @@ def start_training(
                 scheduler.step()
 
             index += 1
-
+        do_save_stuff()
     do_save_stuff()

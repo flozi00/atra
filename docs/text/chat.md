@@ -1,6 +1,6 @@
 # run tgi for chatbot
 ```
-docker run --pull always --gpus all -d --shm-size 1g -p 8080:80 -v ./data:/data ghcr.io/huggingface/text-generation-inference:1.1.0 --max-total-tokens 8192 --max-batch-prefill-tokens 8192 --max-input-length 5000 --model-id flozi00/Mistral-7B-german-assistant-v4-4bit-autogptq --quantize=gptq --cuda-memory-fraction 0.8
+docker run --pull always --gpus all -d --shm-size 1g -p 8080:80 ghcr.io/huggingface/text-generation-inference:latest --max-total-tokens 8192 --max-batch-prefill-tokens 7000 --max-input-length 7000 --model-id flozi00/Mistral-7B-german-assistant-v5-4bit-autogptq --quantize=gptq --cuda-memory-fraction 0.9H
 ```
 
 ```
@@ -11,8 +11,6 @@ docker run --gpus all -p 8081:80 --pull always ghcr.io/huggingface/text-embeddin
 
 * LLM - the model to use for language model, either TGI endpoint or HF model
 * EMBEDDER_HOST - the url for the text embedding inference server
-* TYPESENSE_API_KEY - the api key for typesense
-* TYPESENSE_HOST - the host ip or domain for typesense
 * SERP_API_KEY - the api key for serper.dev
 
 
