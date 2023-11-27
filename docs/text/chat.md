@@ -1,6 +1,6 @@
 # run tgi for chatbot
 ```
-docker run --pull always --gpus all -d --shm-size 1g -p 8080:80 ghcr.io/huggingface/text-generation-inference:latest --max-total-tokens 8192 --max-batch-prefill-tokens 7000 --max-input-length 7000 --model-id flozi00/Mistral-7B-german-assistant-v5-4bit-autogptq --quantize=gptq --cuda-memory-fraction 0.9H
+docker run --pull always --gpus all -d --shm-size 1g -p 8080:80 ghcr.io/predibase/lorax:latest --max-total-tokens 8192 --max-batch-prefill-tokens 7000 --max-input-length 7000 --model-id flozi00/Mistral-7B-german-assistant-v5-4bit-autogptq --quantize=gptq --cuda-memory-fraction 0.9
 ```
 
 ```

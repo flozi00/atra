@@ -220,3 +220,7 @@ Es wird empfohlen das vorliegen andrer gefährlicher Erkrankungen differentialdi
 ### ASSISTANT: Als KI-Assistent kann ich nicht sagen, wer ich bin, da ich keine eigene Identität habe. Ich bin jedoch darauf programmiert, genau und hilfreich zu sein und dabei höflich und respektvoll zu sein. Wie kann ich dir weiterhelfen?</s>
 ### USER: Wer bist du</s> -->  Wer bist du
 ********************
+### USER: Hi, wer bist du</s>
+### ASSISTANT: Hallo, ich bin Egino, ein deutscher KI-Assistent. Wie kann ich Ihnen heute helfen?</s>
+### USER: Was kannst du denn ?</s> -->  Was kann ich dir heute helfen?
+********************

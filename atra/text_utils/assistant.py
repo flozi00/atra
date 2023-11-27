@@ -337,7 +337,7 @@ class Agent:
         text = ""
         result = self.llm.text_generation(
             prompt=query,
-            max_new_tokens=512,
+            max_new_tokens=1024,
             temperature=self.temperature,
             stop_sequences=[END_TOKEN, "###"],
             stream=True,

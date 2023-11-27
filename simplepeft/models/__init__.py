@@ -15,11 +15,18 @@ from transformers import (
     AutoModelForSpeechSeq2Seq,
 )
 
+layer_classes = [torch.nn.Linear, torch.nn.Embedding]
+
 try:
     import bitsandbytes as bnb
 
     bnb_try = bnb.optim  # only for linter
     bnb_available = True
+
+    layer_classes.append(bnb.nn.Linear4bit)
+    layer_classes.append(bnb.nn.Linear8bit)
+    layer_classes.append(bnb.nn.StableEmbedding)
+
 except ImportError:
     bnb_available = False
 
@@ -178,21 +185,18 @@ def get_model(
         def find_all_linear_names(model):
             lora_module_names = set()
             for name, module in model.named_modules():
-                if (
-                    isinstance(module, bnb.nn.Linear4bit)
-                    or isinstance(module, bnb.nn.Linear8bitLt)
-                    or isinstance(module, torch.nn.Linear)
-                    or isinstance(module, torch.nn.Embedding)
-                    or isinstance(module, bnb.nn.StableEmbedding)
-                ):
-                    names = name.split(".")
-                    lora_module_names.add(names[0] if len(names) == 1 else names[-1])
+                for cls in layer_classes:
+                    if isinstance(module, cls):
+                        names = name.split(".")
+                        lora_module_names.add(
+                            names[0] if len(names) == 1 else names[-1]
+                        )
 
             for head in ["lm_head", "proj_out"]:
                 if head in lora_module_names:  # needed for 16-bit
                     lora_module_names.remove(head)
-            lora_module_names =  list(set(lora_module_names))
-            
+            lora_module_names = list(set(lora_module_names))
+
             return lora_module_names
 
         # create the lora config
@@ -235,10 +239,10 @@ def get_model(
     if push_to_hub:
         PUSH_NAME = peft_name.split(sep="/")[-1]
         model.half()
-        model.save_pretrained(PUSH_NAME, safe_serialization=task != Tasks.ASR)
+        model.save_pretrained(PUSH_NAME, safe_serialization=False)
         processor.save_pretrained(PUSH_NAME)
 
-        model.push_to_hub(PUSH_NAME, safe_serialization=task != Tasks.ASR)
+        model.push_to_hub(PUSH_NAME, safe_serialization=False)
         processor.push_to_hub(PUSH_NAME)
 
     model = model.train()
