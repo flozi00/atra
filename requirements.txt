@@ -16,7 +16,7 @@ transformers>=4.30.1
 peft>=0.6.1
 accelerate>=0.23.0
 playwright>=1.38.0
-diffusers>=0.23.0
+diffusers>=0.24.0
 invisible-watermark>=0.2.0
 sentence-transformers
 typesense

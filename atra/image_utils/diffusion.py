@@ -43,9 +43,9 @@ elif "L40" in GPU_NAME:
 
 
 diffusion_pipe = StableDiffusionXLPipeline.from_pretrained(
-    "femboysLover/DreamShaper-fp16-XL",
+    "stablediffusionapi/opendalle",
     torch_dtype=torch.float16 if GPU_AVAILABLE else torch.float32,
-    use_safetensors=True,
+    use_safetensors=False,
 )
 
 refiner = StableDiffusionXLImg2ImgPipeline.from_pretrained(
