@@ -3,6 +3,7 @@ from diffusers import (
     StableDiffusionXLImg2ImgPipeline,
     UniPCMultistepScheduler,
 )
+
 import torch
 from atra.utilities.stats import timeit
 import time
@@ -27,7 +28,7 @@ GPU_AVAILABLE = torch.cuda.is_available()
 
 high_noise_frac = 0.7
 _images_per_prompt = 2
-INFER_STEPS = 10
+INFER_STEPS = 40
 GPU_ID = 0
 POWER = 450 if GPU_AVAILABLE else 100
 if GPU_AVAILABLE:
