@@ -48,27 +48,31 @@ diffusion_pipe = StableDiffusionXLPipeline.from_pretrained(
     use_safetensors=False,
 )
 
-refiner = StableDiffusionXLImg2ImgPipeline.from_pretrained(
-    "stabilityai/stable-diffusion-xl-refiner-1.0",
-    text_encoder_2=diffusion_pipe.text_encoder_2,
-    vae=diffusion_pipe.vae,
-    torch_dtype=torch.float16 if GPU_AVAILABLE else torch.float32,
-    use_safetensors=True,
-    variant="fp16",
+diffusion_pipe.vae = torch.compile(
+    diffusion_pipe.vae, mode="reduce-overhead", fullgraph=True
 )
 
-refiner.vae = torch.compile(refiner.vae, mode="reduce-overhead", fullgraph=True)
+# refiner = StableDiffusionXLImg2ImgPipeline.from_pretrained(
+#    "stabilityai/stable-diffusion-xl-refiner-1.0",
+#    text_encoder_2=diffusion_pipe.text_encoder_2,
+#    vae=diffusion_pipe.vae,
+#    torch_dtype=torch.float16 if GPU_AVAILABLE else torch.float32,
+#    use_safetensors=True,
+#    variant="fp16",
+# )
+
+# refiner.vae = torch.compile(refiner.vae, mode="reduce-overhead", fullgraph=True)
 
 # change scheduler
 diffusion_pipe.scheduler = UniPCMultistepScheduler.from_config(
     diffusion_pipe.scheduler.config
 )
-refiner.scheduler = UniPCMultistepScheduler.from_config(refiner.scheduler.config)
+# refiner.scheduler = UniPCMultistepScheduler.from_config(refiner.scheduler.config)
 
 # set to GPU
 if GPU_AVAILABLE:
     diffusion_pipe = diffusion_pipe.to(f"cuda:{GPU_ID}")
-    refiner.to(f"cuda:{GPU_ID}")
+    # refiner.to(f"cuda:{GPU_ID}")
 
 
 @timeit
@@ -95,16 +99,17 @@ def generate_images(
             prompt=prompt,
             negative_prompt=negatives,
             num_inference_steps=INFER_STEPS,
-            denoising_end=high_noise_frac,
-            output_type="latent",
-        ).images[0]
+            num_images_per_prompt=4,
+            # denoising_end=high_noise_frac,
+            # output_type="latent",
+        ).images
 
-        image = refiner(
-            prompt=prompt,
-            num_inference_steps=INFER_STEPS,
-            denoising_start=high_noise_frac,
-            image=image,
-        ).images[0]
+        # image = refiner(
+        #    prompt=prompt,
+        #    num_inference_steps=INFER_STEPS,
+        #    denoising_start=high_noise_frac,
+        #    image=image,
+        # ).images[0]
 
     consumed_time = time.time() - start_time
     TIME_LOG["Time in seconds"] = consumed_time

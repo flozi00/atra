@@ -9,7 +9,7 @@ def build_diffusion_ui() -> None:
         with gr.Row():
             GET_GLOBAL_HEADER()
         with gr.Column():
-            images = gr.Image(height=512, width=512, label="Image")
+            images = gr.Gallery(label="Image")
             stats = gr.Markdown()
 
         with gr.Column():
