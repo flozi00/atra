@@ -12,6 +12,7 @@ from atra.image_utils.free_lunch_utils import (
     register_free_crossattn_upblock2d,
 )
 import gradio as gr
+import pathlib
 
 
 def apply_watermark_dummy(self, images: torch.FloatTensor):
@@ -25,7 +26,8 @@ diffusers.pipelines.stable_diffusion_xl.watermark.StableDiffusionXLWatermarker.a
 GPU_AVAILABLE = torch.cuda.is_available()
 
 high_noise_frac = 0.7
-INFER_STEPS = 20
+_images_per_prompt = 2
+INFER_STEPS = 10
 GPU_ID = 0
 POWER = 450 if GPU_AVAILABLE else 100
 if GPU_AVAILABLE:
@@ -99,7 +101,7 @@ def generate_images(
             prompt=prompt,
             negative_prompt=negatives,
             num_inference_steps=INFER_STEPS,
-            num_images_per_prompt=4,
+            num_images_per_prompt=_images_per_prompt,
             # denoising_end=high_noise_frac,
             # output_type="latent",
         ).images
@@ -119,5 +121,10 @@ def generate_images(
 
     MD = json.dumps(TIME_LOG, indent=4)
     MD = "```json\n" + MD + "\n```"
+
+    paths = []
+    for x in range(len(image)):
+        image[x].save("output_image.jpg", "JPEG", optimize=True)
+        paths.append(pathlib.Path(f"output_image_{x}.jpg"))
 
     return image, MD
