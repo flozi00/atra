@@ -48,4 +48,4 @@ def build_diffusion_ui() -> None:
         )
 
     ui.queue(api_open=False)
-    ui.launch(**launch_args, server_port=7861)
+    ui.launch(**launch_args)
