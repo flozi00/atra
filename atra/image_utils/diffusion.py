@@ -14,6 +14,7 @@ from atra.image_utils.free_lunch_utils import (
 )
 import gradio as gr
 import pathlib
+import torch._inductor
 
 
 def apply_watermark_dummy(self, images: torch.FloatTensor):
@@ -26,9 +27,8 @@ diffusers.pipelines.stable_diffusion_xl.watermark.StableDiffusionXLWatermarker.a
 
 GPU_AVAILABLE = torch.cuda.is_available()
 
-high_noise_frac = 0.7
 _images_per_prompt = 2
-INFER_STEPS = 40
+INFER_STEPS = 20
 GPU_ID = 0
 POWER = 450 if GPU_AVAILABLE else 100
 if GPU_AVAILABLE:
@@ -51,31 +51,18 @@ diffusion_pipe = StableDiffusionXLPipeline.from_pretrained(
     use_safetensors=False,
 )
 
-diffusion_pipe.vae = torch.compile(
-    diffusion_pipe.vae, mode="reduce-overhead", fullgraph=True
-)
+if GPU_AVAILABLE:
+    diffusion_pipe = diffusion_pipe.to(f"cuda:{GPU_ID}")
 
-# refiner = StableDiffusionXLImg2ImgPipeline.from_pretrained(
-#    "stabilityai/stable-diffusion-xl-refiner-1.0",
-#    text_encoder_2=diffusion_pipe.text_encoder_2,
-#    vae=diffusion_pipe.vae,
-#    torch_dtype=torch.float16 if GPU_AVAILABLE else torch.float32,
-#    use_safetensors=True,
-#    variant="fp16",
-# )
+diffusion_pipe.unet.to(memory_format=torch.channels_last)
+diffusion_pipe.vae.to(memory_format=torch.channels_last)
 
-# refiner.vae = torch.compile(refiner.vae, mode="reduce-overhead", fullgraph=True)
+diffusion_pipe.fuse_qkv_projections()
 
 # change scheduler
 diffusion_pipe.scheduler = UniPCMultistepScheduler.from_config(
     diffusion_pipe.scheduler.config
 )
-# refiner.scheduler = UniPCMultistepScheduler.from_config(refiner.scheduler.config)
-
-# set to GPU
-if GPU_AVAILABLE:
-    diffusion_pipe = diffusion_pipe.to(f"cuda:{GPU_ID}")
-    # refiner.to(f"cuda:{GPU_ID}")
 
 
 @timeit
@@ -103,16 +90,7 @@ def generate_images(
             negative_prompt=negatives,
             num_inference_steps=INFER_STEPS,
             num_images_per_prompt=_images_per_prompt,
-            # denoising_end=high_noise_frac,
-            # output_type="latent",
         ).images
-
-        # image = refiner(
-        #    prompt=prompt,
-        #    num_inference_steps=INFER_STEPS,
-        #    denoising_start=high_noise_frac,
-        #    image=image,
-        # ).images[0]
 
     consumed_time = time.time() - start_time
     TIME_LOG["Time in seconds"] = consumed_time
