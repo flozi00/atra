@@ -46,7 +46,7 @@ elif "L40" in GPU_NAME:
 
 
 diffusion_pipe = StableDiffusionXLPipeline.from_pretrained(
-    "stablediffusionapi/opendalle",
+    "dataautogpt3/OpenDalleV1.1",
     torch_dtype=torch.float16 if GPU_AVAILABLE else torch.float32,
     use_safetensors=False,
 )
