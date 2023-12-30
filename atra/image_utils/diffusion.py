@@ -14,7 +14,7 @@ from atra.image_utils.free_lunch_utils import (
 )
 import gradio as gr
 import pathlib
-import torch._inductor
+from DeepCache import DeepCacheSDHelper
 
 
 def apply_watermark_dummy(self, images: torch.FloatTensor):
@@ -27,8 +27,8 @@ diffusers.pipelines.stable_diffusion_xl.watermark.StableDiffusionXLWatermarker.a
 
 GPU_AVAILABLE = torch.cuda.is_available()
 
-_images_per_prompt = 2
-INFER_STEPS = 20
+_images_per_prompt = 1
+INFER_STEPS = 40
 GPU_ID = 0
 POWER = 450 if GPU_AVAILABLE else 100
 if GPU_AVAILABLE:
@@ -62,6 +62,13 @@ diffusion_pipe.fuse_qkv_projections()
 diffusion_pipe.scheduler = UniPCMultistepScheduler.from_config(
     diffusion_pipe.scheduler.config
 )
+
+helper = DeepCacheSDHelper(pipe=diffusion_pipe)
+helper.set_params(
+    cache_interval=3,
+    cache_branch_id=0,
+)
+helper.enable()
 
 
 @timeit
