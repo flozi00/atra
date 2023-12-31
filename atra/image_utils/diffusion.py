@@ -27,7 +27,8 @@ diffusers.pipelines.stable_diffusion_xl.watermark.StableDiffusionXLWatermarker.a
 
 GPU_AVAILABLE = torch.cuda.is_available()
 
-_images_per_prompt = 1
+_images_per_prompt = 2
+_loops = 4
 INFER_STEPS = 40
 GPU_ID = 0
 POWER = 450 if GPU_AVAILABLE else 100
@@ -65,10 +66,18 @@ diffusion_pipe.scheduler = UniPCMultistepScheduler.from_config(
 
 helper = DeepCacheSDHelper(pipe=diffusion_pipe)
 helper.set_params(
-    cache_interval=3,
+    cache_interval=4,
     cache_branch_id=0,
 )
 helper.enable()
+
+register_free_crossattn_upblock2d(
+    diffusion_pipe,
+    b1=1.3,
+    b2=1.4,
+    s1=0.9,
+    s2=0.2,
+)
 
 
 @timeit
@@ -83,20 +92,16 @@ def generate_images(
         negatives = ""
 
     start_time = time.time()
-    register_free_crossattn_upblock2d(
-        diffusion_pipe,
-        b1=1.3,
-        b2=1.4,
-        s1=0.9,
-        s2=0.2,
-    )
-    with torch.inference_mode():
-        image = diffusion_pipe(
-            prompt=prompt,
-            negative_prompt=negatives,
-            num_inference_steps=INFER_STEPS,
-            num_images_per_prompt=_images_per_prompt,
-        ).images
+    images = []
+    for _ in range(_loops):
+        with torch.inference_mode():
+            image = diffusion_pipe(
+                prompt=prompt,
+                negative_prompt=negatives,
+                num_inference_steps=INFER_STEPS,
+                num_images_per_prompt=_images_per_prompt,
+            ).images
+            images.extend(image)
 
     consumed_time = time.time() - start_time
     TIME_LOG["Time in seconds"] = consumed_time
@@ -108,8 +113,8 @@ def generate_images(
     MD = "```json\n" + MD + "\n```"
 
     paths = []
-    for x in range(len(image)):
-        image[x].save("output_image.jpg", "JPEG", optimize=True)
-        paths.append(pathlib.Path(f"output_image_{x}.jpg"))
+    for x in range(len(images)):
+        images[x].save(f"output_image_{x}.jpg", "JPEG", optimize=True)
+        paths.append(f"output_image_{x}.jpg")
 
-    return image, MD
+    return paths, MD
