@@ -1,6 +1,5 @@
 from diffusers import (
     StableDiffusionXLPipeline,
-    StableDiffusionXLImg2ImgPipeline,
     UniPCMultistepScheduler,
 )
 
@@ -13,7 +12,6 @@ from atra.image_utils.free_lunch_utils import (
     register_free_crossattn_upblock2d,
 )
 import gradio as gr
-import pathlib
 from DeepCache import DeepCacheSDHelper
 
 
