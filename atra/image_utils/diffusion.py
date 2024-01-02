@@ -84,6 +84,7 @@ def generate_images(
     negatives: str = "",
     height: int = 1024,
     width: int = 1024,
+    guidance: float = 7.0,
     progress=gr.Progress(track_tqdm=True),
 ):
     TIME_LOG = {"GPU Power insert in W": POWER}
@@ -102,6 +103,7 @@ def generate_images(
                 num_images_per_prompt=_images_per_prompt,
                 height=height,
                 width=width,
+                guidance_scale=guidance,
             ).images
             images.extend(image)
 
