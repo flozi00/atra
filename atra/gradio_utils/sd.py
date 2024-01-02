@@ -18,15 +18,29 @@ def build_diffusion_ui() -> None:
                 label="Negative Prompt",
                 info="Prompt describing what you dont want to see, useful for refining image",
             )
+            height = gr.Slider(
+                minimum=512,
+                maximum=1024,
+                step=32,
+                value=1024,
+                label="Height",
+            )
+            width = gr.Slider(
+                minimum=512,
+                maximum=1024,
+                step=32,
+                value=1024,
+                label="Width",
+            )
 
         prompt.submit(
             generate_images,
-            inputs=[prompt, negatives],
+            inputs=[prompt, negatives, height, width],
             outputs=[images, stats],
         )
         negatives.submit(
             generate_images,
-            inputs=[prompt, negatives],
+            inputs=[prompt, negatives, height, width],
             outputs=[images, stats],
         )
 

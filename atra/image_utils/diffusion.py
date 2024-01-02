@@ -28,7 +28,7 @@ diffusers.pipelines.stable_diffusion_xl.watermark.StableDiffusionXLWatermarker.a
 GPU_AVAILABLE = torch.cuda.is_available()
 
 _images_per_prompt = 2
-_loops = 4
+_loops = 2
 INFER_STEPS = 40
 GPU_ID = 0
 POWER = 450 if GPU_AVAILABLE else 100
@@ -84,6 +84,8 @@ register_free_crossattn_upblock2d(
 def generate_images(
     prompt: str,
     negatives: str = "",
+    height: int = 1024,
+    width: int = 1024,
     progress=gr.Progress(track_tqdm=True),
 ):
     TIME_LOG = {"GPU Power insert in W": POWER}
@@ -100,6 +102,8 @@ def generate_images(
                 negative_prompt=negatives,
                 num_inference_steps=INFER_STEPS,
                 num_images_per_prompt=_images_per_prompt,
+                height=height,
+                width=width,
             ).images
             images.extend(image)
 
