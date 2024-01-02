@@ -32,22 +32,15 @@ def build_diffusion_ui() -> None:
                 value=1024,
                 label="Width",
             )
-            guidance = gr.Slider(
-                minimum=1.0,
-                maximum=10.0,
-                step=0.1,
-                value=7.0,
-                label="Guidance",
-            )
 
         prompt.submit(
             generate_images,
-            inputs=[prompt, negatives, height, width, guidance],
+            inputs=[prompt, negatives, height, width],
             outputs=[images, stats],
         )
         negatives.submit(
             generate_images,
-            inputs=[prompt, negatives, height, width, guidance],
+            inputs=[prompt, negatives, height, width],
             outputs=[images, stats],
         )
 

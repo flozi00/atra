@@ -26,7 +26,7 @@ diffusers.pipelines.stable_diffusion_xl.watermark.StableDiffusionXLWatermarker.a
 GPU_AVAILABLE = torch.cuda.is_available()
 
 _images_per_prompt = 2
-_loops = 2
+_loops = [5, 7, 10]
 INFER_STEPS = 40
 GPU_ID = 0
 POWER = 450 if GPU_AVAILABLE else 100
@@ -84,7 +84,6 @@ def generate_images(
     negatives: str = "",
     height: int = 1024,
     width: int = 1024,
-    guidance: float = 7.0,
     progress=gr.Progress(track_tqdm=True),
 ):
     TIME_LOG = {"GPU Power insert in W": POWER}
@@ -94,7 +93,7 @@ def generate_images(
 
     start_time = time.time()
     images = []
-    for _ in range(_loops):
+    for guidance_scale in _loops:
         with torch.inference_mode():
             image = diffusion_pipe(
                 prompt=prompt,
@@ -103,7 +102,7 @@ def generate_images(
                 num_images_per_prompt=_images_per_prompt,
                 height=height,
                 width=width,
-                guidance_scale=guidance,
+                guidance_scale=guidance_scale,
             ).images
             images.extend(image)
 
