@@ -7,7 +7,7 @@ import pandas as pd
 from unidecode import unidecode
 
 BATCH_SIZE = 4
-BASE_MODEL = "distilwhisper-german-v1"
+BASE_MODEL = "sanchit-gandhi/distil-whisper-large-v3-de-kd"
 PEFT_MODEL = "distilwhisper-german-v1"
 TASK = Tasks.ASR
 LR = 1e-5
@@ -72,6 +72,20 @@ def get_dataset() -> datasets.Dataset:
     return d_sets
 
 
+def get_streamed_dataset() -> datasets.Dataset:
+    d_sets = datasets.load_dataset(
+        "mozilla-foundation/common_voice_16_0", "hi", split="train", streaming=True
+    )
+
+    d_sets = d_sets.cast_column(
+        column="audio", feature=datasets.features.Audio(sampling_rate=16000)
+    )
+
+    d_sets = d_sets.with_format("torch")
+
+    return d_sets
+
+
 def get_hf_datasets() -> datasets.Dataset:
     ds = datasets.load_dataset("facebook/voxpopuli", "de", split="train")
     ds = ds.rename_column("raw_text", "sentence")
@@ -85,14 +99,16 @@ def get_hf_datasets() -> datasets.Dataset:
 
 
 def main():
-    cv_data = get_dataset()
+    # cv_data = get_dataset()
     # vox_data = get_hf_datasets()
     # cv_data = datasets.concatenate_datasets([cv_data, vox_data])
 
-    new_column = ["de"] * len(cv_data)
-    cv_data = cv_data.add_column("locale", new_column)
+    # new_column = ["de"] * len(cv_data)
+    # cv_data = cv_data.add_column("locale", new_column)
 
-    cv_data = cv_data.map(normalize_text, num_proc=8)
+    cv_data = get_streamed_dataset()
+
+    cv_data = cv_data.map(normalize_text)
     model, processor = get_model(
         task=TASK,
         model_name=BASE_MODEL,

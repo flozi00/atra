@@ -24,7 +24,7 @@ try:
     bnb_available = True
 
     layer_classes.append(bnb.nn.Linear4bit)
-    layer_classes.append(bnb.nn.Linear8bit)
+    layer_classes.append(bnb.nn.Linear8bitLt)
     layer_classes.append(bnb.nn.StableEmbedding)
 
 except ImportError:

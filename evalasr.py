@@ -4,14 +4,11 @@ from atra.audio_utils.asr import speech_recognition
 from text_to_num import alpha2digit
 from tqdm.auto import tqdm
 from unidecode import unidecode
-import diff_match_patch as dmp_module
 import pandas as pd
 import re
 
 base = []
 predicted = []
-
-dmp = dmp_module.diff_match_patch()
 
 
 def normalize_text(batch):
