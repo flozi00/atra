@@ -6,6 +6,8 @@ from transformers import pipeline
 import gradio as gr
 import warnings
 import os
+from transformers import AutoModelForCausalLM
+
 
 warnings.filterwarnings(action="ignore")
 
@@ -14,6 +16,21 @@ if torch.cuda.is_available():
 else:
     GPU_NAME = "CPU"
 
+assistant_model = AutoModelForCausalLM.from_pretrained(
+    os.getenv("SPEC_ASSISTANT_MODEL", "sanchit-gandhi/distil-whisper-large-v3-de-kd"),
+    torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
+    low_cpu_mem_usage=True,
+    use_safetensors=True,
+    attn_implementation="sdpa",
+)
+
+if torch.cuda.is_available():
+    assistant_model = assistant_model.to("cuda:0")
+
+# try:
+#    assistant_model = torch.compile(assistant_model, mode="max-autotune")
+# except Exception:
+#    pass
 
 pipe = pipeline(
     "automatic-speech-recognition",
@@ -21,16 +38,17 @@ pipe = pipeline(
     torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
     model_kwargs={
         "load_in_4bit": True,
-        "use_flash_attention_2": "A" in GPU_NAME or "H" in GPU_NAME or "L" in GPU_NAME,
+        # "use_flash_attention_2": "A" in GPU_NAME or "H" in GPU_NAME or "L" in GPU_NAME,
+        "attn_implementation": "sdpa",
     },
     batch_size=4,
 )
 pipe.model.eval()
 
-try:
-    pipe.model = torch.compile(pipe.model, backend="onnxrt", mode="max-autotune")
-except Exception:
-    pass
+# try:
+#    pipe.model = torch.compile(pipe.model, mode="max-autotune")
+# except Exception:
+#    pass
 
 
 def speech_recognition(data, language, progress=gr.Progress()) -> str:
@@ -61,7 +79,8 @@ def inference_asr(pipe, data, language) -> str:
             "task": "transcribe",
             "language": f"<|{WHISPER_LANG_MAPPING[language]}|>",
             "do_sample": False,
-            "num_beams": 3,
+            "num_beams": 1,
+            "assistant_model": assistant_model,
         },
     )
     return generated_ids["text"]
