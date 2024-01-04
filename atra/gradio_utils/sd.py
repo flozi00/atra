@@ -22,14 +22,14 @@ def build_diffusion_ui() -> None:
                 minimum=512,
                 maximum=1024,
                 step=32,
-                value=1024,
+                value=512,
                 label="Height",
             )
             width = gr.Slider(
                 minimum=512,
                 maximum=1024,
                 step=32,
-                value=1024,
+                value=512,
                 label="Width",
             )
 
