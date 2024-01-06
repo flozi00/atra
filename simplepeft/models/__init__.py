@@ -147,7 +147,9 @@ def get_model(
         )
 
     if use_flash_v2:
-        kwargs["use_flash_attention_2"] = True
+        kwargs["attn_implementation"] = "flash_attention_2"
+    else:
+        kwargs["attn_implementation"] = "sdpa"
 
     # load the pre-trained model and check if its 8-bit compatible
     model = model_class.from_pretrained(

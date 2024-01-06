@@ -4,6 +4,7 @@ from tqdm.auto import tqdm
 from torch.optim.lr_scheduler import ExponentialLR
 from bitsandbytes.optim import PagedLion32bit
 import os
+import torch
 
 ACCUMULATION_STEPS = int(os.getenv("ACCUMULATION_STEPS", 16))
 TOKEN = os.getenv("HF_TOKEN", None)

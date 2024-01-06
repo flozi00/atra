@@ -17,7 +17,7 @@ else:
     GPU_NAME = "CPU"
 
 assistant_model = AutoModelForCausalLM.from_pretrained(
-    os.getenv("SPEC_ASSISTANT_MODEL", "sanchit-gandhi/distil-whisper-large-v3-de-kd"),
+    os.getenv("SPEC_ASSISTANT_MODEL", "flozi00/distilwhisper-german-v1"),
     torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
     low_cpu_mem_usage=True,
     use_safetensors=True,

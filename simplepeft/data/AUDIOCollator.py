@@ -21,10 +21,13 @@ class ASRDataCollator:
         label_features = []
 
         for i in range(len(features)):
-            feature = features[i]
+            try:
+                feature = features[i]
 
-            myaudio = feature[self.wav_key]["array"]
-            mytext = feature[self.text_key]
+                myaudio = feature[self.wav_key]["array"]
+                mytext = feature[self.text_key]
+            except Exception:
+                continue
 
             audio_len = int((len(myaudio) / 16000))
             if audio_len > self.max_audio_in_seconds:

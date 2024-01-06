@@ -7,12 +7,12 @@ import pandas as pd
 from unidecode import unidecode
 
 BATCH_SIZE = 4
-BASE_MODEL = "sanchit-gandhi/distil-whisper-large-v3-de-kd"
+BASE_MODEL = "distilwhisper-german-v1"
 PEFT_MODEL = "distilwhisper-german-v1"
 TASK = Tasks.ASR
-LR = 1e-5
+LR = 1e-6
 
-simplepeft.train.train.ACCUMULATION_STEPS = 64
+simplepeft.train.train.ACCUMULATION_STEPS = 1
 
 
 def normalize_text(batch):
@@ -44,7 +44,7 @@ def normalize_text(batch):
 # the dataset is filtered to only contain sentences with more than 5 characters and at least 2 upvotes and no downvotes
 # the audio is casted to the Audio feature of the datasets library with a sampling rate of 16000
 def get_dataset() -> datasets.Dataset:
-    CV_DATA_PATH = "./cv-corpus-15.0-2023-09-08/de/"
+    CV_DATA_PATH = "./cv-corpus-16.0-2023-12-06-de/cv-corpus-16.0-2023-12-06/de/"
     df = pd.read_table(filepath_or_buffer=f"{CV_DATA_PATH}validated.tsv")
     df["audio"] = f"{CV_DATA_PATH}clips/" + df["path"].astype(dtype=str)
     df["down_votes"] = df["down_votes"].astype(dtype=int)
@@ -72,41 +72,10 @@ def get_dataset() -> datasets.Dataset:
     return d_sets
 
 
-def get_streamed_dataset() -> datasets.Dataset:
-    d_sets = datasets.load_dataset(
-        "mozilla-foundation/common_voice_16_0", "hi", split="train", streaming=True
-    )
-
-    d_sets = d_sets.cast_column(
-        column="audio", feature=datasets.features.Audio(sampling_rate=16000)
-    )
-
-    d_sets = d_sets.with_format("torch")
-
-    return d_sets
-
-
-def get_hf_datasets() -> datasets.Dataset:
-    ds = datasets.load_dataset("facebook/voxpopuli", "de", split="train")
-    ds = ds.rename_column("raw_text", "sentence")
-
-    columns = ds.column_names
-    for column in columns:
-        if column not in ["audio", "sentence"]:
-            ds = ds.remove_columns(column)
-
-    return ds
-
-
 def main():
-    # cv_data = get_dataset()
-    # vox_data = get_hf_datasets()
-    # cv_data = datasets.concatenate_datasets([cv_data, vox_data])
-
-    # new_column = ["de"] * len(cv_data)
-    # cv_data = cv_data.add_column("locale", new_column)
-
-    cv_data = get_streamed_dataset()
+    cv_data = get_dataset()
+    new_column = ["de"] * len(cv_data)
+    cv_data = cv_data.add_column("locale", new_column)
 
     cv_data = cv_data.map(normalize_text)
     model, processor = get_model(
@@ -116,11 +85,13 @@ def main():
         use_peft=False,
         use_flash_v2=True,
         use_bnb=False,
-        lora_depth=512,
+        lora_depth=64,
     )
 
     model.config.forced_decoder_ids = None
     model.config.suppress_tokens = []
+
+    #model.freeze_encoder()
 
     # get the automatic dataloader for the given task, in this case the default arguments are working for data columns, otherwise they can be specified
     # check the **kwargs in the get_dataloader function in simplepeft/data/main.py for more information
