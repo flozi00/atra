@@ -27,7 +27,7 @@ pipe = pipeline(
     os.getenv("ASR_MODEL", "primeline/whisper-large-v3-german"),
     torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
     model_kwargs={
-        "load_in_4bit": True,
+        "load_in_4bit": torch.cuda.is_available(),
         "attn_implementation": "sdpa",
     },
     batch_size=1,
