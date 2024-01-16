@@ -61,5 +61,7 @@ def build_diffusion_ui() -> None:
             inputs=[prompt],
         )
 
+        gr.Textbox(value="the actual model used is: dataautogpt3/ProteusV0.1")
+
     ui.queue(api_open=False)
     ui.launch(**launch_args)
