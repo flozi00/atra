@@ -26,8 +26,7 @@ diffusers.pipelines.stable_diffusion_xl.watermark.StableDiffusionXLWatermarker.a
 GPU_AVAILABLE = torch.cuda.is_available()
 
 _images_per_prompt = 1
-_loops = [5, 9]
-INFER_STEPS = 30
+INFER_STEPS = 60
 GPU_ID = 0
 POWER = 450 if GPU_AVAILABLE else 100
 if GPU_AVAILABLE:
@@ -64,7 +63,7 @@ diffusion_pipe.fuse_qkv_projections()
 
 helper = DeepCacheSDHelper(pipe=diffusion_pipe)
 helper.set_params(
-    cache_interval=3,
+    cache_interval=6,
     cache_branch_id=0,
 )
 helper.enable()
@@ -93,18 +92,16 @@ def generate_images(
 
     start_time = time.time()
     images = []
-    for guidance_scale in _loops:
-        with torch.inference_mode():
-            image = diffusion_pipe(
-                prompt=prompt,
-                negative_prompt=negatives,
-                num_inference_steps=INFER_STEPS,
-                num_images_per_prompt=_images_per_prompt,
-                height=height,
-                width=width,
-                guidance_scale=guidance_scale,
-            ).images
-            images.extend(image)
+    with torch.inference_mode():
+        image = diffusion_pipe(
+            prompt=prompt,
+            negative_prompt=negatives,
+            num_inference_steps=INFER_STEPS,
+            num_images_per_prompt=_images_per_prompt,
+            height=height,
+            width=width,
+        ).images
+        images.extend(image)
 
     consumed_time = time.time() - start_time
     TIME_LOG["Time in seconds"] = consumed_time
