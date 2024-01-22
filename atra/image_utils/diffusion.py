@@ -66,9 +66,9 @@ diffusion_pipe.scheduler = UniPCMultistepScheduler.from_config(
     diffusion_pipe.scheduler.config
 )
 
-diffusion_pipe.unet = torch.compile(
-    diffusion_pipe.unet, mode="reduce-overhead", fullgraph=True
-)
+# diffusion_pipe.unet = torch.compile(
+#    diffusion_pipe.unet, mode="reduce-overhead", fullgraph=True
+# )
 diffusion_pipe.vae.decode = torch.compile(
     diffusion_pipe.vae.decode, mode="reduce-overhead", fullgraph=True
 )
