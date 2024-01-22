@@ -14,10 +14,10 @@ from atra.image_utils.free_lunch_utils import (
 import gradio as gr
 from DeepCache import DeepCacheSDHelper
 
-torch._inductor.config.conv_1x1_as_mm = True
-torch._inductor.config.coordinate_descent_tuning = True
-torch._inductor.config.epilogue_fusion = False
-torch._inductor.config.coordinate_descent_check_all_directions = True
+# torch._inductor.config.conv_1x1_as_mm = True
+# torch._inductor.config.coordinate_descent_tuning = True
+# torch._inductor.config.epilogue_fusion = False
+# torch._inductor.config.coordinate_descent_check_all_directions = True
 
 
 def apply_watermark_dummy(self, images: torch.FloatTensor):
@@ -69,9 +69,9 @@ diffusion_pipe.scheduler = UniPCMultistepScheduler.from_config(
 # diffusion_pipe.unet = torch.compile(
 #    diffusion_pipe.unet, mode="reduce-overhead", fullgraph=True
 # )
-diffusion_pipe.vae.decode = torch.compile(
-    diffusion_pipe.vae.decode, mode="reduce-overhead", fullgraph=True
-)
+# diffusion_pipe.vae.decode = torch.compile(
+#    diffusion_pipe.vae.decode, mode="reduce-overhead", fullgraph=True
+# )
 
 helper = DeepCacheSDHelper(pipe=diffusion_pipe)
 helper.set_params(
