@@ -31,7 +31,7 @@ diffusers.pipelines.stable_diffusion_xl.watermark.StableDiffusionXLWatermarker.a
 GPU_AVAILABLE = torch.cuda.is_available()
 
 _images_per_prompt = 1
-INFER_STEPS = 40
+INFER_STEPS = 80
 GPU_ID = 0
 POWER = 450 if GPU_AVAILABLE else 100
 if GPU_AVAILABLE:
