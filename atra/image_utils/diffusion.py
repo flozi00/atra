@@ -14,6 +14,11 @@ from atra.image_utils.free_lunch_utils import (
 import gradio as gr
 from DeepCache import DeepCacheSDHelper
 
+torch._inductor.config.conv_1x1_as_mm = True
+torch._inductor.config.coordinate_descent_tuning = True
+torch._inductor.config.epilogue_fusion = False
+torch._inductor.config.coordinate_descent_check_all_directions = True
+
 
 def apply_watermark_dummy(self, images: torch.FloatTensor):
     return images
@@ -26,7 +31,7 @@ diffusers.pipelines.stable_diffusion_xl.watermark.StableDiffusionXLWatermarker.a
 GPU_AVAILABLE = torch.cuda.is_available()
 
 _images_per_prompt = 1
-INFER_STEPS = 60
+INFER_STEPS = 40
 GPU_ID = 0
 POWER = 450 if GPU_AVAILABLE else 100
 if GPU_AVAILABLE:
@@ -57,9 +62,16 @@ diffusion_pipe.vae.to(memory_format=torch.channels_last)
 diffusion_pipe.fuse_qkv_projections()
 
 # change scheduler
-# diffusion_pipe.scheduler = UniPCMultistepScheduler.from_config(
-#    diffusion_pipe.scheduler.config
-# )
+diffusion_pipe.scheduler = UniPCMultistepScheduler.from_config(
+    diffusion_pipe.scheduler.config
+)
+
+diffusion_pipe.unet = torch.compile(
+    diffusion_pipe.unet, mode="reduce-overhead", fullgraph=True
+)
+diffusion_pipe.vae.decode = torch.compile(
+    diffusion_pipe.vae.decode, mode="reduce-overhead", fullgraph=True
+)
 
 helper = DeepCacheSDHelper(pipe=diffusion_pipe)
 helper.set_params(
@@ -118,3 +130,6 @@ def generate_images(
         paths.append(f"output_image_{x}.jpg")
 
     return paths, MD
+
+
+generate_images("cyborg style, golden retriever")
