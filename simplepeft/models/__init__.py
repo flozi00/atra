@@ -13,6 +13,7 @@ from transformers import (
     AutoProcessor,
     AutoModelForSeq2SeqLM,
     AutoModelForSpeechSeq2Seq,
+    Wav2Vec2BertForCTC,
 )
 
 layer_classes = [torch.nn.Linear, torch.nn.Embedding]
@@ -84,6 +85,8 @@ def get_model(
     use_flash_v2=False,
     use_bnb=True,
     lora_depth=128,
+    vocab_size=None,
+    processor=None,
 ):
     """Get the ready to use pef model, processor and model config
     Args: task (str): Task for the model
@@ -93,18 +96,7 @@ def get_model(
         model (Model): The ready to use model
         processor (Processor): The processor to use with the model
         model_conf (dict): The model config"""
-    if task == Tasks.ASR:
-        model_class = AutoModelForSpeechSeq2Seq
-        tok_class = AutoProcessor
-        task_type = None
-    elif task == Tasks.TEXT_GEN:
-        model_class = AutoModelForCausalLM
-        tok_class = AutoTokenizer
-        task_type = TaskType.CAUSAL_LM
-    elif task == Tasks.Text2Text:
-        model_class = AutoModelForSeq2SeqLM
-        tok_class = AutoTokenizer
-        task_type = TaskType.SEQ_2_SEQ_LM
+    kwargs = {}
 
     # check if the model_name is a peft model, if True, get the base model name from the config
     # otherwise, dont do anything
@@ -120,7 +112,6 @@ def get_model(
         pretrained_model_name_or_path=model_name,
         trust_remote_code=True,
     )
-    kwargs = {}
     bnb_compatible = (
         bnb_available is True
         and use_peft is True
@@ -128,15 +119,42 @@ def get_model(
         and use_bnb is True
     )
 
-    try:
-        processor = tok_class.from_pretrained(peft_name, legacy=False)
-    except Exception:
-        # load the processor
-        processor = tok_class.from_pretrained(
-            model_name if processor_name is None else processor_name,
-            legacy=False,
-            trust_remote_code=True,
-        )
+    if task == Tasks.ASR:
+        ctc_model = False
+        keys = ["wav2vec", "w2v"]
+        for key in keys:
+            if key in model_name:
+                ctc_model = True
+                conf.attention_dropout=0.0
+                conf.hidden_dropout=0.0
+                conf.feat_proj_dropout=0.0
+                conf.mask_time_prob=0.0
+                conf.layerdrop=0.0
+                conf.ctc_loss_reduction="mean"
+                break
+        model_class = AutoModelForSpeechSeq2Seq if ctc_model is False else Wav2Vec2BertForCTC
+        tok_class = AutoProcessor
+        task_type = None
+    elif task == Tasks.TEXT_GEN:
+        model_class = AutoModelForCausalLM
+        tok_class = AutoTokenizer
+        task_type = TaskType.CAUSAL_LM
+    elif task == Tasks.Text2Text:
+        model_class = AutoModelForSeq2SeqLM
+        tok_class = AutoTokenizer
+        task_type = TaskType.SEQ_2_SEQ_LM
+
+
+    if processor is None:
+        try:
+            processor = tok_class.from_pretrained(peft_name, legacy=False)
+        except Exception:
+            # load the processor
+            processor = tok_class.from_pretrained(
+                model_name if processor_name is None else processor_name,
+                legacy=False,
+                trust_remote_code=True,
+            )
 
     if bnb_compatible:
         kwargs["quantization_config"] = BitsAndBytesConfig(
@@ -148,14 +166,18 @@ def get_model(
 
     if use_flash_v2:
         kwargs["attn_implementation"] = "flash_attention_2"
-    else:
-        kwargs["attn_implementation"] = "sdpa"
+    #else:
+    #    kwargs["attn_implementation"] = "sdpa"
+    
+    if vocab_size is not None:
+        conf.vocab_size = vocab_size
+        kwargs["ignore_mismatched_sizes"]=True
 
     # load the pre-trained model and check if its 8-bit compatible
     model = model_class.from_pretrained(
         model_name,
         config=conf,
-        device_map="auto",
+        #device_map="auto",
         trust_remote_code=True,
         **kwargs,
     )

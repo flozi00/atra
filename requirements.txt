@@ -27,3 +27,4 @@ redis
 qdrant-client
 unidecode
 accelerate
+wandb

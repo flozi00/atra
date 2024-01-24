@@ -5,14 +5,16 @@ import simplepeft.train.train
 from simplepeft.utils import Tasks
 import pandas as pd
 from unidecode import unidecode
+import json
 
-BATCH_SIZE = 4
-BASE_MODEL = "distilwhisper-german-v1"
-PEFT_MODEL = "distilwhisper-german-v1"
+BATCH_SIZE = 2
+BASE_MODEL = "facebook/w2v-bert-2.0"
+PEFT_MODEL = "w2v-bert-2.0-german-cv16.1"
 TASK = Tasks.ASR
-LR = 1e-6
+LR = 1e-4
+MAX_AUDIO_SEC = 10
 
-simplepeft.train.train.ACCUMULATION_STEPS = 1
+simplepeft.train.train.ACCUMULATION_STEPS = 16
 
 
 def normalize_text(batch):
@@ -40,11 +42,47 @@ def normalize_text(batch):
     return batch
 
 
+def extract_all_chars(sentences):
+  all_text = " ".join(sentences)
+  vocab = list(set(all_text))
+  return {"vocab": [vocab], "all_text": [all_text]}
+
+
+def make_ctc_processor(cv_data):
+    vocab_train = extract_all_chars(cv_data["sentence"])
+
+    vocab_list = list(set(vocab_train["vocab"][0]))
+    vocab_dict = {v: k for k, v in enumerate(sorted(vocab_list))}
+    vocab_dict["|"] = vocab_dict[" "]
+    del vocab_dict[" "]
+    vocab_dict["[UNK]"] = len(vocab_dict)
+    vocab_dict["[PAD]"] = len(vocab_dict)
+    with open('vocab.json', 'w') as vocab_file:
+        json.dump(vocab_dict, vocab_file)
+
+    from transformers import Wav2Vec2CTCTokenizer
+
+    tokenizer = Wav2Vec2CTCTokenizer.from_pretrained("./", unk_token="[UNK]", pad_token="[PAD]", word_delimiter_token="|")
+
+    from transformers import SeamlessM4TFeatureExtractor
+
+    feature_extractor = SeamlessM4TFeatureExtractor.from_pretrained("facebook/w2v-bert-2.0")
+
+    from transformers import Wav2Vec2BertProcessor
+
+    processor = Wav2Vec2BertProcessor(feature_extractor=feature_extractor, tokenizer=tokenizer)
+
+    return processor
+
+
+
+
+
 # generate the dataset from the common voice dataset saved locally and load it as a dataset object
 # the dataset is filtered to only contain sentences with more than 5 characters and at least 2 upvotes and no downvotes
 # the audio is casted to the Audio feature of the datasets library with a sampling rate of 16000
 def get_dataset() -> datasets.Dataset:
-    CV_DATA_PATH = "./cv-corpus-16.0-2023-12-06-de/cv-corpus-16.0-2023-12-06/de/"
+    CV_DATA_PATH = "./cv-corpus-16.1-2023-12-06-de/cv-corpus-16.1-2023-12-06/de/"
     df = pd.read_table(filepath_or_buffer=f"{CV_DATA_PATH}validated.tsv")
     df["audio"] = f"{CV_DATA_PATH}clips/" + df["path"].astype(dtype=str)
     df["down_votes"] = df["down_votes"].astype(dtype=int)
@@ -76,21 +114,29 @@ def main():
     cv_data = get_dataset()
     new_column = ["de"] * len(cv_data)
     cv_data = cv_data.add_column("locale", new_column)
-
     cv_data = cv_data.map(normalize_text)
+
+    ctc_processor = make_ctc_processor(cv_data)
+
+    vocab_size = len(ctc_processor.tokenizer)
+
     model, processor = get_model(
         task=TASK,
         model_name=BASE_MODEL,
         peft_name=PEFT_MODEL,
         use_peft=False,
-        use_flash_v2=True,
+        use_flash_v2=False,
         use_bnb=False,
         lora_depth=64,
+        vocab_size=vocab_size,
+        processor = ctc_processor
     )
 
-    model.config.forced_decoder_ids = None
-    model.config.suppress_tokens = []
-
+    try:
+        model.config.forced_decoder_ids = None
+        model.config.suppress_tokens = []
+    except Exception:
+        pass
     #model.freeze_encoder()
 
     # get the automatic dataloader for the given task, in this case the default arguments are working for data columns, otherwise they can be specified
@@ -99,7 +145,7 @@ def main():
         task=TASK,  # type: ignore
         processor=processor,
         datas=cv_data,
-        max_audio_in_seconds=28,
+        max_audio_in_seconds=MAX_AUDIO_SEC,
         BATCH_SIZE=BATCH_SIZE,
     )
 
