@@ -2,9 +2,8 @@ from accelerate import Accelerator
 import warnings
 from tqdm.auto import tqdm
 from torch.optim.lr_scheduler import ExponentialLR
-from bitsandbytes.optim import PagedLion32bit
+from bitsandbytes.optim import PagedAdam
 import os
-import torch
 
 ACCUMULATION_STEPS = int(os.getenv("ACCUMULATION_STEPS", 16))
 TOKEN = os.getenv("HF_TOKEN", None)
@@ -33,7 +32,7 @@ def start_training(
 
     model.train()
 
-    optim = PagedLion32bit(model.parameters(), lr=LR)
+    optim = PagedAdam(model.parameters(), lr=LR)
 
     scheduler = ExponentialLR(optim, gamma=0.9995)
     model, optim, dloader, scheduler = accelerator.prepare(

@@ -6,16 +6,19 @@ from simplepeft.utils import Tasks
 import pandas as pd
 from unidecode import unidecode
 import json
+from transformers import Wav2Vec2BertProcessor, Wav2Vec2CTCTokenizer, SeamlessM4TFeatureExtractor
 
 BATCH_SIZE = 2
-BASE_MODEL = "facebook/w2v-bert-2.0"
+BASE_MODEL = "w2v-bert-2.0-german-cv16.1"
 PEFT_MODEL = "w2v-bert-2.0-german-cv16.1"
 TASK = Tasks.ASR
 LR = 1e-4
 MAX_AUDIO_SEC = 10
 
-simplepeft.train.train.ACCUMULATION_STEPS = 16
+simplepeft.train.train.ACCUMULATION_STEPS = 32
 
+vocab_size = None
+ctc_processor = None
 
 def normalize_text(batch):
     text = batch["sentence"]
@@ -60,16 +63,9 @@ def make_ctc_processor(cv_data):
     with open('vocab.json', 'w') as vocab_file:
         json.dump(vocab_dict, vocab_file)
 
-    from transformers import Wav2Vec2CTCTokenizer
 
     tokenizer = Wav2Vec2CTCTokenizer.from_pretrained("./", unk_token="[UNK]", pad_token="[PAD]", word_delimiter_token="|")
-
-    from transformers import SeamlessM4TFeatureExtractor
-
     feature_extractor = SeamlessM4TFeatureExtractor.from_pretrained("facebook/w2v-bert-2.0")
-
-    from transformers import Wav2Vec2BertProcessor
-
     processor = Wav2Vec2BertProcessor(feature_extractor=feature_extractor, tokenizer=tokenizer)
 
     return processor
@@ -82,20 +78,36 @@ def make_ctc_processor(cv_data):
 # the dataset is filtered to only contain sentences with more than 5 characters and at least 2 upvotes and no downvotes
 # the audio is casted to the Audio feature of the datasets library with a sampling rate of 16000
 def get_dataset() -> datasets.Dataset:
-    CV_DATA_PATH = "./cv-corpus-16.1-2023-12-06-de/cv-corpus-16.1-2023-12-06/de/"
-    df = pd.read_table(filepath_or_buffer=f"{CV_DATA_PATH}validated.tsv")
-    df["audio"] = f"{CV_DATA_PATH}clips/" + df["path"].astype(dtype=str)
+    CV_DATA_PATH = "./cv-corpus-16.1-2023-12-06-de/cv-corpus-16.1-2023-12-06/de"
+
+    # filter for durations
+    durs = pd.read_table(filepath_or_buffer=f"{CV_DATA_PATH}/clip_durations.tsv")
+    durs["clip"] = durs["clip"].astype(dtype=str)
+    durs["duration[ms]"] = durs["duration[ms]"].astype(dtype=int)
+
+    mask = (
+        (durs["duration[ms]"] <= MAX_AUDIO_SEC * 1000)
+        & (durs["duration[ms]"] >= 1000)
+    )
+    durs = durs.loc[mask]
+
+
+    # read the data
+    df = pd.read_table(filepath_or_buffer=f"{CV_DATA_PATH}/train.tsv")
+    df["audio"] = f"{CV_DATA_PATH}/clips/" + df["path"].astype(dtype=str)
     df["down_votes"] = df["down_votes"].astype(dtype=int)
     df["up_votes"] = df["up_votes"].astype(dtype=int)
     df["sentence"] = df["sentence"].astype(dtype=str)
 
-    mask = (
-        (df["down_votes"] <= 0)
-        & (df["up_votes"] >= 2)
-        & (df["sentence"].str.len() >= 5)
-    )
-    df = df.loc[mask]
+    filter_conditions = {"down_votes": (df["down_votes"] <= 0), "up_votes": (df["up_votes"] >= 2), "sentence": (df["sentence"].str.len() >= 5), "audio_len": (df["path"].isin(durs["clip"]) == True)}
 
+    for key, value in filter_conditions.items():
+        before_len = len(df.index)
+        df = df.loc[value]
+        after_len = len(df.index)
+        print(f"Filtered {before_len - after_len} rows for {key}")
+
+    # create the dataset object
     d_sets = datasets.Dataset.from_pandas(df=df)
 
     d_sets = d_sets.cast_column(
@@ -116,9 +128,8 @@ def main():
     cv_data = cv_data.add_column("locale", new_column)
     cv_data = cv_data.map(normalize_text)
 
-    ctc_processor = make_ctc_processor(cv_data)
-
-    vocab_size = len(ctc_processor.tokenizer)
+    #ctc_processor = make_ctc_processor(cv_data)
+    #vocab_size = len(ctc_processor.tokenizer)
 
     model, processor = get_model(
         task=TASK,
