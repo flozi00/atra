@@ -11,8 +11,9 @@ from transformers import AutoModelForCausalLM
 
 warnings.filterwarnings(action="ignore")
 
+
 assistant_model = AutoModelForCausalLM.from_pretrained(
-    os.getenv("SPEC_ASSISTANT_MODEL", "flozi00/distilwhisper-german-v1"),
+    os.getenv("SPEC_ASSISTANT_MODEL", "flozi00/distilwhisper-german-v2"),
     torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
     low_cpu_mem_usage=True,
     use_safetensors=True,
@@ -22,17 +23,23 @@ assistant_model = AutoModelForCausalLM.from_pretrained(
 if torch.cuda.is_available():
     assistant_model = assistant_model.to("cuda:0")
 
+assistant_model.eval()
+assistant_model = torch.compile(assistant_model, mode="max-autotune")
+
 pipe = pipeline(
     "automatic-speech-recognition",
     os.getenv("ASR_MODEL", "primeline/whisper-large-v3-german"),
     torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
     model_kwargs={
-        "load_in_4bit": torch.cuda.is_available(),
+        #"load_in_4bit": torch.cuda.is_available(),
         "attn_implementation": "sdpa",
     },
     batch_size=1,
+    device=0 if torch.cuda.is_available() else -1,
 )
 pipe.model.eval()
+
+pipe.model = torch.compile(pipe.model, mode="max-autotune")
 
 
 def speech_recognition(data, language, progress=gr.Progress()) -> str:
@@ -57,7 +64,7 @@ def inference_asr(pipe, data, language) -> str:
     generated_ids = pipe(
         data,
         chunk_length_s=30,
-        stride_length_s=(10, 0),
+        stride_length_s=(5, 0),
         # return_timestamps="word",
         generate_kwargs={
             "task": "transcribe",

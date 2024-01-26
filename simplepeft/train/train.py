@@ -8,6 +8,7 @@ import os
 ACCUMULATION_STEPS = int(os.getenv("ACCUMULATION_STEPS", 16))
 TOKEN = os.getenv("HF_TOKEN", None)
 EPOCHS = int(os.getenv("EPOCHS", 1))
+SAVE_STEPS = int(os.getenv("SAVE_STEPS", 1000))
 
 
 def get_lr(optimizer):
@@ -69,10 +70,10 @@ def start_training(
         except Exception as e:
             warnings.warn(f"Could not push to hub: {e}")
 
-    index = 1
+    index = 0
     for epoch in range(EPOCHS):
         for data in (pbar := tqdm(dloader)):
-            if index / ACCUMULATION_STEPS % 1000 == 0:
+            if index / ACCUMULATION_STEPS % SAVE_STEPS == 0 and index != 0:
                 do_save_stuff()
 
             optim.zero_grad()

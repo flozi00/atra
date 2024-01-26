@@ -131,6 +131,7 @@ def get_model(
                 conf.mask_time_prob=0.0
                 conf.layerdrop=0.0
                 conf.ctc_loss_reduction="mean"
+                conf.add_adapter = True
                 break
         model_class = AutoModelForSpeechSeq2Seq if ctc_model is False else Wav2Vec2BertForCTC
         tok_class = AutoProcessor

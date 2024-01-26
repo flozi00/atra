@@ -39,9 +39,9 @@ def normalize_text(batch):
 
 
 def get_dataset() -> datasets.Dataset:
-    CV_DATA_PATH = "./cv-corpus-15.0-2023-09-08/de/"
-    df = pd.read_table(filepath_or_buffer=f"{CV_DATA_PATH}validated.tsv")
-    df["audio"] = f"{CV_DATA_PATH}clips/" + df["path"].astype(dtype=str)
+    CV_DATA_PATH = "./cv-corpus-16.1-2023-12-06-de/cv-corpus-16.1-2023-12-06/de"
+    df = pd.read_table(filepath_or_buffer=f"{CV_DATA_PATH}/test.tsv")
+    df["audio"] = f"{CV_DATA_PATH}/clips/" + df["path"].astype(dtype=str)
     df["down_votes"] = df["down_votes"].astype(dtype=int)
     df["up_votes"] = df["up_votes"].astype(dtype=int)
     df["sentence"] = df["sentence"].astype(dtype=str)
@@ -87,7 +87,7 @@ def normalize_str(text):
     return text
 
 
-ds = get_dataset().select(range(100_000))
+ds = get_dataset()
 
 ds = ds.map(normalize_text, num_proc=8)
 

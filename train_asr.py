@@ -9,13 +9,13 @@ import json
 from transformers import Wav2Vec2BertProcessor, Wav2Vec2CTCTokenizer, SeamlessM4TFeatureExtractor
 
 BATCH_SIZE = 2
-BASE_MODEL = "w2v-bert-2.0-german-cv16.1"
-PEFT_MODEL = "w2v-bert-2.0-german-cv16.1"
+BASE_MODEL = "distilwhisper-german-v2"
+PEFT_MODEL = "distilwhisper-german-v2"
 TASK = Tasks.ASR
-LR = 1e-4
-MAX_AUDIO_SEC = 10
+LR = 1e-6
+MAX_AUDIO_SEC = 25
 
-simplepeft.train.train.ACCUMULATION_STEPS = 32
+simplepeft.train.train.ACCUMULATION_STEPS = 4
 
 vocab_size = None
 ctc_processor = None
@@ -65,7 +65,7 @@ def make_ctc_processor(cv_data):
 
 
     tokenizer = Wav2Vec2CTCTokenizer.from_pretrained("./", unk_token="[UNK]", pad_token="[PAD]", word_delimiter_token="|")
-    feature_extractor = SeamlessM4TFeatureExtractor.from_pretrained("facebook/w2v-bert-2.0")
+    feature_extractor = SeamlessM4TFeatureExtractor.from_pretrained(BASE_MODEL)
     processor = Wav2Vec2BertProcessor(feature_extractor=feature_extractor, tokenizer=tokenizer)
 
     return processor
@@ -99,7 +99,7 @@ def get_dataset() -> datasets.Dataset:
     df["up_votes"] = df["up_votes"].astype(dtype=int)
     df["sentence"] = df["sentence"].astype(dtype=str)
 
-    filter_conditions = {"down_votes": (df["down_votes"] <= 0), "up_votes": (df["up_votes"] >= 2), "sentence": (df["sentence"].str.len() >= 5), "audio_len": (df["path"].isin(durs["clip"]) == True)}
+    filter_conditions = {"down_votes": (df["down_votes"] <= 0), "up_votes": (df["up_votes"] >= 2), "sentence": (df["sentence"].str.len() >= 5), "audio_len": (df["path"].isin(durs["clip"]) == True),}
 
     for key, value in filter_conditions.items():
         before_len = len(df.index)
@@ -136,7 +136,7 @@ def main():
         model_name=BASE_MODEL,
         peft_name=PEFT_MODEL,
         use_peft=False,
-        use_flash_v2=False,
+        use_flash_v2=True,
         use_bnb=False,
         lora_depth=64,
         vocab_size=vocab_size,
