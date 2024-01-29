@@ -28,3 +28,4 @@ qdrant-client
 unidecode
 accelerate
 wandb
+openai
