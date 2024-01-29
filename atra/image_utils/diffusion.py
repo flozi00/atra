@@ -4,6 +4,7 @@ from diffusers import (
 )
 
 import torch
+from atra.text_utils.prompts import IMAGES_ENHANCE_PROMPT
 from atra.utilities.stats import timeit
 import time
 import json
@@ -13,11 +14,17 @@ from atra.image_utils.free_lunch_utils import (
 )
 import gradio as gr
 from DeepCache import DeepCacheSDHelper
+import openai
+import os
 
-# torch._inductor.config.conv_1x1_as_mm = True
-# torch._inductor.config.coordinate_descent_tuning = True
-# torch._inductor.config.epilogue_fusion = False
-# torch._inductor.config.coordinate_descent_check_all_directions = True
+api_key = os.getenv("OAI_API_KEY", "")
+base_url = os.getenv("OAI_BASE_URL", "https://api.together.xyz/v1")
+
+if api_key != "":
+    client = openai.OpenAI(
+        api_key=api_key,
+        base_url=base_url,
+    )
 
 
 def apply_watermark_dummy(self, images: torch.FloatTensor):
@@ -97,6 +104,17 @@ def generate_images(
     width: int = 1024,
     progress=gr.Progress(track_tqdm=True),
 ):
+    chat_completion = client.chat.completions.create(
+        model=os.getenv("OAI_MODEL", "mistralai/Mistral-7B-Instruct-v0.2"),
+        messages=[
+            {"role": "system", "content": IMAGES_ENHANCE_PROMPT},
+            {"role": "user", "content": prompt},
+        ],
+        temperature=0.7,
+        max_tokens=64,
+    )
+    prompt = chat_completion.choices[0].message.content
+    print(prompt)
     TIME_LOG = {"GPU Power insert in W": POWER}
 
     if negatives is None:
@@ -132,4 +150,4 @@ def generate_images(
     return paths, MD
 
 
-generate_images("cyborg style, golden retriever")
+# generate_images("cyborg style, golden retriever")
