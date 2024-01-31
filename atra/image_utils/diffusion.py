@@ -114,7 +114,9 @@ def generate_images(
                 ],
                 temperature=0.7,
                 max_tokens=64,
-            )[0]
+            )
+            if isinstance(chat_completion, list):
+                chat_completion = chat_completion[0]
             prompt = chat_completion.choices[0].message.content
         except:
             pass
