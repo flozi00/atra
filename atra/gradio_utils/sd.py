@@ -13,7 +13,9 @@ def build_diffusion_ui() -> None:
             stats = gr.Markdown()
 
         with gr.Column():
-            prompt = gr.Textbox(label="Prompt", info="Prompt of what you want to see")
+            prompt = gr.Textbox(
+                label="Prompt", info="Prompt of what you want to see", interactive=True
+            )
             negatives = gr.Textbox(
                 label="Negative Prompt",
                 info="Prompt describing what you dont want to see, useful for refining image",
@@ -36,12 +38,12 @@ def build_diffusion_ui() -> None:
         prompt.submit(
             generate_images,
             inputs=[prompt, negatives, height, width],
-            outputs=[images, stats],
+            outputs=[images, stats, prompt],
         )
         negatives.submit(
             generate_images,
             inputs=[prompt, negatives, height, width],
-            outputs=[images, stats],
+            outputs=[images, stats, prompt],
         )
 
         gr.Examples(

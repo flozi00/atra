@@ -104,17 +104,24 @@ def generate_images(
     width: int = 1024,
     progress=gr.Progress(track_tqdm=True),
 ):
-    chat_completion = client.chat.completions.create(
-        model=os.getenv("OAI_MODEL", "mistralai/Mistral-7B-Instruct-v0.2"),
-        messages=[
-            {"role": "system", "content": IMAGES_ENHANCE_PROMPT},
-            {"role": "user", "content": prompt},
-        ],
-        temperature=0.7,
-        max_tokens=64,
-    )
-    prompt = chat_completion.choices[0].message.content
-    print(prompt)
+    if prompt.count(" ") < 15:
+        try:
+            chat_completion = client.chat.completions.create(
+                model=os.getenv("OAI_MODEL", ""),
+                messages=[
+                    {"role": "system", "content": IMAGES_ENHANCE_PROMPT},
+                    {"role": "user", "content": prompt},
+                ],
+                temperature=0.7,
+                max_tokens=64,
+            )[0]
+            prompt = chat_completion.choices[0].message.content
+        except:
+            paths, MD, prompt = generate_images(
+                prompt=prompt, negatives=negatives, height=height, width=width
+            )
+            return paths, MD, prompt
+
     TIME_LOG = {"GPU Power insert in W": POWER}
 
     if negatives is None:
@@ -147,7 +154,7 @@ def generate_images(
         images[x].save(f"output_image_{x}.jpg", "JPEG", optimize=True)
         paths.append(f"output_image_{x}.jpg")
 
-    return paths, MD
+    return paths, MD, prompt
 
 
 # generate_images("cyborg style, golden retriever")
