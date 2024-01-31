@@ -117,10 +117,7 @@ def generate_images(
             )[0]
             prompt = chat_completion.choices[0].message.content
         except:
-            paths, MD, prompt = generate_images(
-                prompt=prompt, negatives=negatives, height=height, width=width
-            )
-            return paths, MD, prompt
+            pass
 
     TIME_LOG = {"GPU Power insert in W": POWER}
 
