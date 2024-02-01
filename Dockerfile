@@ -7,7 +7,8 @@ WORKDIR /atra-server
 
 RUN pip install -r requirements.txt
 RUN pip install transformers --upgrade
-RUN pip install flash-attn --no-build-isolation --upgrade
+#RUN pip install flash-attn --no-build-isolation --upgrade
+RUN pip uninstall transformer-engine
 RUN playwright install
 
 RUN chmod +x ./entrypoint.sh

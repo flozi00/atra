@@ -2,6 +2,7 @@ import torch
 from text_to_num.transforms import alpha2digit
 
 from atra.audio_utils.whisper_langs import WHISPER_LANG_MAPPING
+from atra.utilities.stats import timeit
 import gradio as gr
 import warnings
 import os
@@ -23,7 +24,7 @@ model = WhisperForConditionalGeneration.from_pretrained(
     torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
     low_cpu_mem_usage=True,
     use_safetensors=True,
-    # attn_implementation="sdpa",
+    attn_implementation="sdpa",
 )
 
 if torch.cuda.is_available():
@@ -50,7 +51,7 @@ def speech_recognition(data, language, progress=gr.Progress()) -> str:
 
     return transcription
 
-
+@timeit
 def inference_asr(pipe, data, language) -> str:
     model, processor = pipe
     with open(data, "rb") as f:
@@ -59,34 +60,24 @@ def inference_asr(pipe, data, language) -> str:
         raw_audio,
         return_tensors="pt",
         truncation=False,
-        padding=True,
         return_attention_mask=True,
         sampling_rate=16_000,
+        do_normalize = True,
     )
     inputs = inputs.to("cuda", torch.float16)
 
     # activate `temperature_fallback` and repetition detection filters and condition on prev text
-    result = model.generate(
-        **inputs,
-        temperature=(0.0, 0.2, 0.4, 0.6, 0.8, 1.0),
-        return_timestamps=True,
-        # assistant_model=assistant_model,
-    )
+    with torch.inference_mode():
+        result = model.generate(
+            **inputs,
+            temperature=(0.0, 0.2, 0.4, 0.6, 0.8, 1.0) if len(raw_audio)/16000 > 30 else None,
+            return_timestamps=False,
+            task="transcribe",
+            language=f"<|{WHISPER_LANG_MAPPING[language]}|>",
+            do_sample=False,
+            num_beams=1,
+            # assistant_model=assistant_model,
+        )
 
     decoded = processor.batch_decode(result, skip_special_tokens=True)[0]
     return decoded
-
-    generated_ids = pipe(
-        data,
-        chunk_length_s=30,
-        stride_length_s=(5, 0),
-        # return_timestamps="word",
-        generate_kwargs={
-            "task": "transcribe",
-            "language": f"<|{WHISPER_LANG_MAPPING[language]}|>",
-            "do_sample": False,
-            "num_beams": 1,
-            "assistant_model": assistant_model,
-        },
-    )
-    return generated_ids["text"]
