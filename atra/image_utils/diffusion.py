@@ -16,6 +16,7 @@ import gradio as gr
 from DeepCache import DeepCacheSDHelper
 import openai
 import os
+import torch_tensorrt
 
 api_key = os.getenv("OAI_API_KEY", "")
 base_url = os.getenv("OAI_BASE_URL", "https://api.together.xyz/v1")
@@ -156,4 +157,4 @@ def generate_images(
     return paths, MD, prompt
 
 
-# generate_images("cyborg style, golden retriever")
+generate_images("cyborg style, golden retriever")
