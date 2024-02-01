@@ -71,7 +71,7 @@ def inference_asr(pipe, data, language) -> str:
         result = model.generate(
             **inputs,
             temperature=(0.0, 0.2, 0.4, 0.6, 0.8, 1.0) if len(raw_audio)/16000 > 30 else None,
-            return_timestamps=False,
+            return_timestamps=len(raw_audio)/16000 >= 30,
             task="transcribe",
             language=f"<|{WHISPER_LANG_MAPPING[language]}|>",
             do_sample=False,
