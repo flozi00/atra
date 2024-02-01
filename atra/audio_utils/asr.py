@@ -2,44 +2,35 @@ import torch
 from text_to_num.transforms import alpha2digit
 
 from atra.audio_utils.whisper_langs import WHISPER_LANG_MAPPING
-from transformers import pipeline
 import gradio as gr
 import warnings
 import os
-from transformers import AutoModelForCausalLM
-
+from transformers import (
+    WhisperForConditionalGeneration,
+    WhisperProcessor,
+)
+import torch_tensorrt
+from transformers.pipelines.audio_utils import ffmpeg_read
 
 warnings.filterwarnings(action="ignore")
 
+ASR_MODEL = os.getenv("ASR_MODEL", "primeline/whisper-large-v3-german")
 
-assistant_model = AutoModelForCausalLM.from_pretrained(
-    os.getenv("SPEC_ASSISTANT_MODEL", "flozi00/distilwhisper-german-v2"),
+
+processor = WhisperProcessor.from_pretrained(ASR_MODEL)
+model = WhisperForConditionalGeneration.from_pretrained(
+    ASR_MODEL,
     torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
     low_cpu_mem_usage=True,
     use_safetensors=True,
-    attn_implementation="sdpa",
+    # attn_implementation="sdpa",
 )
 
 if torch.cuda.is_available():
-    assistant_model = assistant_model.to("cuda:0")
+    model = model.to("cuda:0")
 
-assistant_model.eval()
-assistant_model = torch.compile(assistant_model, mode="max-autotune")
-
-pipe = pipeline(
-    "automatic-speech-recognition",
-    os.getenv("ASR_MODEL", "primeline/whisper-large-v3-german"),
-    torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
-    model_kwargs={
-        #"load_in_4bit": torch.cuda.is_available(),
-        "attn_implementation": "sdpa",
-    },
-    batch_size=1,
-    device=0 if torch.cuda.is_available() else -1,
-)
-pipe.model.eval()
-
-pipe.model = torch.compile(pipe.model, mode="max-autotune")
+model.eval()
+model = torch.compile(model, mode="max-autotune", backend="torch_tensorrt")
 
 
 def speech_recognition(data, language, progress=gr.Progress()) -> str:
@@ -47,7 +38,7 @@ def speech_recognition(data, language, progress=gr.Progress()) -> str:
         return ""
 
     progress.__call__(progress=0.7, desc="Transcribing Audio")
-    transcription = inference_asr(pipe=pipe, data=data, language=language)
+    transcription = inference_asr(pipe=(model, processor), data=data, language=language)
 
     progress.__call__(progress=0.8, desc="Converting to Text")
     try:
@@ -61,6 +52,30 @@ def speech_recognition(data, language, progress=gr.Progress()) -> str:
 
 
 def inference_asr(pipe, data, language) -> str:
+    model, processor = pipe
+    with open(data, "rb") as f:
+        raw_audio = ffmpeg_read(f.read(), sampling_rate=16_000)
+    inputs = processor(
+        raw_audio,
+        return_tensors="pt",
+        truncation=False,
+        padding=True,
+        return_attention_mask=True,
+        sampling_rate=16_000,
+    )
+    inputs = inputs.to("cuda", torch.float16)
+
+    # activate `temperature_fallback` and repetition detection filters and condition on prev text
+    result = model.generate(
+        **inputs,
+        temperature=(0.0, 0.2, 0.4, 0.6, 0.8, 1.0),
+        return_timestamps=True,
+        # assistant_model=assistant_model,
+    )
+
+    decoded = processor.batch_decode(result, skip_special_tokens=True)[0]
+    return decoded
+
     generated_ids = pipe(
         data,
         chunk_length_s=30,

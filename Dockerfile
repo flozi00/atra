@@ -1,12 +1,10 @@
-FROM huggingface/transformers-pytorch-gpu:latest
+FROM nvcr.io/nvidia/pytorch:24.01-py3
 
 RUN apt update && apt-get install ffmpeg -y
 
 COPY . /atra-server                                                            
 WORKDIR /atra-server
 
-RUN pip uninstall transformers -y
-RUN pip uninstall transformers -y
 RUN pip install -r requirements.txt
 RUN pip install transformers --upgrade
 RUN pip install flash-attn --no-build-isolation --upgrade

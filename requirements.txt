@@ -4,8 +4,6 @@ onnx>=1.14.1
 onnxruntime>=1.12.1
 sacremoses
 sentencepiece
-torch>=2.0.0
-torchaudio
 soundfile
 librosa>=0.10.1
 pydub
@@ -14,12 +12,10 @@ pyloudnorm
 tokenizers>=0.13.3
 transformers>=4.30.1
 peft>=0.6.1
-accelerate>=0.23.0
 playwright>=1.38.0
 diffusers>=0.25.0
 invisible-watermark>=0.2.0
 sentence-transformers
-typesense
 bitsandbytes
 onnxruntime>=1.16.0
 python-redis-cache>=2.2.5
@@ -27,5 +23,4 @@ redis
 qdrant-client
 unidecode
 accelerate
-wandb
 openai
