@@ -15,4 +15,4 @@ RUN chmod +x ./entrypoint.sh
 
 ENTRYPOINT [ "/atra-server/entrypoint.sh" ]
 
-CMD [ "sdapp.py" ]
+CMD [ "sdapp" ]

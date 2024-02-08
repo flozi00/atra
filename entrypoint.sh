@@ -1,3 +1,3 @@
 #!/bin/bash
 args_array=("$@")
-eval "python3 $@"
+eval "granian --interface asgi $@:app"
