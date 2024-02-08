@@ -67,4 +67,4 @@ def build_diffusion_ui() -> None:
 
     ui.queue(api_open=False)
 
-    return ui
+    ui.launch(**launch_args)

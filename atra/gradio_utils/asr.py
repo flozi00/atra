@@ -29,4 +29,4 @@ def build_asr_ui():
 
     ui.queue(api_open=False)
 
-    return ui
+    ui.launch(**launch_args)
