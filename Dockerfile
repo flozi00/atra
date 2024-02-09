@@ -9,6 +9,7 @@ RUN pip install -r requirements.txt
 RUN pip install transformers --upgrade
 #RUN pip install flash-attn --no-build-isolation --upgrade
 RUN pip uninstall transformer-engine -y
+RUN pip install --extra-index-url https://pypi.ngc.nvidia.com triton-model-navigator
 RUN playwright install
 
 RUN chmod +x ./entrypoint.sh

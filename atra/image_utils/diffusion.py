@@ -13,6 +13,17 @@ from atra.image_utils.free_lunch_utils import (
 from DeepCache import DeepCacheSDHelper
 import openai
 import os
+import model_navigator as nav
+from transformers.modeling_outputs import BaseModelOutputWithPooling
+import transformers, diffusers
+
+DEVICE = torch.device("cuda")
+
+# workaround to make transformers use the same device as model navigator
+transformers.modeling_utils.get_parameter_device = lambda parameter: DEVICE
+diffusers.models.modeling_utils.get_parameter_device = lambda parameter: DEVICE
+
+nav.inplace_config.mode = "optimize"
 
 api_key = os.getenv("OAI_API_KEY", "")
 base_url = os.getenv("OAI_BASE_URL", "https://api.together.xyz/v1")
@@ -39,33 +50,63 @@ INFER_STEPS = 80
 GPU_ID = 0
 
 
-diffusion_pipe = StableDiffusionXLPipeline.from_pretrained(
+pipe = StableDiffusionXLPipeline.from_pretrained(
     "dataautogpt3/ProteusV0.2",
     torch_dtype=torch.float16 if GPU_AVAILABLE else torch.float32,
 )
 
-if GPU_AVAILABLE:
-    diffusion_pipe = diffusion_pipe.to(f"cuda:{GPU_ID}")
+pipe = pipe.to(DEVICE)
 
-diffusion_pipe.unet.to(memory_format=torch.channels_last)
-diffusion_pipe.vae.to(memory_format=torch.channels_last)
-
-diffusion_pipe.fuse_qkv_projections()
-
-# change scheduler
-diffusion_pipe.scheduler = UniPCMultistepScheduler.from_config(
-    diffusion_pipe.scheduler.config
+optimize_config = nav.OptimizeConfig(
+    batching=False,
+    target_formats=(nav.Format.TENSORRT,),
+    runners=(
+        #"TorchCUDA",
+        "TensorRT",
+    ),
+    custom_configs=[nav.TensorRTConfig(precision=nav.TensorRTPrecision.FP16, optimization_level=5)],
 )
 
-helper = DeepCacheSDHelper(pipe=diffusion_pipe)
+# For outputs that are not primitive types (float, int, bool, str) or tensors and list, dict, tuples combinations of those.
+# we need to provide a mapping to a desired output type. CLIP output is BaseModelOutputWithPooling, which inherits from dict.
+# Model Navigator will recognize that the return type is a dict and will return it, but we need to provide a mapping to BaseModelOutputWithPooling.
+def clip_output_mapping(output):
+    return BaseModelOutputWithPooling(**output)
+
+pipe.text_encoder = nav.Module(
+    pipe.text_encoder,
+    optimize_config=optimize_config,
+    output_mapping=clip_output_mapping,
+)
+pipe.unet = nav.Module(
+    pipe.unet,
+    optimize_config=optimize_config,
+)
+pipe.vae.decoder = nav.Module(
+    pipe.vae.decoder,
+    optimize_config=optimize_config,
+)
+
+
+pipe.unet.to(memory_format=torch.channels_last)
+pipe.vae.to(memory_format=torch.channels_last)
+
+pipe.fuse_qkv_projections()
+
+# change scheduler
+pipe.scheduler = UniPCMultistepScheduler.from_config(
+    pipe.scheduler.config
+)
+
+helper = DeepCacheSDHelper(pipe=pipe)
 helper.set_params(
-    cache_interval=6,
+    cache_interval=8,
     cache_branch_id=0,
 )
 helper.enable()
 
 register_free_crossattn_upblock2d(
-    diffusion_pipe,
+    pipe,
     b1=1.3,
     b2=1.4,
     s1=0.9,
@@ -81,28 +122,28 @@ def generate_images(
 ):
     if prompt.count(" ") < 15:
         try:
-            chat_completion = client.chat.completions.create(
-                model=os.getenv("OAI_MODEL", ""),
-                messages=[
-                    {"role": "system", "content": IMAGES_ENHANCE_PROMPT},
-                    {"role": "user", "content": prompt},
-                ],
-                temperature=0.7,
-                max_tokens=64,
-            )
-            if isinstance(chat_completion, list):
-                chat_completion = chat_completion[0]
-            prompt = chat_completion.choices[0].message.content
+            if api_key != "": 
+                chat_completion = client.chat.completions.create(
+                    model=os.getenv("OAI_MODEL", ""),
+                    messages=[
+                        {"role": "system", "content": IMAGES_ENHANCE_PROMPT},
+                        {"role": "user", "content": prompt},
+                    ],
+                    temperature=0.7,
+                    max_tokens=64,
+                )
+                if isinstance(chat_completion, list):
+                    chat_completion = chat_completion[0]
+                prompt = chat_completion.choices[0].message.content
         except:
             pass
 
-    with torch.inference_mode():
-        image = diffusion_pipe(
-            prompt=prompt,
-            num_inference_steps=INFER_STEPS,
-            num_images_per_prompt=_images_per_prompt,
-            height=height,
-            width=width,
-        ).images[0]
+    image = pipe(
+        prompt=prompt,
+        num_inference_steps=INFER_STEPS,
+        num_images_per_prompt=_images_per_prompt,
+        height=height,
+        width=width,
+    ).images[0]
 
     return image, prompt
