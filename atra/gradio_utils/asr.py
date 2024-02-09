@@ -1,9 +1,32 @@
+import base64
 import gradio as gr
-from atra.audio_utils.asr import speech_recognition
 from atra.gradio_utils.ui import GLOBAL_CSS, GET_GLOBAL_HEADER, launch_args
 from atra.audio_utils.whisper_langs import WHISPER_LANG_MAPPING
+from pytriton.client import ModelClient
+import numpy as np
 
 asr_langs = sorted(list(WHISPER_LANG_MAPPING.keys()))
+
+
+def infer_client(audio: str, language: str) -> str:
+    if audio is None:
+        return ""
+    with ModelClient("localhost", "Whisper") as client:
+        with open(audio, "rb") as f:
+            audio = f.read()
+        audio = base64.b64encode(audio)
+        audio = np.array([[audio]])
+        language = np.array([[language]])
+        language = np.char.encode(language, "utf-8")
+
+        result_dict = client.infer_batch(language=language, audio=audio)
+
+        transcription = result_dict["transcription"]
+        transcription = [
+            np.char.decode(p.astype("bytes"), "utf-8").item() for p in transcription
+        ]
+
+    return transcription[0]
 
 
 def build_asr_ui():
@@ -22,7 +45,7 @@ def build_asr_ui():
                 transcription_finished = gr.Textbox(max_lines=10)
 
         microphone_file.change(
-            fn=speech_recognition,
+            fn=infer_client,
             inputs=[microphone_file, input_lang],
             outputs=[transcription_finished],
         )
