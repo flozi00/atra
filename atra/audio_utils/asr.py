@@ -10,7 +10,7 @@ from transformers import (
     WhisperProcessor,
 )
 
-# import torch_tensorrt
+import torch_tensorrt
 from transformers.pipelines.audio_utils import ffmpeg_read
 
 warnings.filterwarnings(action="ignore")
@@ -24,14 +24,14 @@ model = WhisperForConditionalGeneration.from_pretrained(
     torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
     low_cpu_mem_usage=True,
     use_safetensors=True,
-    # attn_implementation="sdpa",
+    attn_implementation="sdpa",
 )
 
 if torch.cuda.is_available():
     model = model.to("cuda:0")
 
 model.eval()
-model = torch.compile(model, mode="max-autotune")
+model = torch.compile(model, mode="max-autotune", backend="torch_tensorrt")
 
 
 def speech_recognition(data, language) -> str:
