@@ -14,6 +14,7 @@ huggingface
 *gptq/*
 data/
 *.jpg
+*.jpeg
 .env
 typesense-data/
 wandb

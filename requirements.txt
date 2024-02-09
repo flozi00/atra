@@ -24,3 +24,4 @@ unidecode
 accelerate
 openai
 granian
+nvidia-pytriton

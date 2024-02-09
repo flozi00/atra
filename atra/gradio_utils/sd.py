@@ -1,6 +1,33 @@
 from atra.gradio_utils.ui import GLOBAL_CSS, GET_GLOBAL_HEADER, launch_args
 import gradio as gr
-from atra.image_utils.diffusion import generate_images
+import base64
+import io
+import numpy as np
+from pytriton.client import ModelClient
+from PIL import Image
+
+
+def infer_client(prompt: str, img_size: int):
+    files = []
+    with ModelClient("localhost", "SDXL") as client:
+        img_size = np.array([[img_size]])
+        prompt = np.array([[prompt]])
+        prompt = np.char.encode(prompt, "utf-8")
+
+        result_dict = client.infer_batch(prompt=prompt, img_size=img_size)
+
+        for idx, image in enumerate(result_dict["image"]):
+            file_path = f"output_image_{idx}.jpeg"
+            msg = base64.b64decode(image[0])
+            buffer = io.BytesIO(msg)
+            image = Image.open(buffer)
+            image.save(file_path, "JPEG")
+            files.append(file_path)
+
+        prompt = result_dict["prompt"]
+        prompts = [np.char.decode(p.astype("bytes"), "utf-8").item() for p in prompt]
+
+    return files, prompts[0]
 
 
 def build_diffusion_ui() -> None:
@@ -10,40 +37,23 @@ def build_diffusion_ui() -> None:
             GET_GLOBAL_HEADER()
         with gr.Column():
             images = gr.Gallery(label="Image")
-            stats = gr.Markdown()
 
         with gr.Column():
             prompt = gr.Textbox(
                 label="Prompt", info="Prompt of what you want to see", interactive=True
             )
-            negatives = gr.Textbox(
-                label="Negative Prompt",
-                info="Prompt describing what you dont want to see, useful for refining image",
-            )
             height = gr.Slider(
                 minimum=512,
                 maximum=1024,
                 step=32,
-                value=1024,
+                value=512,
                 label="Height",
-            )
-            width = gr.Slider(
-                minimum=512,
-                maximum=1024,
-                step=32,
-                value=1024,
-                label="Width",
             )
 
         prompt.submit(
-            generate_images,
-            inputs=[prompt, negatives, height, width],
-            outputs=[images, stats, prompt],
-        )
-        negatives.submit(
-            generate_images,
-            inputs=[prompt, negatives, height, width],
-            outputs=[images, stats, prompt],
+            infer_client,
+            inputs=[prompt, height],
+            outputs=[images, prompt],
         )
 
         gr.Examples(
