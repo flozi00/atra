@@ -24,6 +24,7 @@ transformers.modeling_utils.get_parameter_device = lambda parameter: DEVICE
 diffusers.models.modeling_utils.get_parameter_device = lambda parameter: DEVICE
 
 nav.inplace_config.mode = "optimize"
+nav.inplace_config.min_num_samples = 100
 
 api_key = os.getenv("OAI_API_KEY", "")
 base_url = os.getenv("OAI_BASE_URL", "https://api.together.xyz/v1")
@@ -46,7 +47,7 @@ diffusers.pipelines.stable_diffusion_xl.watermark.StableDiffusionXLWatermarker.a
 GPU_AVAILABLE = torch.cuda.is_available()
 
 _images_per_prompt = 1
-INFER_STEPS = 80
+INFER_STEPS = 20
 GPU_ID = 0
 
 
@@ -61,17 +62,21 @@ optimize_config = nav.OptimizeConfig(
     batching=False,
     target_formats=(nav.Format.TENSORRT,),
     runners=(
-        #"TorchCUDA",
+        # "TorchCUDA",
         "TensorRT",
     ),
-    custom_configs=[nav.TensorRTConfig(precision=nav.TensorRTPrecision.FP16, optimization_level=5)],
+    custom_configs=[
+        nav.TensorRTConfig(precision=nav.TensorRTPrecision.FP16, optimization_level=5)
+    ],
 )
+
 
 # For outputs that are not primitive types (float, int, bool, str) or tensors and list, dict, tuples combinations of those.
 # we need to provide a mapping to a desired output type. CLIP output is BaseModelOutputWithPooling, which inherits from dict.
 # Model Navigator will recognize that the return type is a dict and will return it, but we need to provide a mapping to BaseModelOutputWithPooling.
 def clip_output_mapping(output):
     return BaseModelOutputWithPooling(**output)
+
 
 pipe.text_encoder = nav.Module(
     pipe.text_encoder,
@@ -94,13 +99,11 @@ pipe.vae.to(memory_format=torch.channels_last)
 pipe.fuse_qkv_projections()
 
 # change scheduler
-pipe.scheduler = UniPCMultistepScheduler.from_config(
-    pipe.scheduler.config
-)
+pipe.scheduler = UniPCMultistepScheduler.from_config(pipe.scheduler.config)
 
 helper = DeepCacheSDHelper(pipe=pipe)
 helper.set_params(
-    cache_interval=8,
+    cache_interval=int(INFER_STEPS / 10),
     cache_branch_id=0,
 )
 helper.enable()
@@ -122,7 +125,7 @@ def generate_images(
 ):
     if prompt.count(" ") < 15:
         try:
-            if api_key != "": 
+            if api_key != "":
                 chat_completion = client.chat.completions.create(
                     model=os.getenv("OAI_MODEL", ""),
                     messages=[
