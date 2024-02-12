@@ -2,7 +2,9 @@
     "image": "flozi00/atra:latest",
     "runArgs": [
         "--gpus",
-        "all"
+        "all",
+        "--pull",
+        "always"
     ],
     "customizations": {
         // Configure properties specific to VS Code.
