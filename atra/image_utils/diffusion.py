@@ -21,7 +21,7 @@ DEVICE = torch.device("cuda")
 GPU_AVAILABLE = torch.cuda.is_available()
 
 _images_per_prompt = 1
-INFER_STEPS = 40
+INFER_STEPS = 80
 GPU_ID = 0
 
 MODEL_ID = "dataautogpt3/ProteusV0.3"

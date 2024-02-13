@@ -11,7 +11,6 @@ RUN pip install --extra-index-url https://pypi.ngc.nvidia.com triton-model-navig
 RUN pip install tensorrt_llm -U --pre --extra-index-url https://pypi.nvidia.com
 RUN pip install -r requirements.txt
 RUN pip install transformers diffusers --upgrade
-RUN playwright install
 
 RUN chmod +x ./entrypoint.sh
 
