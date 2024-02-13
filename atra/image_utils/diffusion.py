@@ -62,6 +62,12 @@ pipe: StableDiffusionXLPipeline = StableDiffusionXLPipeline.from_pretrained(
     vae=vae,
 )
 
+pipe.load_lora_weights(
+    "stabilityai/stable-diffusion-xl-base-1.0",
+    weight_name="sd_xl_offset_example-lora_1.0.safetensors",
+)
+pipe.fuse_lora(lora_scale=0.1)
+
 pipe.scheduler = UniPCMultistepScheduler.from_config(pipe.scheduler.config)
 
 pipe = pipe.to(DEVICE)
