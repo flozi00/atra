@@ -44,7 +44,7 @@ def build_diffusion_ui() -> None:
             )
             height = gr.Slider(
                 minimum=512,
-                maximum=1024,
+                maximum=1280,
                 step=32,
                 value=512,
                 label="Height",
@@ -73,7 +73,7 @@ def build_diffusion_ui() -> None:
             inputs=[prompt],
         )
 
-        gr.Textbox(value="the actual model used is: dataautogpt3/ProteusV0.2")
+        gr.Textbox(value="the actual model used is: dataautogpt3/ProteusV0.3")
 
     ui.queue(api_open=False)
 

@@ -1,15 +1,14 @@
 from diffusers import (
     StableDiffusionXLPipeline,
     UniPCMultistepScheduler,
+    KDPM2AncestralDiscreteScheduler,
+    AutoencoderKL,
 )
 
 import torch
 from atra.text_utils.prompts import IMAGES_ENHANCE_PROMPT
 from atra.utilities.stats import timeit
 import diffusers.pipelines.stable_diffusion_xl.watermark
-from atra.image_utils.free_lunch_utils import (
-    register_free_crossattn_upblock2d,
-)
 from DeepCache import DeepCacheSDHelper
 import openai
 import os
@@ -19,12 +18,20 @@ import transformers, diffusers
 
 DEVICE = torch.device("cuda")
 
+GPU_AVAILABLE = torch.cuda.is_available()
+
+_images_per_prompt = 1
+INFER_STEPS = 120
+GPU_ID = 0
+
+MODEL_ID = "dataautogpt3/ProteusV0.3"
+
 # workaround to make transformers use the same device as model navigator
 transformers.modeling_utils.get_parameter_device = lambda parameter: DEVICE
 diffusers.models.modeling_utils.get_parameter_device = lambda parameter: DEVICE
 
 nav.inplace_config.mode = "optimize"
-nav.inplace_config.min_num_samples = 100
+nav.inplace_config.min_num_samples = INFER_STEPS * 2
 
 api_key = os.getenv("OAI_API_KEY", "")
 base_url = os.getenv("OAI_BASE_URL", "https://api.together.xyz/v1")
@@ -44,17 +51,18 @@ diffusers.pipelines.stable_diffusion_xl.watermark.StableDiffusionXLWatermarker.a
     apply_watermark_dummy
 )
 
-GPU_AVAILABLE = torch.cuda.is_available()
-
-_images_per_prompt = 1
-INFER_STEPS = 20
-GPU_ID = 0
-
-
-pipe = StableDiffusionXLPipeline.from_pretrained(
-    "dataautogpt3/ProteusV0.2",
-    torch_dtype=torch.float16 if GPU_AVAILABLE else torch.float32,
+vae = AutoencoderKL.from_pretrained(
+    "madebyollin/sdxl-vae-fp16-fix", torch_dtype=torch.float16
 )
+
+
+pipe: StableDiffusionXLPipeline = StableDiffusionXLPipeline.from_pretrained(
+    MODEL_ID,
+    torch_dtype=torch.float16,
+    vae=vae,
+)
+
+pipe.scheduler = UniPCMultistepScheduler.from_config(pipe.scheduler.config)
 
 pipe = pipe.to(DEVICE)
 
@@ -92,29 +100,14 @@ pipe.vae.decoder = nav.Module(
     optimize_config=optimize_config,
 )
 
-
-pipe.unet.to(memory_format=torch.channels_last)
-pipe.vae.to(memory_format=torch.channels_last)
-
-pipe.fuse_qkv_projections()
-
-# change scheduler
-pipe.scheduler = UniPCMultistepScheduler.from_config(pipe.scheduler.config)
+pipe.enable_freeu(s1=0.9, s2=0.2, b1=1.2, b2=1.4)
 
 helper = DeepCacheSDHelper(pipe=pipe)
 helper.set_params(
-    cache_interval=int(INFER_STEPS / 10),
+    cache_interval=3,
     cache_branch_id=0,
 )
 helper.enable()
-
-register_free_crossattn_upblock2d(
-    pipe,
-    b1=1.3,
-    b2=1.4,
-    s1=0.9,
-    s2=0.2,
-)
 
 
 @timeit
@@ -123,6 +116,8 @@ def generate_images(
     height: int = 1024,
     width: int = 1024,
 ):
+    negative_prompt = "bad quality, bad anatomy, worst quality, low quality, low resolutions, extra fingers, blur, blurry, ugly, wrongs proportions, watermark, image artifacts, lowres, ugly, jpeg artifacts, deformed, noisy image"
+
     if prompt.count(" ") < 15:
         try:
             if api_key != "":
@@ -143,10 +138,12 @@ def generate_images(
 
     image = pipe(
         prompt=prompt,
+        negative_prompt=negative_prompt,
         num_inference_steps=INFER_STEPS,
         num_images_per_prompt=_images_per_prompt,
         height=height,
         width=width,
+        guidance_scale=7,
     ).images[0]
 
     return image, prompt

@@ -13,7 +13,7 @@ tokenizers>=0.13.3
 transformers>=4.30.1
 peft>=0.6.1
 playwright>=1.38.0
-diffusers>=0.25.0
+diffusers>=0.26.1
 sentence-transformers
 bitsandbytes
 onnxruntime>=1.16.0
