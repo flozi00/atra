@@ -21,7 +21,7 @@ DEVICE = torch.device("cuda")
 GPU_AVAILABLE = torch.cuda.is_available()
 
 _images_per_prompt = 1
-INFER_STEPS = 120
+INFER_STEPS = 40
 GPU_ID = 0
 
 MODEL_ID = "dataautogpt3/ProteusV0.3"
@@ -62,7 +62,7 @@ pipe: StableDiffusionXLPipeline = StableDiffusionXLPipeline.from_pretrained(
     vae=vae,
 )
 
-pipe.scheduler = KDPM2AncestralDiscreteScheduler.from_config(pipe.scheduler.config)
+pipe.scheduler = UniPCMultistepScheduler.from_config(pipe.scheduler.config)
 
 pipe = pipe.to(DEVICE)
 
