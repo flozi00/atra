@@ -43,10 +43,10 @@ def build_diffusion_ui() -> None:
                 label="Prompt", info="Prompt of what you want to see", interactive=True
             )
             height = gr.Slider(
-                minimum=512,
+                minimum=1024,
                 maximum=1280,
                 step=32,
-                value=512,
+                value=1280,
                 label="Height",
             )
 

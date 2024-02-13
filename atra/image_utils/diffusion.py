@@ -62,7 +62,7 @@ pipe: StableDiffusionXLPipeline = StableDiffusionXLPipeline.from_pretrained(
     vae=vae,
 )
 
-pipe.scheduler = UniPCMultistepScheduler.from_config(pipe.scheduler.config)
+pipe.scheduler = KDPM2AncestralDiscreteScheduler.from_config(pipe.scheduler.config)
 
 pipe = pipe.to(DEVICE)
 
@@ -104,7 +104,7 @@ pipe.enable_freeu(s1=0.9, s2=0.2, b1=1.2, b2=1.4)
 
 helper = DeepCacheSDHelper(pipe=pipe)
 helper.set_params(
-    cache_interval=3,
+    cache_interval=2,
     cache_branch_id=0,
 )
 helper.enable()
