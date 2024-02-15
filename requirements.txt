@@ -6,3 +6,5 @@ openai==1.12.0
 nvidia-pytriton==0.5.1
 diffusers==0.26.3
 transformers==4.37.2
+git+https://github.com/tencent-ailab/IP-Adapter.git
+opencv-python==4.8.0.74

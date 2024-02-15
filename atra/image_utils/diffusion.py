@@ -3,6 +3,7 @@ from diffusers import (
     UniPCMultistepScheduler,
     KDPM2AncestralDiscreteScheduler,
     AutoencoderKL,
+    StableDiffusionPipeline,
 )
 
 import torch
@@ -43,30 +44,12 @@ if api_key != "":
     )
 
 
-def apply_watermark_dummy(self, images: torch.FloatTensor):
-    return images
-
-
-diffusers.pipelines.stable_diffusion_xl.watermark.StableDiffusionXLWatermarker.apply_watermark = (
-    apply_watermark_dummy
-)
-
-vae = AutoencoderKL.from_pretrained(
-    "madebyollin/sdxl-vae-fp16-fix", torch_dtype=torch.float16
-)
-
-
 pipe: StableDiffusionXLPipeline = StableDiffusionXLPipeline.from_pretrained(
     MODEL_ID,
     torch_dtype=torch.float16,
-    vae=vae,
+    requires_safety_checker=False,
+    safety_checker=None,
 )
-
-pipe.load_lora_weights(
-    "stabilityai/stable-diffusion-xl-base-1.0",
-    weight_name="sd_xl_offset_example-lora_1.0.safetensors",
-)
-pipe.fuse_lora(lora_scale=0.1)
 
 pipe.scheduler = UniPCMultistepScheduler.from_config(pipe.scheduler.config)
 
@@ -115,13 +98,16 @@ helper.set_params(
 )
 helper.enable()
 
+ADAPTER_LOADED = False
 
 @timeit
 def generate_images(
     prompt: str,
     height: int = 1024,
     width: int = 1024,
+    face_image = None,
 ):
+    global ADAPTER_LOADED
     negative_prompt = "bad quality, bad anatomy, worst quality, low quality, low resolutions, extra fingers, blur, blurry, ugly, wrongs proportions, watermark, image artifacts, lowres, ugly, jpeg artifacts, deformed, noisy image"
 
     if prompt.count(" ") < 15:
@@ -141,7 +127,15 @@ def generate_images(
                 prompt = chat_completion.choices[0].message.content
         except:
             pass
-
+    
+    if face_image is None and ADAPTER_LOADED:
+        pipe.unload_ip_adapter()
+        ADAPTER_LOADED = False
+    elif ADAPTER_LOADED is False:
+        pipe.load_ip_adapter("h94/IP-Adapter", subfolder="sdxl_models", weight_name="ip-adapter_sdxl.bin")
+        pipe.set_ip_adapter_scale(1)
+        ADAPTER_LOADED = True
+    
     image = pipe(
         prompt=prompt,
         negative_prompt=negative_prompt,
@@ -149,7 +143,8 @@ def generate_images(
         num_images_per_prompt=_images_per_prompt,
         height=height,
         width=width,
-        guidance_scale=7,
+        guidance_scale=9 if face_image else 7,
+        ip_adapter_image=face_image if face_image else None,
     ).images[0]
 
     return image, prompt
