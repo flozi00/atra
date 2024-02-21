@@ -31,7 +31,10 @@ if torch.cuda.is_available():
     model = model.to("cuda:0")
 
 model.eval()
-model = torch.compile(model, mode="max-autotune", backend="torch_tensorrt")
+model = torch.compile(
+    model, mode="max-autotune", backend="torch_tensorrt", fullgraph=True
+)
+
 
 
 def speech_recognition(data, language) -> str:
