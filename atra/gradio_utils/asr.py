@@ -1,7 +1,7 @@
 import base64
 import gradio as gr
 from atra.gradio_utils.ui import GLOBAL_CSS, GET_GLOBAL_HEADER, launch_args
-from atra.audio_utils.whisper_langs import WHISPER_LANG_MAPPING
+from atra.utilities.whisper_langs import WHISPER_LANG_MAPPING
 from pytriton.client import ModelClient
 import numpy as np
 
