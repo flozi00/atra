@@ -12,4 +12,6 @@ RUN pip install -r requirements.txt
 
 RUN chmod +x ./entrypoint.sh
 
+ENTRYPOINT ["/bin/bash"]
+
 CMD [ "python3 asrapp.py" ]
