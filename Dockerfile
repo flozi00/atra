@@ -12,6 +12,4 @@ RUN pip install -r requirements.txt
 
 RUN chmod +x ./entrypoint.sh
 
-ENTRYPOINT [ "/atra-server/entrypoint.sh" ]
-
-CMD [ "sdapp" ]
+CMD [ "python3 asrapp.py" ]
