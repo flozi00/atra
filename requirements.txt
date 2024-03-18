@@ -4,6 +4,6 @@ peft==0.9.0
 accelerate==0.27.2
 openai==1.13.3
 nvidia-pytriton==0.5.3
-diffusers==0.26.3
+diffusers==0.27.0
 transformers==4.38.2
 vllm==0.3.3
