@@ -4,7 +4,8 @@
         "--gpus",
         "all",
         "--pull",
-        "always"
+        "always",
+        "--network=host"
     ],
     "customizations": {
         // Configure properties specific to VS Code.
