@@ -10,7 +10,7 @@ ACCUMULATION_STEPS = int(os.getenv("ACCUMULATION_STEPS", 16))
 TOKEN = os.getenv("HF_TOKEN", None)
 EPOCHS = int(os.getenv("EPOCHS", 1))
 SAVE_STEPS = int(os.getenv("SAVE_STEPS", 1000))
-LR= float(os.getenv("LR", 1e-4))
+LR= float(os.getenv("LR", 1e-5))
 
 def get_lr(optimizer):
     for param_group in optimizer.param_groups:

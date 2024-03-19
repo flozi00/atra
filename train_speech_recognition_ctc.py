@@ -28,7 +28,7 @@ class ASRDataCollator:
     wav_key: str = os.getenv("AUDIO_PATH","audio")
     locale_key: str = os.getenv("LOCALE_KEY", "de")
     text_key: str = os.getenv("TEXT_KEY", "transkription")
-    max_audio_in_seconds: float = float(os.getenv("MAX_AUDIO_IN_SECONDS", 10.0))
+    max_audio_in_seconds: float = float(os.getenv("MAX_AUDIO_IN_SECONDS", 20.0))
 
     def __call__(
         self, features: List[Dict[str, Union[List[int], torch.Tensor]]]
