@@ -73,6 +73,7 @@ def start_training(
     index = 1
     for epoch in range(EPOCHS):
         for data in (pbar := tqdm(dloader)):
+            smooth_loss = 0
             if index / ACCUMULATION_STEPS % SAVE_STEPS == 0 and index != 0:
                 do_save_stuff()
 
@@ -83,17 +84,21 @@ def start_training(
                 loss = output.loss
                 accelerator.backward(loss)
 
+                smooth_loss += float(loss.item())
+
                 if index % ACCUMULATION_STEPS == 0:
+                    smooth_loss = smooth_loss / ACCUMULATION_STEPS
                     pbar.set_description(
-                        f"Loss: {loss} LR: {get_lr(optim.optimizer)}",
+                        f"Loss: {smooth_loss} LR: {get_lr(optim.optimizer)}",
                         refresh=True,
                     )
                     accelerator.log(
                         values={
-                            "training_loss": loss,
+                            "training_loss": smooth_loss,
                         },
                         step=int(index / ACCUMULATION_STEPS),
                     )
+                    smooth_loss = 0
                 if accelerator.sync_gradients:
                     accelerator.clip_grad_value_(model.parameters(), 0.7)
                 optim.step()

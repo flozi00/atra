@@ -15,4 +15,4 @@ RUN chmod +x ./entrypoint.sh
 
 ENTRYPOINT ["/bin/bash"]
 
-CMD [ "python3 asrapp.py" ]
+CMD [ "run_asr.sh" ]

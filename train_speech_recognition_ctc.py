@@ -4,12 +4,16 @@ from simple_nlp.models import get_model
 import simple_nlp.train
 import json
 import os
-from transformers import Wav2Vec2BertProcessor, Wav2Vec2CTCTokenizer, SeamlessM4TFeatureExtractor
+from transformers import (
+    Wav2Vec2BertProcessor,
+    Wav2Vec2CTCTokenizer,
+    SeamlessM4TFeatureExtractor,
+)
 from torch.utils.data import DataLoader
 
 BATCH_SIZE = 2
-BASE_MODEL = os.getenv("BASE_MODEL","flozi00/distilwhisper-german-v2")
-OUT_MODEL = os.getenv("OUTPUT_MODEL","distilwhisper-german-canary")
+BASE_MODEL = os.getenv("BASE_MODEL", "flozi00/distilwhisper-german-v2")
+OUT_MODEL = os.getenv("OUTPUT_MODEL", "distilwhisper-german-canary")
 
 from dataclasses import dataclass
 from typing import Dict, List, Union
@@ -22,7 +26,7 @@ from transformers import AutoProcessor
 @dataclass
 class ASRDataCollator:
     processor: AutoProcessor
-    wav_key: str = os.getenv("AUDIO_PATH","audio")
+    wav_key: str = os.getenv("AUDIO_PATH", "audio")
     locale_key: str = os.getenv("LOCALE_KEY", "de")
     text_key: str = os.getenv("TEXT_KEY", "transkription")
     max_audio_in_seconds: float = float(os.getenv("MAX_AUDIO_IN_SECONDS", 30.0))
@@ -111,9 +115,9 @@ class ASRDataCollator:
 
 
 def extract_all_chars(sentences):
-  all_text = " ".join(sentences)
-  vocab = list(set(all_text))
-  return {"vocab": [vocab], "all_text": [all_text]}
+    all_text = " ".join(sentences)
+    vocab = list(set(all_text))
+    return {"vocab": [vocab], "all_text": [all_text]}
 
 
 def make_ctc_processor(cv_data):
@@ -125,19 +129,29 @@ def make_ctc_processor(cv_data):
     del vocab_dict[" "]
     vocab_dict["[UNK]"] = len(vocab_dict)
     vocab_dict["[PAD]"] = len(vocab_dict)
-    with open('vocab.json', 'w') as vocab_file:
+    with open("vocab.json", "w") as vocab_file:
         json.dump(vocab_dict, vocab_file)
 
-
-    tokenizer = Wav2Vec2CTCTokenizer.from_pretrained("./", unk_token="[UNK]", pad_token="[PAD]", word_delimiter_token="|")
+    tokenizer = Wav2Vec2CTCTokenizer.from_pretrained(
+        "./", unk_token="[UNK]", pad_token="[PAD]", word_delimiter_token="|"
+    )
     feature_extractor = SeamlessM4TFeatureExtractor.from_pretrained(BASE_MODEL)
-    processor = Wav2Vec2BertProcessor(feature_extractor=feature_extractor, tokenizer=tokenizer)
+    processor = Wav2Vec2BertProcessor(
+        feature_extractor=feature_extractor, tokenizer=tokenizer
+    )
 
     return processor
 
 
 def main():
-    cv_data = datasets.load_dataset(os.getenv("DATASET","flozi00/german-canary-asr-0324"), os.getenv("SUBSET","default"), split="train").cast_column(os.getenv("AUDIO_PATH","audio"), datasets.Audio(sampling_rate=16000, decode=True))
+    cv_data = datasets.load_dataset(
+        os.getenv("DATASET", "flozi00/german-canary-asr-0324"),
+        os.getenv("SUBSET", "default"),
+        split="train",
+    ).cast_column(
+        os.getenv("AUDIO_PATH", "audio"),
+        datasets.Audio(sampling_rate=16000, decode=True),
+    )
 
     if "w2v" in BASE_MODEL or "wav2vec" in BASE_MODEL:
         ctc_processor = make_ctc_processor(cv_data)
@@ -147,9 +161,7 @@ def main():
         vocab_size = None
 
     model, processor = get_model(
-        model_name=BASE_MODEL,
-        vocab_size=vocab_size,
-        processor = ctc_processor
+        model_name=BASE_MODEL, vocab_size=vocab_size, processor=ctc_processor
     )
 
     try:
@@ -158,10 +170,7 @@ def main():
     except Exception:
         pass
 
-
-    dataloader = ASRDataCollator(
-        processor=processor
-    )
+    dataloader = ASRDataCollator(processor=processor)
 
     cv_data = cv_data.shuffle(seed=random.randint(0, 1000))
     dloader = DataLoader(
