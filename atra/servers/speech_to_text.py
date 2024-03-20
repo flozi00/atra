@@ -86,6 +86,7 @@ def inference_asr(pipe, data, language) -> str:
             language=f"<|{WHISPER_LANG_MAPPING[language]}|>",
             do_sample=False,
             num_beams=1,
+            return_timestamps=True,
             # assistant_model=assistant_model,
         )
 
