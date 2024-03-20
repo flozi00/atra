@@ -111,7 +111,7 @@ def _infer_fn(
     return {"transcription": np.array(outputs)}
 
 
-config = TritonConfig(exit_on_error=True, http_port=10_000, grpc_port=10_001)
+config = TritonConfig(exit_on_error=True, http_port=10_000, grpc_port=10_001, metrics_port=10_002)
 
 triton_server = Triton(config=config)
 triton_server.bind(
