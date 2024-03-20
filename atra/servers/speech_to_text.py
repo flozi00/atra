@@ -15,7 +15,7 @@ from transformers import (
     WhisperProcessor,
 )
 
-import torch_tensorrt
+import torch_tensorrt # noqa
 from transformers.pipelines.audio_utils import ffmpeg_read
 
 warnings.filterwarnings(action="ignore")
@@ -45,27 +45,29 @@ def speech_recognition(data, language) -> str:
     if data is None:
         return ""
 
-    transcription = inference_asr(pipe=(model, processor), data=data, language=language)
+    transcriptions = inference_asr(pipe=(model, processor), data=data, language=language)
 
-    try:
-        transcription = alpha2digit(
-            text=transcription, lang=WHISPER_LANG_MAPPING[language]
-        )
-    except Exception:
-        pass
+    for i in range(len(transcriptions)):
+        try:
+            transcriptions[i] = alpha2digit(
+                text=transcriptions[i], lang=WHISPER_LANG_MAPPING[language]
+            )
+        except Exception:
+            pass
 
-    return transcription
+    return transcriptions
 
 
 @timeit
 def inference_asr(pipe, data, language) -> str:
     model, processor = pipe
-    raw_audio = ffmpeg_read(data, sampling_rate=16_000)
+    raw_audio = [ffmpeg_read(audio, sampling_rate=16_000) for audio in data]
+    
     inputs = processor(
         raw_audio,
         return_tensors="pt",
         truncation=False,
-        return_attention_mask=True,
+        padding="longest" if len(raw_audio) > 1 else "max_length", return_attention_mask=True,
         sampling_rate=16_000,
         do_normalize=True,
     )
@@ -79,7 +81,7 @@ def inference_asr(pipe, data, language) -> str:
             temperature=(
                 (0.0, 0.2, 0.4, 0.6, 0.8, 1.0) if len(raw_audio) / 16000 > 30 else None
             ),
-            return_timestamps=len(raw_audio) / 16000 >= 30,
+            return_timestamps=False,
             task="transcribe",
             language=f"<|{WHISPER_LANG_MAPPING[language]}|>",
             do_sample=False,
@@ -87,7 +89,7 @@ def inference_asr(pipe, data, language) -> str:
             # assistant_model=assistant_model,
         )
 
-    decoded = processor.batch_decode(result, skip_special_tokens=True)[0]
+    decoded = processor.batch_decode(result, skip_special_tokens=True)
     return decoded
 
 
@@ -102,8 +104,8 @@ def _infer_fn(
 
     outputs = []
 
-    for i in range(len(languages)):
-        transcription = speech_recognition(data=audios[i], language=languages[i])
+    transcriptions = speech_recognition(data=audios, language=languages[0])
+    for transcription in transcriptions:
         outputs.append(np.char.encode(np.array([transcription]), "utf-8"))
 
     return {"transcription": np.array(outputs)}

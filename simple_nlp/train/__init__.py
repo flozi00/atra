@@ -6,10 +6,10 @@ from torch.optim.lr_scheduler import ExponentialLR
 from bitsandbytes.optim import PagedAdam
 import os
 
-ACCUMULATION_STEPS = int(os.getenv("ACCUMULATION_STEPS", 16))
+ACCUMULATION_STEPS = int(os.getenv("ACCUMULATION_STEPS", 128))
 TOKEN = os.getenv("HF_TOKEN", None)
 EPOCHS = int(os.getenv("EPOCHS", 1))
-SAVE_STEPS = int(os.getenv("SAVE_STEPS", 1000))
+SAVE_STEPS = int(os.getenv("SAVE_STEPS", 100))
 LR= float(os.getenv("LR", 1e-5))
 
 def get_lr(optimizer):
@@ -70,7 +70,7 @@ def start_training(
         except Exception as e:
             warnings.warn(f"Could not push to hub: {e}")
 
-    index = 0
+    index = 1
     for epoch in range(EPOCHS):
         for data in (pbar := tqdm(dloader)):
             if index / ACCUMULATION_STEPS % SAVE_STEPS == 0 and index != 0:

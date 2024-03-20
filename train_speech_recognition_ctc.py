@@ -8,11 +8,8 @@ from transformers import Wav2Vec2BertProcessor, Wav2Vec2CTCTokenizer, SeamlessM4
 from torch.utils.data import DataLoader
 
 BATCH_SIZE = 2
-BASE_MODEL = os.getenv("BASE_MODEL","facebook/w2v-bert-2.0")
-OUT_MODEL = os.getenv("OUTPUT_MODEL","w2v-bert-2.0-german-canary")
-
-vocab_size = None
-ctc_processor = None
+BASE_MODEL = os.getenv("BASE_MODEL","flozi00/distilwhisper-german-v2")
+OUT_MODEL = os.getenv("OUTPUT_MODEL","distilwhisper-german-canary")
 
 from dataclasses import dataclass
 from typing import Dict, List, Union
@@ -28,7 +25,7 @@ class ASRDataCollator:
     wav_key: str = os.getenv("AUDIO_PATH","audio")
     locale_key: str = os.getenv("LOCALE_KEY", "de")
     text_key: str = os.getenv("TEXT_KEY", "transkription")
-    max_audio_in_seconds: float = float(os.getenv("MAX_AUDIO_IN_SECONDS", 20.0))
+    max_audio_in_seconds: float = float(os.getenv("MAX_AUDIO_IN_SECONDS", 30.0))
 
     def __call__(
         self, features: List[Dict[str, Union[List[int], torch.Tensor]]]
@@ -140,15 +137,17 @@ def make_ctc_processor(cv_data):
 
 
 def main():
-    cv_data = datasets.load_dataset("flozi00/german-canary-asr-0324", "default", split="train").cast_column(os.getenv("AUDIO_PATH","audio"), datasets.Audio(sampling_rate=16000, decode=True))
+    cv_data = datasets.load_dataset(os.getenv("DATASET","flozi00/german-canary-asr-0324"), os.getenv("SUBSET","default"), split="train").cast_column(os.getenv("AUDIO_PATH","audio"), datasets.Audio(sampling_rate=16000, decode=True))
 
     if "w2v" in BASE_MODEL or "wav2vec" in BASE_MODEL:
         ctc_processor = make_ctc_processor(cv_data)
         vocab_size = len(ctc_processor.tokenizer)
+    else:
+        ctc_processor = None
+        vocab_size = None
 
     model, processor = get_model(
         model_name=BASE_MODEL,
-        use_flash_v2=False,
         vocab_size=vocab_size,
         processor = ctc_processor
     )

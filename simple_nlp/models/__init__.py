@@ -9,12 +9,11 @@ from transformers import (
 def get_model(
     model_name: str,
     processor_name: str = None,
-    use_flash_v2=False,
     vocab_size=None,
     processor=None,
 ):
     kwargs = {}
-
+    use_flash_v2 = True
     # get the config of the base model and extract the model type from it
     conf = AutoConfig.from_pretrained(
         pretrained_model_name_or_path=model_name,
@@ -33,6 +32,7 @@ def get_model(
             conf.layerdrop=0.0
             conf.ctc_loss_reduction="mean"
             conf.add_adapter = True
+            use_flash_v2 = False
             break
     model_class = AutoModelForSpeechSeq2Seq if ctc_model is False else Wav2Vec2BertForCTC
     tok_class = AutoProcessor
@@ -46,7 +46,7 @@ def get_model(
         )
 
     if use_flash_v2:
-        kwargs["attn_implementation"] = "flash_attention_2"
+        kwargs["attn_implementation"] = "sdpa"
     #else:
     #    kwargs["attn_implementation"] = "sdpa"
     

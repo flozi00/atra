@@ -9,6 +9,7 @@ WORKDIR /atra-server
 RUN pip uninstall transformer-engine -y
 RUN pip install --extra-index-url https://pypi.ngc.nvidia.com triton-model-navigator
 RUN pip install -r requirements.txt
+RUN pip install torch torch-tensorrt tensorrt --upgrade
 
 RUN chmod +x ./entrypoint.sh
 
