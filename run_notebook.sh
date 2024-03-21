@@ -1,1 +1,1 @@
-mkdir /workdir && cd /workdir && jupyter lab
+mkdir -p /workdir && cd /workdir && jupyter lab
