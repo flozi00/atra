@@ -1,4 +1,4 @@
-gradio==4.21.0
+gradio==4.23.0
 peft==0.10.0
 text2num==2.5.1
 accelerate==0.28.0
