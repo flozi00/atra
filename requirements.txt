@@ -5,7 +5,7 @@ accelerate==0.28.0
 openai==1.14.1
 nvidia-pytriton==0.5.3
 diffusers==0.27.0
-transformers==4.38.2
+transformers==4.39.1
 vllm==0.3.3
 datasets>=2.18.0
 bitsandbytes>=0.43.0
