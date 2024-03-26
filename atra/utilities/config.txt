@@ -49,7 +49,7 @@
     "default_aspect_ratio": "512*768",
     "checkpoint_downloads": {
         "RealVisXL_V4.0.safetensors": "https://huggingface.co/SG161222/RealVisXL_V4.0/resolve/main/RealVisXL_V4.0.safetensors",
-        "ProteusV0.4.safetensors":"https://huggingface.co/dataautogpt3/ProteusV0.4/resolve/main/ProteusV0.4.safetensors",
+        "ProteusV0.4.safetensors":"https://huggingface.co/dataautogpt3/ProteusV0.4/resolve/main/ProteusV0.4.safetensors"
     },
     "default_model": "RealVisXL_V4.0.safetensors"
 }
