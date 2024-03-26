@@ -7,8 +7,9 @@ WORKDIR /atra-server
 
 RUN pip uninstall transformer-engine flash-attn -y
 RUN pip install -r requirements.txt
-RUN pip install torch torch-tensorrt tensorrt --upgrade
+#RUN pip install torch torch-tensorrt tensorrt --upgrade
 RUN pip install flash-attn --no-build-isolation --upgrade
+RUN pip install vllm==0.3.3 --no-deps
 
 RUN chmod +x ./entrypoint.sh
 
