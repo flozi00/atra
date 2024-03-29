@@ -4,13 +4,13 @@
 # 2. check if env vars exists and add them to the command
 # 3. run the command
 
-pip install vllm==0.3.3
+pip install vllm --upgrade
 
 # 1. create base string for the command
 cmd="python3 -m vllm.entrypoints.openai.api_server"
 
 # 2. check if env vars exists and add them to the command
-# check for --host, --port, --quantization, --model, --kv-cache-dtype, --gpu-memory-utilization
+# check for --host, --port, --quantization, --model, --kv-cache-dtype, --gpu-memory-utilization, --enable-prefix-caching, --swap-space
 
 if [ -n "$VLLM_HOST" ]; then
   cmd="$cmd --host $VLLM_HOST"
@@ -34,6 +34,14 @@ fi
 
 if [ -n "$VLLM_GPU_MEMORY_UTILIZATION" ]; then
   cmd="$cmd --gpu-memory-utilization $VLLM_GPU_MEMORY_UTILIZATION"
+fi
+
+if [ -n "$VLLM_ENABLE_PREFIX_CACHING" ]; then
+  cmd="$cmd --enable-prefix-caching"
+fi
+
+if [ -n "$VLLM_SWAP_SPACE" ]; then
+  cmd="$cmd --swap-space $VLLM_SWAP_SPACE"
 fi
 
 # 3. run the command
