@@ -1,6 +1,6 @@
 gradio==4.24.0
 text2num==2.5.1
-accelerate==0.28.0
+accelerate==0.29.1
 openai==1.14.3
 nvidia-pytriton==0.5.3
 diffusers==0.27.2
