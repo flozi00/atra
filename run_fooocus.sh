@@ -16,10 +16,14 @@ rm /Fooocus/config.txt
 
 cp -f /atra-server/atra/utilities/config.txt /Fooocus/config.txt
 
-cmd="python3 /Fooocus/entry_with_update.py --listen --always-gpu --vae-in-fp16 --unet-in-fp8-e4m3fn --clip-in-fp8-e4m3fn"
+cmd="python3 /Fooocus/entry_with_update.py --listen --always-gpu --vae-in-fp16"
 
 if [ -n "$SERVER_PORT" ]; then
   cmd="$cmd --port $SERVER_PORT"
+fi
+
+if [ -n "$FP8" ]; then
+  cmd="$cmd --unet-in-fp8-e4m3fn --clip-in-fp8-e4m3fn"
 fi
 
 echo "Running command: $cmd"
