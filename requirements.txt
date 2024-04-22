@@ -4,7 +4,7 @@ accelerate==0.29.1
 openai==1.16.2
 nvidia-pytriton==0.5.3
 diffusers==0.27.2
-transformers==4.39.3
+transformers==4.40.0
 datasets>=2.18.0
 evaluate>=0.4.1
 jiwer>=3.0.3
