@@ -37,7 +37,7 @@ if [ -n "$VLLM_GPU_MEMORY_UTILIZATION" ]; then
 fi
 
 if [ -n "$VLLM_ENABLE_PREFIX_CACHING" ]; then
-  cmd="$cmd --enable-prefix-caching"
+  cmd="$cmd --enable-prefix-caching --use-v2-block-manager --enable-chunked-prefill"
 fi
 
 if [ -n "$VLLM_SWAP_SPACE" ]; then
