@@ -1,4 +1,4 @@
-FROM nvcr.io/nvidia/pytorch:23.09-py3
+FROM nvcr.io/nvidia/pytorch:24.03-py3
 
 RUN apt update && apt-get install ffmpeg -y
 
