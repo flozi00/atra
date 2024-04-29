@@ -44,6 +44,7 @@ model = model.to("cpu")
 
 
 def speech_recognition(data, language) -> str:
+    global model
     if data is None:
         return ""
     if torch.cuda.is_available():
