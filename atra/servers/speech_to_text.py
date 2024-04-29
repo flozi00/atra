@@ -40,12 +40,16 @@ model = torch.compile(
     model, mode="max-autotune", backend="torch_tensorrt", fullgraph=True
 )
 
+model = model.to("cpu")
+
 
 def speech_recognition(data, language) -> str:
     if data is None:
         return ""
-
+    if torch.cuda.is_available():
+        model = model.to("cuda:0")
     transcriptions = inference_asr(pipe=(model, processor), data=data, language=language)
+    model = model.to("cpu")
 
     for i in range(len(transcriptions)):
         try:

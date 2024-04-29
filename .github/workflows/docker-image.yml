@@ -69,6 +69,14 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
+          file: ./Dockerfile.vllm
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/atra:vllm
+      -
+        name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
           file: ./Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/atra:latest

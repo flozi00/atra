@@ -16,7 +16,7 @@ rm /Fooocus/config.txt
 
 cp -f /atra-server/atra/utilities/config.txt /Fooocus/config.txt
 
-cmd="python3 /Fooocus/entry_with_update.py --listen --always-gpu --vae-in-fp16"
+cmd="python3 /Fooocus/entry_with_update.py --listen --vae-in-fp16"
 
 if [ -n "$SERVER_PORT" ]; then
   cmd="$cmd --port $SERVER_PORT"
