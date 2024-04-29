@@ -51,6 +51,8 @@ def speech_recognition(data, language) -> str:
         model = model.to("cuda:0")
     transcriptions = inference_asr(pipe=(model, processor), data=data, language=language)
     model = model.to("cpu")
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
 
     for i in range(len(transcriptions)):
         try:
