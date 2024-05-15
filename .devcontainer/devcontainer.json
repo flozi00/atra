@@ -5,7 +5,9 @@
         "all",
         "--pull",
         "always",
-        "--network=host"
+        "--network=host",
+        "shm_size",
+        "4g"
     ],
     "customizations": {
         // Configure properties specific to VS Code.

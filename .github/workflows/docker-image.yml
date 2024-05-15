@@ -73,14 +73,6 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/atra:vllm
       -
-        name: Build and push axolotl
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          file: ./Dockerfile.axolotl
-          push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/atra:axolotl
-      -
         name: Build and push
         uses: docker/build-push-action@v4
         with:

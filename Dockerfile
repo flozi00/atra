@@ -1,4 +1,4 @@
-FROM nvcr.io/nvidia/pytorch:24.03-py3
+FROM winglian/axolotl:main-latest
 
 RUN apt update && apt-get install ffmpeg -y
 
