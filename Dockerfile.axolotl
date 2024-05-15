@@ -1,0 +1,10 @@
+FROM winglian/axolotl:main-latest
+
+COPY . /atra-server                                                            
+WORKDIR /atra-server
+
+RUN chmod +x ./entrypoint.sh
+
+ENTRYPOINT ["/bin/bash"]
+
+CMD [ "run_notebook.sh" ]

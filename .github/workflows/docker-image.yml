@@ -65,13 +65,21 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
       -
-        name: Build and push
+        name: Build and push vllm
         uses: docker/build-push-action@v4
         with:
           context: .
           file: ./Dockerfile.vllm
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/atra:vllm
+      -
+        name: Build and push axolotl
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./Dockerfile.axolotl
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/atra:axolotl
       -
         name: Build and push
         uses: docker/build-push-action@v4
