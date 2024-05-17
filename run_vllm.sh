@@ -42,6 +42,10 @@ if [ -n "$VLLM_TENSOR_PARALLEL_SIZE" ]; then
   cmd="$cmd --tensor-parallel-size $VLLM_TENSOR_PARALLEL_SIZE"
 fi
 
+if [ -n "$VLLM_ADDITIONAL_ARGS" ]; then
+  cmd="$cmd $VLLM_ADDITIONAL_ARGS"
+fi
+
 # 3. run the command
 echo "Running command: $cmd"
 $cmd
