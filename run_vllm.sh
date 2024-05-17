@@ -5,7 +5,7 @@
 # 3. run the command
 
 # 1. create base string for the command
-cmd="python3 -m vllm.entrypoints.openai.api_server --use-v2-block-manager --enable-chunked-prefill"
+cmd="python3 -m vllm.entrypoints.openai.api_server --use-v2-block-manager --enable-chunked-prefill --enforce-eager"
 
 # 2. check if env vars exists and add them to the command
 # check for --host, --port, --quantization, --model, --kv-cache-dtype, --gpu-memory-utilization, --swap-space, --tensor-parallel-size
