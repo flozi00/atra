@@ -1,4 +1,4 @@
-FROM vllm/vllm-openai:latest
+FROM flozi00/atra:vllm-main
 
 COPY . /atra-server                                                            
 WORKDIR /atra-server
