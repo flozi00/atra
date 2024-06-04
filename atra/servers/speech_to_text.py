@@ -20,13 +20,12 @@ from transformers.pipelines.audio_utils import ffmpeg_read
 
 warnings.filterwarnings(action="ignore")
 
-ASR_MODEL = os.getenv("ASR_MODEL", "primeline/whisper-large-v3-german")
-
+ASR_MODEL = os.getenv("ASR_MODEL", "primeline/distil-whisper-large-v3-german")
 
 processor = WhisperProcessor.from_pretrained(ASR_MODEL)
 model = WhisperForConditionalGeneration.from_pretrained(
     ASR_MODEL,
-    torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
+    torch_dtype=torch.bfloat16 if torch.cuda.is_available() else torch.float32,
     low_cpu_mem_usage=True,
     use_safetensors=True,
     attn_implementation="sdpa",
@@ -40,20 +39,12 @@ model = torch.compile(
     model, mode="max-autotune", backend="torch_tensorrt", fullgraph=True
 )
 
-model = model.to("cpu")
-
 
 def speech_recognition(data, language) -> str:
-    global model
     if data is None:
         return ""
-    if torch.cuda.is_available():
-        model = model.to("cuda:0")
+    
     transcriptions = inference_asr(pipe=(model, processor), data=data, language=language)
-    model = model.to("cpu")
-    if torch.cuda.is_available():
-        torch.cuda.empty_cache()
-
     for i in range(len(transcriptions)):
         try:
             transcriptions[i] = alpha2digit(
