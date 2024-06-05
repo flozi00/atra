@@ -70,7 +70,7 @@ def inference_asr(pipe, data, language) -> str:
         do_normalize=True,
     )
     if torch.cuda.is_available():
-        inputs = inputs.to("cuda", torch.float16)
+        inputs = inputs.to("cuda", torch.bfloat16)
 
     # activate `temperature_fallback` and repetition detection filters and condition on prev text
     with torch.inference_mode():
