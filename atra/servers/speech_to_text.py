@@ -20,7 +20,7 @@ from transformers.pipelines.audio_utils import ffmpeg_read
 
 warnings.filterwarnings(action="ignore")
 
-ASR_MODEL = os.getenv("ASR_MODEL", "primeline/distil-whisper-large-v3-german")
+ASR_MODEL = os.getenv("ASR_MODEL", "primeline/whisper-large-v3-german")
 
 processor = WhisperProcessor.from_pretrained(ASR_MODEL)
 model = WhisperForConditionalGeneration.from_pretrained(
