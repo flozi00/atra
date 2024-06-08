@@ -13,6 +13,8 @@ from fastapi import UploadFile, Form
 from fastapi.responses import PlainTextResponse, JSONResponse
 import uvicorn
 import torch_tensorrt # noqa
+from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor, pipeline
+
 
 
 class OpenAIStub(FastAPI):
@@ -85,7 +87,7 @@ app = OpenAIStub()
 async def whisper(file, response_format: str, **kwargs):
     global pipe
 
-    result = pipe(await file.read(), **kwargs)
+    result = pipe(await file.read(), batch_size=8, **kwargs)
 
     filename_noext, ext = os.path.splitext(file.filename)
 
@@ -202,11 +204,22 @@ if __name__ == "__main__":
     
     MODEL_ID = os.getenv("ASR_MODEL", "primeline/whisper-large-v3-german")
 
-    pipe = pipeline("automatic-speech-recognition", model=MODEL_ID, device=device, chunk_length_s=30, torch_dtype=dtype)
-
-    pipe.model = torch.compile(
-        pipe.model, mode="max-autotune", backend="torch_tensorrt", fullgraph=True
+    model = AutoModelForSpeechSeq2Seq.from_pretrained(
+        MODEL_ID, torch_dtype=dtype, low_cpu_mem_usage=True, use_safetensors=True, attn_implementation="sdpa"
     )
+    model.to(device)
+
+    model = torch.compile(
+        model, mode="max-autotune", backend="torch_tensorrt", fullgraph=True
+    )
+
+    processor = AutoProcessor.from_pretrained(MODEL_ID)
+
+    pipe = pipeline("automatic-speech-recognition",
+    model=model,
+    tokenizer=processor.tokenizer,
+    feature_extractor=processor.feature_extractor, 
+    device=device, chunk_length_s=30, torch_dtype=dtype)
 
     app.register_model('whisper-1', MODEL_ID)
 
