@@ -87,7 +87,7 @@ app = OpenAIStub()
 async def whisper(file, response_format: str, **kwargs):
     global pipe
 
-    result = pipe(await file.read(), batch_size=8, **kwargs)
+    result = pipe(await file.read(), batch_size=16, **kwargs)
 
     filename_noext, ext = os.path.splitext(file.filename)
 
