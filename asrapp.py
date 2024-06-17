@@ -85,10 +85,10 @@ pipe = None
 app = OpenAIStub()
 
 
-def whisper(file, response_format: str, **kwargs):
+async def whisper(file, response_format: str, **kwargs):
     global pipe
 
-    result = pipe(file, batch_size=4, **kwargs)
+    result = pipe(await file.read(), batch_size=4, **kwargs)
 
     filename_noext, ext = os.path.splitext(file.filename)
 
@@ -207,22 +207,21 @@ async def transcriptions(
     kwargs = {"generate_kwargs": {"task": "transcribe"}}
 
     if language:
-        kwargs["generate_kwargs"]["language"] = language
+        kwargs["generate_kwargs"]["language"] = language.lower()
     # May work soon, https://github.com/huggingface/transformers/issues/27317
     #    if prompt:
     #        kwargs["initial_prompt"] = prompt
     if temperature:
         kwargs["generate_kwargs"]["temperature"] = temperature
-        kwargs["generate_kwargs"]["do_sample"] = False
+    kwargs["generate_kwargs"]["do_sample"] = False
+    kwargs["generate_kwargs"]["num_beams"] = 1
 
     if response_format == "verbose_json" and "word" in timestamp_granularities:
         kwargs["return_timestamps"] = "word"
     else:
         kwargs["return_timestamps"] = response_format in ["verbose_json", "srt", "vtt"]
 
-    file = await file.read()
-
-    return whisper(file, response_format, **kwargs)
+    return await whisper(file, response_format, **kwargs)
 
 
 @app.post("/v1/audio/translations")
@@ -242,13 +241,13 @@ async def translations(
     #        kwargs["initial_prompt"] = prompt
     if temperature:
         kwargs["generate_kwargs"]["temperature"] = temperature
-        kwargs["generate_kwargs"]["do_sample"] = False
+
+    kwargs["generate_kwargs"]["do_sample"] = False
+    kwargs["generate_kwargs"]["num_beams"] = 1
 
     kwargs["return_timestamps"] = response_format in ["verbose_json", "srt", "vtt"]
 
-    file = await file.read()
-
-    return whisper(file, response_format, **kwargs)
+    return await whisper(file, response_format, **kwargs)
 
 
 if __name__ == "__main__":
@@ -271,7 +270,7 @@ if __name__ == "__main__":
     model.to(device)
 
     model = torch.compile(
-        model, mode="reduce-overhead", backend="torch_tensorrt", fullgraph=True
+        model, mode="max-autotune", backend="torch_tensorrt", fullgraph=True
     )
 
     processor = AutoProcessor.from_pretrained(MODEL_ID)
