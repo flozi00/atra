@@ -85,10 +85,10 @@ pipe = None
 app = OpenAIStub()
 
 
-async def whisper(file, response_format: str, **kwargs):
+def whisper(file, response_format: str, **kwargs):
     global pipe
 
-    result = pipe(await file.read(), batch_size=4, **kwargs)
+    result = pipe(file.read(), batch_size=4, **kwargs)
 
     filename_noext, ext = os.path.splitext(file.filename)
 
@@ -193,7 +193,7 @@ async def whisper(file, response_format: str, **kwargs):
 
 
 @app.post("/v1/audio/transcriptions")
-async def transcriptions(
+def transcriptions(
     file: UploadFile,
     model: str = Form(...),
     language: Optional[str] = Form(None),
@@ -220,11 +220,11 @@ async def transcriptions(
     else:
         kwargs["return_timestamps"] = response_format in ["verbose_json", "srt", "vtt"]
 
-    return await whisper(file, response_format, **kwargs)
+    return whisper(file, response_format, **kwargs)
 
 
 @app.post("/v1/audio/translations")
-async def translations(
+def translations(
     file: UploadFile,
     model: str = Form(...),
     prompt: Optional[str] = Form(None),
@@ -244,7 +244,7 @@ async def translations(
 
     kwargs["return_timestamps"] = response_format in ["verbose_json", "srt", "vtt"]
 
-    return await whisper(file, response_format, **kwargs)
+    return whisper(file, response_format, **kwargs)
 
 
 if __name__ == "__main__":
