@@ -88,7 +88,7 @@ app = OpenAIStub()
 def whisper(file, response_format: str, **kwargs):
     global pipe
 
-    result = pipe(file.read(), batch_size=4, **kwargs)
+    result = pipe(file, batch_size=4, **kwargs)
 
     filename_noext, ext = os.path.splitext(file.filename)
 
@@ -193,7 +193,7 @@ def whisper(file, response_format: str, **kwargs):
 
 
 @app.post("/v1/audio/transcriptions")
-def transcriptions(
+async def transcriptions(
     file: UploadFile,
     model: str = Form(...),
     language: Optional[str] = Form(None),
@@ -213,18 +213,20 @@ def transcriptions(
     #        kwargs["initial_prompt"] = prompt
     if temperature:
         kwargs["generate_kwargs"]["temperature"] = temperature
-        kwargs["generate_kwargs"]["do_sample"] = True
+        kwargs["generate_kwargs"]["do_sample"] = False
 
     if response_format == "verbose_json" and "word" in timestamp_granularities:
         kwargs["return_timestamps"] = "word"
     else:
         kwargs["return_timestamps"] = response_format in ["verbose_json", "srt", "vtt"]
 
+    file = await file.read()
+
     return whisper(file, response_format, **kwargs)
 
 
 @app.post("/v1/audio/translations")
-def translations(
+async def translations(
     file: UploadFile,
     model: str = Form(...),
     prompt: Optional[str] = Form(None),
@@ -240,9 +242,11 @@ def translations(
     #        kwargs["initial_prompt"] = prompt
     if temperature:
         kwargs["generate_kwargs"]["temperature"] = temperature
-        kwargs["generate_kwargs"]["do_sample"] = True
+        kwargs["generate_kwargs"]["do_sample"] = False
 
     kwargs["return_timestamps"] = response_format in ["verbose_json", "srt", "vtt"]
+
+    file = await file.read()
 
     return whisper(file, response_format, **kwargs)
 
@@ -267,7 +271,7 @@ if __name__ == "__main__":
     model.to(device)
 
     model = torch.compile(
-        model, mode="max-autotune", backend="torch_tensorrt", fullgraph=True
+        model, mode="reduce-overhead", backend="torch_tensorrt", fullgraph=True
     )
 
     processor = AutoProcessor.from_pretrained(MODEL_ID)
