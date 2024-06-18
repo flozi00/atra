@@ -28,11 +28,49 @@ class OpenAIStub(FastAPI):
 
 
 pipe = None
+MODEL_DICT = {}
 app = OpenAIStub()
 
+device = "cuda" if torch.cuda.is_available() else "cpu"
 
-async def whisper(file, response_format: str, **kwargs):
-    global pipe
+if torch.cuda.is_available():
+    dtype = torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16
+else:
+    dtype = torch.float32
+
+
+def get_model(model_id) -> tuple[AutoModelForSpeechSeq2Seq, AutoProcessor]:
+    global MODEL_DICT
+    if model_id in MODEL_DICT:
+        return MODEL_DICT[model_id]
+    model = AutoModelForSpeechSeq2Seq.from_pretrained(
+        model_id,
+        torch_dtype=dtype,
+        low_cpu_mem_usage=True,
+        use_safetensors=True,
+        attn_implementation="sdpa",
+    )
+    model.to(device)
+
+    model = torch.compile(
+        model, mode="max-autotune", backend="torch_tensorrt", fullgraph=True
+    )
+    processor = AutoProcessor.from_pretrained(model_id)
+    MODEL_DICT[model_id] = (model, processor)
+    return model, processor
+
+
+async def whisper(model_id, file, response_format: str, **kwargs):
+    model, processor = get_model(model_id)
+    pipe = pipeline(
+        "automatic-speech-recognition",
+        model=model,
+        tokenizer=processor.tokenizer,
+        feature_extractor=processor.feature_extractor,
+        device=device,
+        chunk_length_s=30,
+        torch_dtype=dtype,
+    )
 
     result = pipe(await file.read(), batch_size=4, **kwargs)
 
@@ -167,7 +205,7 @@ async def transcriptions(
     else:
         kwargs["return_timestamps"] = response_format in ["verbose_json", "srt", "vtt"]
 
-    return await whisper(file, response_format, **kwargs)
+    return await whisper(model, file, response_format, **kwargs)
 
 
 @app.post("/v1/audio/translations")
@@ -193,44 +231,8 @@ async def translations(
 
     kwargs["return_timestamps"] = response_format in ["verbose_json", "srt", "vtt"]
 
-    return await whisper(file, response_format, **kwargs)
+    return await whisper(model, file, response_format, **kwargs)
 
 
 if __name__ == "__main__":
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-
-    if torch.cuda.is_available():
-        dtype = torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16
-    else:
-        dtype = torch.float32
-
-    MODEL_ID = os.getenv("ASR_MODEL", "primeline/whisper-large-v3-german")
-
-    model = AutoModelForSpeechSeq2Seq.from_pretrained(
-        MODEL_ID,
-        torch_dtype=dtype,
-        low_cpu_mem_usage=True,
-        use_safetensors=True,
-        attn_implementation="sdpa",
-    )
-    model.to(device)
-
-    model = torch.compile(
-        model, mode="max-autotune", backend="torch_tensorrt", fullgraph=True
-    )
-
-    processor = AutoProcessor.from_pretrained(MODEL_ID)
-
-    pipe = pipeline(
-        "automatic-speech-recognition",
-        model=model,
-        tokenizer=processor.tokenizer,
-        feature_extractor=processor.feature_extractor,
-        device=device,
-        chunk_length_s=30,
-        torch_dtype=dtype,
-    )
-
-    app.register_model("whisper-1", MODEL_ID)
-
     uvicorn.run(app, host="0.0.0.0", port=7862)
