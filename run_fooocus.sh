@@ -4,7 +4,7 @@ git clone https://github.com/lllyasviel/Fooocus.git /Fooocus
 
 cd /Fooocus
 git pull
-git checkout "1c999be8c8134fe01a75723ea933858435856950"
+git checkout "v2.4.3"
 git pull
 
 pip install torchsde
