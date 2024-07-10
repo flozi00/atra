@@ -52,9 +52,10 @@ def get_model(model_id) -> tuple[AutoModelForSpeechSeq2Seq, AutoProcessor]:
     )
     model.to(device)
 
-    model = torch.compile(
-        model, mode="max-autotune", backend="torch_tensorrt", fullgraph=True
-    )
+    if torch.cuda.is_available():
+        model = torch.compile(
+            model, mode="max-autotune", backend="torch_tensorrt", fullgraph=True
+        )
     processor = AutoProcessor.from_pretrained(model_id)
     MODEL_DICT[model_id] = (model, processor)
     return model, processor
