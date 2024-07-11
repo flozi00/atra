@@ -9,7 +9,6 @@ from typing import Optional, List
 from fastapi import UploadFile, Form
 from fastapi.responses import PlainTextResponse, JSONResponse
 import uvicorn
-import torch_tensorrt  # noqa
 from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor, pipeline
 
 
@@ -53,6 +52,7 @@ def get_model(model_id) -> tuple[AutoModelForSpeechSeq2Seq, AutoProcessor]:
     model.to(device)
 
     if torch.cuda.is_available():
+        import torch_tensorrt  # noqa
         model = torch.compile(
             model, mode="max-autotune", backend="torch_tensorrt", fullgraph=True
         )
