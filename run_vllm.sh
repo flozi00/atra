@@ -4,7 +4,6 @@
 # 2. check if env vars exists and add them to the command
 # 3. run the command
 
-# 1. create base string for the command
 cmd="python3 -m vllm.entrypoints.openai.api_server "
 
 if [ -n "$VLLM_ADDITIONAL_ARGS" ]; then
