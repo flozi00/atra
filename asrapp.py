@@ -52,9 +52,8 @@ def get_model(model_id) -> tuple[AutoModelForSpeechSeq2Seq, AutoProcessor]:
     model.to(device)
 
     if torch.cuda.is_available():
-        import torch_tensorrt  # noqa
         model.forward = torch.compile(
-            model.forward, mode="max-autotune", backend="torch_tensorrt", fullgraph=True
+            model.forward, mode="max-autotune", fullgraph=True
         )
     model.generation_config.cache_implementation = "static"
     processor = AutoProcessor.from_pretrained(model_id)
