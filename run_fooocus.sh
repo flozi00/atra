@@ -4,7 +4,7 @@ git clone https://github.com/lllyasviel/Fooocus.git /Fooocus
 
 cd /Fooocus
 git pull
-git checkout "v2.4.3"
+git checkout "v2.5.5"
 git pull
 
 pip install torchsde
@@ -25,6 +25,8 @@ fi
 if [ -n "$FP8" ]; then
   cmd="$cmd --unet-in-fp8-e4m3fn --clip-in-fp8-e4m3fn"
 fi
+
+pip install gradio --upgrade
 
 echo "Running command: $cmd"
 $cmd
