@@ -8,6 +8,8 @@ git checkout "v2.5.5"
 git pull
 
 pip install torchsde
+pip install pygit2
+pip install opencv-python --upgrade
 
 # echo All files are downloaded, now running the server
 echo "All files are downloaded, now running the server"
