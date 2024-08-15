@@ -26,7 +26,7 @@ if [ -n "$FP8" ]; then
   cmd="$cmd --unet-in-fp8-e4m3fn --clip-in-fp8-e4m3fn"
 fi
 
-pip install gradio --upgrade
+#pip install gradio --upgrade
 
 echo "Running command: $cmd"
 $cmd
