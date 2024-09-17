@@ -5,7 +5,7 @@ RUN apt update && apt-get install ffmpeg -y
 COPY . /atra-server                                                            
 WORKDIR /atra-server
 
-RUN pip uninstall transformer-engine -y
+#RUN pip uninstall transformer-engine -y
 RUN pip install -r requirements.txt
 
 RUN chmod +x ./entrypoint.sh
